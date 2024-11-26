@@ -25,7 +25,7 @@
           p-id="11553"
         />
       </svg>
-      <n-text>SPlayer</n-text>
+      <n-text>HEMusic</n-text>
     </div>
     <n-scrollbar
       :style="{
@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStatusStore, useMusicStore } from "@/stores";
+import { useMusicStore, useStatusStore } from "@/stores";
 
 const router = useRouter();
 const musicStore = useMusicStore();

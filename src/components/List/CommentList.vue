@@ -5,10 +5,7 @@
         <div v-if="!transparent" class="user">
           <div class="avatar">
             <n-image
-              :src="
-                item.user?.avatarUrl &&
-                item.user.avatarUrl.replace(/^http:/, 'https:') + '?param=100y100'
-              "
+              :src="item.user?.avatar && item.user.avatar.replace(/^http:/, 'https:')"
               class="cover"
               preview-disabled
               lazy
@@ -20,55 +17,36 @@
                 </div>
               </template>
             </n-image>
-            <!-- 音乐人 -->
-            <img
-              v-if="item.user.isAnnualCount"
-              class="annual"
-              alt="annual"
-              src="/images/annual.png?assest"
-              title="网易音乐人"
-            />
           </div>
-          <!-- 会员 -->
-          <img
-            v-if="item.user.vipLevel && item.user.vipLevel > 0"
-            :src="item.user.vipIconUrl && item.user.vipIconUrl.replace(/^http:/, 'https:')"
-            class="vip"
-            alt="vip"
-            title="黑胶会员"
-          />
         </div>
         <!-- 内容 -->
         <div class="data">
           <!-- 评论 -->
           <div class="content">
             <n-text class="name">{{ item.user.name || "未知用户名" }}：</n-text>
-            <n-text class="text">{{ getContent(item.content) }}</n-text>
+            <n-text class="text" v-dompurify-html="getContent(item.content)" />
           </div>
           <!-- 回复 -->
-          <div class="reply" v-if="item.beReplied">
+          <div class="reply" v-if="item.be_replied">
             <n-text class="name" :depth="3">
-              @ {{ item.beReplied.user.name || "未知用户名" }}：
+              @ {{ item.be_replied.user.name || "未知用户名" }}：
             </n-text>
-            <n-text class="text">{{ getContent(item.beReplied.content) }}</n-text>
+            <n-text class="text" v-dompurify-html="getContent(item.be_replied.content)" />
           </div>
           <!-- 信息 -->
           <n-flex class="meta" align-items="center">
             <div class="item">
               <SvgIcon name="Time" :depth="3" />
-              <n-text :depth="3">{{ formatCommentTime(item.time) }}</n-text>
+              <n-text :depth="3">{{ formatCommentTime(Number(item.timestamp) * 1000) }}</n-text>
             </div>
-            <div v-if="item.ip" :title="item.ip.ip" class="item">
-              <SvgIcon name="IP" :depth="3" />
-              <n-text :depth="3">{{ item.ip.location }}</n-text>
-            </div>
+            <!--            <div v-if="item.ip" :title="item.ip.ip" class="item">-->
+            <!--              <SvgIcon name="IP" :depth="3" />-->
+            <!--              <n-text :depth="3">{{ item.ip.location }}</n-text>-->
+            <!--            </div>-->
             <!-- 点赞 -->
-            <div class="item like" @click="likeComment(item)">
-              <SvgIcon
-                :name="item?.liked ? 'ThumbUp' : 'ThumbUpOff'"
-                :depth="item?.liked ? 1 : 3"
-              />
-              <n-text :depth="item?.liked ? 1 : 3">{{ item.likedCount }}</n-text>
+            <div class="item like">
+              <SvgIcon name="ThumbUp" :depth="1" />
+              <n-text :depth="1">{{ item.praise_num }}</n-text>
             </div>
           </n-flex>
         </div>
@@ -89,19 +67,13 @@
 </template>
 
 <script setup lang="ts">
-import type { CommentType } from "@/types/main";
 import { coverLoaded } from "@/utils/helper";
 import { formatCommentTime } from "@/utils/time";
-import { debounce } from "lodash-es";
-import { isLogin } from "@/utils/auth";
-import { openUserLogin } from "@/utils/modal";
-import emoji from "@/assets/data/emoji.json";
-import { commentLike } from "@/api/comment";
+import { CommentInfo } from "@/types/main.hemusic";
 
-const props = defineProps<{
-  data: CommentType[];
+defineProps<{
+  data: CommentInfo[];
   loading: boolean;
-  type: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
   loadMore?: boolean;
   // 透明
   transparent?: boolean;
@@ -114,42 +86,25 @@ const emit = defineEmits<{
 
 // 获取评论内容
 const getContent = (content: string) => {
-  try {
-    if (!content) return;
-    content = content.trim();
-    // 正则
-    const emojiRegex = /\[(\S+?)\]/g;
-    // 替换内容为表情
-    const replacedText = content.replace(emojiRegex, (match, emojiName) => {
-      // 在 emojiData 中查找匹配的 emojiName 对应的 emoji
-      const emojiObject = emoji.find((emoji) => emoji.emjName === emojiName);
-      // 如果找到了对应的 emoji，则返回该 emoji，否则返回原始字符串
-      return emojiObject ? emojiObject.emoji : match;
-    });
-    return replacedText;
-  } catch (error) {
-    console.error(error);
-    return content;
-  }
+  return content;
+  // try {
+  //   if (!content) return;
+  //   content = content.trim();
+  //   // 正则
+  //   const emojiRegex = /\[(\S+?)\]/g;
+  //   // 替换内容为表情
+  //   const replacedText = content.replace(emojiRegex, (match, emojiName) => {
+  //     // 在 emojiData 中查找匹配的 emojiName 对应的 emoji
+  //     const emojiObject = emoji.find((emoji) => emoji.emjName === emojiName);
+  //     // 如果找到了对应的 emoji，则返回该 emoji，否则返回原始字符串
+  //     return emojiObject ? emojiObject.emoji : match;
+  //   });
+  //   return replacedText;
+  // } catch (error) {
+  //   console.error(error);
+  //   return content;
+  // }
 };
-
-// 评论点赞
-const likeComment = debounce(async (data: CommentType) => {
-  if (!isLogin()) {
-    openUserLogin();
-    return;
-  }
-  // 是否点赞
-  const isLiked = data.liked;
-  // 点赞或取消
-  const result = await commentLike(data.id, isLiked ? 2 : 1, props.type);
-  if (result.code === 200) {
-    data.liked = !isLiked;
-    if (data.likedCount) data.likedCount += isLiked ? -1 : 1;
-  } else {
-    window.$message.error(result.msg || "评论点赞失败");
-  }
-}, 300);
 </script>
 
 <style lang="scss" scoped>

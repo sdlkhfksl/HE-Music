@@ -12,16 +12,16 @@
         <n-flex class="meta" align="center">
           <div class="item">
             <SvgIcon name="Video" :depth="3" />
-            <n-text>{{ formatNumber(videoData.playCount || 0) }}</n-text>
+            <n-text>{{ formatNumber(Number(videoData.play_count) || 0) }}</n-text>
           </div>
-          <div class="item">
-            <SvgIcon name="Chat" :depth="3" />
-            <n-text>{{ formatNumber(videoData.commentCount || 0) }}</n-text>
-          </div>
-          <div class="item">
-            <SvgIcon name="Time" :depth="3" />
-            <n-text>{{ formatTimestamp(videoData.updateTime || videoData.createTime) }}</n-text>
-          </div>
+          <!--          <div class="item">-->
+          <!--            <SvgIcon name="Chat" :depth="3" />-->
+          <!--            <n-text>{{ formatNumber(videoData.commentCount || 0) }}</n-text>-->
+          <!--          </div>-->
+          <!--          <div class="item">-->
+          <!--            <SvgIcon name="Time" :depth="3" />-->
+          <!--            <n-text>{{ formatTimestamp(videoData.updateTime || videoData.createTime) }}</n-text>-->
+          <!--          </div>-->
         </n-flex>
       </div>
       <div v-else class="info">
@@ -35,59 +35,47 @@
       </Transition>
     </div>
     <!-- 菜单 -->
-    <Transition name="fade" mode="out-in">
-      <n-flex :key="videoData?.id" class="menu" justify="space-between" align="center">
-        <div
-          class="artist"
-          @click="
-            router.push({
-              name: 'artist',
-              query: { id: artistData?.id },
-            })
-          "
-        >
-          <n-avatar :src="artistData?.cover || '/images/artist.jpg?assest'" class="cover" round />
-          <n-text class="name">{{ artistData?.name || "未知歌手" }}</n-text>
-        </div>
-        <n-flex class="control">
-          <!-- 点赞 -->
-          <n-button :focusable="false" quaternary>
-            <template #icon>
-              <SvgIcon :name="videoData?.liked ? 'ThumbUp' : 'ThumbUpOff'" />
-            </template>
-            {{ formatNumber(videoData?.likedCount || 0) }}
-          </n-button>
-          <!-- 收藏 -->
-          <n-button :focusable="false" quaternary>
-            <template #icon>
-              <SvgIcon name="Favorite" />
-              <!-- FavoriteBorder -->
-            </template>
-            {{ formatNumber(videoData?.subCount || 0) }}
-          </n-button>
-          <!-- 分享 -->
-          <n-button :focusable="false" quaternary>
-            <template #icon>
-              <SvgIcon name="Share" />
-              <!-- FavoriteBorder -->
-            </template>
-            {{ formatNumber(videoData?.shareCount || 0) }}
-          </n-button>
-        </n-flex>
-      </n-flex>
-    </Transition>
-    <!-- 简介及标签 -->
+    <!--    <Transition name="fade" mode="out-in">-->
+    <!--      <n-flex :key="videoData?.id" class="menu" justify="space-between" align="center">-->
+    <!--        <n-flex class="control">-->
+    <!--          &lt;!&ndash; 点赞 &ndash;&gt;-->
+    <!--          <n-button :focusable="false" quaternary>-->
+    <!--            <template #icon>-->
+    <!--              <SvgIcon :name="videoData?.liked ? 'ThumbUp' : 'ThumbUpOff'" />-->
+    <!--            </template>-->
+    <!--            {{ formatNumber(videoData?.likedCount || 0) }}-->
+    <!--          </n-button>-->
+    <!--          &lt;!&ndash; 收藏 &ndash;&gt;-->
+    <!--          <n-button :focusable="false" quaternary>-->
+    <!--            <template #icon>-->
+    <!--              <SvgIcon name="Favorite" />-->
+    <!--              &lt;!&ndash; FavoriteBorder &ndash;&gt;-->
+    <!--            </template>-->
+    <!--            {{ formatNumber(videoData?.subCount || 0) }}-->
+    <!--          </n-button>-->
+    <!--          &lt;!&ndash; 分享 &ndash;&gt;-->
+    <!--          <n-button :focusable="false" quaternary>-->
+    <!--            <template #icon>-->
+    <!--              <SvgIcon name="Share" />-->
+    <!--              &lt;!&ndash; FavoriteBorder &ndash;&gt;-->
+    <!--            </template>-->
+    <!--            {{ formatNumber(videoData?.shareCount || 0) }}-->
+    <!--          </n-button>-->
+    <!--        </n-flex>-->
+    <!--      </n-flex>-->
+    <!--    </Transition>-->
+    <!--     简介及标签-->
     <Transition name="fade" mode="out-in">
       <div v-if="videoData" class="desc">
-        <n-divider />
-        <n-ellipsis :line-clamp="3" :tooltip="{ placement: 'bottom', width: 'trigger' }">
-          {{ videoData?.description || "该视频暂无简介" }}
-        </n-ellipsis>
-        <n-flex v-if="videoData?.tags" class="tags">
-          <n-tag v-for="(item, index) in videoData.tags" :key="index" :bordered="false" round>
-            {{ item }}
-          </n-tag>
-        </n-flex>
+        <!--        <n-divider />-->
+        <!--        <n-ellipsis :line-clamp="3" :tooltip="{ placement: 'bottom', width: 'trigger' }">-->
+        <!--          {{ "该视频暂无简介" }}-->
+        <!--        </n-ellipsis>-->
+        <!--        <n-flex v-if="videoData?.tags" class="tags">-->
+        <!--          <n-tag v-for="(item, index) in videoData.tags" :key="index" :bordered="false" round>-->
+        <!--            {{ item }}-->
+        <!--          </n-tag>-->
+        <!--        </n-flex>-->
         <n-divider />
       </div>
       <div v-else class="desc">
@@ -99,7 +87,7 @@
       <n-flex class="title" justify="space-between">
         <n-h3 prefix="bar">
           评论
-          <n-text class="num" depth="3">{{ videoData?.commentCount || 0 }}</n-text>
+          <n-text class="num" depth="3">{{ 0 }}</n-text>
         </n-h3>
         <n-flex class="tag">
           <n-tag
@@ -116,7 +104,6 @@
       <CommentList
         :data="commentData"
         :loading="commentLoading"
-        :type="videoType === 'mv' ? 1 : 5"
         :loadMore="commentHasMore"
         @loadMore="loadMoreComment"
       />
@@ -125,48 +112,41 @@
 </template>
 
 <script setup lang="ts">
-import type { CoverType, CommentType } from "@/types/main";
-import { useStatusStore } from "@/stores";
-import { videoDetail, videoUrl, videoDetailInfo } from "@/api/video";
-import { formatCommentList, formatCoverList } from "@/utils/format";
-import { isArray, isEmpty } from "lodash-es";
+import { useDataStore, useStatusStore } from "@/stores";
+import { getMVUrlStr, videoDetail } from "@/api/video";
+import { isEmpty } from "lodash-es";
 import { formatNumber } from "@/utils/helper";
 import { getComment } from "@/api/comment";
 import player from "@/utils/player";
 // Plyr
 import Plyr from "plyr";
 import "plyr/dist/plyr.css";
-import { formatTimestamp } from "@/utils/time";
+import { CommentInfo, MVInfo } from "@/types/main.hemusic";
 
 const router = useRouter();
 const statusStore = useStatusStore();
+const dataStore = useDataStore();
 
 // 是否激活
 const isActivated = ref<boolean>(false);
 
 // 视频参数
-const videoId = computed<number>(() => Number(router.currentRoute.value.query.id as string));
-const videoType = computed<"video" | "mv">(
-  () => (router.currentRoute.value.query.type as "video" | "mv") || "mv",
-);
+const videoId = computed<string>(() => router.currentRoute.value.query.id as string);
+const videoPlatform = computed<string>(() => router.currentRoute.value.query.platform as string);
 
 // 视频数据
 const videoRef = ref<HTMLVideoElement | null>(null);
-const videoData = ref<CoverType | null>(null);
+const videoData = ref<MVInfo | null>(null);
 const videoPlayer = ref<Plyr | null>(null);
 
 // 评论数据
 const commentLoading = ref<boolean>(true);
-const commentData = ref<CommentType[]>([]);
+const commentData = ref<CommentInfo[]>([]);
 const commentType = ref<"hot" | "new">("hot");
 const commentPage = ref<number>(1);
 const commentHasMore = ref<boolean>(true);
 const commentText = { hot: "最热", new: "最新" };
-
-// 歌手数据
-const artistData = computed(
-  () => (isArray(videoData.value?.artists) && videoData.value?.artists?.[0]) || null,
-);
+const commentLastId = ref<string>("");
 
 // 播放器配置
 const playerOptions: Plyr.Options = {
@@ -187,9 +167,12 @@ const playerOptions: Plyr.Options = {
   ratio: "16:9",
   invertTime: false,
   autoplay: true,
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
   quality: {
     default: 1080,
-    options: [1080, 720, 480, 240],
+    // options: [],
+    // options: [1080, 720, 480, 240],
   },
   i18n: {
     play: "播放",
@@ -221,43 +204,32 @@ const initPlayer = () => {
 };
 
 // 获取视频数据
-const getVideoData = async (id: number, type: "mv" | "video") => {
+const getVideoData = async (id: string, platform: string) => {
+  console.log("getVideoData", id, platform);
   try {
-    if (!id || !videoPlayer.value) return;
+    if (!id || !platform || !videoPlayer.value) return;
     // 获取视频详情
-    const detail = await videoDetail(id, type);
-    const detailInfo = await videoDetailInfo(id, type);
-    // 处理数据
-    videoData.value = formatCoverList({ ...detail.data, ...detailInfo })[0];
-    // 获取视频地址
-    const brs = detail.data?.brs;
-    if (isEmpty(brs)) {
-      window.$message.error("播放地址获取失败");
-      return;
-    }
-    const requests = brs.map(async (v: any) => {
-      try {
-        const result = await videoUrl(id, type, v.br);
+    const result = await videoDetail(id, platform);
+    videoData.value = result;
+    const sources =
+      videoData.value?.links?.map((item) => {
         return {
-          src: result.data.url.replace(/^http:/, "https:"),
+          src:
+            item.url || getMVUrlStr(platform, id, item.quality, item.format, true, dataStore.token),
           type: "video/mp4",
-          size: result.data.r,
+          size: item.quality,
         };
-      } catch (error) {
-        console.error("视频地址加载失败：", error);
-        return null;
-      }
-    });
-    const sources = (await Promise.all(requests)).filter((source) => source !== null);
+      }) || [];
+
     // 更改播放地址
     videoPlayer.value.source = {
       type: "video",
-      title: videoData.value.name,
+      title: videoData.value?.name,
       sources,
-      poster: videoData.value.cover,
+      poster: videoData.value?.cover,
     };
     // 获取评论
-    getCommentData(id);
+    getCommentData(id, platform);
   } catch (error) {
     console.error("Error getting video data:", error);
     window.$message.error("获取视频数据失败");
@@ -265,35 +237,31 @@ const getVideoData = async (id: number, type: "mv" | "video") => {
 };
 
 // 获取评论数据
-const getCommentData = async (id: number, clean: boolean = true) => {
+const getCommentData = async (id: string, platform: string, clean: boolean = true) => {
   try {
-    if (!id) return;
+    if (!id || !platform) return;
     commentLoading.value = true;
     if (clean) commentData.value = [];
-    // 分页参数
-    const cursor =
-      commentPage.value > 1 && commentData.value?.length > 0
-        ? commentData.value[commentData.value.length - 1]?.time
-        : undefined;
     // 获取评论
     const result = await getComment(
       id,
-      videoType.value === "mv" ? 1 : 5,
+      videoPlatform.value,
+      "mv",
       commentPage.value,
       20,
-      commentType.value === "hot" ? 2 : 3,
-      cursor,
+      commentLastId.value,
+      commentType.value === "hot",
     );
-    if (isEmpty(result.data?.comments)) {
+    if (isEmpty(result.list)) {
       commentHasMore.value = false;
       commentLoading.value = false;
       return;
     }
     // 处理数据
-    const formatData = formatCommentList(result.data.comments);
-    commentData.value = commentData.value.concat(formatData);
+    commentData.value = commentData.value.concat(result.list);
     // 是否还有
-    commentHasMore.value = result.data.hasMore;
+    commentHasMore.value = result.has_more;
+    commentLastId.value = result.last_id;
     commentLoading.value = false;
   } catch (error) {
     console.error("Error getting comment data:", error);
@@ -304,7 +272,7 @@ const getCommentData = async (id: number, clean: boolean = true) => {
 // 加载更多评论
 const loadMoreComment = () => {
   commentPage.value++;
-  if (commentHasMore.value) getCommentData(videoId.value, false);
+  if (commentHasMore.value) getCommentData(videoId.value, videoPlatform.value, false);
 };
 
 // 关闭音乐播放
@@ -320,7 +288,7 @@ onActivated(() => {
     closeMusic();
     if (videoId.value !== videoData.value?.id) {
       // initPlayer();
-      getVideoData(videoId.value, videoType.value);
+      getVideoData(videoId.value, videoPlatform.value);
     }
   }
 });
@@ -330,13 +298,11 @@ onDeactivated(() => {
 });
 
 onMounted(() => {
-  console.log(11);
-
   closeMusic();
   // 初始化播放器
   initPlayer();
   // 获取视频数据
-  getVideoData(videoId.value, videoType.value);
+  getVideoData(videoId.value, videoPlatform.value);
 });
 
 onUnmounted(() => {

@@ -16,43 +16,45 @@
           <span>该歌曲暂时无法播放，为您采用其他音源，可能会与原曲存在差别</span>
         </div>
       </n-popover>
-      <!-- 云盘歌曲 -->
-      <SvgIcon v-if="musicStore.playSong.pc" :depth="3" name="Cloud" size="22" />
     </div>
     <!-- 别名 -->
-    <span v-if="musicStore.playSong.alia" class="alia">
-      {{ musicStore.playSong.alia }}
+    <span v-if="musicStore.playSong.alias" class="alia">
+      {{ musicStore.playSong.alias }}
     </span>
     <!-- 歌手 -->
-    <div v-if="musicStore.playSong.type !== 'radio'" class="artists">
+    <div class="artists">
       <SvgIcon :depth="3" name="Artist" size="20" />
-      <div v-if="Array.isArray(musicStore.playSong.artists)" class="ar-list">
+      <div v-if="Array.isArray(musicStore.playSong.singers)" class="ar-list">
         <span
-          v-for="ar in musicStore.playSong.artists"
+          v-for="ar in musicStore.playSong.singers"
           :key="ar.id"
           class="ar"
-          @click="jumpPage({ name: 'artist', query: { id: ar.id } })"
+          @click="
+            jumpPage({
+              name: 'artist',
+              query: { id: ar.id, platform: musicStore.playSong.platform },
+            })
+          "
         >
           {{ ar.name }}
         </span>
       </div>
       <div v-else class="ar-list">
-        <span class="ar">{{ musicStore.playSong.artists || "未知艺术家" }}</span>
-      </div>
-    </div>
-    <div v-else class="artists">
-      <SvgIcon :depth="3" name="Artist" size="20" />
-      <div class="ar-list">
-        <span class="ar">{{ musicStore.playSong.dj?.creator || "未知艺术家" }}</span>
+        <span class="ar">{{ musicStore.playSong.singers || "未知艺术家" }}</span>
       </div>
     </div>
     <!-- 专辑 -->
-    <div v-if="musicStore.playSong.type !== 'radio'" class="album">
+    <div class="album">
       <SvgIcon :depth="3" name="Album" size="20" />
       <span
         v-if="isObject(musicStore.playSong.album)"
         class="name-text text-hidden"
-        @click="jumpPage({ name: 'album', query: { id: musicStore.playSong.album.id } })"
+        @click="
+          jumpPage({
+            name: 'album',
+            query: { id: musicStore.playSong.album.id, platform: musicStore.playSong.platform },
+          })
+        "
       >
         {{ musicStore.playSong.album?.name || "未知专辑" }}
       </span>
@@ -60,21 +62,12 @@
         {{ musicStore.playSong.album || "未知专辑" }}
       </span>
     </div>
-    <!-- 电台 -->
-    <div
-      v-if="musicStore.playSong.type === 'radio'"
-      class="dj"
-      @click="jumpPage({ name: 'dj', query: { id: musicStore.playSong.dj?.id } })"
-    >
-      <SvgIcon :depth="3" name="Podcast" size="20" />
-      <span class="name-text text-hidden">{{ musicStore.playSong.dj?.name || "播客电台" }}</span>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { RouteLocationRaw } from "vue-router";
-import { useMusicStore, useStatusStore, useSettingStore } from "@/stores";
+import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
 import { debounce, isObject } from "lodash-es";
 
 defineProps<{

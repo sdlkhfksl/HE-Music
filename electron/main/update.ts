@@ -8,8 +8,8 @@ const { autoUpdater } = electronUpdater;
 // 更新源
 autoUpdater.setFeedURL({
   provider: "github",
-  owner: "imsyy",
-  repo: "SPlayer",
+  owner: "serious-snow",
+  repo: "HE-Music",
 });
 
 // 禁用自动下载

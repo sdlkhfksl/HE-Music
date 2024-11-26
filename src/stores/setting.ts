@@ -43,15 +43,7 @@ interface SettingState {
   proxyProtocol: "off" | "http" | "https";
   proxyServe: string;
   proxyPort: number;
-  songLevel:
-    | "standard"
-    | "higher"
-    | "exhigh"
-    | "lossless"
-    | "hires"
-    | "jyeffect"
-    | "sky"
-    | "jymaster";
+  songLevel: "128mp3" | "192mp3" | "320mp3" | "flac" | "hires";
   playDevice: "default" | string;
   autoPlay: boolean;
   songVolumeFade: boolean;
@@ -81,8 +73,6 @@ interface SettingState {
   useRealIP: boolean;
   realIP: string;
   fullPlayerCache: boolean;
-  scrobbleSong: boolean;
-  dynamicCover: boolean;
 }
 
 export const useSettingStore = defineStore({
@@ -109,7 +99,7 @@ export const useSettingStore = defineStore({
     preventSleep: false, // 是否禁止休眠
     fullPlayerCache: false, // 全屏播放器缓存
     // 播放
-    songLevel: "exhigh", // 音质
+    songLevel: "320mp3", // 音质
     playDevice: "default", // 播放设备
     autoPlay: false, // 自动播放
     songVolumeFade: true, // 渐入渐出
@@ -125,8 +115,6 @@ export const useSettingStore = defineStore({
     smtcOpen: true, // 是否开启 SMTC
     smtcOutputHighQualityCover: false, // 是否输出高清封面
     playSongDemo: false, // 是否播放试听歌曲
-    scrobbleSong: false, // 是否打卡
-    dynamicCover: true, // 动态封面
     // 歌词
     lyricFontSize: 46, // 歌词大小
     lyricTranFontSize: 22, // 歌词翻译大小

@@ -2,7 +2,7 @@
   <div class="like">
     <div class="title">
       <n-text class="keyword">我的收藏</n-text>
-      <n-flex v-if="dataStore.loginType !== 'uid'" class="status">
+      <n-flex class="status">
         <div
           v-for="(item, index) in likeData"
           :key="index"
@@ -16,7 +16,6 @@
     </div>
     <!-- 标签页 -->
     <n-tabs
-      v-if="dataStore.loginType !== 'uid'"
       v-model:value="likeType"
       class="tabs"
       type="segment"
@@ -25,8 +24,7 @@
       <n-tab name="like-playlists"> 歌单 </n-tab>
       <n-tab name="like-albums"> 专辑 </n-tab>
       <n-tab name="like-artists"> 歌手 </n-tab>
-      <n-tab name="like-videos"> 视频 </n-tab>
-      <n-tab name="like-radios"> 播客 </n-tab>
+      <!--      <n-tab name="like-videos"> 视频 </n-tab>-->
     </n-tabs>
     <!-- 路由 -->
     <RouterView v-slot="{ Component }">
@@ -53,7 +51,8 @@ const likeData = computed(() => [
   {
     icon: "MusicList",
     name: "like-playlists",
-    length: dataStore.userLikeData.playlists?.length || 0,
+    length:
+      (dataStore.userLikeData.playlists?.length || 0) + (dataStore.userCreatedPlaylist.length || 0),
   },
   {
     icon: "Album",
@@ -65,16 +64,11 @@ const likeData = computed(() => [
     name: "like-artists",
     length: dataStore.userLikeData.artists?.length || 0,
   },
-  {
-    icon: "Video",
-    name: "like-videos",
-    length: dataStore.userLikeData.mvs?.length || 0,
-  },
-  {
-    icon: "Record",
-    name: "like-radios",
-    length: dataStore.userLikeData.djs?.length || 0,
-  },
+  // {
+  //   icon: "Video",
+  //   name: "like-videos",
+  //   length: dataStore.userLikeData.mvs?.length || 0,
+  // }
 ]);
 
 onBeforeRouteUpdate((to) => {

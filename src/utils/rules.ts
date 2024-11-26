@@ -41,11 +41,40 @@ export const phoneRule: FormItemRule = {
   trigger: ["input", "blur"],
   validator: (_: FormItemRule, value: any) => {
     if (!value) return new Error("请输入手机号");
-    else if (
-      !/^1(3\d|4[5-9]|5[0-35-9]|6[567]|7[0-8]|8\d|9[0-35-9])\d{8}$/.test(value)
-    ) {
+    else if (!/^1(3\d|4[5-9]|5[0-35-9]|6[567]|7[0-8]|8\d|9[0-35-9])\d{8}$/.test(value)) {
       return new Error("请输入正确的手机号");
     }
     return true;
   },
-}
+};
+
+export const passwordRule: FormItemRule = {
+  required: true,
+  type: "string",
+  // message: "密码长度为6-18位",
+  trigger: ["input", "blur"],
+  validator: (_: FormItemRule, value: any) => {
+    if (!value) return new Error("请输入密码");
+    else if (value.length < 6 || value.length > 18) {
+      return new Error("密码长度为6-18位");
+    }
+    return true;
+  },
+};
+
+export const usernameRule: FormItemRule = {
+  required: true,
+  type: "string",
+  // message: "用户名",
+  trigger: ["input", "blur"],
+  validator: (_: FormItemRule, value: any) => {
+    if (!value) return new Error("请输入用户名");
+    else if (value.length < 4 || value.length > 18) {
+      return new Error("用户名长度为6-18位");
+    }
+    if (!/^[0-9a-zA-Z_]{4,18}$/.test(value)) {
+      return new Error("用户名只能包含字母、数字、下划线");
+    }
+    return true;
+  },
+};

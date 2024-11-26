@@ -3,6 +3,8 @@ import { openUserLogin } from "@/utils/modal";
 import { isElectron } from "@/utils/helper";
 import { isLogin } from "@/utils/auth";
 import routes from "./routes";
+import { usePlatformStore } from "@/stores";
+import { AxiosError } from "axios";
 
 // 基础配置
 const router: Router = createRouter({
@@ -28,11 +30,19 @@ const router: Router = createRouter({
 });
 
 // 前置守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   // console.log("前置守卫", to, from);
   // 进度条
   if (!isElectron && to.path !== from.path) {
     window.$loadingBar.start();
+  }
+  const platformStore = usePlatformStore();
+  if (!to.meta.offline && !platformStore.platforms.length) {
+    platformStore.loadPlatforms().catch((e: AxiosError) => {
+      if (e.status === 401) {
+        openUserLogin();
+      }
+    });
   }
   // 需要登录
   if (to.meta.needLogin && !isLogin()) {

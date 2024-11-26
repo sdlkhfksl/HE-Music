@@ -1,6 +1,7 @@
 import type { SongType, CoverType, ArtistType, CommentType, MetaData, CatType } from "@/types/main";
 import { msToTime } from "./time";
 import { flatMap, isArray, uniqBy } from "lodash-es";
+import { SongInfo } from "@/types/main.hemusic";
 
 type CoverDataType = {
   cover: string;
@@ -111,7 +112,7 @@ export const formatCoverList = (data: any[]): CoverType[] => {
         item.algTags ||
         item.videoGroup?.map((tag: any) => tag.name) ||
         (item.category ? [item.category] : []),
-      userId: item.userId,
+      // id: item.userId,
       playCount: item.playCount,
       commentCount: item.commentCount,
       shareCount: item.shareCount,
@@ -237,4 +238,23 @@ const getCoverSizeUrl = (url: string, size: number | null = null) => {
     console.error("图片链接处理出错：", error);
     return "/images/song.jpg?assest";
   }
+};
+
+export const getSizeCover = (song: SongInfo, size = 300) => {
+  if (!song) {
+    return "/images/song.jpg?assest";
+  }
+  const { cover = "", platform } = song;
+  switch (platform) {
+    case "tidal":
+      if (![80, 160, 320, 640, 1280].includes(size)) {
+        size = 320;
+      }
+      break;
+  }
+
+  if (cover) {
+    return cover.replaceAll("{x}", size.toString()).replaceAll("{y}", size.toString());
+  }
+  return "/images/song.jpg?assest";
 };

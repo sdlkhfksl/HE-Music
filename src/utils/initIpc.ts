@@ -28,7 +28,7 @@ const initIpc = () => {
     window.electron.ipcRenderer.on("toogleLikeSong", async () => {
       const dataStore = useDataStore();
       const musicStore = useMusicStore();
-      await toLikeSong(musicStore.playSong, !dataStore.isLikeSong(musicStore.playSong.id));
+      await toLikeSong(musicStore.playSong, !dataStore.isLikeSong(musicStore.playSong));
     });
     // 桌面歌词开关
     window.electron.ipcRenderer.on("toogleDesktopLyric", () => player.toggleDesktopLyric());

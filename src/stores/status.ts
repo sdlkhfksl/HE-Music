@@ -17,7 +17,6 @@ interface StatusState {
   playVolume: number;
   playVolumeMute: number;
   playSongMode: PlayModeType;
-  playHeartbeatMode: boolean;
   songCoverTheme: {
     main?: RGB;
     light?: ColorScheme;
@@ -36,7 +35,6 @@ interface StatusState {
   listSort: SortType;
   showDesktopLyric: boolean;
   showPlayerComment: boolean;
-  personalFmMode: boolean;
 }
 
 export const useStatusStore = defineStore({
@@ -85,10 +83,6 @@ export const useStatusStore = defineStore({
     playVolumeMute: 0,
     // 播放模式
     playSongMode: "repeat",
-    // 心动模式
-    playHeartbeatMode: false,
-    // 私人FM模式
-    personalFmMode: false,
     // 主内容高度
     mainContentHeight: 0,
     // 列表排序
@@ -119,8 +113,6 @@ export const useStatusStore = defineStore({
       "songCoverTheme",
       "listSort",
       "showDesktopLyric",
-      "playHeartbeatMode",
-      "personalFmMode",
     ],
   },
 });

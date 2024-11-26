@@ -1,13 +1,13 @@
-<!-- 播客列表 -->
+<!-- 歌单列表 -->
 <template>
-  <div :class="['playlist', { small: listScrolling }]">
+  <div :class="['toplist', { small: listScrolling }]">
     <Transition name="fade" mode="out-in">
-      <div v-if="radioDetailData" class="detail">
+      <div v-if="playlistDetailData" class="detail">
         <div class="cover">
           <n-image
-            :src="radioDetailData.coverSize?.m || radioDetailData.cover"
+            :src="playlistDetailData.cover"
             :previewed-img-props="{ style: { borderRadius: '8px' } }"
-            :preview-src="radioDetailData.cover"
+            :preview-src="playlistDetailData.cover"
             :renderToolbar="renderToolbar"
             show-toolbar-tooltip
             class="cover-img"
@@ -20,20 +20,34 @@
             </template>
           </n-image>
           <!-- 封面背板 -->
-          <n-image
-            class="cover-shadow"
-            preview-disabled
-            :src="radioDetailData.coverSize?.m || radioDetailData.cover"
-          />
+          <n-image class="cover-shadow" preview-disabled :src="playlistDetailData.cover" />
+          <!-- 遮罩 -->
+          <div class="cover-mask" />
+          <!-- 播放量 -->
+          <div class="play-count">
+            <SvgIcon name="Play" />
+            <span class="num">{{ formatNumber(Number(playlistDetailData.play_count) || 0) }}</span>
+          </div>
         </div>
         <div class="data">
           <n-h2 class="name text-hidden">
-            {{ radioDetailData.name || "未知播客" }}
+            {{ playlistDetailData.name || "未知歌单" }}
+            <!-- 隐私歌单 -->
+            <!--            <n-popover-->
+            <!--              v-if="playlistDetailData?.privacy === 10"-->
+            <!--              :show-arrow="false"-->
+            <!--              placement="right"-->
+            <!--            >-->
+            <!--              <template #trigger>-->
+            <!--                <SvgIcon :depth="3" name="EyeLock" size="22" />-->
+            <!--              </template>-->
+            <!--              <n-text>隐私歌单</n-text>-->
+            <!--            </n-popover>-->
           </n-h2>
           <n-collapse-transition :show="!listScrolling" class="collapse">
             <!-- 简介 -->
             <n-ellipsis
-              v-if="radioDetailData.description"
+              v-if="playlistDetailData.description"
               :line-clamp="1"
               :tooltip="{
                 trigger: 'click',
@@ -41,38 +55,17 @@
                 width: 'trigger',
               }"
             >
-              {{ radioDetailData.description }}
+              {{ playlistDetailData.description }}
             </n-ellipsis>
             <!-- 信息 -->
             <n-flex class="meta">
-              <div class="item">
-                <SvgIcon name="Person" :depth="3" />
-                <n-text>{{ radioDetailData.creator?.name || "未知用户名" }}</n-text>
-              </div>
+              <!--              <div class="item">-->
+              <!--                <SvgIcon name="Person" :depth="3" />-->
+              <!--                <n-text>{{ playlistDetailData.creator || "未知用户名" }}</n-text>-->
+              <!--              </div>-->
               <div class="item">
                 <SvgIcon name="Music" :depth="3" />
-                <n-text>{{ radioDetailData.count || 0 }}</n-text>
-              </div>
-              <div v-if="radioDetailData.updateTime" class="item">
-                <SvgIcon name="Update" :depth="3" />
-                <n-text>{{ radioDetailData.updateTime }}</n-text>
-              </div>
-              <div v-else-if="radioDetailData.createTime" class="item">
-                <SvgIcon name="Time" :depth="3" />
-                <n-text>{{ formatTimestamp(radioDetailData.createTime) }}</n-text>
-              </div>
-              <div v-if="radioDetailData.tags?.length" class="item">
-                <SvgIcon name="Tag" :depth="3" />
-                <n-flex class="tags">
-                  <n-tag
-                    v-for="(item, index) in radioDetailData.tags"
-                    :key="index"
-                    :bordered="false"
-                    round
-                  >
-                    {{ item }}
-                  </n-tag>
-                </n-flex>
+                <n-text>{{ playlistDetailData.total_num || 0 }}</n-text>
               </div>
             </n-flex>
           </n-collapse-transition>
@@ -96,23 +89,14 @@
                     ? isSamePlaylist
                       ? "更新中..."
                       : `加载中... (${
-                          radioListData.length === radioDetailData.count ? 0 : radioListData.length
-                        }/${radioDetailData.count})`
+                          playlistData.length === Number(playlistDetailData.total_num)
+                            ? 0
+                            : playlistData.length
+                        }/${playlistDetailData.total_num})`
                     : "播放"
                 }}
               </n-button>
-              <n-button
-                :focusable="false"
-                strong
-                secondary
-                round
-                @click="toSubRadio(radioId, !isLikeRadio)"
-              >
-                <template #icon>
-                  <SvgIcon :name="isLikeRadio ? 'Favorite' : 'FavoriteBorder'" />
-                </template>
-                {{ isLikeRadio ? "取消订阅" : "订阅播客" }}
-              </n-button>
+
               <!-- 更多 -->
               <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">
                 <n-button :focusable="false" class="more" circle strong secondary>
@@ -125,7 +109,7 @@
             <n-flex class="right">
               <!-- 模糊搜索 -->
               <n-input
-                v-if="radioListData?.length"
+                v-if="playlistData?.length"
                 v-model:value="searchValue"
                 :input-props="{ autocomplete: 'off' }"
                 class="search"
@@ -153,11 +137,12 @@
       <SongList
         v-if="!searchValue || searchData?.length"
         :data="playlistDataShow"
-        :loading="loading"
+        :loading="songLoading"
         :height="songListHeight"
-        :radioId="radioId"
-        type="radio"
+        loadMore
+        disabledSort
         @scroll="listScroll"
+        @reachBottom="reachBottom"
       />
       <n-empty
         v-else
@@ -174,33 +159,40 @@
 </template>
 
 <script setup lang="ts">
-import type { CoverType, SongType } from "@/types/main";
 import type { DropdownOption, MessageReactive } from "naive-ui";
-import { formatCoverList, formatSongsList } from "@/utils/format";
-import { coverLoaded, fuzzySearch, renderIcon } from "@/utils/helper";
+import { topInfo } from "@/api/playlist";
+import { coverLoaded, formatNumber, fuzzySearch, renderIcon } from "@/utils/helper";
 import { renderToolbar } from "@/utils/meta";
 import { debounce } from "lodash-es";
-import { useDataStore, useStatusStore } from "@/stores";
-import { radioAllProgram, radioDetail } from "@/api/radio";
+import { useStatusStore } from "@/stores";
+import { openBatchList } from "@/utils/modal";
 import player from "@/utils/player";
-import { formatTimestamp } from "@/utils/time";
-import { toSubRadio } from "@/utils/auth";
+import { SongInfo, TopInfo } from "@/types/main.hemusic";
+import { computed } from "vue";
+import SongList from "@/components/List/SongList.vue";
 
 const router = useRouter();
-const dataStore = useDataStore();
 const statusStore = useStatusStore();
 
-// 播客数据
-const radioListData = shallowRef<SongType[]>([]);
-const radioDetailData = ref<CoverType | null>(null);
+// 搜索数据
+const songHasMore = ref<boolean>(false);
+const songLoading = ref<boolean>(false);
+const songPageIndex = ref<number>(1);
+
+// 歌单数据
+const playlistData = shallowRef<SongInfo[]>([]);
+const playlistDetailData = ref<TopInfo | null>(null);
 
 // 模糊搜索数据
 const searchValue = ref<string>("");
-const searchData = ref<SongType[]>([]);
+const searchData = ref<SongInfo[]>([]);
 
-// 电台 ID
-const oldRadioId = ref<number>(0);
-const radioId = computed<number>(() => Number(router.currentRoute.value.query.id as string));
+// 歌单 ID
+const oldPlaylistId = ref<string>("");
+const playlistId = computed<string>(() => router.currentRoute.value.query.id as string);
+
+const oldPlatform = ref<string>("");
+const platform = computed<string>(() => router.currentRoute.value.query.platform as string);
 
 // 加载提示
 const loading = ref<boolean>(true);
@@ -211,7 +203,7 @@ const listScrolling = ref<boolean>(false);
 
 // 列表应该展示数据
 const playlistDataShow = computed(() =>
-  searchValue.value ? searchData.value : radioListData.value,
+  searchValue.value ? searchData.value : playlistData.value,
 );
 
 // 列表高度
@@ -219,73 +211,57 @@ const songListHeight = computed(() => {
   return statusStore.mainContentHeight - (listScrolling.value ? 120 : 240);
 });
 
-// 是否处于收藏播客
-const isLikeRadio = computed(() => {
-  return dataStore.userLikeData.djs.some((radio) => radio.id === radioDetailData.value?.id);
-});
-
-// 是否处于播客页面
-const isPlaylistPage = computed<boolean>(() => router.currentRoute.value.name === "radio");
-
-// 是否为相同播客
-const isSamePlaylist = computed<boolean>(() => oldRadioId.value === radioId.value);
+// 是否为相同歌单
+const isSamePlaylist = computed<boolean>(
+  () => oldPlaylistId.value === playlistId.value && oldPlatform.value === platform.value,
+);
 
 // 更多操作
 const moreOptions = computed<DropdownOption[]>(() => [
   {
-    label: "刷新播客",
-    key: "refresh",
+    label: "批量操作",
+    key: "batch",
     props: {
-      onClick: () => getRadioDetail(radioId.value),
+      onClick: () => openBatchList(playlistDataShow.value, false),
     },
-    icon: renderIcon("Refresh"),
-  },
-  {
-    label: "打开源页面",
-    key: "open",
-    props: {
-      onClick: () => {
-        window.open(`https://music.163.com/#/djradio?id=${radioId.value}`);
-      },
-    },
-    icon: renderIcon("Link"),
+    icon: renderIcon("Batch"),
   },
 ]);
 
-// 获取播客基础信息
-const getRadioDetail = async (id: number) => {
-  if (!id) return;
+// 获取歌单基础信息
+const getTopDetail = async (id: string, platform: string, refresh: boolean = false) => {
+  if (!id || !platform) return;
   // 设置加载状态
   loading.value = true;
   // 清空数据
   clearInput();
-  // 获取播客详情
-  radioDetailData.value = null;
-  const detail = await radioDetail(id);
-  radioDetailData.value = formatCoverList(detail.data)[0];
-  // 获取全部节目
-  await getRadioAllProgram(id, radioDetailData.value?.count as number);
+  if (!refresh) resetPlaylistData();
+  // 在线歌单
+  await handleOnlinePlaylist(id, platform);
 };
 
-// 获取播客全部歌曲
-const getRadioAllProgram = async (id: number, count: number) => {
-  if (!id || !count) return;
-  loading.value = true;
-  radioListData.value = [];
-  // 加载提示
-  if (count > 500) loadingMsgShow();
-  // 循环获取
-  let offset: number = 0;
-  const limit: number = 500;
-  do {
-    const result = await radioAllProgram(id, limit, offset);
-    const songData = formatSongsList(result.programs);
-    radioListData.value = radioListData.value.concat(songData);
-    // 更新数据
-    offset += limit;
-  } while (offset < count && isPlaylistPage.value);
-  // 关闭加载
-  loadingMsgShow(false);
+// 重置歌单数据
+const resetPlaylistData = () => {
+  playlistDetailData.value = null;
+  playlistData.value = [];
+  listScrolling.value = false;
+  songPageIndex.value = 1;
+  songLoading.value = false;
+  songHasMore.value = false;
+};
+
+// 获取在线歌单
+const handleOnlinePlaylist = async (id: string, platform: string) => {
+  songLoading.value = true;
+  // 获取歌单详情
+  const detail = await topInfo(id, platform, songPageIndex.value, 100);
+  if (songPageIndex.value == 1) {
+    playlistDetailData.value = detail;
+  }
+  playlistData.value = playlistData.value?.concat(detail.songs);
+  songHasMore.value = detail.has_more;
+  loading.value = false;
+  songLoading.value = false;
 };
 
 // 列表滚动
@@ -302,10 +278,11 @@ const clearInput = () => {
 };
 
 // 加载提示
-const loadingMsgShow = (show: boolean = true) => {
+const loadingMsgShow = (show: boolean = true, count?: number) => {
   if (show) {
+    if (count && count <= 800) return;
     loadingMsg.value?.destroy();
-    loadingMsg.value = window.$message.loading("该播客节目数量过多，请稍等", {
+    loadingMsg.value = window.$message.loading("该歌单歌曲数量过多，请稍等", {
       duration: 0,
       closable: true,
     });
@@ -318,8 +295,12 @@ const loadingMsgShow = (show: boolean = true) => {
 
 // 播放全部歌曲
 const playAllSongs = debounce(() => {
-  if (!radioDetailData.value || !radioListData.value?.length) return;
-  player.updatePlayList(radioListData.value, undefined, radioId.value);
+  if (!playlistDetailData.value || !playlistData.value?.length) return;
+  player.updatePlayList(playlistData.value, undefined, {
+    id: playlistDetailData.value?.id,
+    platform: playlistDetailData.value?.platform,
+    type: "top",
+  });
 }, 300);
 
 // 模糊搜索
@@ -327,38 +308,52 @@ const listSearch = debounce((val: string) => {
   val = val.trim();
   if (!val || val === "") return;
   // 获取搜索结果
-  const result = fuzzySearch(val, radioListData.value);
+  const result = fuzzySearch(val, playlistData.value);
   searchData.value = result;
 }, 300);
 
+// 列表触底
+const reachBottom = () => {
+  if (songHasMore.value) {
+    songPageIndex.value++;
+    handleOnlinePlaylist(playlistId.value, platform.value);
+  } else {
+    songLoading.value = false;
+  }
+};
+
 onBeforeRouteUpdate((to) => {
-  const id = Number(to.query.id as string);
-  if (id) {
-    oldRadioId.value = id;
-    getRadioDetail(id);
+  const id = to.query.id as string;
+  const platform = to.query.platform as string;
+  if (id && platform) {
+    oldPlaylistId.value = id;
+    oldPlatform.value = platform;
+    getTopDetail(id, platform);
   }
 });
 
 onActivated(() => {
   // 是否为首次进入
-  if (oldRadioId.value === 0) {
-    oldRadioId.value = radioId.value;
+  if (oldPlaylistId.value) {
+    oldPlaylistId.value = playlistId.value;
+    oldPlatform.value = platform.value;
   } else {
     // 是否不相同
-    const isSame = oldRadioId.value === radioId.value;
-    oldRadioId.value = radioId.value;
-    // 刷新播客
-    if (!isSame) getRadioDetail(radioId.value);
+    const isSame = oldPlaylistId.value === playlistId.value && oldPlatform.value == platform.value;
+    oldPlaylistId.value = playlistId.value;
+    oldPlatform.value = platform.value;
+    // 刷新歌单
+    getTopDetail(playlistId.value, platform.value, isSame);
   }
 });
 
 onDeactivated(() => loadingMsgShow(false));
 onUnmounted(() => loadingMsgShow(false));
-onMounted(() => getRadioDetail(radioId.value));
+onMounted(() => getTopDetail(playlistId.value, platform.value));
 </script>
 
 <style lang="scss" scoped>
-.playlist {
+.toplist {
   display: flex;
   flex-direction: column;
   .detail {
@@ -467,6 +462,10 @@ onMounted(() => getRadioDetail(radioId.value));
         transition:
           font-size 0.3s var(--n-bezier),
           color 0.3s var(--n-bezier);
+        .n-icon {
+          cursor: pointer;
+          transform: translateY(2px);
+        }
       }
       .collapse {
         position: absolute;

@@ -23,42 +23,49 @@
 </template>
 
 <script setup lang="ts">
-import type { ArtistType } from "@/types/main";
-import { searchResult } from "@/api/search";
-import { formatArtistsList } from "@/utils/format";
+import { searchResultHemusic } from "@/api/search";
+import { SingerInfo } from "@/types/main.hemusic";
+import ArtistList from "@/components/List/ArtistList.vue";
 
 const props = defineProps<{
   keyword: string;
+  platform: string;
 }>();
 
 // 搜索数据
 const hasMore = ref<boolean>(true);
 const loading = ref<boolean>(true);
-const searchOffset = ref<number>(0);
+const searchPage = ref<number>(1);
 const searchCount = ref<number>(1);
-const searchResultData = ref<ArtistType[]>([]);
+const searchResultData = ref<SingerInfo[]>([]);
 
 // 获取搜索结果
 const getSearchResult = async () => {
   // 获取数据
   loading.value = true;
-  const result = await searchResult(props.keyword, 50, searchOffset.value, 100);
-  // 是否还有
-  hasMore.value = result.result?.hasMore || result.result?.artistCount > searchOffset.value + 50;
-  // 搜索总数
-  searchCount.value = result.result?.artistCount;
-  // 处理数据
-  const artistData = formatArtistsList(result.result.artists);
-  searchResultData.value = searchResultData.value?.concat(artistData);
-  loading.value = false;
+  searchResultHemusic(props.keyword, 30, searchPage.value, props.platform, "singer")
+    .then((result) => {
+      // 是否还有
+      hasMore.value = result?.has_more;
+      // 搜索总数
+      searchCount.value = result?.total_num;
+      // 处理数据
+      searchResultData.value = searchResultData.value?.concat(result?.list);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 };
 
-// 加载更多
+// 列表触底
 const loadMore = () => {
-  searchOffset.value += 50;
-  getSearchResult();
+  if (hasMore.value) {
+    searchPage.value++;
+    getSearchResult();
+  } else {
+    loading.value = false;
+  }
 };
-
 onMounted(() => {
   getSearchResult();
 });

@@ -26,29 +26,10 @@
         </div>
         <!-- 搜索建议 -->
         <Transition name="fade" mode="out-in" @after-leave="calcSearchSuggestHeights">
-          <div
-            v-if="Object.keys(searchSuggestData)?.length && searchSuggestData?.order"
-            ref="searchSuggestRef"
-            class="all-suggest"
-          >
-            <div v-for="(item, index) in searchSuggestData.order" :key="index" class="suggest">
-              <div class="suggest-type">
-                <SvgIcon :name="searchSuggestionsType[item].icon" />
-                <n-text>{{ searchSuggestionsType[item].name }}</n-text>
-              </div>
-              <div
-                v-for="(suggestItem, suggestIndex) in searchSuggestData[item]"
-                :key="suggestIndex"
-                class="suggest-item"
-                @click="emit('toSearch', suggestItem, item)"
-              >
-                <n-text class="name">{{ suggestItem.name }}</n-text>
-                <n-text v-if="suggestItem?.artist" class="artist" depth="3">
-                  {{ suggestItem.artist.name }}
-                </n-text>
-                <n-text v-else-if="suggestItem?.artists" class="artist" depth="3">
-                  {{ suggestItem.artists[0].name }}
-                </n-text>
+          <div v-if="searchSuggestData?.length" ref="searchSuggestRef" class="all-suggest">
+            <div v-for="(suggestItem, index) in searchSuggestData" :key="index" class="suggest">
+              <div class="suggest-item" @click="emit('toSearch', suggestItem, 'keyword')">
+                <n-text class="name">{{ suggestItem }}</n-text>
               </div>
             </div>
           </div>
@@ -60,47 +41,35 @@
 
 <script setup lang="ts">
 import { searchSuggest } from "@/api/search";
-import { useStatusStore } from "@/stores";
+import { usePlatformStore, useStatusStore } from "@/stores";
+import { FeatureSupportFlag } from "@/api/platform";
 
 const emit = defineEmits<{
   toSearch: [key: number | string, type: string];
 }>();
 
 const statusStore = useStatusStore();
+const platformStore = usePlatformStore();
 
 // 搜索建议数据
-const searchSuggestData = ref<any>({});
+const searchSuggestData = ref<string[]>([]);
 const searchSuggestHeights = ref<number>(0);
 
 // 搜索建议元素
 const directSearchRef = ref<HTMLElement | null>(null);
 const searchSuggestRef = ref<HTMLElement | null>(null);
 
-// 搜索建议分类
-const searchSuggestionsType = {
-  songs: {
-    name: "单曲",
-    icon: "Music",
-  },
-  artists: {
-    name: "歌手",
-    icon: "Artist",
-  },
-  albums: {
-    name: "专辑",
-    icon: "Album",
-  },
-  playlists: {
-    name: "歌单",
-    icon: "MusicList",
-  },
-};
-
 // 获取搜索建议
 const getSearchSuggest = async (keywords: string) => {
-  searchSuggestData.value = {};
-  const result = await searchSuggest(keywords);
-  searchSuggestData.value = result.result;
+  searchSuggestData.value = [];
+  const platform = platformStore.platforms.find(
+    (item) => item.feature_support_flag & FeatureSupportFlag.GetSearchSuggest && item.status === 1,
+  );
+  if (!platform) {
+    return;
+  }
+  const result = await searchSuggest(keywords, platform?.id || "");
+  searchSuggestData.value = result.keys;
   // 计算高度
   nextTick(calcSearchSuggestHeights);
 };

@@ -20,7 +20,7 @@
           @click="
             deleteSongs(
               playListId,
-              checkSongData.map((item) => item.id),
+              checkSongData.map((item) => ({ id: item.id, platform: item.platform })),
             )
           "
         >
@@ -49,30 +49,31 @@
 
 <script setup lang="ts">
 import type { DataTableColumns, DataTableRowKey } from "naive-ui";
-import type { SongType } from "@/types/main";
 import { isArray, isObject } from "lodash-es";
 import { openPlaylistAdd } from "@/utils/modal";
 import { deleteSongs } from "@/utils/auth";
+import { SongInfo } from "@/types/main.hemusic";
 
 interface DataType {
   key?: number;
-  id?: number;
+  id?: string;
+  platform?: string;
   name?: string;
   artists?: string;
   album?: string;
   // 原始数据
-  origin?: SongType;
+  origin?: SongInfo;
 }
 
 const props = defineProps<{
-  data: SongType[];
+  data: SongInfo[];
   isLocal: boolean;
-  playListId?: number;
+  playListId?: string;
 }>();
 
 // 选中数据
 const checkCount = ref<number>(0);
-const checkSongData = ref<SongType[]>([]);
+const checkSongData = ref<SongInfo[]>([]);
 
 // 表头数据
 const columnsData = computed<DataTableColumns<DataType>>(() => [
@@ -115,11 +116,12 @@ const tableData = computed<DataType[]>(() =>
   props.data.map((song, index) => ({
     key: index + 1,
     id: song?.id,
+    platform: song?.platform,
     name: song?.name || "未知曲目",
-    artists: isArray(song?.artists)
+    artists: isArray(song?.singers)
       ? // 拼接歌手
-        song?.artists.map((ar: { name: string }) => ar.name).join(" / ")
-      : song?.artists || "未知歌手",
+        song?.singers.map((ar: { name: string }) => ar.name).join(" / ")
+      : song?.singers || "未知歌手",
     album: isObject(song?.album) ? song?.album.name : song?.album || "未知专辑",
     // 原始数据
     origin: song,
@@ -131,7 +133,7 @@ const tableCheck = (keys: DataTableRowKey[], rows: DataType[]) => {
   // 更改选中数量
   checkCount.value = keys.length;
   // 更改选中歌曲
-  checkSongData.value = rows.map((row) => row.origin).filter((song) => song) as SongType[];
+  checkSongData.value = rows.map((row) => row.origin).filter((song) => song) as SongInfo[];
 };
 </script>
 

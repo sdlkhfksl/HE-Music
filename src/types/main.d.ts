@@ -1,4 +1,11 @@
 import { songLevelData, sortOptions } from "@/utils/meta";
+import {
+  MVInfo,
+  UserFavouriteAlbumInfo,
+  UserFavouritePlaylistInfo,
+  UserFavouriteSingerInfo,
+  UserFavouriteSongInfo,
+} from "@/types/main.hemusic";
 
 export type MetaData = {
   id: number;
@@ -133,8 +140,8 @@ export type LyricContentType = {
 export type LyricType = {
   time: number;
   endTime: number;
-  tran?: string;
-  roma?: string;
+  tran: string;
+  roma: string;
   content: string;
   contents: LyricContentType[];
 };
@@ -181,12 +188,11 @@ export interface UserDataType {
 }
 
 export interface UserLikeDataType {
-  songs: number[];
-  playlists: CoverType[];
-  artists: ArtistType[];
-  albums: CoverType[];
-  mvs: CoverType[];
-  djs: CoverType[];
+  songs: UserFavouriteSongInfo[];
+  playlists: UserFavouritePlaylistInfo[];
+  artists: UserFavouriteSingerInfo[];
+  albums: UserFavouriteAlbumInfo[];
+  mvs: MVInfo[];
 }
 
 // sort
@@ -236,4 +242,4 @@ interface UpdateInfoType {
 }
 
 // 登录方式
-export type LoginType = "qr" | "phone" | "cookie" | "uid";
+export type LoginType = "qr" | "phone" | "cookie" | "uid" | "password";

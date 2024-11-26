@@ -4,7 +4,7 @@
       <div v-if="artistDetailData" class="detail">
         <div class="cover">
           <n-image
-            :src="artistDetailData.coverSize?.m || artistDetailData.cover"
+            :src="artistDetailData.cover"
             :previewed-img-props="{ style: { borderRadius: '8px' } }"
             :preview-src="artistDetailData.cover"
             :renderToolbar="renderToolbar"
@@ -19,24 +19,16 @@
             </template>
           </n-image>
           <!-- 封面背板 -->
-          <n-image
-            class="cover-shadow"
-            preview-disabled
-            :src="artistDetailData.coverSize?.m || artistDetailData.cover"
-          />
+          <n-image class="cover-shadow" preview-disabled :src="artistDetailData.cover" />
         </div>
         <div class="data">
           <div class="name text-hidden">
             <n-text class="name-text">{{ artistDetailData.name || "未知艺术家" }}</n-text>
-            <n-text v-if="artistDetailData?.alia" class="name-alias" depth="3">
-              {{ artistDetailData.alia || "未知艺术家" }}
+            <n-text v-if="artistDetailData?.alias" class="name-alias" depth="3">
+              {{ artistDetailData.alias || "未知艺术家" }}
             </n-text>
           </div>
           <n-collapse-transition :show="!listScrolling" class="collapse">
-            <!-- 职业 -->
-            <n-text v-if="artistDetailData?.identify" :depth="3" class="identify text-hidden">
-              {{ artistDetailData.identify }}
-            </n-text>
             <!-- 信息 -->
             <n-flex class="meta">
               <div
@@ -44,21 +36,21 @@
                 @click="router.push({ name: 'artist-songs', query: { id: artistId } })"
               >
                 <SvgIcon name="Music" :depth="3" />
-                <n-text>{{ artistDetailData.musicSize || 0 }}</n-text>
+                <n-text>{{ artistDetailData.song_num || 0 }}</n-text>
               </div>
               <div
                 class="item"
                 @click="router.push({ name: 'artist-albums', query: { id: artistId } })"
               >
                 <SvgIcon name="Album" :depth="3" />
-                <n-text>{{ artistDetailData.albumSize || 0 }}</n-text>
+                <n-text>{{ artistDetailData.album_num || 0 }}</n-text>
               </div>
               <div
                 class="item"
                 @click="router.push({ name: 'artist-videos', query: { id: artistId } })"
               >
                 <SvgIcon name="Video" :depth="3" />
-                <n-text>{{ artistDetailData.mvSize || 0 }}</n-text>
+                <n-text>{{ artistDetailData.mv_num || 0 }}</n-text>
               </div>
             </n-flex>
             <!-- 简介 -->
@@ -94,7 +86,7 @@
                 strong
                 secondary
                 round
-                @click="toLikeArtist(artistId, !isLikeArtist)"
+                @click="toLikeArtist(artistDetailData, !isLikeArtist)"
               >
                 <template #icon>
                   <SvgIcon :name="isLikeArtist ? 'Favorite' : 'FavoriteBorder'" />
@@ -102,13 +94,13 @@
                 {{ isLikeArtist ? "取消关注" : "关注歌手" }}
               </n-button>
               <!-- 更多 -->
-              <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">
-                <n-button :focusable="false" class="more" circle strong secondary>
-                  <template #icon>
-                    <SvgIcon name="List" />
-                  </template>
-                </n-button>
-              </n-dropdown>
+              <!--              <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">-->
+              <!--                <n-button :focusable="false" class="more" circle strong secondary>-->
+              <!--                  <template #icon>-->
+              <!--                    <SvgIcon name="List" />-->
+              <!--                  </template>-->
+              <!--                </n-button>-->
+              <!--              </n-dropdown>-->
             </n-flex>
           </n-flex>
         </div>
@@ -134,6 +126,7 @@
             ref="componentRef"
             :is="Component"
             :id="artistId"
+            :platform="platform"
             class="router-view"
             @scroll="listScroll"
           />
@@ -144,15 +137,13 @@
 </template>
 
 <script setup lang="ts">
-import type { DropdownOption } from "naive-ui";
-import type { ArtistType } from "@/types/main";
-import { coverLoaded, renderIcon } from "@/utils/helper";
+import { coverLoaded } from "@/utils/helper";
 import { renderToolbar } from "@/utils/meta";
 import { artistDetail } from "@/api/artist";
-import { formatArtistsList } from "@/utils/format";
 import { useDataStore, useSettingStore } from "@/stores";
 import { toLikeArtist } from "@/utils/auth";
 import ArtistSongs from "./songs.vue";
+import { SingerInfo } from "@/types/main.hemusic";
 
 const router = useRouter();
 const dataStore = useDataStore();
@@ -162,46 +153,47 @@ const settingStore = useSettingStore();
 const componentRef = ref<InstanceType<typeof ArtistSongs> | null>(null);
 
 // 歌手 ID
-const artistId = computed<number>(() => Number(router.currentRoute.value.query.id as string));
+const artistId = computed<string>(() => router.currentRoute.value.query.id as string);
+const platform = computed<string>(() => router.currentRoute.value.query.platform as string);
 
 // 歌手分类
 const artistType = ref<string>((router.currentRoute.value?.name as string) || "artist-songs");
 
 // 歌手数据
-const artistDetailData = ref<ArtistType | null>(null);
+const artistDetailData = ref<SingerInfo | null>(null);
 
 // 列表是否滚动
 const listScrolling = ref<boolean>(false);
 
 // 更多操作
-const moreOptions = computed<DropdownOption[]>(() => [
-  {
-    label: "打开源页面",
-    key: "open",
-    props: {
-      onClick: () => {
-        window.open(`https://music.163.com/#/artist?id=${artistId.value}`);
-      },
-    },
-    icon: renderIcon("Link"),
-  },
-]);
+// const moreOptions = computed<DropdownOption[]>(() => [
+//   {
+//     label: "打开源页面",
+//     key: "open",
+//     props: {
+//       onClick: () => {
+//         window.open(`https://music.163.com/#/artist?id=${artistId.value}`);
+//       },
+//     },
+//     icon: renderIcon("Link"),
+//   },
+// ]);
 
 // 是否处于收藏歌手
 const isLikeArtist = computed(() => {
-  return dataStore.userLikeData.artists.some((ar) => ar.id === artistId.value);
+  return dataStore.userLikeData.artists.some(
+    (ar) =>
+      ar.id === artistDetailData.value?.id && ar.platform === artistDetailData.value?.platform,
+  );
 });
 
 // 获取歌手详情
-const getArtistDetail = async (id: number) => {
+const getArtistDetail = async (id: string, platform: string) => {
   try {
-    if (!id) return;
+    if (!id || !platform) return;
     listScrolling.value = false;
     artistDetailData.value = null;
-    const result = await artistDetail(id);
-    artistDetailData.value = formatArtistsList(result.data.artist)[0];
-    // 附加身份
-    artistDetailData.value.identify = result.data.identify?.imageDesc;
+    artistDetailData.value = await artistDetail(id, platform);
   } catch (error) {
     console.error("Erorr getting artist detail:", error);
     window.$message.error("获取歌手详情失败");
@@ -212,13 +204,16 @@ const getArtistDetail = async (id: number) => {
 const tabChange = (value: string) => {
   router.push({
     name: value,
-    query: { id: artistId.value },
+    query: { id: artistId.value, platform: platform.value },
   });
 };
 
 // 播放全部歌曲
 const playAllSongs = async () => {
-  await router.push({ name: "artist-songs", query: { id: artistId.value } });
+  await router.push({
+    name: "artist-songs",
+    query: { id: artistId.value, platform: platform.value },
+  });
   if (componentRef.value) componentRef.value.playAllSongs();
 };
 
@@ -233,11 +228,14 @@ onBeforeRouteUpdate((to) => {
   listScrolling.value = false;
   if (to.matched[0].name !== "artist") return;
   artistType.value = to.name as string;
-  const id = Number(to.query.id as string);
-  if (id && id !== artistId.value) getArtistDetail(id);
+  const id = to.query.id as string;
+  const pt = to.query.platform as string;
+  if ((id && id !== artistId.value) || (pt && pt !== platform.value)) {
+    getArtistDetail(id, pt);
+  }
 });
 
-onMounted(() => getArtistDetail(artistId.value));
+onMounted(() => getArtistDetail(artistId.value, platform.value));
 </script>
 
 <style lang="scss" scoped>

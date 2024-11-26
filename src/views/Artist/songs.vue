@@ -11,15 +11,15 @@
 </template>
 
 <script setup lang="ts">
-import type { SongType } from "@/types/main";
 import { artistAllSongs } from "@/api/artist";
-import { songDetail } from "@/api/song";
-import { formatSongsList } from "@/utils/format";
 import { debounce } from "lodash-es";
 import player from "@/utils/player";
+import SongList from "@/components/List/SongList.vue";
+import { SongInfo } from "@/types/main.hemusic";
 
 const props = defineProps<{
-  id: number;
+  id: string;
+  platform: string;
 }>();
 
 const emit = defineEmits<{
@@ -29,23 +29,19 @@ const emit = defineEmits<{
 // 歌曲数据
 const loading = ref<boolean>(true);
 const hasMore = ref<boolean>(true);
-const songData = ref<SongType[]>([]);
-const songOffset = ref<number>(0);
+const songData = ref<SongInfo[]>([]);
+const songPageIndex = ref<number>(1);
 
 // 获取歌手全部歌曲
 const getArtistAllSongs = async () => {
   try {
-    if (!props.id) return;
+    if (!props.id || !props.platform) return;
     loading.value = true;
     // 获取数据
-    const result = await artistAllSongs(props.id, 100, songOffset.value);
+    const result = await artistAllSongs(props.id, props.platform, songPageIndex.value, 50);
     // 是否还有
-    hasMore.value = result?.more;
-    // 处理数据
-    const ids: number[] = result?.songs.map((song: any) => song.id as number);
-    const songs = await songDetail(ids);
-    const songDetailData = formatSongsList(songs?.songs);
-    songData.value = songData.value.concat(songDetailData);
+    hasMore.value = result?.has_more;
+    songData.value = songData.value.concat(result.list);
     loading.value = false;
   } catch (error) {
     console.error("Error getting artist all songs:", error);
@@ -61,7 +57,7 @@ const playAllSongs = debounce(() => {
 // 列表触底
 const reachBottom = () => {
   if (hasMore.value) {
-    songOffset.value += 100;
+    songPageIndex.value++;
     getArtistAllSongs();
   } else {
     loading.value = false;

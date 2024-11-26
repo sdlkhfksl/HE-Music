@@ -1,4 +1,4 @@
-import request from "@/utils/request";
+import request, { requestHemusic } from "@/utils/request";
 
 // 生成二维码 key
 export const qrKey = () => {
@@ -110,5 +110,16 @@ export const logout = () => {
 export const countryList = () => {
   return request({
     url: "/countries/code/list",
+  });
+};
+
+export const accountLogin = (username: string, password: string) => {
+  return requestHemusic({
+    url: "/v1/user/login",
+    method: "post",
+    data: {
+      username,
+      password,
+    },
   });
 };

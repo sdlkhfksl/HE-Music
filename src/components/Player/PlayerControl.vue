@@ -5,12 +5,11 @@
         <n-flex class="left" align="center">
           <!-- 喜欢歌曲 -->
           <div
-            v-if="musicStore.playSong.type !== 'radio'"
             class="menu-icon"
-            @click="toLikeSong(musicStore.playSong, !dataStore.isLikeSong(musicStore.playSong.id))"
+            @click="toLikeSong(musicStore.playSong, !dataStore.isLikeSong(musicStore.playSong))"
           >
             <SvgIcon
-              :name="dataStore.isLikeSong(musicStore.playSong.id) ? 'Favorite' : 'FavoriteBorder'"
+              :name="dataStore.isLikeSong(musicStore.playSong) ? 'Favorite' : 'FavoriteBorder'"
             />
           </div>
           <!-- 添加到歌单 -->
@@ -27,16 +26,8 @@
         </n-flex>
         <div class="center">
           <div class="btn">
-            <!-- 不喜欢 -->
-            <div
-              v-if="statusStore.personalFmMode"
-              class="btn-icon"
-              v-debounce="() => player.personalFMTrash(musicStore.personalFMSong?.id)"
-            >
-              <SvgIcon class="icon" :size="18" name="ThumbDown" />
-            </div>
             <!-- 上一曲 -->
-            <div v-else class="btn-icon" v-debounce="() => player.nextOrPrev('prev')">
+            <div class="btn-icon" v-debounce="() => player.nextOrPrev('prev')">
               <SvgIcon :size="26" name="SkipPrev" />
             </div>
             <!-- 播放暂停 -->
@@ -97,11 +88,7 @@
             <SvgIcon :name="playModeIcon" />
           </div>
           <!-- 播放列表 -->
-          <div
-            v-if="!statusStore.personalFmMode"
-            class="menu-icon"
-            @click.stop="statusStore.playListShow = !statusStore.playListShow"
-          >
+          <div class="menu-icon" @click.stop="statusStore.playListShow = !statusStore.playListShow">
             <SvgIcon name="PlayList" />
           </div>
         </n-flex>
@@ -111,8 +98,8 @@
 </template>
 
 <script setup lang="ts">
-import { useMusicStore, useStatusStore, useDataStore } from "@/stores";
-import { secondsToTime, calculateCurrentTime } from "@/utils/time";
+import { useDataStore, useMusicStore, useStatusStore } from "@/stores";
+import { calculateCurrentTime, secondsToTime } from "@/utils/time";
 import { openDownloadSong, openPlaylistAdd } from "@/utils/modal";
 import { toLikeSong } from "@/utils/auth";
 import player from "@/utils/player";
@@ -124,13 +111,7 @@ const statusStore = useStatusStore();
 // 当前播放模式图标
 const playModeIcon = computed(() => {
   const mode = statusStore.playSongMode;
-  return statusStore.playHeartbeatMode
-    ? "HeartBit"
-    : mode === "repeat"
-      ? "Repeat"
-      : mode === "repeat-once"
-        ? "RepeatSong"
-        : "Shuffle";
+  return mode === "repeat" ? "Repeat" : mode === "repeat-once" ? "RepeatSong" : "Shuffle";
 });
 
 // 进度条拖拽结束

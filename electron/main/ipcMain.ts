@@ -1,23 +1,23 @@
 import {
   app,
-  ipcMain,
   BrowserWindow,
+  dialog,
+  ipcMain,
+  net,
   powerSaveBlocker,
   screen,
-  shell,
-  dialog,
-  net,
   session,
+  shell,
 } from "electron";
-import { File, Picture, Id3v2Settings } from "node-taglib-sharp";
+import { File, Id3v2Settings, Picture } from "node-taglib-sharp";
 import { parseFile } from "music-metadata";
 import { getFonts } from "font-list";
 import { MainTray } from "./tray";
 import { Thumbar } from "./thumbar";
 import { StoreType } from "./store";
-import { isDev, getFileID, getFileMD5 } from "./utils";
+import { getFileID, getFileMD5, isDev } from "./utils";
 import { isShortcutRegistered, registerShortcut, unregisterShortcuts } from "./shortcut";
-import { join, basename, resolve } from "path";
+import { basename, join, resolve } from "path";
 import { download } from "electron-dl";
 import { checkUpdate, startDownloadUpdate } from "./update";
 import fs from "fs/promises";
@@ -124,7 +124,7 @@ const initWinIpcMain = (
   // 开启控制台
   ipcMain.on("open-dev-tools", () => {
     win?.webContents.openDevTools({
-      title: "SPlayer DevTools",
+      title: "HE-Music DevTools",
       mode: isDev ? "right" : "detach",
     });
   });
@@ -193,10 +193,10 @@ const initWinIpcMain = (
         return {
           id: getFileID(filePath),
           name: common.title || basename(filePath),
-          artists: common.artists?.[0] || common.artist,
+          singers: common.artists?.[0] || common.artist,
           album: common.album || "",
           alia: common.comment?.[0],
-          duration: (format?.duration ?? 0) * 1000,
+          duration: format?.duration ?? 0,
           size: (size / (1024 * 1024)).toFixed(2),
           path: filePath,
           quality,
@@ -362,7 +362,7 @@ const initWinIpcMain = (
   // 修改音乐元信息
   ipcMain.handle("set-music-metadata", async (_, path: string, metadata: any) => {
     try {
-      const { name, artist, album, alia, lyric, cover } = metadata;
+      const { name, singers, album, alia, lyric, cover } = metadata;
       // 规范化路径
       const songPath = resolve(path);
       const coverPath = cover ? resolve(cover) : null;
@@ -374,9 +374,9 @@ const initWinIpcMain = (
       Id3v2Settings.forceDefaultVersion = true;
       Id3v2Settings.defaultVersion = 3;
       songFile.tag.title = name || "未知曲目";
-      songFile.tag.performers = [artist || "未知艺术家"];
+      songFile.tag.performers = [singers || "未知艺术家"];
       songFile.tag.album = album || "未知专辑";
-      songFile.tag.albumArtists = [artist || "未知艺术家"];
+      songFile.tag.albumArtists = [singers || "未知艺术家"];
       songFile.tag.lyrics = lyric || "";
       songFile.tag.description = alia || "";
       songFile.tag.comment = alia || "";
@@ -456,8 +456,8 @@ const initWinIpcMain = (
         Id3v2Settings.defaultVersion = 3;
         songFile.tag.title = songData?.name || "未知曲目";
         songFile.tag.album = songData?.album?.name || "未知专辑";
-        songFile.tag.performers = songData?.artists?.map((ar: any) => ar.name) || ["未知艺术家"];
-        songFile.tag.albumArtists = songData?.artists?.map((ar: any) => ar.name) || ["未知艺术家"];
+        songFile.tag.performers = songData?.singers?.map((ar: any) => ar.name) || ["未知艺术家"];
+        songFile.tag.albumArtists = songData?.singers?.map((ar: any) => ar.name) || ["未知艺术家"];
         if (lyric && downloadLyric) songFile.tag.lyrics = lyric;
         if (songCover && downloadCover) songFile.tag.pictures = [songCover];
         // 保存元信息

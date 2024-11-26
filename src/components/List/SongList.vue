@@ -44,12 +44,10 @@
                 </div>
               </n-dropdown>
               <n-text v-else class="title">标题</n-text>
-              <n-text v-if="type !== 'radio' && !hiddenAlbum" class="album">专辑</n-text>
-              <n-text v-if="type !== 'radio'" class="actions">操作</n-text>
-              <n-text v-if="type === 'radio'" class="meta date">更新日期</n-text>
-              <n-text v-if="type === 'radio'" class="meta">播放量</n-text>
+              <n-text v-if="!hiddenAlbum" class="album">专辑</n-text>
+              <n-text class="actions">操作</n-text>
               <n-text class="meta">时长</n-text>
-              <n-text v-if="data?.[0].size && !hiddenSize" class="meta size">大小</n-text>
+              <n-text v-if="!hiddenSize" class="meta">大小</n-text>
             </div>
           </template>
           <!-- 主内容 -->
@@ -59,16 +57,16 @@
               :index="index"
               :hiddenCover="hiddenCover"
               :hiddenAlbum="hiddenAlbum"
-              :hiddenSize="hiddenSize"
-              @dblclick.stop="player.updatePlayList(listData, itemData, playListId)"
+              @dblclick.stop="player.updatePlayList(listData, itemData, playlist)"
               @contextmenu.stop="
-                songListMenuRef?.openDropdown($event, listData, itemData, index, type, playListId)
+                songListMenuRef?.openDropdown($event, listData, itemData, index, playlist)
               "
+              :hiddenSize="hiddenSize"
             />
           </template>
           <!-- 加载更多 -->
           <template #footer>
-            <div class="load-more">
+            <div v-if="showFooter" class="load-more">
               <n-flex v-if="loadMore && loading">
                 <n-spin size="small" />
                 <n-text>{{ loadingText || "努力加载中" }}</n-text>
@@ -111,7 +109,7 @@
 
 <script setup lang="ts">
 import type { DropdownOption } from "naive-ui";
-import type { SongType, SortType } from "@/types/main";
+import type { SortType } from "@/types/main";
 import { useMusicStore, useStatusStore } from "@/stores";
 import { VirtList } from "vue-virt-list";
 import { cloneDeep, entries, isEmpty } from "lodash-es";
@@ -119,13 +117,14 @@ import { sortOptions } from "@/utils/meta";
 import { renderIcon } from "@/utils/helper";
 import SongListMenu from "@/components/Menu/SongListMenu.vue";
 import player from "@/utils/player";
+import { SongInfo } from "@/types/main.hemusic";
 
 const props = withDefaults(
   defineProps<{
     // 列表数据
-    data: SongType[];
+    data: SongInfo[];
     // 列表类型
-    type?: "song" | "radio";
+    type?: "song";
     // 列表高度
     height?: number | "auto"; // px
     // 是否加载
@@ -136,18 +135,27 @@ const props = withDefaults(
     // 隐藏元素
     hiddenAlbum?: boolean;
     hiddenCover?: boolean;
-    hiddenSize?: boolean;
     // 隐藏滚动条
     hiddenScrollbar?: boolean;
     // 禁用排序
     disabledSort?: boolean;
     // 播放歌单 ID
-    playListId?: number;
+    playListId?: string;
+    playlist?: {
+      id: string;
+      platform?: string;
+      type?: string;
+    };
+    // 显示底部
+    showFooter?: boolean;
+    hiddenSize?: boolean;
   }>(),
   {
     type: "song",
     loadingText: "努力加载中...",
-    playListId: 0,
+    playListId: "",
+    showFooter: true,
+    hiddenSize: true,
   },
 );
 
@@ -157,7 +165,7 @@ const emit = defineEmits<{
   // 滚动
   scroll: [e: Event];
   // 删除歌曲
-  removeSong: [id: number[]];
+  removeSong: [info: SongInfo[]];
 }>();
 
 const musicStore = useMusicStore();
@@ -178,7 +186,7 @@ const floatToolShow = ref<boolean>(true);
 const songListMenuRef = ref<InstanceType<typeof SongListMenu> | null>(null);
 
 // 列表数据
-const listData = computed<SongType[]>(() => {
+const listData = computed<SongInfo[]>(() => {
   const data = cloneDeep(props.data);
   if (props.disabledSort) return data;
   // 排序
@@ -189,24 +197,24 @@ const listData = computed<SongType[]>(() => {
       return data.sort((a, b) => b.name.localeCompare(a.name));
     case "arAZ":
       return data.sort((a, b) => {
-        const artistA = Array.isArray(a.artists) ? a.artists[0].name : a.artists;
-        const artistB = Array.isArray(b.artists) ? b.artists[0].name : b.artists;
-        return artistA.localeCompare(artistB);
+        const artistA = Array.isArray(a.singers) ? a.singers[0].name : a.singers;
+        const artistB = Array.isArray(b.singers) ? b.singers[0].name : b.singers;
+        return artistA?.localeCompare(artistB || "") || 0;
       });
     case "arZA":
       return data.sort((a, b) => {
-        const artistA = Array.isArray(a.artists) ? a.artists[0].name : a.artists;
-        const artistB = Array.isArray(b.artists) ? b.artists[0].name : b.artists;
-        return artistB.localeCompare(artistA);
+        const artistA = Array.isArray(a.singers) ? a.singers[0].name : a.singers;
+        const artistB = Array.isArray(b.singers) ? b.singers[0].name : b.singers;
+        return artistB?.localeCompare(artistA || "") || 0;
       });
     case "timeDown":
       return data.sort((a, b) => b.duration - a.duration);
     case "timeUp":
       return data.sort((a, b) => a.duration - b.duration);
-    case "dateDown":
-      return data.sort((a, b) => (b.updateTime || 0) - (a.updateTime || 0));
-    case "dateUp":
-      return data.sort((a, b) => (a.updateTime || 0) - (b.updateTime || 0));
+    // case "dateDown":
+    //   return data.sort((a, b) => (b.updateTime || 0) - (a.updateTime || 0));
+    // case "dateUp":
+    //   return data.sort((a, b) => (a.updateTime || 0) - (b.updateTime || 0));
     default:
       return data;
   }
@@ -225,7 +233,7 @@ const sortMenuOptions = computed<DropdownOption[]>(() =>
   entries(sortOptions).map(([key, { name, show, icon }]) => ({
     key,
     label: name,
-    show: show === "all" ? true : show === props.type ? true : false,
+    show: show === "all" ? true : show === props.type,
     icon: renderIcon(icon),
   })),
 );
@@ -246,8 +254,14 @@ const onToBottom = (e: Event) => {
 const sortSelect = (key: SortType) => {
   statusStore.listSort = key;
   // 更新列表
-  if (musicStore.playPlaylistId === props.playListId) {
-    player.updatePlayList(listData.value, musicStore.playSong, props.playListId, {
+  if (
+    musicStore.isPlayingPlaylist(
+      props.playlist?.id || "",
+      props.playlist?.platform || "",
+      props.playlist?.type || "",
+    )
+  ) {
+    player.updatePlayList(listData.value, musicStore.playSong, props.playlist, {
       showTip: false,
       play: false,
       scrobble: false,
@@ -258,7 +272,7 @@ const sortSelect = (key: SortType) => {
 };
 
 // 删除指定索引
-const removeSong = (id: number[]) => emit("removeSong", id);
+const removeSong = (song: SongInfo[]) => emit("removeSong", song);
 
 // keep-alive 处理
 onBeforeRouteLeave(() => {

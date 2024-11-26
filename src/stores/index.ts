@@ -6,3 +6,4 @@ export { useDataStore } from "./data";
 
 // local-localforage
 export { useLocalStore } from "./local";
+export { usePlatformStore } from "./platform";

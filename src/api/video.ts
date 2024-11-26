@@ -1,10 +1,10 @@
-import request from "@/utils/request";
+import request, { API_URL, requestHemusic } from "@/utils/request";
 
 // 视频详情
-export const videoDetail = (id: number, type: "mv" | "video") => {
-  return request({
-    url: `/${type}/detail`,
-    params: type === "mv" ? { mvid: id } : { id },
+export const videoDetail = (id: string, platform: string) => {
+  return requestHemusic({
+    url: `/v1/mv`,
+    params: { id, platform },
   });
 };
 
@@ -23,6 +23,23 @@ export const videoDetailInfo = (id: number, type: "mv" | "video") => {
     params: type === "mv" ? { mvid: id } : { vid: id },
   });
 };
+
+export const getMVUrlStr = (
+  platform,
+  id: string,
+  quality = 320,
+  format = "mp4",
+  redirect = true,
+  token = "",
+) =>
+  `${API_URL}/v1/mv/url?${new URLSearchParams({
+    id,
+    platform,
+    quality: quality.toString(),
+    format,
+    redirect: redirect.toString(),
+    token,
+  }).toString()}`;
 
 /**
  * 全部 mv

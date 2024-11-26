@@ -23,7 +23,7 @@
         <s-image
           v-if="!hiddenCover"
           :key="song.cover"
-          :src="song.path ? song.cover : song.coverSize?.s || song.cover"
+          :src="song.path ? song.cover : getSizeCover(song, 300)"
           class="cover"
           @update:show="localCover"
         />
@@ -52,20 +52,20 @@
               {{ song.quality }}
             </n-tag>
             <!-- 特权 -->
-            <n-tag v-if="song.originCoverType === 1" :bordered="false" type="primary" round>
-              原
-            </n-tag>
-            <n-tag v-if="song.free === 1" :bordered="false" type="error" round> VIP </n-tag>
-            <n-tag v-if="song.free === 4" :bordered="false" type="error" round> EP </n-tag>
+            <!--            <n-tag v-if="song.originCoverType === 1" :bordered="false" type="primary" round>-->
+            <!--              原-->
+            <!--            </n-tag>-->
+            <!--            <n-tag v-if="song.free === 1" :bordered="false" type="error" round> VIP </n-tag>-->
+            <!--            <n-tag v-if="song.free === 4" :bordered="false" type="error" round> EP </n-tag>-->
             <!-- 云盘 -->
-            <n-tag v-if="song?.pc" :bordered="false" class="cloud" type="info" round>
-              <template #icon>
-                <SvgIcon name="Cloud" />
-              </template>
-            </n-tag>
+            <!--            <n-tag v-if="song?.pc" :bordered="false" class="cloud" type="info" round>-->
+            <!--              <template #icon>-->
+            <!--                <SvgIcon name="Cloud" />-->
+            <!--              </template>-->
+            <!--            </n-tag>-->
             <!-- MV -->
             <n-tag
-              v-if="song?.mv"
+              v-if="song?.mv_id"
               :bordered="false"
               class="mv"
               type="warning"
@@ -73,7 +73,7 @@
               @click.stop="
                 router.push({
                   name: 'video',
-                  query: { id: song.mv },
+                  query: { id: song.mv_id, platform: song.platform },
                 })
               "
             >
@@ -81,35 +81,39 @@
             </n-tag>
           </div>
           <!-- 歌手 -->
-          <div v-if="Array.isArray(song.artists)" class="artists text-hidden">
+          <div v-if="Array.isArray(song.singers)" class="artists text-hidden">
             <n-text
-              v-for="ar in song.artists"
+              v-for="ar in song.singers"
               :key="ar.id"
               class="ar"
-              @click="openJumpArtist(song.artists)"
+              @click="openJumpArtist(song.platform, song.singers)"
             >
               {{ ar.name }}
             </n-text>
           </div>
-          <div v-else-if="song.type === 'radio'" class="artists">
-            <n-text class="ar"> 电台节目 </n-text>
-          </div>
-          <div v-else class="artists text-hidden" @click="openJumpArtist(song.artists)">
-            <n-text class="ar"> {{ song.artists || "未知艺术家" }} </n-text>
+          <!--          <div v-else-if="song.type === 'radio'" class="artists">-->
+          <!--            <n-text class="ar"> 电台节目 </n-text>-->
+          <!--          </div>-->
+          <div
+            v-else
+            class="artists text-hidden"
+            @click="openJumpArtist(song.platform, song.singers)"
+          >
+            <n-text class="ar"> {{ song.singers || "未知艺术家" }} </n-text>
           </div>
           <!-- 别名 -->
-          <n-text v-if="song.alia" class="alia text-hidden" depth="3">{{ song.alia }}</n-text>
+          <!--          <n-text v-if="song.alia" class="alia text-hidden" depth="3">{{ song.alia }}</n-text>-->
         </div>
       </div>
       <!-- 专辑 -->
-      <div v-if="song.type !== 'radio' && !hiddenAlbum" class="album text-hidden">
+      <div v-if="!hiddenAlbum" class="album text-hidden">
         <n-text
           v-if="isObject(song.album)"
           class="album-text"
           @click="
             router.push({
               name: 'album',
-              query: { id: song.album?.id },
+              query: { id: song.album?.id, platform: song.platform },
             })
           "
         >
@@ -120,47 +124,46 @@
         </n-text>
       </div>
       <!-- 操作 -->
-      <div v-if="song.type !== 'radio'" class="actions" @click.stop @dblclick.stop>
+      <div class="actions" @click.stop @dblclick.stop>
         <!-- 喜欢歌曲 -->
         <SvgIcon
-          :name="dataStore.isLikeSong(song.id) ? 'Favorite' : 'FavoriteBorder'"
+          :name="dataStore.isLikeSong(song) ? 'Favorite' : 'FavoriteBorder'"
           :size="20"
-          @click.stop="toLikeSong(song, !dataStore.isLikeSong(song.id))"
+          @click.stop="toLikeSong(song, !dataStore.isLikeSong(song))"
           @delclick.stop
         />
       </div>
-      <!-- 更新日期 -->
-      <n-text v-if="song.type === 'radio'" class="meta date" depth="3">
-        {{ formatTimestamp(song.updateTime) }}
-      </n-text>
-      <!-- 播放量 -->
-      <n-text v-if="song.type === 'radio'" class="meta" depth="3">
-        {{ formatNumber(song.playCount || 0) }}
-      </n-text>
+      <!--      &lt;!&ndash; 更新日期 &ndash;&gt;-->
+      <!--      <n-text v-if="song.type === 'radio'" class="meta date" depth="3">-->
+      <!--        {{ formatTimestamp(song.updateTime) }}-->
+      <!--      </n-text>-->
+      <!--      &lt;!&ndash; 播放量 &ndash;&gt;-->
+      <!--      <n-text v-if="song.type === 'radio'" class="meta" depth="3">-->
+      <!--        {{ formatNumber(song.playCount || 0) }}-->
+      <!--      </n-text>-->
       <!-- 时长 -->
-      <n-text class="meta" depth="3">{{ msToTime(song.duration) }}</n-text>
+      <n-text class="meta" depth="3">{{ secondsToTime(song.duration) }}</n-text>
       <!-- 大小 -->
-      <n-text v-if="song.path && song.size && !hiddenSize" class="meta size" depth="3">
-        {{ song.size }}M
-      </n-text>
+      <n-text v-if="!hiddenSize" class="meta size" depth="3"> {{ song.size }}M </n-text>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { SongType } from "@/types/main";
-import { useStatusStore, useMusicStore, useDataStore } from "@/stores";
-import { formatNumber, isElectron } from "@/utils/helper";
+import { useDataStore, useMusicStore, useStatusStore } from "@/stores";
+import { isElectron } from "@/utils/helper";
 import { openJumpArtist } from "@/utils/modal";
 import { toLikeSong } from "@/utils/auth";
 import { isObject } from "lodash-es";
-import { formatTimestamp, msToTime } from "@/utils/time";
+import { secondsToTime } from "@/utils/time";
 import player from "@/utils/player";
 import blob from "@/utils/blob";
+import { SongInfo } from "@/types/main.hemusic";
+import { getSizeCover } from "@/utils/format";
 
 const props = defineProps<{
   // 歌曲
-  song: SongType;
+  song: SongInfo;
   // 索引
   index: number;
   // 隐藏信息

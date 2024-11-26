@@ -58,13 +58,10 @@
             />
             <!-- 喜欢 -->
             <SvgIcon
-              v-if="musicStore.playSong.type !== 'radio'"
-              :name="dataStore.isLikeSong(musicStore.playSong.id) ? 'Favorite' : 'FavoriteBorder'"
+              :name="dataStore.isLikeSong(musicStore.playSong) ? 'Favorite' : 'FavoriteBorder'"
               :size="20"
               class="like"
-              @click="
-                toLikeSong(musicStore.playSong, !dataStore.isLikeSong(musicStore.playSong.id))
-              "
+              @click="toLikeSong(musicStore.playSong, !dataStore.isLikeSong(musicStore.playSong))"
             />
             <!-- 更多操作 -->
             <n-dropdown :options="songMoreOptions" trigger="click" placement="top-start">
@@ -83,19 +80,22 @@
             />
             <!-- 歌手 -->
             <div v-else class="artists">
-              <n-text v-if="musicStore.playSong.type === 'radio'" class="ar-item">播客电台</n-text>
-              <template v-else-if="Array.isArray(musicStore.playSong.artists)">
+              <template v-if="Array.isArray(musicStore.playSong.singers)">
                 <n-text
-                  v-for="(item, index) in musicStore.playSong.artists"
+                  v-for="(item, index) in musicStore.playSong.singers"
                   :key="index"
                   class="ar-item"
-                  @click="openJumpArtist(musicStore.playSong.artists)"
+                  @click="openJumpArtist(musicStore.playSong.platform, musicStore.playSong.singers)"
                 >
                   {{ item.name }}
                 </n-text>
               </template>
-              <n-text v-else class="ar-item" @click="openJumpArtist(musicStore.playSong.artists)">
-                {{ musicStore.playSong.artists || "未知艺术家" }}
+              <n-text
+                v-else
+                class="ar-item"
+                @click="openJumpArtist(musicStore.playSong.platform, musicStore.playSong.singers)"
+              >
+                {{ musicStore.playSong.singers || "未知艺术家" }}
               </n-text>
             </div>
           </Transition>
@@ -104,16 +104,8 @@
     </div>
     <!-- 控制 -->
     <div class="play-control">
-      <!-- 不喜欢 -->
-      <div
-        v-if="statusStore.personalFmMode"
-        class="play-icon"
-        v-debounce="() => player.personalFMTrash(musicStore.personalFMSong?.id)"
-      >
-        <SvgIcon class="icon" :size="18" name="ThumbDown" />
-      </div>
       <!-- 上一曲 -->
-      <div v-else class="play-icon" v-debounce="() => player.nextOrPrev('prev')">
+      <div class="play-icon" v-debounce="() => player.nextOrPrev('prev')">
         <SvgIcon :size="26" name="SkipPrev" />
       </div>
       <!-- 播放暂停 -->
@@ -145,12 +137,7 @@
     </div>
     <!-- 功能 -->
     <Transition name="fade" mode="out-in">
-      <n-flex
-        :key="statusStore.personalFmMode ? 'fm' : 'normal'"
-        :size="[8, 0]"
-        class="play-menu"
-        justify="end"
-      >
+      <n-flex :key="'normal'" :size="[8, 0]" class="play-menu" justify="end">
         <!-- 播放时间 -->
         <div class="time">
           <n-text depth="2">{{ secondsToTime(statusStore.currentTime) }}</n-text>
@@ -162,7 +149,6 @@
         </div>
         <!-- 播放模式 -->
         <n-dropdown
-          v-if="musicStore.playSong.type !== 'radio' && !statusStore.personalFmMode"
           :options="playModeOptions"
           :show-arrow="true"
           @select="(mode) => player.togglePlayMode(mode)"
@@ -193,7 +179,6 @@
         </n-popover>
         <!-- 播放列表 -->
         <n-badge
-          v-if="!statusStore.personalFmMode"
           :value="dataStore.playList?.length ?? 0"
           :show="settingStore.showPlaylistCount"
           :max="999"
@@ -212,9 +197,9 @@
 
 <script setup lang="ts">
 import type { DropdownOption } from "naive-ui";
-import { useMusicStore, useStatusStore, useDataStore, useSettingStore } from "@/stores";
-import { secondsToTime, calculateCurrentTime } from "@/utils/time";
-import { renderIcon, isElectron } from "@/utils/helper";
+import { useDataStore, useMusicStore, useSettingStore, useStatusStore } from "@/stores";
+import { calculateCurrentTime, secondsToTime } from "@/utils/time";
+import { isElectron, renderIcon } from "@/utils/helper";
 import { toLikeSong } from "@/utils/auth";
 import { openDownloadSong, openJumpArtist, openPlaylistAdd } from "@/utils/modal";
 import player from "@/utils/player";
@@ -248,8 +233,7 @@ const playModeOptions = ref([
 const songMoreOptions = computed<DropdownOption[]>(() => {
   // 当前状态
   const song = musicStore.playSong;
-  const isHasMv = !!song?.mv && song.mv !== 0;
-  const isSong = song.type === "song";
+  const isHasMv = !!song?.mv_id;
   const isLocal = !!song?.path;
   return [
     {
@@ -263,17 +247,20 @@ const songMoreOptions = computed<DropdownOption[]>(() => {
     {
       key: "mv",
       label: "观看 MV",
-      show: isSong && isHasMv,
+      show: isHasMv,
       props: {
         onClick: () =>
-          router.push({ name: "video", query: { id: musicStore.playSong.mv, type: "mv" } }),
+          router.push({
+            name: "video",
+            query: { id: musicStore.playSong.mv_id, platform: song.platform, type: "mv" },
+          }),
       },
       icon: renderIcon("Video", { size: 18 }),
     },
     {
       key: "download",
       label: "下载歌曲",
-      show: !isLocal && isSong,
+      show: !isLocal,
       props: { onClick: () => openDownloadSong(musicStore.playSong) },
       icon: renderIcon("Download"),
     },
@@ -317,24 +304,14 @@ const playVolumeIcon = computed(() => {
 // 当前播放模式图标
 const playModeIcon = computed(() => {
   const mode = statusStore.playSongMode;
-  return statusStore.playHeartbeatMode
-    ? "HeartBit"
-    : mode === "repeat"
-      ? "Repeat"
-      : mode === "repeat-once"
-        ? "RepeatSong"
-        : "Shuffle";
+  return mode === "repeat" ? "Repeat" : mode === "repeat-once" ? "RepeatSong" : "Shuffle";
 });
 
 // 是否展示歌词
 const isShowLyrics = computed(() => {
   const isHasLrc = musicStore.isHasLrc;
   return (
-    isHasLrc &&
-    settingStore.barLyricShow &&
-    musicStore.playSong.type !== "radio" &&
-    statusStore.playStatus &&
-    statusStore.lyricIndex !== -1
+    isHasLrc && settingStore.barLyricShow && statusStore.playStatus && statusStore.lyricIndex !== -1
   );
 });
 

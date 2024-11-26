@@ -3,6 +3,8 @@ import App from "./App.vue";
 // pinia
 import { createPinia } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
+// vue-dompurify-html
+import VueDOMPurifyHTML from "vue-dompurify-html";
 // router
 import router from "@/router";
 // 自定义指令
@@ -25,6 +27,8 @@ pinia.use(piniaPluginPersistedstate);
 app.use(pinia);
 // router
 app.use(router);
+// vue-dompurify-html
+app.use(VueDOMPurifyHTML);
 // 自定义指令
 app.directive("debounce", debounceDirective);
 app.directive("throttle", throttleDirective);

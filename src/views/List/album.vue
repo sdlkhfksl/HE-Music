@@ -5,7 +5,7 @@
       <div v-if="albumDetailData" class="detail">
         <div class="cover">
           <n-image
-            :src="albumDetailData.coverSize?.m || albumDetailData.cover"
+            :src="albumDetailData.cover"
             :previewed-img-props="{ style: { borderRadius: '8px' } }"
             :preview-src="albumDetailData.cover"
             :renderToolbar="renderToolbar"
@@ -20,11 +20,7 @@
             </template>
           </n-image>
           <!-- 封面背板 -->
-          <n-image
-            class="cover-shadow"
-            preview-disabled
-            :src="albumDetailData.coverSize?.m || albumDetailData.cover"
-          />
+          <n-image class="cover-shadow" preview-disabled :src="albumDetailData.cover" />
         </div>
         <div class="data">
           <n-h2 class="name">
@@ -50,12 +46,12 @@
               <div class="item">
                 <SvgIcon name="Person" :depth="3" />
                 <div
-                  v-if="Array.isArray(albumDetailData.artists)"
+                  v-if="Array.isArray(albumDetailData.singers)"
                   class="artists text-hidden"
-                  @click="openJumpArtist(albumDetailData.artists)"
+                  @click="openJumpArtist(albumDetailData.platform, albumDetailData.singers)"
                 >
                   <n-text
-                    v-for="(ar, arIndex) in albumDetailData.artists"
+                    v-for="(ar, arIndex) in albumDetailData.singers"
                     :key="arIndex"
                     class="ar"
                   >
@@ -65,22 +61,22 @@
                 <div
                   v-else
                   class="artists text-hidden"
-                  @click="openJumpArtist(albumDetailData.artists || '')"
+                  @click="openJumpArtist(albumDetailData.platform, albumDetailData.singers || '')"
                 >
-                  <n-text class="ar"> {{ albumDetailData.artists || "未知艺术家" }} </n-text>
+                  <n-text class="ar"> {{ albumDetailData.singers || "未知艺术家" }} </n-text>
                 </div>
               </div>
               <div class="item">
                 <SvgIcon name="Music" :depth="3" />
-                <n-text>{{ albumDetailData.count }}</n-text>
+                <n-text>{{ albumDetailData.song_num }}</n-text>
               </div>
-              <div v-if="albumDetailData.updateTime" class="item">
-                <SvgIcon name="Update" :depth="3" />
-                <n-text>{{ albumDetailData.updateTime }}</n-text>
-              </div>
-              <div v-else-if="albumDetailData.createTime" class="item">
+              <!--              <div v-if="albumDetailData.updateTime" class="item">-->
+              <!--                <SvgIcon name="Update" :depth="3" />-->
+              <!--                <n-text>{{ albumDetailData.updateTime }}</n-text>-->
+              <!--              </div>-->
+              <div v-if="albumDetailData.publish_time" class="item">
                 <SvgIcon name="Time" :depth="3" />
-                <n-text>{{ formatTimestamp(albumDetailData.createTime) }}</n-text>
+                <n-text>{{ formatTimestamp(Number(albumDetailData.publish_time) * 1000) }}</n-text>
               </div>
             </n-flex>
           </n-collapse-transition>
@@ -101,20 +97,26 @@
                 </template>
                 {{ loading ? "加载中..." : "播放" }}
               </n-button>
-              <n-button :focusable="false" strong secondary round>
+              <n-button
+                :focusable="false"
+                strong
+                secondary
+                round
+                @click="toLikeAlbum(albumDetailData, !isLikeAlbum)"
+              >
                 <template #icon>
                   <SvgIcon :name="isLikeAlbum ? 'Favorite' : 'FavoriteBorder'" />
                 </template>
                 {{ isLikeAlbum ? "取消收藏" : "收藏专辑" }}
               </n-button>
               <!-- 更多 -->
-              <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">
-                <n-button :focusable="false" class="more" circle strong secondary>
-                  <template #icon>
-                    <SvgIcon name="List" />
-                  </template>
-                </n-button>
-              </n-dropdown>
+              <!--              <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">-->
+              <!--                <n-button :focusable="false" class="more" circle strong secondary>-->
+              <!--                  <template #icon>-->
+              <!--                    <SvgIcon name="List" />-->
+              <!--                  </template>-->
+              <!--                </n-button>-->
+              <!--              </n-dropdown>-->
             </n-flex>
             <n-flex class="right">
               <!-- 模糊搜索 -->
@@ -167,18 +169,18 @@
 </template>
 
 <script setup lang="ts">
-import type { CoverType, SongType } from "@/types/main";
-import type { DropdownOption } from "naive-ui";
-import { songDetail } from "@/api/song";
 import { albumDetail } from "@/api/album";
-import { formatCoverList, formatSongsList } from "@/utils/format";
-import { coverLoaded, fuzzySearch, renderIcon } from "@/utils/helper";
+import { coverLoaded, fuzzySearch } from "@/utils/helper";
 import { renderToolbar } from "@/utils/meta";
 import { useDataStore, useStatusStore } from "@/stores";
 import { debounce } from "lodash-es";
 import { formatTimestamp } from "@/utils/time";
 import { openJumpArtist } from "@/utils/modal";
 import player from "@/utils/player";
+import { AlbumInfo, SongInfo } from "@/types/main.hemusic";
+import { computed } from "vue";
+import SongList from "@/components/List/SongList.vue";
+import { toLikeAlbum } from "@/utils/auth";
 
 const router = useRouter();
 const dataStore = useDataStore();
@@ -189,22 +191,26 @@ const isActivated = ref<boolean>(false);
 
 // 专辑数据
 const loading = ref<boolean>(true);
-const albumData = shallowRef<SongType[]>([]);
-const albumDetailData = ref<CoverType | null>(null);
+const albumData = shallowRef<SongInfo[]>([]);
+const albumDetailData = ref<AlbumInfo | null>(null);
 
 // 模糊搜索数据
 const searchValue = ref<string>("");
-const searchData = ref<SongType[]>([]);
+const searchData = ref<SongInfo[]>([]);
 
 // 专辑 ID
-const albumId = computed<number>(() => Number(router.currentRoute.value.query.id as string));
+const albumId = computed<string>(() => router.currentRoute.value.query.id as string);
+const platform = computed<string>(() => router.currentRoute.value.query.platform as string);
 
 // 列表是否滚动
 const listScrolling = ref<boolean>(false);
 
 // 是否处于收藏专辑
 const isLikeAlbum = computed(() =>
-  dataStore.userLikeData.albums.some((album) => album.id === albumDetailData.value?.id),
+  dataStore.userLikeData.albums.some(
+    (album) =>
+      album.id === albumDetailData.value?.id && album.platform === albumDetailData.value?.platform,
+  ),
 );
 
 // 列表应该展示数据
@@ -216,22 +222,22 @@ const songListHeight = computed(() => {
 });
 
 // 更多操作
-const moreOptions = computed<DropdownOption[]>(() => [
-  {
-    label: "打开源页面",
-    key: "open",
-    props: {
-      onClick: () => {
-        window.open(`https://music.163.com/#/album?id=${albumId.value}`);
-      },
-    },
-    icon: renderIcon("Link"),
-  },
-]);
+// const moreOptions = computed<DropdownOption[]>(() => [
+//   {
+//     label: "打开源页面",
+//     key: "open",
+//     props: {
+//       onClick: () => {
+//         window.open(`https://music.163.com/#/album?id=${albumId.value}`);
+//       },
+//     },
+//     icon: renderIcon("Link"),
+//   },
+// ]);
 
 // 获取专辑基础信息
-const getAlbumDetail = async (id: number, refresh: boolean = false) => {
-  if (!id) return;
+const getAlbumDetail = async (id: string, platform: string, refresh: boolean = false) => {
+  if (!id || !platform) return;
   loading.value = true;
   // 清空数据
   clearInput();
@@ -240,13 +246,14 @@ const getAlbumDetail = async (id: number, refresh: boolean = false) => {
     albumDetailData.value = null;
   }
   // 获取专辑详情
-  const detail = await albumDetail(id);
-  albumDetailData.value = formatCoverList(detail.album)[0];
-  // 获取专辑歌曲
-  const ids: number[] = detail.songs.map((song: any) => song.id as number);
-  const result = await songDetail(ids);
-  albumData.value = formatSongsList(result.songs);
-  loading.value = false;
+  albumDetail(id, platform)
+    .then((detail) => {
+      albumDetailData.value = detail;
+      albumData.value = detail.songs;
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 };
 
 // 列表滚动
@@ -279,15 +286,16 @@ const listSearch = debounce((val: string) => {
 
 onBeforeRouteUpdate((to) => {
   clearInput();
-  const id = Number(to.query.id as string);
-  if (id) getAlbumDetail(id);
+  const id = to.query.id as string;
+  const platform = to.query.platform as string;
+  if (id && platform) getAlbumDetail(id, platform);
 });
 
 onActivated(() => {
   if (!isActivated.value) {
     isActivated.value = true;
   } else {
-    getAlbumDetail(albumId.value, albumDetailData.value?.id === albumId.value);
+    getAlbumDetail(albumId.value, platform.value);
   }
 });
 
@@ -296,7 +304,7 @@ onDeactivated(() => {
 });
 
 onMounted(() => {
-  getAlbumDetail(albumId.value);
+  getAlbumDetail(albumId.value, platform.value);
 });
 </script>
 

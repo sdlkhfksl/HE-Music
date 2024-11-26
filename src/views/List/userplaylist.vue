@@ -1,11 +1,11 @@
 <!-- 歌单列表 -->
 <template>
-  <div :class="['liked', { small: listScrolling }]">
+  <div :class="['playlist', { small: listScrolling }]">
     <Transition name="fade" mode="out-in">
       <div v-if="playlistDetailData" class="detail">
         <div class="cover">
           <n-image
-            :src="playlistDetailData.coverSize?.m || playlistDetailData.cover"
+            :src="playlistDetailData.cover"
             :previewed-img-props="{ style: { borderRadius: '8px' } }"
             :preview-src="playlistDetailData.cover"
             :renderToolbar="renderToolbar"
@@ -20,25 +20,22 @@
             </template>
           </n-image>
           <!-- 封面背板 -->
-          <n-image
-            class="cover-shadow"
-            preview-disabled
-            :src="playlistDetailData.coverSize?.m || playlistDetailData.cover"
-          />
+          <n-image class="cover-shadow" preview-disabled :src="playlistDetailData.cover" />
           <!-- 遮罩 -->
           <div class="cover-mask" />
-          <!-- 播放量 -->
-          <div class="play-count">
-            <SvgIcon name="Play" />
-            <span class="num">{{ formatNumber(playlistDetailData.playCount || 0) }}</span>
-          </div>
         </div>
         <div class="data">
-          <n-h2 class="name text-hidden"> 我喜欢的音乐 </n-h2>
+          <n-h2 class="name text-hidden">
+            {{
+              playlistDetailData.is_default == 1
+                ? "我喜欢的音乐"
+                : playlistDetailData.name || "未知歌单"
+            }}
+          </n-h2>
           <n-collapse-transition :show="!listScrolling" class="collapse">
             <!-- 简介 -->
             <n-ellipsis
-              v-if="playlistDetailData.description"
+              v-if="playlistDetailData.description || '这个人很懒，什么都没有留下'"
               :line-clamp="1"
               :tooltip="{
                 trigger: 'click',
@@ -46,40 +43,25 @@
                 width: 'trigger',
               }"
             >
-              {{ playlistDetailData.description }}
+              {{ playlistDetailData.description || "这个人很懒，什么都没有留下" }}
             </n-ellipsis>
             <!-- 信息 -->
             <n-flex class="meta">
               <div class="item">
                 <SvgIcon name="Person" :depth="3" />
-                <n-text>{{ playlistDetailData.creator?.name || "未知用户名" }}</n-text>
+                <n-text>{{ playlistDetailData.creator || "未知用户名" }}</n-text>
               </div>
-              <div v-if="playlistDetailData.updateTime" class="item">
-                <SvgIcon name="Update" :depth="3" />
-                <n-text>{{ formatTimestamp(playlistDetailData.updateTime) }}</n-text>
+              <div class="item">
+                <SvgIcon name="Music" :depth="3" />
+                <n-text>{{ playlistDetailData.song_num || 0 }}</n-text>
               </div>
-              <div v-else-if="playlistDetailData.createTime" class="item">
+              <!--              <div v-if="playlistDetailData.updateTime" class="item">-->
+              <!--                <SvgIcon name="Update" :depth="3" />-->
+              <!--                <n-text>{{ formatTimestamp(playlistDetailData.updateTime) }}</n-text>-->
+              <!--              </div>-->
+              <div v-if="playlistDetailData.created_at" class="item">
                 <SvgIcon name="Time" :depth="3" />
-                <n-text>{{ formatTimestamp(playlistDetailData.createTime) }}</n-text>
-              </div>
-              <div v-if="playlistDetailData.tags?.length" class="item">
-                <SvgIcon name="Tag" :depth="3" />
-                <n-flex class="tags">
-                  <n-tag
-                    v-for="(item, index) in playlistDetailData.tags"
-                    :key="index"
-                    :bordered="false"
-                    round
-                    @click="
-                      router.push({
-                        name: 'discover-playlists',
-                        query: { cat: item },
-                      })
-                    "
-                  >
-                    {{ item }}
-                  </n-tag>
-                </n-flex>
+                <n-text>{{ formatTimestamp(Number(playlistDetailData.created_at) * 1000) }}</n-text>
               </div>
             </n-flex>
           </n-collapse-transition>
@@ -100,11 +82,21 @@
                 </template>
                 {{
                   loading
-                    ? `正在更新... (${
-                        playlistData.length === playlistDetailData.count ? 0 : playlistData.length
-                      }/${playlistDetailData.count})`
+                    ? isSamePlaylist
+                      ? "更新中..."
+                      : `加载中... (${
+                          playlistData.length === Number(playlistDetailData.song_num)
+                            ? 0
+                            : playlistData.length
+                        }/${playlistDetailData.song_num})`
                     : "播放"
                 }}
+              </n-button>
+              <n-button :focusable="false" strong secondary round @click="updatePlaylist">
+                <template #icon>
+                  <SvgIcon name="EditNote" />
+                </template>
+                编辑歌单
               </n-button>
               <!-- 更多 -->
               <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">
@@ -148,7 +140,11 @@
         :data="playlistDataShow"
         :loading="loading"
         :height="songListHeight"
-        :playListId="playlistId"
+        :playlist="{
+          id: playlistId,
+          platform: '',
+          type: 'user-playlist',
+        }"
         @scroll="listScroll"
         @removeSong="removeSong"
       />
@@ -167,37 +163,36 @@
 </template>
 
 <script setup lang="ts">
-import type { CoverType, SongType } from "@/types/main";
 import type { DropdownOption, MessageReactive } from "naive-ui";
-import { songDetail } from "@/api/song";
-import { playlistDetail, playlistAllSongs } from "@/api/playlist";
-import { formatCoverList, formatSongsList } from "@/utils/format";
-import { coverLoaded, formatNumber, fuzzySearch, renderIcon } from "@/utils/helper";
+
+import { coverLoaded, fuzzySearch, renderIcon } from "@/utils/helper";
 import { renderToolbar } from "@/utils/meta";
-import { debounce, isObject } from "lodash-es";
+import { updateUserCreatedPlaylist } from "@/utils/auth";
+import { debounce } from "lodash-es";
 import { useDataStore, useStatusStore } from "@/stores";
 import { openBatchList, openUpdatePlaylist } from "@/utils/modal";
-import { formatTimestamp } from "@/utils/time";
-import { isLogin } from "@/utils/auth";
 import player from "@/utils/player";
+import { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
+import { computed } from "vue";
+import SongList from "@/components/List/SongList.vue";
+import { deleteUserPlaylist, getUserPlaylistDetail } from "@/api/userplaylist";
+import { formatTimestamp } from "@/utils/time";
 
 const router = useRouter();
-const dataStore = useDataStore();
 const statusStore = useStatusStore();
-
-// 是否激活
-const isActivated = ref<boolean>(false);
+const dataStore = useDataStore();
 
 // 歌单数据
-const playlistData = shallowRef<SongType[]>([]);
-const playlistDetailData = ref<CoverType | null>(null);
+const playlistData = shallowRef<SongInfo[]>([]);
+const playlistDetailData = ref<UserPlaylistInfo | null>(null);
 
 // 模糊搜索数据
 const searchValue = ref<string>("");
-const searchData = ref<SongType[]>([]);
+const searchData = ref<SongInfo[]>([]);
 
 // 歌单 ID
-const playlistId = computed<number>(() => dataStore.userLikeData.playlists?.[0]?.id);
+const oldPlaylistId = ref<string>("");
+const playlistId = computed<string>(() => router.currentRoute.value.query.id as string);
 
 // 加载提示
 const loading = ref<boolean>(true);
@@ -216,23 +211,19 @@ const songListHeight = computed(() => {
   return statusStore.mainContentHeight - (listScrolling.value ? 120 : 240);
 });
 
-// 是否处于我喜欢页面
-const isLikedPage = computed(() => router.currentRoute.value.name === "like-songs");
+// 是否为相同歌单
+const isSamePlaylist = computed<boolean>(() => oldPlaylistId.value === playlistId.value);
 
 // 更多操作
 const moreOptions = computed<DropdownOption[]>(() => [
   {
-    label: "编辑歌单",
-    key: "edit",
+    label: "删除歌单",
+    key: "delete",
+    show: playlistDetailData.value?.is_default !== 1,
     props: {
-      onClick: () => {
-        if (!playlistDetailData.value || !playlistId.value) return;
-        openUpdatePlaylist(playlistId.value, playlistDetailData.value, () =>
-          getPlaylistDetail(playlistId.value, { getList: false, refresh: false }),
-        );
-      },
+      onClick: () => toDeletePlaylist(),
     },
-    icon: renderIcon("EditNote"),
+    icon: renderIcon("Delete"),
   },
   {
     label: "批量操作",
@@ -242,109 +233,50 @@ const moreOptions = computed<DropdownOption[]>(() => [
     },
     icon: renderIcon("Batch"),
   },
-  {
-    label: "打开源页面",
-    key: "open",
-    props: {
-      onClick: () => {
-        window.open(`https://music.163.com/#/playlist?id=${playlistId.value}`);
-      },
-    },
-    icon: renderIcon("Link"),
-  },
 ]);
 
 // 获取歌单基础信息
-const getPlaylistDetail = async (
-  id: number,
-  options: {
-    getList: boolean;
-    refresh: boolean;
-  } = {
-    getList: true,
-    refresh: false,
-  },
-) => {
+const getPlaylistDetail = async (id: string, refresh: boolean = false) => {
   if (!id) return;
   // 设置加载状态
   loading.value = true;
-  const { getList, refresh } = options;
   // 清空数据
   clearInput();
-  if (!refresh) resetPlaylistData(getList);
-  // 获取歌单内容
-  getPlaylistData(id, getList, refresh);
+  if (!refresh) resetPlaylistData();
+  // 判断是否为本地歌单，本地歌单 ID 为 16 位
+  const isLocal = id.toString().length === 16;
+  // 本地歌单
+  if (isLocal) handleLocalPlaylist(id);
+  // 在线歌单
+  else await handleOnlinePlaylist(id);
 };
 
 // 重置歌单数据
-const resetPlaylistData = (getList: boolean) => {
+const resetPlaylistData = () => {
   playlistDetailData.value = null;
-  if (getList) {
-    playlistData.value = [];
-    listScrolling.value = false;
-  }
+  playlistData.value = [];
+  listScrolling.value = false;
 };
 
-// 获取歌单
-const getPlaylistData = async (id: number, getList: boolean, refresh: boolean) => {
-  // 加载缓存
-  loadLikedCache();
+// 获取本地歌单
+const handleLocalPlaylist = (id: string) => {
+  console.log(id);
+};
+
+// 获取在线歌单
+const handleOnlinePlaylist = async (id: string) => {
   // 获取歌单详情
-  const detail = await playlistDetail(id);
-  playlistDetailData.value = formatCoverList(detail.playlist)[0];
-  // 不需要获取列表或无歌曲
-  if (!getList || playlistDetailData.value.count === 0) {
-    loading.value = false;
-    return;
-  }
-  // 如果已登录且歌曲数量少于 800，直接加载所有歌曲
-  if (isLogin() === 1 && (playlistDetailData.value?.count as number) < 800) {
-    const ids: number[] = detail.privileges.map((song: any) => song.id as number);
-    const result = await songDetail(ids);
-    playlistData.value = formatSongsList(result.songs);
-  } else {
-    await getPlaylistAllSongs(id, playlistDetailData.value.count || 0, refresh);
-  }
-  // 更新我喜欢
-  dataStore.setLikeSongsList(playlistDetailData.value, playlistData.value);
+  const detail = await getUserPlaylistDetail(id);
+  playlistDetailData.value = detail;
+  playlistData.value = detail.songs;
   loading.value = false;
-};
-
-// 加载缓存
-const loadLikedCache = () => {
-  if (isObject(dataStore.likeSongsList.detail)) {
-    playlistDetailData.value = dataStore.likeSongsList.detail;
+  // 默认歌单
+  if (detail.is_default === 1) {
+    await dataStore.setUserLikeData(
+      "songs",
+      detail.songs.map((item) => ({ id: item.id, platform: item.platform })),
+    );
   }
-  if (dataStore.likeSongsList.data.length) {
-    playlistData.value = dataStore.likeSongsList.data;
-  }
-};
-
-// 获取歌单全部歌曲
-const getPlaylistAllSongs = async (
-  id: number,
-  count: number,
-  // 是否为刷新列表
-  refresh: boolean = false,
-) => {
-  loading.value = true;
-  // 加载提示
-  loadingMsgShow(!refresh);
-  // 循环获取
-  let offset: number = 0;
-  const limit: number = 500;
-  const listData: SongType[] = [];
-  do {
-    const result = await playlistAllSongs(id, limit, offset);
-    const songData = formatSongsList(result.songs);
-    listData.push(...songData);
-    if (!refresh) playlistData.value = playlistData.value.concat(songData);
-    // 更新数据
-    offset += limit;
-  } while (offset < count && isLikedPage.value);
-  if (refresh) playlistData.value = listData;
-  // 关闭加载
-  loadingMsgShow(false);
 };
 
 // 列表滚动
@@ -360,24 +292,10 @@ const clearInput = () => {
   searchData.value = [];
 };
 
-// 播放全部歌曲
-const playAllSongs = debounce(() => {
-  if (!playlistDetailData.value || !playlistData.value?.length) return;
-  player.updatePlayList(playlistData.value, undefined, playlistId.value);
-}, 300);
-
-// 模糊搜索
-const listSearch = debounce((val: string) => {
-  val = val.trim();
-  if (!val || val === "") return;
-  // 获取搜索结果
-  const result = fuzzySearch(val, playlistData.value);
-  searchData.value = result;
-}, 300);
-
 // 加载提示
-const loadingMsgShow = (show: boolean = true) => {
+const loadingMsgShow = (show: boolean = true, count?: number) => {
   if (show) {
+    if (count && count <= 800) return;
     loadingMsg.value?.destroy();
     loadingMsg.value = window.$message.loading("该歌单歌曲数量过多，请稍等", {
       duration: 0,
@@ -390,32 +308,94 @@ const loadingMsgShow = (show: boolean = true) => {
   }
 };
 
-// 删除指定索引歌曲
-const removeSong = (ids: number[]) => {
-  if (!playlistData.value) return;
-  playlistData.value = playlistData.value.filter((song) => !ids.includes(song.id));
+// 播放全部歌曲
+const playAllSongs = debounce(() => {
+  if (!playlistDetailData.value || !playlistData.value?.length) return;
+  player.updatePlayList(playlistData.value, undefined, {
+    id: playlistDetailData.value?.id,
+    platform: "",
+    type: "user-playlist",
+  });
+}, 300);
+
+// 模糊搜索
+const listSearch = debounce((val: string) => {
+  val = val.trim();
+  if (!val || val === "") return;
+  // 获取搜索结果
+  const result = fuzzySearch(val, playlistData.value);
+  searchData.value = result;
+}, 300);
+
+// 删除歌单
+const toDeletePlaylist = async () => {
+  if (!playlistDetailData.value || !playlistId.value) return;
+  window.$dialog.warning({
+    title: "删除歌单",
+    content: "确认删除这个歌单？该操作无法撤销！",
+    positiveText: "删除",
+    negativeText: "取消",
+    onPositiveClick: async () => {
+      await deleteUserPlaylist(playlistId.value);
+      window.$message.success("歌单删除成功");
+      await updateUserCreatedPlaylist();
+    },
+  });
 };
 
+// 删除指定索引歌曲
+const removeSong = (ids: SongInfo[]) => {
+  if (!playlistData.value) return;
+  playlistData.value = playlistData.value.filter(
+    (song) => !ids.some(({ id, platform }) => song.id === id && song.platform === platform),
+  );
+  if (playlistDetailData.value) {
+    playlistDetailData.value.song_num = playlistData.value?.length?.toString();
+  }
+  if (playlistDetailData.value?.is_default === 1) {
+    dataStore.setUserLikeData(
+      "songs",
+      playlistData.value.map((item) => ({ id: item.id, platform: item.platform })),
+    );
+  }
+};
+
+// 编辑歌单
+const updatePlaylist = () => {
+  if (!playlistDetailData.value || !playlistId.value) return;
+  openUpdatePlaylist(playlistId.value, playlistDetailData.value, () =>
+    getPlaylistDetail(playlistId.value, false),
+  );
+};
+
+onBeforeRouteUpdate((to) => {
+  const id = to.query.id as string;
+  if (id) {
+    oldPlaylistId.value = id;
+    getPlaylistDetail(id);
+  }
+});
+
 onActivated(() => {
-  if (!isActivated.value) {
-    isActivated.value = true;
+  // 是否为首次进入
+  if (!oldPlaylistId.value) {
+    oldPlaylistId.value = playlistId.value;
   } else {
-    getPlaylistDetail(playlistId.value, { getList: true, refresh: true });
+    // 是否不相同
+    const isSame = oldPlaylistId.value === playlistId.value;
+    oldPlaylistId.value = playlistId.value;
+    // 刷新歌单
+    getPlaylistDetail(playlistId.value, isSame);
   }
 });
 
 onDeactivated(() => loadingMsgShow(false));
 onUnmounted(() => loadingMsgShow(false));
-
-onMounted(async () => {
-  const data: any = await dataStore.getUserLikePlaylist();
-  const id = data?.detail?.id;
-  if (id) getPlaylistDetail(id);
-});
+onMounted(() => getPlaylistDetail(playlistId.value));
 </script>
 
 <style lang="scss" scoped>
-.liked {
+.playlist {
   display: flex;
   flex-direction: column;
   .detail {
@@ -524,6 +504,10 @@ onMounted(async () => {
         transition:
           font-size 0.3s var(--n-bezier),
           color 0.3s var(--n-bezier);
+        .n-icon {
+          cursor: pointer;
+          transform: translateY(2px);
+        }
       }
       .collapse {
         position: absolute;

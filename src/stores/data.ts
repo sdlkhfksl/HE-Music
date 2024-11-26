@@ -1,37 +1,23 @@
 import { defineStore } from "pinia";
-import type {
-  SongType,
-  CoverType,
-  UserDataType,
-  UserLikeDataType,
-  CatType,
-  LoginType,
-} from "@/types/main";
-import { playlistCatlist } from "@/api/playlist";
+import type { CoverType, UserLikeDataType } from "@/types/main";
+import { playlistTagList } from "@/api/playlist";
 import { cloneDeep, isEmpty } from "lodash-es";
-import { isLogin } from "@/utils/auth";
 import localforage from "localforage";
-import { formatCategoryList } from "@/utils/format";
+import { SongInfo, TagGroupInfo, UserInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 
 interface ListState {
-  playList: SongType[];
-  historyList: SongType[];
-  cloudPlayList: SongType[];
+  playList: SongInfo[];
+  historyList: SongInfo[];
   searchHistory: string[];
   localPlayList: CoverType[];
+  // loginType: LoginType;
+  userData: UserInfo;
+  // 登录状态
   userLoginStatus: boolean;
-  loginType: LoginType;
-  userData: UserDataType;
+  token: string;
   userLikeData: UserLikeDataType;
-  likeSongsList: {
-    detail: CoverType;
-    data: SongType[];
-  };
-  catData: {
-    type: Record<number, string>;
-    cats: CatType[];
-    hqCats: CatType[];
-  };
+  userCreatedPlaylist: UserPlaylistInfo[]; //用户创建的歌单
+  catData: Record<string, TagGroupInfo[]>;
 }
 
 type UserDataKeys = keyof ListState["userLikeData"];
@@ -61,18 +47,18 @@ export const useDataStore = defineStore({
     searchHistory: [],
     // 本地歌单
     localPlayList: [],
-    // 云盘歌单
-    cloudPlayList: [],
     // 登录状态
     userLoginStatus: false,
-    // 登录方式
-    loginType: "qr",
+    token: "",
+    userCreatedPlaylist: [],
     // 用户数据
     userData: {
-      userId: 0,
-      userType: 0,
-      vipType: 0,
-      name: "",
+      id: "",
+      username: "",
+      email: "",
+      status: 0,
+      nickname: "",
+      cover: "",
     },
     // 用户喜欢数据
     userLikeData: {
@@ -81,27 +67,16 @@ export const useDataStore = defineStore({
       artists: [],
       albums: [],
       mvs: [],
-      djs: [],
-    },
-    // 我喜欢的音乐
-    likeSongsList: {
-      detail: {
-        id: 0,
-        name: "我喜欢的音乐",
-        cover: "/images/album.jpg?assest",
-      },
-      data: [],
     },
     // 分类数据
-    catData: {
-      type: {},
-      cats: [],
-      hqCats: [],
-    },
+    catData: {},
   }),
   getters: {
     // 是否为喜欢歌曲
-    isLikeSong: (state) => (id: number) => state.userLikeData.songs.includes(id),
+    isLikeSong:
+      (state) =>
+      ({ id, platform }: { id: string; platform: string } = { id: "", platform: "" }) =>
+        state.userLikeData.songs.some((item) => item.id === id && item.platform === platform),
   },
   actions: {
     async loadData() {
@@ -128,7 +103,7 @@ export const useDataStore = defineStore({
       }
     },
     // 更新播放列表
-    async setPlayList(data: SongType | SongType[]): Promise<number> {
+    async setPlayList(data: SongInfo | SongInfo[]): Promise<number> {
       try {
         // 若为列表
         if (Array.isArray(data)) {
@@ -141,9 +116,11 @@ export const useDataStore = defineStore({
         // 若为单曲
         else {
           // 若为单曲
-          const song = cloneDeep(data as SongType);
+          const song = cloneDeep(data as SongInfo);
           // 歌曲去重
-          const playList = this.playList.filter((s) => s.id !== song.id);
+          const playList = this.playList.filter(
+            (item) => item.id !== song.id || item.platform !== song.platform,
+          );
           // 添加到歌单末尾
           playList.push(song);
           // 获取索引
@@ -159,9 +136,11 @@ export const useDataStore = defineStore({
       }
     },
     // 新增下一首播放歌曲
-    async setNextPlaySong(song: SongType, index: number): Promise<number> {
+    async setNextPlaySong(song: SongInfo, index: number): Promise<number> {
       // 移除重复的歌曲（如果存在）
-      const playList = this.playList.filter((item) => item.id !== song.id);
+      const playList = this.playList.filter(
+        (item) => item.id !== song.id || item.platform !== song.platform,
+      );
       // 在当前播放位置之后插入歌曲
       const indexAdd = index + 1;
       playList.splice(indexAdd, 0, song);
@@ -171,7 +150,7 @@ export const useDataStore = defineStore({
       return indexAdd;
     },
     // 更改播放历史
-    async setHistory(song: SongType) {
+    async setHistory(song: SongInfo) {
       try {
         let historyList: ListState["historyList"] | null = await musicDB.getItem("historyList");
         // 是否无数据
@@ -181,12 +160,15 @@ export const useDataStore = defineStore({
         // 深拷贝
         song = cloneDeep(song);
         // 添加到首项并移除重复项
-        const updatedList = [song, ...historyList.filter((item) => item.id !== song.id)];
+        const updatedList = [
+          song,
+          ...historyList.filter((item) => item.id !== song.id || item.platform !== song.platform),
+        ];
         // 最多 500 首
         if (updatedList.length > 500) updatedList.splice(500);
         await musicDB.setItem("historyList", updatedList);
         // 更新播放历史
-        this.historyList = updatedList as SongType[];
+        this.historyList = updatedList as SongInfo[];
       } catch (error) {
         console.error("Error updating history:", error);
         throw error;
@@ -201,25 +183,6 @@ export const useDataStore = defineStore({
         console.error("Error clearing history:", error);
         throw error;
       }
-    },
-    // 更改我喜欢的音乐
-    async setLikeSongsList(detail: CoverType, data: SongType[]) {
-      await musicDB.setItem("likeSongsList", {
-        detail: cloneDeep(detail),
-        data: cloneDeep(data),
-      });
-      this.likeSongsList = { detail, data };
-    },
-    // 获取我喜欢的歌单数据
-    async getUserLikePlaylist() {
-      if (!isLogin() || !this.userData.userId) return;
-      const result = await musicDB.getItem("likeSongsList");
-      return result;
-    },
-    // 更改云盘歌单
-    async setCloudPlayList(data: SongType[]) {
-      await musicDB.setItem("cloudPlayList", cloneDeep(data));
-      this.cloudPlayList = data;
     },
     // 更改用户数据
     async setUserLikeData<K extends UserDataKeys>(
@@ -239,12 +202,15 @@ export const useDataStore = defineStore({
     async clearUserData() {
       try {
         this.userLoginStatus = false;
-        this.loginType = "qr";
+        this.token = "";
+        this.userCreatedPlaylist = [];
         this.userData = {
-          userId: 0,
-          userType: 0,
-          vipType: 0,
-          name: "",
+          id: "",
+          username: "",
+          email: "",
+          status: 0,
+          nickname: "",
+          cover: "",
         };
         await Promise.all(
           Object.keys(this.userLikeData).map(async (key) => {
@@ -275,17 +241,13 @@ export const useDataStore = defineStore({
       }
     },
     // 获取歌单分类
-    async getPlaylistCatList() {
-      if (!isEmpty(this.catData.cats) && !isEmpty(this.catData.hqCats)) return;
+    async getPlaylistCatList(platform: string) {
+      if (!isEmpty(this.catData[platform])) return;
       // 获取歌单分类
       try {
-        const [catsRes, hqCatsRes] = await Promise.all([playlistCatlist(), playlistCatlist(true)]);
-        console.log(catsRes, hqCatsRes);
-        this.catData = {
-          type: catsRes.categories,
-          cats: formatCategoryList(catsRes.sub),
-          hqCats: formatCategoryList(hqCatsRes.tags),
-        };
+        const res = await playlistTagList(platform);
+        console.log("tag", "platform", res);
+        this.catData[platform] = res.group_list;
       } catch (error) {
         console.error("Error getting playlist cat list:", error);
         throw error;
@@ -296,6 +258,6 @@ export const useDataStore = defineStore({
   persist: {
     key: "data-store",
     storage: localStorage,
-    paths: ["userLoginStatus", "loginType", "userData", "searchHistory", "catData"],
+    paths: ["userLoginStatus", "userData", "searchHistory", "catData", "token"],
   },
 });

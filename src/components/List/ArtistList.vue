@@ -8,7 +8,7 @@
           @click="
             router.push({
               name: 'artist',
-              query: { id: item.id },
+              query: { id: item.id, platform: item.platform },
             })
           "
         >
@@ -16,13 +16,13 @@
             <!-- 封面 -->
             <div class="cover">
               <s-image
-                :src="item.coverSize?.m || item.cover"
+                :src="item.cover"
                 default-src="/images/artist.jpg?assest"
                 class="cover-img"
               />
               <!-- 封面背板 -->
               <s-image
-                :src="item.coverSize?.m || item.cover"
+                :src="item.cover"
                 default-src="/images/artist.jpg?assest"
                 class="cover-shadow"
               />
@@ -33,9 +33,20 @@
             <div class="cover-data">
               <n-text class="name text-hidden">{{ item.name }}</n-text>
               <!-- 数量 -->
-              <div v-if="item.musicSize" class="num">
-                <SvgIcon name="Music" :depth="3" />
-                <n-text class="num" :depth="3">{{ item.musicSize }}</n-text>
+
+              <div class="item">
+                <div v-if="item.song_num" class="num">
+                  <SvgIcon name="Music" :depth="3" />
+                  <n-text class="num" :depth="3">{{ item.song_num }}</n-text>
+                </div>
+                <div v-if="item.album_num" class="num">
+                  <SvgIcon name="Album" :depth="3" />
+                  <n-text class="num" :depth="3">{{ item.album_num }}</n-text>
+                </div>
+                <div v-if="item.mv_num" class="num">
+                  <SvgIcon name="Video" :depth="3" />
+                  <n-text class="num" :depth="3">{{ item.mv_num }}</n-text>
+                </div>
               </div>
             </div>
           </div>
@@ -68,11 +79,10 @@
 </template>
 
 <script setup lang="ts">
-import type { ArtistType } from "@/types/main";
+import { SingerInfo, UserFavouriteSingerInfo } from "@/types/main.hemusic";
 
 interface Props {
-  data: ArtistType[];
-  type?: "playlist" | "album" | "video";
+  data: SingerInfo[] | UserFavouriteSingerInfo[];
   cols?: string;
   loadMore?: boolean;
   loading?: boolean;
@@ -159,6 +169,19 @@ const router = useRouter();
       align-items: center;
       flex-direction: column;
       padding: 0 12px;
+
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .num {
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          gap: 4px;
+        }
+      }
       .name {
         font-size: 16px;
         margin-bottom: 4px;

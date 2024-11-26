@@ -1,6 +1,5 @@
 <template>
   <div :class="['player-cover', settingStore.playerType, { playing: statusStore.playStatus }]">
-    <!-- 指针 -->
     <img
       v-if="settingStore.playerType === 'record'"
       class="pointer"
@@ -10,83 +9,18 @@
     <!-- 专辑图片 -->
     <s-image
       :key="musicStore.getSongCover()"
-      :src="musicStore.getSongCover('l')"
+      :src="musicStore.getSongCover(500)"
       class="cover-img"
     />
-    <!-- 动态封面 -->
-    <Transition name="fade" mode="out-in">
-      <video
-        v-if="dynamicCover && settingStore.dynamicCover && settingStore.playerType === 'cover'"
-        ref="videoRef"
-        :src="dynamicCover"
-        :class="['dynamic-cover', { loaded: dynamicCoverLoaded }]"
-        muted
-        autoplay
-        @loadeddata="dynamicCoverLoaded = true"
-        @ended="dynamicCoverEnded"
-      />
-    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { songDynamicCover } from "@/api/song";
 import { useSettingStore, useStatusStore, useMusicStore } from "@/stores";
-import { isLogin } from "@/utils/auth";
-import { isEmpty } from "lodash-es";
 
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
-
-// 动态封面
-const dynamicCover = ref<string>("");
-const dynamicCoverLoaded = ref<boolean>(false);
-
-// 视频元素
-const videoRef = ref<HTMLVideoElement | null>(null);
-
-// 封面再放送
-const { start: dynamicCoverStart, stop: dynamicCoverStop } = useTimeoutFn(
-  () => {
-    dynamicCoverLoaded.value = true;
-    videoRef.value?.play();
-  },
-  2000,
-  { immediate: false },
-);
-
-// 获取动态封面
-const getDynamicCover = async () => {
-  if (
-    isLogin() !== 1 ||
-    !musicStore.playSong.id ||
-    !settingStore.dynamicCover ||
-    settingStore.playerType !== "cover"
-  )
-    return;
-  dynamicCoverStop();
-  dynamicCoverLoaded.value = false;
-  const result = await songDynamicCover(musicStore.playSong.id);
-  if (!isEmpty(result.data) && result?.data?.videoPlayUrl) {
-    dynamicCover.value = result.data.videoPlayUrl;
-  } else {
-    dynamicCover.value = "";
-  }
-};
-
-// 封面播放结束
-const dynamicCoverEnded = () => {
-  dynamicCoverLoaded.value = false;
-  dynamicCoverStart();
-};
-
-watch(
-  () => [musicStore.playSong.id, settingStore.dynamicCover, settingStore.playerType],
-  () => getDynamicCover(),
-);
-
-onMounted(getDynamicCover);
 </script>
 
 <style lang="scss" scoped>

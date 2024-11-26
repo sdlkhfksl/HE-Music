@@ -18,8 +18,8 @@
         <TransitionGroup v-else tag="div" name="fade" class="cover-list">
           <n-image
             v-for="item in songList"
-            :key="item.id"
-            :src="item.coverSize?.m || item.cover"
+            :key="`${item.id}-${item.platform}`"
+            :src="item.cover"
             preview-disabled
             lazy
             @load="coverLoaded"
@@ -48,14 +48,14 @@
 </template>
 
 <script lang="ts" setup>
-import type { SongType } from "@/types/main";
 import { coverLoaded } from "@/utils/helper";
 import { sampleSize } from "lodash-es";
+import { SongInfo } from "@/types/main.hemusic";
 
 const props = defineProps<{
   size: "normal" | "small";
   title: string | VNode;
-  data?: SongType[];
+  data?: SongInfo[];
   description?: string;
   loading?: boolean;
   height?: number;

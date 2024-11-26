@@ -14,14 +14,14 @@
             </n-list-item>
             <!-- 已有歌单 -->
             <n-list-item
-              v-for="(item, index) in onlinePlaylists"
+              v-for="(item, index) in dataStore.userCreatedPlaylist"
               :key="index"
               class="playlist"
-              @click="addPlaylist(item?.id, index)"
+              @click="addPlaylist(item)"
             >
               <template #prefix>
                 <n-image
-                  :src="item?.coverSize?.s || '/images/album.jpg?assest'"
+                  :src="item.cover || '/images/album.jpg?assest'"
                   class="cover"
                   preview-disabled
                   lazy
@@ -36,7 +36,7 @@
               </template>
               <n-thing :title="index === 0 ? '我喜欢的音乐' : item.name">
                 <template #description>
-                  <n-text depth="3" class="size">{{ item.count }} 首音乐</n-text>
+                  <n-text depth="3" class="size">{{ item.song_num }} 首音乐</n-text>
                 </template>
               </n-thing>
             </n-list-item>
@@ -51,17 +51,17 @@
 </template>
 
 <script setup lang="ts">
-import type { SongType } from "@/types/main";
 import type { MessageReactive } from "naive-ui";
 import { useDataStore } from "@/stores";
 import { coverLoaded } from "@/utils/helper";
-import { playlistTracks } from "@/api/playlist";
 import { debounce } from "lodash-es";
-import { isLogin, updateUserLikePlaylist, updateUserLikeSongs } from "@/utils/auth";
+import { updateUserCreatedPlaylist, updateUserLikeSongs } from "@/utils/auth";
 import { openCreatePlaylist } from "@/utils/modal";
+import { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
+import { addSongToPlaylist } from "@/api/userplaylist";
 
 const props = defineProps<{
-  data: SongType[];
+  data: SongInfo[];
   isLocal: boolean;
 }>();
 
@@ -74,37 +74,30 @@ const dataStore = useDataStore();
 // 加载提示
 const loadingMsg = ref<MessageReactive>();
 
-// 在线歌单
-const onlinePlaylists = computed(() => {
-  return (
-    dataStore.userLikeData.playlists.filter(
-      (playlist) => playlist.userId === dataStore.userData?.userId,
-    ) || []
-  );
-});
-
 // 添加到歌单
 const addPlaylist = debounce(
-  async (id: number, index: number) => {
-    if (isLogin() === 2) {
-      window.$message.warning("该登录模式暂不支持该操作");
+  async (info: UserPlaylistInfo) => {
+    loadingMsg.value = window.$message.loading("正在添加歌曲至歌单", { duration: 0 });
+    const ids = props.data
+      .map((item) => {
+        return {
+          id: item.id,
+          platform: item.platform,
+        };
+      })
+      .filter((item) => item.id && item.platform);
+    if (ids.length === 0) {
+      if (loadingMsg.value) loadingMsg.value.destroy();
       return;
     }
-    loadingMsg.value = window.$message.loading("正在添加歌曲至歌单", { duration: 0 });
-    const ids = props.data.map((item) => item.id).filter((item) => item !== 0);
-    const result = await playlistTracks(id, ids);
-    if (loadingMsg.value) loadingMsg.value.destroy();
-    if (result.status === 200) {
-      if (result.body?.code !== 200) {
-        window.$message.error(result.body?.message || "添加失败，请重试");
-        return;
-      }
-      emit("close");
+    try {
+      await addSongToPlaylist(info.id, ids);
       window.$message.success("添加歌曲至歌单成功");
-      if (index === 0) await updateUserLikeSongs();
-      await updateUserLikePlaylist();
-    } else {
-      window.$message.error(result?.message || "添加失败，请重试");
+      emit("close");
+      if (info.is_default === 1) await updateUserLikeSongs();
+      await updateUserCreatedPlaylist();
+    } catch (e: any) {
+      window.$message.error(e?.message || "添加失败，请重试");
     }
   },
   500,

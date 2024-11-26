@@ -1,4 +1,4 @@
-import type { SongType, UpdateLogType } from "@/types/main";
+import type { UpdateLogType } from "@/types/main";
 import { NTooltip, SelectOption } from "naive-ui";
 import { h, VNode } from "vue";
 import { useClipboard } from "@vueuse/core";
@@ -9,6 +9,7 @@ import { convertToLocalTime } from "./time";
 import { useSettingStore } from "@/stores";
 import { marked } from "marked";
 import SvgIcon from "@/components/Global/SvgIcon.vue";
+import { SongInfo } from "@/types/main.hemusic";
 
 type AnyObject = { [key: string]: any };
 
@@ -64,9 +65,9 @@ export const renderOption = ({ node, option }: { node: VNode; option: SelectOpti
   );
 
 // 模糊搜索
-export const fuzzySearch = (keyword: string, data: SongType[]): SongType[] => {
+export const fuzzySearch = (keyword: string, data: SongInfo[]): SongInfo[] => {
   try {
-    const result: SongType[] = [];
+    const result: SongInfo[] = [];
     const regex = new RegExp(keyword, "i");
 
     /**

@@ -38,18 +38,18 @@
 </template>
 
 <script setup lang="ts">
-import type { SongType } from "@/types/main";
 import { some } from "lodash-es";
 import blob from "@/utils/blob";
+import { SongInfo } from "@/types/main.hemusic";
 
-const props = defineProps<{ data: SongType[] }>();
+const props = defineProps<{ data: SongInfo[] }>();
 
 // 专辑数据
 const chooseAlbum = ref<string>("");
-const albumData = computed<Record<string, SongType[]>>(() => formatArtistsList(props.data));
+const albumData = computed<Record<string, SongInfo[]>>(() => formatArtistsList(props.data));
 
 // 区分专辑数据
-const formatArtistsList = (data: SongType[]): Record<string, SongType[]> => {
+const formatArtistsList = (data: SongInfo[]): Record<string, SongInfo[]> => {
   const allAlbums = data.reduce(
     (acc, song) => {
       // 专辑信息
@@ -60,12 +60,12 @@ const formatArtistsList = (data: SongType[]): Record<string, SongType[]> => {
       if (!some(acc[albumName], { id: song.id })) acc[albumName].push(song);
       return acc;
     },
-    {} as Record<string, SongType[]>,
+    {} as Record<string, SongInfo[]>,
   );
   // 按字母顺序排序
   const sortedAlbums = Object.keys(allAlbums).sort((a, b) => a.localeCompare(b));
   // 创建排序后的专辑对象
-  const sortedAllAlbums: Record<string, SongType[]> = {};
+  const sortedAllAlbums: Record<string, SongInfo[]> = {};
   sortedAlbums.forEach((album) => {
     sortedAllAlbums[album] = allAlbums[album];
   });

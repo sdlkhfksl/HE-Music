@@ -245,9 +245,9 @@ const checkRegistered = debounce(async (shortcut: string) => {
 
 // 开关全局快捷键
 const updateGlobalOpen = (val: boolean) => {
-  if(val) shortcutStore.registerAllShortcuts();
+  if (val) shortcutStore.registerAllShortcuts();
   else window.electron.ipcRenderer.send("unregister-all-shortcut");
-}
+};
 
 // 重置快捷键
 const resetShortcut = () => {

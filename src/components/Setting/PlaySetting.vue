@@ -50,7 +50,7 @@
       <n-card class="set-item">
         <div class="label">
           <n-text class="name">在线歌曲音质</n-text>
-          <n-text class="tip" :depth="3"> {{ songLevelData[settingStore.songLevel].tip }}</n-text>
+          <n-text class="tip" :depth="3"> {{ songLevelData[settingStore.songLevel]?.tip }}</n-text>
         </div>
         <n-select
           v-model:value="settingStore.songLevel"
@@ -73,13 +73,13 @@
         </div>
         <n-switch v-model:value="settingStore.useSongUnlock" class="set" :round="false" />
       </n-card>
-      <n-card class="set-item">
-        <div class="label">
-          <n-text class="name">听歌打卡</n-text>
-          <n-text class="tip" :depth="3">是否将播放歌曲同步至网易云音乐</n-text>
-        </div>
-        <n-switch v-model:value="settingStore.scrobbleSong" class="set" :round="false" />
-      </n-card>
+      <!--      <n-card class="set-item">-->
+      <!--        <div class="label">-->
+      <!--          <n-text class="name">听歌打卡</n-text>-->
+      <!--          <n-text class="tip" :depth="3">是否将播放歌曲同步至网易云音乐</n-text>-->
+      <!--        </div>-->
+      <!--        <n-switch v-model:value="settingStore.scrobbleSong" class="set" :round="false" />-->
+      <!--      </n-card>-->
       <n-card v-if="isElectron" class="set-item">
         <div class="label">
           <n-text class="name">音频输出设备</n-text>
@@ -176,18 +176,6 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">动态封面</n-text>
-          <n-text class="tip" :depth="3">可展示部分歌曲的动态封面，仅在封面模式有效</n-text>
-        </div>
-        <n-switch
-          v-model:value="settingStore.dynamicCover"
-          :disabled="isLogin() !== 1"
-          :round="false"
-          class="set"
-        />
-      </n-card>
-      <n-card class="set-item">
-        <div class="label">
           <n-text class="name">音乐频谱</n-text>
           <n-text class="tip" :depth="3">开启音乐频谱会极大影响性能，如遇问题请关闭</n-text>
         </div>
@@ -227,7 +215,6 @@
 <script setup lang="ts">
 import type { SelectOption } from "naive-ui";
 import { useSettingStore } from "@/stores";
-import { isLogin } from "@/utils/auth";
 import { isElectron, renderOption } from "@/utils/helper";
 import { uniqBy } from "lodash";
 import player from "@/utils/player";
@@ -242,41 +229,41 @@ const showSpectrums = ref<boolean>(settingStore.showSpectrums);
 
 // 音质数据
 const songLevelData = {
-  standard: {
+  "128mp3": {
     label: "标准音质",
     tip: "标准音质 128kbps",
-    value: "standard",
+    value: "128mp3",
   },
-  higher: {
+  "192mp3": {
     label: "较高音质",
-    tip: "较高音质 328kbps",
-    value: "higher",
+    tip: "较高音质 192kbps",
+    value: "192mp3",
   },
-  exhigh: {
+  "320mp3": {
     label: "极高 HQ",
     tip: "近 CD 品质的细节体验，最高 320kbps",
-    value: "exhigh",
+    value: "320mp3",
   },
-  lossless: {
+  flac: {
     label: "无损 SQ",
     tip: "高保真无损音质，最高 48kHz/16bit",
-    value: "lossless",
+    value: "flac",
   },
   hires: {
-    label: "高清臻音 Spatial Audio",
+    label: "HI-RES",
     tip: "环绕声体验，声音听感增强，96kHz/24bit",
     value: "hires",
   },
-  jymaster: {
-    label: "超清母带 Master",
-    tip: "还原音频细节，192kHz/24bit",
-    value: "jymaster",
-  },
-  sky: {
-    label: "沉浸环绕声 Surround Audio",
-    tip: "沉浸式体验，最高 5.1 声道",
-    value: "sky",
-  },
+  // jymaster: {
+  //   label: "超清母带 Master",
+  //   tip: "还原音频细节，192kHz/24bit",
+  //   value: "jymaster",
+  // },
+  // sky: {
+  //   label: "沉浸环绕声 Surround Audio",
+  //   tip: "沉浸式体验，最高 5.1 声道",
+  //   value: "sky",
+  // },
 };
 
 // 获取全部输出设备

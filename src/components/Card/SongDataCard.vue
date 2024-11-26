@@ -1,12 +1,6 @@
 <template>
   <n-card class="song-data-card">
-    <n-image
-      :src="data?.coverSize?.s || data?.cover"
-      class="cover"
-      preview-disabled
-      lazy
-      @load="coverLoaded"
-    >
+    <n-image :src="getSizeCover(data, 300)" class="cover" preview-disabled lazy @load="coverLoaded">
       <template #placeholder>
         <div class="cover-loading">
           <img src="/images/song.jpg?assest" class="loading-img" alt="loading-img" />
@@ -16,15 +10,15 @@
     <Transition name="fade" mode="out-in">
       <div v-if="data" class="data">
         <n-text class="name">{{ data.name || "未知曲目" }}</n-text>
-        <div v-if="Array.isArray(data.artists)" class="artists text-hidden">
+        <div v-if="Array.isArray(data.singers)" class="artists text-hidden">
           <SvgIcon name="Artist" :depth="3" />
-          <n-text v-for="ar in data.artists" :key="ar.id" class="ar">
+          <n-text v-for="ar in data.singers" :key="ar.id" class="ar">
             {{ ar.name }}
           </n-text>
         </div>
         <div v-else class="artists text-hidden">
           <SvgIcon name="Artist" :depth="3" />
-          <n-text class="ar"> {{ data.artists || "未知艺术家" }} </n-text>
+          <n-text class="ar"> {{ data.singers || "未知艺术家" }} </n-text>
         </div>
         <div class="album text-hidden">
           <SvgIcon name="Album" :depth="3" />
@@ -44,12 +38,13 @@
 </template>
 
 <script setup lang="ts">
-import type { SongType } from "@/types/main";
 import { coverLoaded } from "@/utils/helper";
 import { isObject } from "lodash-es";
+import { getSizeCover } from "@/utils/format";
+import { SongInfo } from "@/types/main.hemusic";
 
 defineProps<{
-  data: SongType | null;
+  data: SongInfo;
   canJump?: boolean;
 }>();
 </script>

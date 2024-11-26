@@ -22,7 +22,6 @@ const init = async () => {
 
   // 事件监听
   initEventListener();
-
   // 加载数据
   await dataStore.loadData();
   // 初始化播放器

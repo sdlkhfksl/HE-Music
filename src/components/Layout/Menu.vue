@@ -18,26 +18,23 @@
 
 <script setup lang="ts">
 import {
-  type MenuOption,
   type MenuGroupOption,
   type MenuInst,
-  NText,
+  type MenuOption,
+  NAvatar,
   NButton,
   NEllipsis,
-  NAvatar,
+  NText,
 } from "naive-ui";
-import type { CoverType } from "@/types/main";
-import { useStatusStore, useSettingStore, useDataStore, useMusicStore } from "@/stores";
-import { useRouter, RouterLink } from "vue-router";
+
+import { useDataStore, useSettingStore, useStatusStore } from "@/stores";
+import { RouterLink, useRouter } from "vue-router";
 import { isElectron, renderIcon } from "@/utils/helper";
 import { openCreatePlaylist } from "@/utils/modal";
-import { debounce } from "lodash-es";
-import { isLogin } from "@/utils/auth";
-import player from "@/utils/player";
+import { PlaylistInfo, UserFavouritePlaylistInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 
 const router = useRouter();
 const dataStore = useDataStore();
-const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 
@@ -49,16 +46,16 @@ const menuActiveKey = ref<string | number>((router.currentRoute.value.name as st
 const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
   return settingStore.useOnlineService
     ? [
-        {
-          key: "home",
-          link: "home",
-          label: "为我推荐",
-          icon: renderIcon("Home", {
-            style: {
-              transform: "translateY(-1px)",
-            },
-          }),
-        },
+        // {
+        //   key: "home",
+        //   link: "home",
+        //   label: "为我推荐",
+        //   icon: renderIcon("Home", {
+        //     style: {
+        //       transform: "translateY(-1px)",
+        //     },
+        //   }),
+        // },
         {
           key: "discover",
           link: "discover",
@@ -70,20 +67,20 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
           }),
         },
         {
-          key: "personal-fm",
-          label: "私人漫游",
-          show: isLogin() !== 0,
-          icon: renderIcon("Radio", {
+          key: "playlist-square",
+          link: "playlist-square",
+          label: "歌单广场",
+          icon: renderIcon("Square", {
             style: {
               transform: "translateY(-1px)",
             },
           }),
         },
         {
-          key: "radio-hot",
-          link: "radio-hot",
-          label: "播客电台",
-          icon: renderIcon("Record", {
+          key: "top-list",
+          link: "top-list",
+          label: "排行榜",
+          icon: renderIcon("TopList", {
             style: {
               transform: "translateY(-1px)",
             },
@@ -93,37 +90,17 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
           key: "divider",
           type: "divider",
         },
-        {
-          key: "like-songs",
-          label: () =>
-            h("div", { class: "user-liked" }, [
-              h(NText, null, () => "我喜欢的音乐"),
-              h(NButton, {
-                type: "tertiary",
-                round: true,
-                strong: true,
-                secondary: true,
-                renderIcon: renderIcon("HeartBit"),
-                onClick: (event: Event) => {
-                  event.stopPropagation();
-                  openHeartMode();
-                },
-              }),
-            ]),
-          icon: renderIcon("Favorite"),
-        },
+        // {
+        //   key: "like-songs",
+        //   link: "like-songs",
+        //   label: "我喜欢的音乐",
+        //   icon: renderIcon("Favorite"),
+        // },
         {
           key: "like",
           link: "like",
           label: "我的收藏",
           icon: renderIcon("Star"),
-        },
-        {
-          key: "cloud",
-          link: "cloud",
-          label: "我的云盘",
-          show: isLogin() === 1,
-          icon: renderIcon("Cloud"),
         },
         {
           key: "local",
@@ -144,7 +121,7 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
         },
         // 创建的歌单
         {
-          key: "user-playlists",
+          key: "user-playlist",
           icon: statusStore.menuCollapsed ? renderIcon("PlaylistAdd") : undefined,
           label: () =>
             h("div", { class: "user-list" }, [
@@ -180,14 +157,41 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
 });
 
 // 生成歌单列表
-const renderPlaylist = (playlist: CoverType[], showCover: boolean) => {
+const renderUserPlaylist = (playlist: UserPlaylistInfo[], showCover: boolean) => {
   return playlist.map((playlist) => ({
     key: playlist.id,
+    id: playlist.id,
+    type: "user-playlist",
     label: () =>
       showCover
         ? h("div", { class: "pl-cover" }, [
             h(NAvatar, {
-              src: playlist.coverSize?.s || playlist.cover,
+              src: playlist.cover,
+              fallbackSrc: "/images/album.jpg?assest",
+              lazy: true,
+            }),
+            h(NEllipsis, null, () => playlist.name),
+          ])
+        : h(NEllipsis, null, () => playlist.name),
+    icon: showCover ? undefined : renderIcon("PlayList"),
+  }));
+};
+
+// 生成歌单列表
+const renderPlaylist = (
+  playlist: PlaylistInfo[] | UserFavouritePlaylistInfo[],
+  showCover: boolean,
+) => {
+  return playlist.map((playlist) => ({
+    key: `${playlist.platform}-${playlist.id}`,
+    id: playlist.id,
+    type: "playlist",
+    platform: playlist.platform,
+    label: () =>
+      showCover
+        ? h("div", { class: "pl-cover" }, [
+            h(NAvatar, {
+              src: playlist.cover,
               fallbackSrc: "/images/album.jpg?assest",
               lazy: true,
             }),
@@ -200,18 +204,13 @@ const renderPlaylist = (playlist: CoverType[], showCover: boolean) => {
 
 // 创建的歌单
 const createPlaylist = computed<MenuOption[]>(() => {
-  const userId = dataStore.userData.userId;
-  const list = dataStore.userLikeData.playlists
-    .filter((playlist) => playlist?.userId === userId)
-    .slice(1);
-  return renderPlaylist(list, settingStore.menuShowCover);
+  const list = dataStore.userCreatedPlaylist;
+  return renderUserPlaylist(list, settingStore.menuShowCover);
 });
 
 // 收藏的歌单
 const likedPlaylist = computed<MenuOption[]>(() => {
-  const userId = dataStore.userData.userId;
-  const list = dataStore.userLikeData.playlists.filter((playlist) => playlist?.userId !== userId);
-  return renderPlaylist(list, settingStore.menuShowCover);
+  return renderPlaylist(dataStore.userLikeData.playlists, settingStore.menuShowCover);
 });
 
 // 渲染菜单路由
@@ -224,41 +223,17 @@ const renderMenuLabel = (option: MenuOption) => {
 };
 
 // 菜单项更改
-const menuUpdate = (key: string, item: MenuOption) => {
-  // 私人漫游
-  if (key === "personal-fm") {
-    if (!musicStore.personalFMSong?.id) {
-      window.$message.error("开启私人漫游出错，请重试");
-      return;
-    }
-    if (statusStore.personalFmMode) {
-      player.play();
-    } else {
-      // 更改播放模式
-      statusStore.personalFmMode = true;
-      statusStore.playHeartbeatMode = false;
-      player.resetStatus();
-      player.initPlayer();
-    }
-    statusStore.showFullPlayer = true;
-    window.$message.info("已开启私人漫游", { icon: renderIcon("Radio") });
-    return;
-  }
-  if (typeof key === "number") {
+const menuUpdate = (_: string, item: MenuOption) => {
+  if (item.platform) {
     router.push({
-      name: "playlist",
-      query: { id: item.key },
+      name: (item.type as string) || "",
+      query: { id: item.id as string, platform: item.platform as string },
     });
-  } else {
-    switch (key) {
-      case "like-songs":
-        router.push({
-          name: "like-songs",
-        });
-        break;
-      default:
-        break;
-    }
+  } else if ((item.type as string) === "user-playlist") {
+    router.push({
+      name: (item.type as string) || "",
+      query: { id: item.id as string },
+    });
   }
 };
 
@@ -275,12 +250,20 @@ const checkMenuItem = () => {
   switch (routerName) {
     case "playlist": {
       // 获取歌单 id
-      const playlistId = Number(router.currentRoute.value.query.id || 0);
+      const playlistId = router.currentRoute.value.query.id as string;
+      const playlistPlatform = router.currentRoute.value.query.platform as string;
       // 是否处于用户歌单
       const isUserPlaylist = dataStore.userLikeData.playlists.some(
-        (playlist) => playlist?.id === playlistId,
+        (playlist) => playlist?.id === playlistId && playlist.platform === playlistPlatform,
       );
-      if (playlistId) menuActiveKey.value = isUserPlaylist ? Number(playlistId) : "home";
+      if (playlistId)
+        menuActiveKey.value = isUserPlaylist ? `${playlistPlatform}-${playlistId}` : "home";
+      menuRef.value?.showOption(playlistId);
+      break;
+    }
+    case "user-playlist": {
+      const playlistId = router.currentRoute.value.query.id as string;
+      menuActiveKey.value = playlistId;
       menuRef.value?.showOption(playlistId);
       break;
     }
@@ -290,15 +273,13 @@ const checkMenuItem = () => {
   }
 };
 
-// 开启心动模式
-const openHeartMode = debounce(() => player.toggleHeartMode(), 1000, {
-  leading: true,
-  trailing: false,
-});
-
 // 监听路由
 watch(
-  () => [router.currentRoute.value, dataStore.userLikeData.playlists],
+  () => [
+    router.currentRoute.value,
+    dataStore.userLikeData.playlists,
+    dataStore.userCreatedPlaylist,
+  ],
   () => checkMenuItem(),
 );
 </script>

@@ -4,7 +4,7 @@
       <div v-show="statusStore.playerMetaShow" class="menu-content">
         <n-flex class="left">
           <div
-            v-if="musicStore.isHasLrc && musicStore.playSong.type !== 'radio'"
+            v-if="musicStore.isHasLrc"
             :class="['menu-icon', { open: statusStore.pureLyricMode }]"
             @click="statusStore.pureLyricMode = !statusStore.pureLyricMode"
           >
@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStatusStore, useMusicStore } from "@/stores";
+import { useMusicStore, useStatusStore } from "@/stores";
 
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();

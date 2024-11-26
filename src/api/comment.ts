@@ -1,25 +1,35 @@
-import request from "@/utils/request";
+import request, { requestHemusic } from "@/utils/request";
 
 /**
  * 获取评论
  * @param {number} id - 对应资源的 id
- * @param {string} type - 对应资源的类型，0: 歌曲, 1: mv, 2: 歌单, 3: 专辑, 4: 电台节目, 5: 视频, 6: 动态, 7: 电台
- * @param {number} pageNo - 分页参数,第 N 页, 默认 1
- * @param {number} pageSize - 分页参数,每页多少条数据, 默认 20
- * @param {number} sortType - 排序方式, 1:按推荐排序, 2:按热度排序, 3:按时间排序
- * @param {number} cursor - 当 sortType 为 3 时且页数不是第一页时需传入, 值为上一条数据的 time
+ * @param platform
+ * @param resource_type
+ * @param page_index
+ * @param page_size
+ * @param last_id
+ * @param is_hot
  */
 export const getComment = (
-  id: number,
-  type: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 = 0,
-  pageNo: number = 1,
-  pageSize: number = 20,
-  sortType: 1 | 2 | 3 = 1,
-  cursor?: number,
+  id: string,
+  platform: string,
+  resource_type: string,
+  page_index: number = 1,
+  page_size: number = 20,
+  last_id?: string,
+  is_hot?: boolean,
 ) => {
-  return request({
-    url: "/comment/new",
-    params: { id, type, pageNo, pageSize, sortType, cursor, timestamp: Date.now() },
+  return requestHemusic({
+    url: "/v1/comment/list",
+    params: {
+      id,
+      platform,
+      resource_type,
+      page_index,
+      page_size,
+      last_id,
+      is_hot,
+    },
   });
 };
 

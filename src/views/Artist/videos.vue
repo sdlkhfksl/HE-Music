@@ -1,6 +1,6 @@
 <template>
   <div class="artist-type">
-    <CoverList
+    <VideoList
       :data="videoData"
       :loading="loading"
       :loadMore="hasMore"
@@ -12,32 +12,32 @@
 </template>
 
 <script setup lang="ts">
-import type { CoverType } from "@/types/main";
 import { artistVideos } from "@/api/artist";
-import { formatCoverList } from "@/utils/format";
+import { MVInfo } from "@/types/main.hemusic";
+import VideoList from "@/components/List/VideoList.vue";
 
 const props = defineProps<{
-  id: number;
+  id: string;
+  platform: string;
 }>();
 
 // 歌曲数据
 const loading = ref<boolean>(true);
 const hasMore = ref<boolean>(true);
-const videoData = ref<CoverType[]>([]);
-const videoOffset = ref<number>(0);
+const videoData = ref<MVInfo[]>([]);
+const videoPageIndex = ref<number>(1);
 
 // 获取歌手全部视频
 const getArtistAllVideos = async () => {
   try {
-    if (!props.id) return;
+    if (!props.id || !props.platform) return;
     loading.value = true;
     // 获取数据
-    const result = await artistVideos(props.id, 50, videoOffset.value);
+    const result = await artistVideos(props.id, props.platform, videoPageIndex.value, 50);
     // 是否还有
-    hasMore.value = result?.hasMore;
+    hasMore.value = result?.has_more;
     // 处理数据
-    const listData = formatCoverList(result?.mvs);
-    videoData.value = videoData.value.concat(listData);
+    videoData.value = result?.list;
     loading.value = false;
   } catch (error) {
     console.error("Error getting artist all videos:", error);
@@ -47,7 +47,7 @@ const getArtistAllVideos = async () => {
 // 加载更多
 const loadMore = () => {
   if (hasMore.value) {
-    videoOffset.value += 50;
+    videoPageIndex.value++;
     getArtistAllVideos();
   } else {
     loading.value = false;

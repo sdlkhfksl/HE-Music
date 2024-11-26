@@ -1,33 +1,29 @@
 <template>
   <Transition name="fade" mode="out-in">
-    <div v-if="data.length > 0" :class="['cover-list', type]">
+    <div v-if="data.length > 0" class="cover-list playlist">
       <n-grid :cols="cols" x-gap="20" y-gap="20">
         <n-gi v-for="(item, index) in data" :key="index">
           <div
             class="cover-item"
             @click="goDetail(item)"
-            @contextmenu="coverMenuRef?.openDropdown($event, item, type)"
+            @contextmenu="coverMenuRef?.openDropdown($event, item, 'playlist')"
           >
             <!-- 封面 -->
             <div class="cover">
               <s-image
                 :key="item.cover"
-                :src="
-                  type === 'video' ? `${item.cover}?param=464y260` : item.coverSize?.m || item.cover
-                "
-                :default-src="
-                  type !== 'video' ? '/images/album.jpg?assest' : '/images/video.jpg?assest'
-                "
+                :src="item.cover"
+                default-src="/images/album.jpg?assest"
                 class="cover-img"
                 once
               />
-              <template v-if="item.playCount">
+              <template v-if="item.play_count">
                 <!-- 遮罩 -->
-                <div v-if="type !== 'album'" class="cover-mask" />
+                <div class="cover-mask" />
                 <!-- 播放量 -->
-                <div v-if="type !== 'album'" class="play-count">
+                <div class="play-count">
                   <SvgIcon name="Play" />
-                  <span class="num">{{ formatNumber(item.playCount || 0) }}</span>
+                  <span class="num">{{ formatNumber(Number(item.play_count) || 0) }}</span>
                 </div>
               </template>
               <!-- 简介 -->
@@ -45,7 +41,7 @@
                   @click.stop="playList(item)"
                 >
                   <template #icon>
-                    <SvgIcon :size="32" :name="isPlaying(item.id) ? 'Pause' : 'Play'" />
+                    <SvgIcon :size="32" :name="isPlaying(item) ? 'Pause' : 'Play'" />
                   </template>
                 </n-button>
               </div>
@@ -54,31 +50,13 @@
             <div class="cover-data">
               <n-text class="name text-hidden">{{ item.name }}</n-text>
               <!-- 创建者 -->
-              <n-text
-                v-if="(type === 'playlist' || type === 'radio') && item?.creator?.id"
-                class="creator"
-                depth="3"
-              >
-                {{ item.creator?.name || item.creator || "未知" }}
-              </n-text>
-              <!-- 更新提示 -->
-              <n-text v-if="item.updateTip" class="tip" depth="3">{{ item.updateTip }}</n-text>
-              <!-- 专辑信息 -->
-              <div v-if="type === 'album'" class="meta">
-                <n-text class="count" depth="3">{{ item.count || 0 }}首</n-text>
-                <n-text class="date" depth="3">{{ formatTimestamp(item.createTime) }}</n-text>
+
+              <div class="meta">
+                <n-text class="count" depth="3">{{ item.song_num || 0 }}首</n-text>
+                <n-text v-if="item.creator" class="creator" depth="3">
+                  {{ item.creator || "未知" }}
+                </n-text>
               </div>
-              <!-- 歌手 -->
-              <template v-if="type === 'video' && item.artists">
-                <div v-if="Array.isArray(item.artists)" class="artists text-hidden">
-                  <n-text v-for="(ar, arIndex) in item.artists" :key="arIndex" class="ar">
-                    {{ ar.name || "未知艺术家" }}
-                  </n-text>
-                </div>
-                <div v-else class="artists text-hidden">
-                  <n-text class="ar"> {{ item.artists || "未知艺术家" }} </n-text>
-                </div>
-              </template>
             </div>
           </div>
         </n-gi>
@@ -92,7 +70,7 @@
       <!-- 右键菜单 -->
       <CoverMenu ref="coverMenuRef" @toPlay="playList" />
     </div>
-    <div v-else-if="loading" :class="['cover-list', 'loading', type]">
+    <div v-else-if="loading" class="cover-list loading playlist">
       <n-grid :cols="cols" x-gap="20" y-gap="20">
         <n-gi v-for="item in loadingNum || 50" :key="item">
           <div class="cover-item">
@@ -112,22 +90,21 @@
 </template>
 
 <script setup lang="ts">
-import type { CoverType, SongType } from "@/types/main";
-import { albumDetail } from "@/api/album";
 import { formatNumber } from "@/utils/helper";
 import { useMusicStore, useStatusStore } from "@/stores";
 import { debounce } from "lodash-es";
-import { formatSongsList } from "@/utils/format";
-import { songDetail } from "@/api/song";
-import { playlistAllSongs } from "@/api/playlist";
-import { radioAllProgram } from "@/api/radio";
+import { playlistDetail } from "@/api/playlist";
 import CoverMenu from "@/components/Menu/CoverMenu.vue";
 import player from "@/utils/player";
-import { formatTimestamp } from "@/utils/time";
+import {
+  CoverType,
+  PlaylistInfo,
+  UserFavouritePlaylistInfo,
+  UserPlaylistInfo,
+} from "@/types/main.hemusic";
 
 interface Props {
-  data: CoverType[];
-  type: "playlist" | "album" | "video" | "radio";
+  data: PlaylistInfo[] | UserPlaylistInfo[] | UserFavouritePlaylistInfo[];
   cols?: string;
   loadMore?: boolean;
   loading?: boolean;
@@ -135,7 +112,7 @@ interface Props {
   loadingText?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   cols: "3 600:3 800:4 900:5 1200:6 1400:7",
 });
 
@@ -152,13 +129,14 @@ const statusStore = useStatusStore();
 const coverMenuRef = ref<InstanceType<typeof CoverMenu> | null>(null);
 
 // 是否处于当前播放列表
-const isPlaying = (id: number) => musicStore.playPlaylistId === id && statusStore.playStatus;
+const isPlaying = (item: PlaylistInfo | UserPlaylistInfo | UserFavouritePlaylistInfo) =>
+  musicStore.isPlayingPlaylist(item.id, item.platform, "playlist") && statusStore.playStatus;
 
 // 查看详情
-const goDetail = (item: CoverType) => {
+const goDetail = (item: PlaylistInfo | UserPlaylistInfo | UserFavouritePlaylistInfo) => {
   router.push({
-    name: props.type,
-    query: { id: item.id },
+    name: "playlist",
+    query: { id: item.id, platform: item.platform || "" },
   });
 };
 
@@ -166,17 +144,18 @@ const goDetail = (item: CoverType) => {
 const playList = debounce(
   async (item: CoverType) => {
     try {
-      // 视频直接跳转
-      if (props.type === "video") {
-        return router.push({ name: "video", query: { id: item.id } });
-      }
       // 是否为当前列表
-      if (musicStore.playPlaylistId === item.id) return player.playOrPause();
+      if (musicStore.isPlayingPlaylist(item.id, item.platform, "playlist"))
+        return player.playOrPause();
       // 开始加载
       item.loading = true;
       // 获取播放列表
-      const list = await getListData(item.id);
-      player.updatePlayList(list, undefined, item.id);
+      const list = await playlistDetail(item.id, item.platform);
+      player.updatePlayList(list.songs, undefined, {
+        id: item.id,
+        platform: item.platform,
+        type: "playlist",
+      });
     } catch (error) {
       console.log("Error to play: ", error);
     } finally {
@@ -186,29 +165,6 @@ const playList = debounce(
   300,
   { leading: true, trailing: false },
 );
-
-// 获取列表数据
-const getListData = async (id: number): Promise<SongType[]> => {
-  switch (props.type) {
-    case "album": {
-      const result = await albumDetail(id);
-      const ids: number[] = result.songs.map((song: any) => song.id as number);
-      const songRes = await songDetail(ids);
-      return formatSongsList(songRes.songs);
-    }
-    case "playlist": {
-      // 仅请求 100 首
-      const result = await playlistAllSongs(id, 100);
-      return formatSongsList(result.songs);
-    }
-    case "radio": {
-      const result = await radioAllProgram(id, 100);
-      return formatSongsList(result.programs);
-    }
-    default:
-      return [];
-  }
-};
 </script>
 
 <style lang="scss" scoped>

@@ -1,11 +1,11 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosError, AxiosResponse } from "axios";
-import { isDev, isElectron } from "./helper";
-import { useSettingStore } from "@/stores";
-import { getCookie } from "./cookie";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { isDev } from "./helper";
+import { useDataStore, useSettingStore } from "@/stores";
 import { isLogin } from "./auth";
 
+export const API_URL = String(isDev ? "http://127.0.0.1:8001" : import.meta.env["VITE_API_URL"]);
 // 全局地址
-const baseURL: string = String(isDev ? "/api/netease" : import.meta.env["VITE_API_URL"]);
+const baseURL: string = String(isDev ? "/api/netease" : import.meta.env["VITE_NETEASE_API_URL"]);
 
 // 基础配置
 const server: AxiosInstance = axios.create({
@@ -16,24 +16,24 @@ const server: AxiosInstance = axios.create({
   timeout: 15000,
 });
 
+// 基础配置
+const serverHemusic: AxiosInstance = axios.create({
+  baseURL: API_URL,
+  // 允许跨域
+  withCredentials: true,
+  // 超时时间
+  timeout: 15000,
+});
+
 // 请求拦截器
-server.interceptors.request.use(
+serverHemusic.interceptors.request.use(
   (request) => {
     // pinia
     const settingStore = useSettingStore();
     if (!request.params) request.params = {};
-    // Cookie
-    if (!request.params.noCookie && (isLogin() || getCookie("MUSIC_U") !== null)) {
-      const cookie = `MUSIC_U=${getCookie("MUSIC_U")};`;
-      request.params.cookie = encodeURIComponent(cookie);
-    }
-    // realIP
-    if (!isElectron && !request.url?.includes("/login")) {
-      request.params.realIP = "116.25.146.177";
-    }
-    // 自定义 realIP
-    if (settingStore.useRealIP) {
-      request.params.realIP = settingStore.realIP || "116.25.146.177";
+    if (isLogin()) {
+      const token = useDataStore().token;
+      request.headers.set("Authorization", "Bearer " + token);
     }
     // proxy
     if (settingStore.proxyProtocol !== "off") {
@@ -53,7 +53,7 @@ server.interceptors.request.use(
 );
 
 // 响应拦截器
-server.interceptors.response.use(
+serverHemusic.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: AxiosError) => {
     const { response } = error;
@@ -99,6 +99,12 @@ server.interceptors.response.use(
 const request = async (config: AxiosRequestConfig): Promise<any> => {
   // 返回请求数据
   const { data } = await server.request(config);
+  return data as any;
+};
+
+export const requestHemusic = async (config: AxiosRequestConfig): Promise<any> => {
+  // 返回请求数据
+  const { data } = await serverHemusic.request(config);
   return data as any;
 };
 

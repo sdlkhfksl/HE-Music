@@ -56,24 +56,13 @@
         ]"
         @mousemove="playerMove"
       >
-        <div
-          v-if="
-            !(statusStore.pureLyricMode && musicStore.isHasLrc) ||
-            musicStore.playSong.type === 'radio'
-          "
-          class="content-left"
-        >
+        <div v-if="!(statusStore.pureLyricMode && musicStore.isHasLrc)" class="content-left">
           <!-- 封面 -->
           <PlayerCover />
           <!-- 数据 -->
           <PlayerData
             v-if="settingStore.playerType === 'cover' || !musicStore.isHasLrc || isShowComment"
-            :center="
-              statusStore.pureLyricMode ||
-              musicStore.playSong.type === 'radio' ||
-              !musicStore.isHasLrc ||
-              isShowComment
-            "
+            :center="statusStore.pureLyricMode || !musicStore.isHasLrc || isShowComment"
             :theme="mainColor"
           />
         </div>
@@ -111,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStatusStore, useMusicStore, useSettingStore } from "@/stores";
+import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
 import { isElectron } from "@/utils/helper";
 import { throttle } from "lodash-es";
 import player from "@/utils/player";

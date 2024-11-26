@@ -1,14 +1,14 @@
 {
-  "name": "splayer",
-  "productName": "SPlayer",
-  "version": "3.0.0-beta.1",
+  "name": "hemusic",
+  "productName": "HE-Music",
+  "version": "1.0.0",
   "description": "A minimalist music player",
   "main": "./out/main/index.js",
-  "author": "imsyy",
-  "home": "https://imsyy.top",
-  "github": "https://github.com/imsyy/SPlayer",
-  "blog": "https://blog.imsyy.top",
-  "repository": "github:imsyy/SPlayer",
+  "author": "serious-snow",
+  "home": "https://wjhe.top",
+  "github": "https://github.com/serious-snow/HE-Music",
+  "blog": "https://blog.wjhe.top",
+  "repository": "github:serious-snow/HE-Music",
   "license": "AGPL-3.0",
   "license-file": "LICENSE",
   "engines": {
@@ -69,6 +69,7 @@
     "pinia": "^2.2.6",
     "pinia-plugin-persistedstate": "^3.2.3",
     "plyr": "^3.7.8",
+    "vue-dompurify-html": "^5.1.0",
     "vue-virt-list": "^1.5.5"
   },
   "devDependencies": {

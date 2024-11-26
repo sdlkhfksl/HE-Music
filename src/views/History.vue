@@ -59,6 +59,7 @@
 <script setup lang="ts">
 import { useDataStore } from "@/stores";
 import player from "@/utils/player";
+import SongList from "@/components/List/SongList.vue";
 
 const dataStore = useDataStore();
 

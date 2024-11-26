@@ -51,16 +51,13 @@
               <!-- 信息 -->
               <div class="data">
                 <n-text class="name text-hidden">{{ songData.name || "未知曲目" }}</n-text>
-                <div v-if="Array.isArray(songData?.artists)" class="artists">
-                  <n-text v-for="ar in songData.artists" :key="ar.id" depth="3" class="ar">
+                <div v-if="Array.isArray(songData?.singers)" class="artists">
+                  <n-text v-for="ar in songData.singers" :key="ar.id" depth="3" class="ar">
                     {{ ar.name }}
                   </n-text>
                 </div>
-                <div v-else-if="songData.type === 'radio'" class="artists">
-                  <n-text class="ar" depth="3"> 播客电台 </n-text>
-                </div>
                 <div v-else class="artists">
-                  <n-text class="ar" depth="3"> {{ songData?.artists || "未知艺术家" }} </n-text>
+                  <n-text class="ar" depth="3"> {{ songData?.singers || "未知艺术家" }} </n-text>
                 </div>
               </div>
               <!-- 移除 -->

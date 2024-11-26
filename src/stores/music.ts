@@ -1,37 +1,36 @@
 import { defineStore } from "pinia";
 import type { LyricLine } from "@applemusic-like-lyrics/core";
-import type { SongType, LyricType } from "@/types/main";
+import type { LyricType } from "@/types/main";
+import { SongInfo } from "@/types/main.hemusic";
+import { getSizeCover } from "@/utils/format";
 
 interface MusicState {
-  playSong: SongType;
-  playPlaylistId: number;
+  playSong: SongInfo;
+  playPlaylist: {
+    id: string;
+    platform: string;
+    type: string;
+  };
   songLyric: {
     lrcData: LyricType[];
     yrcData: LyricType[];
     lrcAMData: LyricLine[];
     yrcAMData: LyricLine[];
   };
-  personalFM: {
-    playIndex: number;
-    list: SongType[];
-  };
-  dailySongsData: {
-    timestamp: number | null;
-    list: SongType[];
-  };
 }
 
 // 默认音乐数据
-const defaultMusicData: SongType = {
-  id: 0,
+const defaultMusicData: SongInfo = {
+  id: "",
+  platform: "",
   name: "未播放歌曲",
-  artists: "未知歌手",
+  singers: "未知歌手",
   album: "未知专辑",
   cover: "/images/song.jpg?assest",
   duration: 0,
-  free: 0,
-  mv: null,
-  type: "song",
+  mv_id: "",
+  subtitle: "",
+  links: [],
 };
 
 export const useMusicStore = defineStore({
@@ -39,8 +38,11 @@ export const useMusicStore = defineStore({
   state: (): MusicState => ({
     // 当前播放歌曲
     playSong: { ...defaultMusicData },
-    // 当前播放歌单
-    playPlaylistId: 0,
+    playPlaylist: {
+      id: "",
+      platform: "",
+      type: "",
+    },
     // 当前歌曲歌词
     songLyric: {
       lrcData: [], // 普通歌词
@@ -48,21 +50,11 @@ export const useMusicStore = defineStore({
       lrcAMData: [], // 普通歌词-AM
       yrcAMData: [], // 逐字歌词-AM
     },
-    // 私人FM数据
-    personalFM: {
-      playIndex: 0,
-      list: [],
-    },
-    // 每日推荐
-    dailySongsData: {
-      timestamp: null, // 更新时间
-      list: [], // 歌曲数据
-    },
   }),
   getters: {
     // 是否具有歌词
     isHasLrc(state): boolean {
-      return state.songLyric.lrcData.length > 0 && state.playSong.type !== "radio";
+      return state.songLyric.lrcData.length > 0;
     },
     // 是否具有逐字歌词
     isHasYrc(state): boolean {
@@ -70,18 +62,22 @@ export const useMusicStore = defineStore({
     },
     // 是否有播放器
     isHasPlayer(state): boolean {
-      return state.playSong?.id !== 0;
+      return !!state.playSong?.id;
     },
     // 歌曲封面
     songCover(state): string {
-      return state.playSong.path
-        ? state.playSong.cover
-        : state.playSong.coverSize?.s || state.playSong.cover;
+      return state.playSong.path ? state.playSong.cover : getSizeCover(state.playSong);
     },
-    // 私人FM播放歌曲
-    personalFMSong(state): SongType {
-      return state.personalFM.list?.[state.personalFM.playIndex] || defaultMusicData;
-    },
+    isPlayingPlaylist:
+      (state) =>
+      (id: string, platform: string, type: string): boolean => {
+        return (
+          !!state.playPlaylist.id &&
+          state.playPlaylist.id === id &&
+          state.playPlaylist.platform === platform &&
+          state.playPlaylist.type === type
+        );
+      },
   },
   actions: {
     // 恢复默认音乐数据
@@ -95,12 +91,8 @@ export const useMusicStore = defineStore({
       };
     },
     // 获取歌曲封面
-    getSongCover(size: "s" | "m" | "l" | "xl" | "cover" = "s") {
-      return this.playSong.path
-        ? this.playSong.cover
-        : size === "cover"
-          ? this.playSong.cover
-          : this.playSong.coverSize?.[size] || this.playSong.cover;
+    getSongCover(size: number = 300) {
+      return this.playSong.path ? this.playSong.cover : getSizeCover(this.playSong, size);
     },
   },
   // 持久化

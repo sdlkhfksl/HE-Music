@@ -5,18 +5,19 @@
       :data="data"
       :loading="loading"
       :hidden-cover="!settingStore.showLocalCover"
+      :hiddenSize="false"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { SongType } from "@/types/main";
 import { useSettingStore } from "@/stores";
+import { SongInfo } from "@/types/main.hemusic";
 
 const settingStore = useSettingStore();
 
 defineProps<{
-  data: SongType[];
+  data: SongInfo[];
   loading: boolean;
 }>();
 </script>

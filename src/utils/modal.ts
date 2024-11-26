@@ -1,8 +1,7 @@
 import { h } from "vue";
-import type { CoverType, UpdateInfoType, SettingType, SongType } from "@/types/main";
+import type { SettingType, UpdateInfoType } from "@/types/main";
 import { isLogin } from "./auth";
 import { isArray, isFunction } from "lodash-es";
-import { useDataStore } from "@/stores";
 import router from "@/router";
 import Login from "@/components/Modal/Login/Login.vue";
 import JumpArtist from "@/components/Modal/JumpArtist.vue";
@@ -10,12 +9,12 @@ import UserAgreement from "@/components/Modal/UserAgreement.vue";
 import SongInfoEditor from "@/components/Modal/SongInfoEditor.vue";
 import PlaylistAdd from "@/components/Modal/PlaylistAdd.vue";
 import batchList from "@/components/Modal/batchList.vue";
-import CloudMatch from "@/components/Modal/CloudMatch.vue";
 import CreatePlaylist from "@/components/Modal/CreatePlaylist.vue";
 import UpdatePlaylist from "@/components/Modal/UpdatePlaylist.vue";
 import DownloadSong from "@/components/Modal/DownloadSong.vue";
 import MainSetting from "@/components/Setting/MainSetting.vue";
 import UpdateApp from "@/components/Modal/UpdateApp.vue";
+import { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 
 // 用户协议
 export const openUserAgreement = () => {
@@ -64,11 +63,11 @@ export const openUserLogin = (showTip: boolean = false) => {
 };
 
 // 跳转到歌手
-export const openJumpArtist = (data: SongType["artists"]) => {
+export const openJumpArtist = (platform: string, data: SongInfo["singers"]) => {
   // 若 data 为数组且只有一个元素，则直接跳转
   if (isArray(data) && data.length === 1) {
     const id = data[0].id;
-    router.push({ name: "artist", query: { id } });
+    router.push({ name: "artist", query: { id, platform } });
     return;
   }
   const modal = window.$modal.create({
@@ -78,13 +77,13 @@ export const openJumpArtist = (data: SongType["artists"]) => {
     style: { width: "600px" },
     title: "跳转到歌手",
     content: () => {
-      return h(JumpArtist, { artist: data, onClose: () => modal.destroy() });
+      return h(JumpArtist, { artist: data, platform, onClose: () => modal.destroy() });
     },
   });
 };
 
 // 编辑歌曲信息
-export const openSongInfoEditor = (song: SongType) => {
+export const openSongInfoEditor = (song: SongInfo) => {
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -99,7 +98,7 @@ export const openSongInfoEditor = (song: SongType) => {
 };
 
 // 添加到歌单
-export const openPlaylistAdd = (data: SongType[], isLocal: boolean) => {
+export const openPlaylistAdd = (data: SongInfo[], isLocal: boolean) => {
   if (!data.length) return window.$message.warning("请正确选择歌曲");
   if (!isLogin() && !isLocal) return openUserLogin();
   const modal = window.$modal.create({
@@ -120,7 +119,7 @@ export const openPlaylistAdd = (data: SongType[], isLocal: boolean) => {
  * @param isLocal 是否为本地音乐
  * @param playListId 歌单 id
  */
-export const openBatchList = (data: SongType[], isLocal: boolean, playListId?: number) => {
+export const openBatchList = (data: SongInfo[], isLocal: boolean, playListId?: string) => {
   window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -130,20 +129,6 @@ export const openBatchList = (data: SongType[], isLocal: boolean, playListId?: n
     },
     title: "批量操作",
     content: () => h(batchList, { data, isLocal, playListId }),
-  });
-};
-
-// 云盘歌曲纠正
-export const openCloudMatch = (id: number, index: number) => {
-  const modal = window.$modal.create({
-    preset: "card",
-    transformOrigin: "center",
-    autoFocus: false,
-    style: { width: "600px" },
-    title: "云盘歌曲纠正",
-    content: () => {
-      return h(CloudMatch, { id, index, onClose: () => modal.destroy() });
-    },
   });
 };
 
@@ -162,7 +147,11 @@ export const openCreatePlaylist = () => {
 };
 
 // 编辑歌单
-export const openUpdatePlaylist = (id: number, data: CoverType, func: () => Promise<void>) => {
+export const openUpdatePlaylist = (
+  id: string,
+  data: UserPlaylistInfo,
+  func: () => Promise<void>,
+) => {
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -184,13 +173,12 @@ export const openUpdatePlaylist = (id: number, data: CoverType, func: () => Prom
 };
 
 // 下载歌曲
-export const openDownloadSong = (song: SongType) => {
-  const dataStore = useDataStore();
-  if (!isLogin()) return openUserLogin();
+export const openDownloadSong = (song: SongInfo) => {
+  // if (!isLogin()) return openUserLogin();
   // 是否可下载
   if (!song) return window.$message.warning("请正确选择歌曲");
-  if (song.free !== 0 && dataStore.userData.vipType === 0 && !song?.pc) {
-    return window.$message.warning("账号会员等级不足，请提升权限");
+  if (song.links?.length === 0) {
+    return window.$message.warning("该歌曲不支持下载");
   }
   const modal = window.$modal.create({
     preset: "card",
@@ -199,9 +187,11 @@ export const openDownloadSong = (song: SongType) => {
     style: { width: "600px" },
     title: "下载歌曲",
     content: () => {
-      return h(DownloadSong, { id: song.id, onClose: () => modal.destroy() });
+      return h(DownloadSong, { song, onClose: () => modal.destroy() });
     },
   });
+
+  return;
 };
 
 // 打开设置

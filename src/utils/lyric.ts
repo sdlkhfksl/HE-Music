@@ -1,6 +1,6 @@
-import { LyricLine, parseLrc, parseYrc } from "@applemusic-like-lyrics/lyric";
+import { LyricLine, LyricWord, parseLrc } from "@applemusic-like-lyrics/lyric";
 import { keywords } from "@/assets/data/exclude";
-import type { LyricType } from "@/types/main";
+import { LyricType } from "@/types/main";
 import { useMusicStore } from "@/stores";
 import { msToS } from "./time";
 
@@ -18,7 +18,7 @@ export const resetSongLyric = () => {
 // 解析歌词数据
 export const parsedLyricsData = (lyricData: any) => {
   const musicStore = useMusicStore();
-  if (lyricData.code !== 200) {
+  if (!lyricData.lyric) {
     resetSongLyric();
     return;
   }
@@ -26,44 +26,24 @@ export const parsedLyricsData = (lyricData: any) => {
   let yrcData: LyricType[] = [];
   // 处理后歌词
   let lrcParseData: LyricLine[] = [];
-  let tlyricParseData: LyricLine[] = [];
-  let romalrcParseData: LyricLine[] = [];
   let yrcParseData: LyricLine[] = [];
-  let ytlrcParseData: LyricLine[] = [];
-  let yromalrcParseData: LyricLine[] = [];
+
   // 普通歌词
-  if (lyricData?.lrc?.lyric) {
-    lrcParseData = parseLrc(lyricData.lrc.lyric);
-    lrcData = parseLrcData(lrcParseData);
-    // 其他翻译
-    if (lyricData?.tlyric?.lyric) {
-      tlyricParseData = parseLrc(lyricData.tlyric.lyric);
-      lrcData = alignLyrics(lrcData, parseLrcData(tlyricParseData), "tran");
-    }
-    if (lyricData?.romalrc?.lyric) {
-      romalrcParseData = parseLrc(lyricData.romalrc.lyric);
-      lrcData = alignLyrics(lrcData, parseLrcData(romalrcParseData), "roma");
-    }
-  }
+  lrcParseData = parseLineLyric(lyricData).line;
+  lrcData = parseLrcData(lrcParseData);
+
   // 逐字歌词
-  if (lyricData?.yrc?.lyric) {
-    yrcParseData = parseYrc(lyricData.yrc.lyric);
+  if (wordTimestampRegex.test(lyricData.lyric)) {
+    // 普通歌词
+    yrcParseData = parseFontLyric(lyricData).line;
     yrcData = parseYrcData(yrcParseData);
-    // 其他翻译
-    if (lyricData?.ytlrc?.lyric) {
-      ytlrcParseData = parseLrc(lyricData.ytlrc.lyric);
-      yrcData = alignLyrics(yrcData, parseLrcData(ytlrcParseData), "tran");
-    }
-    if (lyricData?.yromalrc?.lyric) {
-      yromalrcParseData = parseLrc(lyricData.yromalrc.lyric);
-      yrcData = alignLyrics(yrcData, parseLrcData(yromalrcParseData), "roma");
-    }
   }
+
   musicStore.songLyric = {
     lrcData,
     yrcData,
-    lrcAMData: parseAMData(lrcParseData, tlyricParseData, romalrcParseData),
-    yrcAMData: parseAMData(yrcParseData, ytlrcParseData, yromalrcParseData),
+    lrcAMData: lrcParseData,
+    yrcAMData: yrcParseData,
   };
 };
 
@@ -72,7 +52,7 @@ export const parseLrcData = (lrcData: LyricLine[]): LyricType[] => {
   if (!lrcData) return [];
   // 数据处理
   const lrcList = lrcData
-    .map((line) => {
+    .map((line): LyricType | null => {
       const words = line.words;
       const time = msToS(words[0].startTime);
       const content = words[0].word.trim();
@@ -83,6 +63,10 @@ export const parseLrcData = (lrcData: LyricLine[]): LyricType[] => {
       return {
         time,
         content,
+        tran: line.translatedLyric,
+        roma: line.romanLyric,
+        endTime: 0,
+        contents: [],
       };
     })
     .filter((line): line is LyricType => line !== null);
@@ -121,6 +105,8 @@ export const parseYrcData = (yrcData: LyricLine[]): LyricType[] => {
         endTime,
         content: contentStr,
         contents,
+        tran: line.translatedLyric,
+        roma: line.romanLyric,
       };
     })
     .filter((line): line is LyricType => line !== null);
@@ -188,17 +174,156 @@ export const parseLocalLyric = (lyric: string) => {
 };
 
 // 处理 AM 歌词
-const parseAMData = (lrcData: LyricLine[], tranData?: LyricLine[], romaData?: LyricLine[]) => {
-  return lrcData.map((line, index, lines) => ({
-    words: line.words,
-    startTime: line.words[0]?.startTime ?? 0,
-    endTime:
-      lines[index + 1]?.words?.[0]?.startTime ??
-      line.words?.[line.words.length - 1]?.endTime ??
-      Infinity,
-    translatedLyric: tranData?.[index]?.words?.[0]?.word ?? "",
-    romanLyric: romaData?.[index]?.words?.[0]?.word ?? "",
-    isBG: line.isBG ?? false,
-    isDuet: line.isDuet ?? false,
-  }));
+const wordTimestampRegex = /<\d+,\d+>/g;
+const wordLineRegex = /<(?<begin>\d+),(?<end>\d+)>(?<word>.*?)(?=<\d+,\d+>|$)/g;
+
+// regexr.com/6e52n
+const extractLrcRegex = /^(?<lyricTimestamps>(?:\[.+?\])+)(?!\[)(?<content>.+)$/gm;
+const extractTimestampRegex = /\[(?<min>\d+):(?<sec>\d+)(?:\.|:)*(?<ms>\d+)*\]/g;
+
+export const parseLyric = ({ lyric, spelling, trans }) => {
+  if (!wordTimestampRegex.test(lyric)) {
+    return parseLineLyric({ lyric, spelling, trans });
+  }
+  return parseFontLyric({ lyric, spelling, trans });
+};
+
+export const parseFontLyric = ({ lyric, spelling, trans }) => {
+  const parsedLyrics: LyricLine[] = [];
+
+  const lyrics = parse(lyric);
+  const spells = parse(spelling);
+  const transLyrics = parse(trans);
+
+  for (const { rawTime, time, content } of lyrics) {
+    // content
+    // <0,648>Love<648,162> <810,810>Story<1620,162> <1782,162>-<1944,162> <2106,972>Taylor<3078,162> <3240,810>
+    const words: LyricWord[] = [];
+    for (const line of content.matchAll(wordLineRegex)) {
+      if (!line.groups) continue;
+      const { begin, end, word } = line.groups as {
+        begin: string;
+        end: string;
+        word: string;
+      };
+      // console.log("begin:",begin,"end:", end,"word:", word)
+      words.push({
+        startTime: time + parseInt(begin),
+        endTime: time + parseInt(begin) + parseInt(end),
+        word: word,
+      });
+    }
+    const lrc: LyricLine = {
+      words: words,
+      translatedLyric:
+        transLyrics.find(({ rawTime: tLyricRawTime }) => tLyricRawTime === rawTime)?.content || "",
+      romanLyric:
+        spells.find(({ rawTime: sLyricRawTime }) => sLyricRawTime === rawTime)?.content || "",
+      startTime: time,
+      endTime: words[words.length - 1]?.endTime || 0,
+      isBG: false,
+      isDuet: false,
+    };
+
+    if (parsedLyrics[parsedLyrics.length - 1]?.endTime === 0) {
+      parsedLyrics[parsedLyrics.length - 1].endTime = time;
+    }
+    parsedLyrics.push(lrc);
+  }
+
+  return { line: parsedLyrics, metadata: {} };
+};
+
+export const removeWordLyric = (str: string) => {
+  return str.replace(wordTimestampRegex, "");
+};
+
+export const parseLineLyric = ({ lyric, spelling, trans }) => {
+  lyric = lyric.replace(wordTimestampRegex, "");
+  const parsedLyrics: LyricLine[] = [];
+
+  const lyrics = parse(lyric);
+  const spells = parse(spelling);
+  const transLyrics = parse(trans);
+
+  for (const { rawTime, time, content } of lyrics) {
+    const lrc: LyricLine = {
+      words: [
+        {
+          startTime: time,
+          endTime: 0,
+          word: content,
+        },
+      ],
+      translatedLyric:
+        transLyrics.find(({ rawTime: tLyricRawTime }) => tLyricRawTime === rawTime)?.content || "",
+      romanLyric:
+        spells.find(({ rawTime: sLyricRawTime }) => sLyricRawTime === rawTime)?.content || "",
+      startTime: time,
+      endTime: 0,
+      isBG: false,
+      isDuet: false,
+    };
+
+    if (parsedLyrics[parsedLyrics.length - 1]) {
+      parsedLyrics[parsedLyrics.length - 1].endTime = time;
+      parsedLyrics[parsedLyrics.length - 1].words[0].endTime = time;
+    }
+    parsedLyrics.push(lrc);
+  }
+
+  parsedLyrics[parsedLyrics.length - 1].endTime = Infinity;
+  parsedLyrics[parsedLyrics.length - 1].words[0].endTime = Infinity;
+
+  return { line: parsedLyrics, metadata: {} };
+};
+
+function trimContent(content: string) {
+  const t = content.trim();
+  return t.length < 1 ? content : t;
+}
+
+const parse = (lrc: string) => {
+  const parsedLyrics: { rawTime: string; time: number; content: string }[] = [];
+
+  const binarySearch = (lyric) => {
+    const time = lyric.time;
+
+    let low = 0;
+    let high = parsedLyrics.length - 1;
+
+    while (low <= high) {
+      const mid = Math.floor((low + high) / 2);
+      const midTime = parsedLyrics[mid].time;
+      if (midTime === time) {
+        return mid;
+      } else if (midTime < time) {
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+
+    return low;
+  };
+
+  for (const line of lrc.trim().matchAll(extractLrcRegex)) {
+    if (!line.groups) continue;
+    const { lyricTimestamps, content } = line.groups as {
+      lyricTimestamps: string;
+      content: string;
+    };
+
+    for (const timestamp of lyricTimestamps.matchAll(extractTimestampRegex)) {
+      if (!timestamp.groups) continue;
+      const { min, sec, ms } = timestamp.groups as { min: string; sec: string; ms: string };
+      const rawTime = timestamp[0];
+      const time = (Number(min) * 60 + Number(sec)) * 1000 + Number(ms ?? 0);
+
+      const parsedLyric = { rawTime, time, content: trimContent(content) };
+      parsedLyrics.splice(binarySearch(parsedLyric), 0, parsedLyric);
+    }
+  }
+
+  return parsedLyrics;
 };

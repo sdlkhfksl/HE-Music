@@ -1,6 +1,6 @@
 <template>
   <div class="artist-type">
-    <CoverList
+    <AlbumList
       :data="albumData"
       :loading="loading"
       :loadMore="hasMore"
@@ -11,32 +11,31 @@
 </template>
 
 <script setup lang="ts">
-import type { CoverType } from "@/types/main";
 import { artistAblums } from "@/api/artist";
-import { formatCoverList } from "@/utils/format";
+import { AlbumInfo } from "@/types/main.hemusic";
+import AlbumList from "@/components/List/AlbumList.vue";
 
 const props = defineProps<{
-  id: number;
+  id: string;
+  platform: string;
 }>();
 
 // 歌曲数据
 const loading = ref<boolean>(true);
 const hasMore = ref<boolean>(true);
-const albumData = ref<CoverType[]>([]);
-const albumOffset = ref<number>(0);
+const albumData = ref<AlbumInfo[]>([]);
+const albumPageIndex = ref<number>(1);
 
 // 获取歌手全部专辑
 const getArtistAllAlbums = async () => {
   try {
-    if (!props.id) return;
+    if (!props.id || !props.platform) return;
     loading.value = true;
     // 获取数据
-    const result = await artistAblums(props.id, 50, albumOffset.value);
+    const result = await artistAblums(props.id, props.platform, albumPageIndex.value, 50);
     // 是否还有
-    hasMore.value = result?.more;
-    // 处理数据
-    const listData = formatCoverList(result?.hotAlbums);
-    albumData.value = albumData.value.concat(listData);
+    hasMore.value = result?.has_more;
+    albumData.value = albumData.value.concat(result.list);
     loading.value = false;
   } catch (error) {
     console.error("Error getting artist all albums:", error);
@@ -46,7 +45,7 @@ const getArtistAllAlbums = async () => {
 // 加载更多
 const loadMore = () => {
   if (hasMore.value) {
-    albumOffset.value += 50;
+    albumPageIndex.value++;
     getArtistAllAlbums();
   } else {
     loading.value = false;

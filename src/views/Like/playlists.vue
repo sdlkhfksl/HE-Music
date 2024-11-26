@@ -14,13 +14,14 @@
       </n-tag>
     </n-flex>
     <Transition name="fade" mode="out-in">
-      <CoverList :key="plTypeChoose" :data="listData" :loading="true" type="playlist" />
+      <PlaylistList :key="plTypeChoose" :data="listData" type="playlist" />
     </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useDataStore } from "@/stores";
+import PlaylistList from "@/components/List/PlaylistList.vue";
 
 const dataStore = useDataStore();
 
@@ -30,13 +31,7 @@ const plTypeName = ["我创建的", "我收藏的"];
 
 // 歌单列表内容
 const listData = computed(() =>
-  dataStore.userLikeData.playlists
-    ?.filter((pl) =>
-      plTypeChoose.value === 0
-        ? pl.userId === dataStore.userData.userId
-        : pl?.userId !== dataStore.userData.userId,
-    )
-    .slice(plTypeChoose.value === 0 ? 1 : 0),
+  plTypeChoose.value === 0 ? dataStore.userCreatedPlaylist : dataStore.userLikeData.playlists,
 );
 
 // 更换歌单类型

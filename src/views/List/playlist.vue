@@ -5,7 +5,7 @@
       <div v-if="playlistDetailData" class="detail">
         <div class="cover">
           <n-image
-            :src="playlistDetailData.coverSize?.m || playlistDetailData.cover"
+            :src="playlistDetailData.cover"
             :previewed-img-props="{ style: { borderRadius: '8px' } }"
             :preview-src="playlistDetailData.cover"
             :renderToolbar="renderToolbar"
@@ -20,33 +20,29 @@
             </template>
           </n-image>
           <!-- 封面背板 -->
-          <n-image
-            class="cover-shadow"
-            preview-disabled
-            :src="playlistDetailData.coverSize?.m || playlistDetailData.cover"
-          />
+          <n-image class="cover-shadow" preview-disabled :src="playlistDetailData.cover" />
           <!-- 遮罩 -->
           <div class="cover-mask" />
           <!-- 播放量 -->
           <div class="play-count">
             <SvgIcon name="Play" />
-            <span class="num">{{ formatNumber(playlistDetailData.playCount || 0) }}</span>
+            <span class="num">{{ formatNumber(Number(playlistDetailData.play_count) || 0) }}</span>
           </div>
         </div>
         <div class="data">
           <n-h2 class="name text-hidden">
             {{ playlistDetailData.name || "未知歌单" }}
             <!-- 隐私歌单 -->
-            <n-popover
-              v-if="playlistDetailData?.privacy === 10"
-              :show-arrow="false"
-              placement="right"
-            >
-              <template #trigger>
-                <SvgIcon :depth="3" name="EyeLock" size="22" />
-              </template>
-              <n-text>隐私歌单</n-text>
-            </n-popover>
+            <!--            <n-popover-->
+            <!--              v-if="playlistDetailData?.privacy === 10"-->
+            <!--              :show-arrow="false"-->
+            <!--              placement="right"-->
+            <!--            >-->
+            <!--              <template #trigger>-->
+            <!--                <SvgIcon :depth="3" name="EyeLock" size="22" />-->
+            <!--              </template>-->
+            <!--              <n-text>隐私歌单</n-text>-->
+            <!--            </n-popover>-->
           </n-h2>
           <n-collapse-transition :show="!listScrolling" class="collapse">
             <!-- 简介 -->
@@ -65,36 +61,36 @@
             <n-flex class="meta">
               <div class="item">
                 <SvgIcon name="Person" :depth="3" />
-                <n-text>{{ playlistDetailData.creator?.name || "未知用户名" }}</n-text>
+                <n-text>{{ playlistDetailData.creator || "未知用户名" }}</n-text>
               </div>
-              <!-- <div class="item">
+              <div class="item">
                 <SvgIcon name="Music" :depth="3" />
-                <n-text>{{ playlistDetailData.count || 0 }}</n-text>
-              </div> -->
-              <div v-if="playlistDetailData.updateTime" class="item">
-                <SvgIcon name="Update" :depth="3" />
-                <n-text>{{ formatTimestamp(playlistDetailData.updateTime) }}</n-text>
+                <n-text>{{ playlistDetailData.song_num || 0 }}</n-text>
               </div>
-              <div v-else-if="playlistDetailData.createTime" class="item">
-                <SvgIcon name="Time" :depth="3" />
-                <n-text>{{ formatTimestamp(playlistDetailData.createTime) }}</n-text>
-              </div>
+              <!--              <div v-if="playlistDetailData.updateTime" class="item">-->
+              <!--                <SvgIcon name="Update" :depth="3" />-->
+              <!--                <n-text>{{ formatTimestamp(playlistDetailData.updateTime) }}</n-text>-->
+              <!--              </div>-->
+              <!--              <div v-else-if="playlistDetailData.createTime" class="item">-->
+              <!--                <SvgIcon name="Time" :depth="3" />-->
+              <!--                <n-text>{{ formatTimestamp(playlistDetailData.createTime) }}</n-text>-->
+              <!--              </div>-->
               <div v-if="playlistDetailData.tags?.length" class="item">
                 <SvgIcon name="Tag" :depth="3" />
                 <n-flex class="tags">
                   <n-tag
-                    v-for="(item, index) in playlistDetailData.tags"
-                    :key="index"
+                    v-for="item in playlistDetailData.tags"
+                    :key="`${item.platform}-${item.id}`"
                     :bordered="false"
                     round
                     @click="
                       router.push({
-                        name: 'discover-playlists',
-                        query: { cat: item },
+                        name: 'playlist-square',
+                        query: { platform: item.platform, tag_id: item.id },
                       })
                     "
                   >
-                    {{ item }}
+                    {{ item.name }}
                   </n-tag>
                 </n-flex>
               </div>
@@ -120,31 +116,19 @@
                     ? isSamePlaylist
                       ? "更新中..."
                       : `加载中... (${
-                          playlistData.length === playlistDetailData.count ? 0 : playlistData.length
-                        }/${playlistDetailData.count})`
+                          playlistData.length === Number(playlistDetailData.song_num)
+                            ? 0
+                            : playlistData.length
+                        }/${playlistDetailData.song_num})`
                     : "播放"
                 }}
               </n-button>
               <n-button
-                v-if="isUserPlaylist"
                 :focusable="false"
                 strong
                 secondary
                 round
-                @click="updatePlaylist"
-              >
-                <template #icon>
-                  <SvgIcon name="EditNote" />
-                </template>
-                编辑歌单
-              </n-button>
-              <n-button
-                v-else
-                :focusable="false"
-                strong
-                secondary
-                round
-                @click="toLikePlaylist(playlistId, !isLikePlaylist)"
+                @click="toLikePlaylist(playlistDetailData, !isLikePlaylist)"
               >
                 <template #icon>
                   <SvgIcon :name="isLikePlaylist ? 'Favorite' : 'FavoriteBorder'" />
@@ -193,9 +177,12 @@
         :data="playlistDataShow"
         :loading="loading"
         :height="songListHeight"
-        :playListId="playlistId"
+        :playlist="{
+          id: playlistId,
+          platform: playlistDetailData?.platform,
+          type: 'playlist',
+        }"
         @scroll="listScroll"
-        @removeSong="removeSong"
       />
       <n-empty
         v-else
@@ -212,35 +199,37 @@
 </template>
 
 <script setup lang="ts">
-import type { CoverType, SongType } from "@/types/main";
 import type { DropdownOption, MessageReactive } from "naive-ui";
-import { songDetail } from "@/api/song";
-import { playlistDetail, playlistAllSongs, deletePlaylist } from "@/api/playlist";
-import { formatCoverList, formatSongsList } from "@/utils/format";
+import { playlistDetail } from "@/api/playlist";
 import { coverLoaded, formatNumber, fuzzySearch, renderIcon } from "@/utils/helper";
 import { renderToolbar } from "@/utils/meta";
-import { isLogin, toLikePlaylist, updateUserLikePlaylist } from "@/utils/auth";
+import { toLikePlaylist } from "@/utils/auth";
 import { debounce } from "lodash-es";
 import { useDataStore, useStatusStore } from "@/stores";
-import { openBatchList, openUpdatePlaylist } from "@/utils/modal";
-import { formatTimestamp } from "@/utils/time";
+import { openBatchList } from "@/utils/modal";
 import player from "@/utils/player";
+import { PlaylistInfo, SongInfo } from "@/types/main.hemusic";
+import { computed } from "vue";
+import SongList from "@/components/List/SongList.vue";
 
 const router = useRouter();
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
 
 // 歌单数据
-const playlistData = shallowRef<SongType[]>([]);
-const playlistDetailData = ref<CoverType | null>(null);
+const playlistData = shallowRef<SongInfo[]>([]);
+const playlistDetailData = ref<PlaylistInfo | null>(null);
 
 // 模糊搜索数据
 const searchValue = ref<string>("");
-const searchData = ref<SongType[]>([]);
+const searchData = ref<SongInfo[]>([]);
 
 // 歌单 ID
-const oldPlaylistId = ref<number>(0);
-const playlistId = computed<number>(() => Number(router.currentRoute.value.query.id as string));
+const oldPlaylistId = ref<string>("");
+const playlistId = computed<string>(() => router.currentRoute.value.query.id as string);
+
+const oldPlatform = ref<string>("");
+const platform = computed<string>(() => router.currentRoute.value.query.platform as string);
 
 // 加载提示
 const loading = ref<boolean>(true);
@@ -259,146 +248,71 @@ const songListHeight = computed(() => {
   return statusStore.mainContentHeight - (listScrolling.value ? 120 : 240);
 });
 
-// 是否为用户歌单
-const isUserPlaylist = computed(() => {
-  return playlistDetailData.value?.creator?.id === dataStore.userData?.userId;
-});
-
 // 是否处于收藏歌单
 const isLikePlaylist = computed(() => {
   return dataStore.userLikeData.playlists.some(
-    (playlist) => playlist.id === playlistDetailData.value?.id,
+    (playlist) =>
+      playlist.id === playlistDetailData.value?.id &&
+      playlist.platform === playlistDetailData.value?.platform,
   );
 });
 
-// 是否处于歌单页面
-const isPlaylistPage = computed<boolean>(() => router.currentRoute.value.name === "playlist");
-
 // 是否为相同歌单
-const isSamePlaylist = computed<boolean>(() => oldPlaylistId.value === playlistId.value);
+const isSamePlaylist = computed<boolean>(
+  () => oldPlaylistId.value === playlistId.value && oldPlatform.value === platform.value,
+);
 
 // 更多操作
 const moreOptions = computed<DropdownOption[]>(() => [
   {
-    label: "公开隐私歌单",
-    key: "privacy",
-    show: playlistDetailData.value?.privacy === 10,
-    icon: renderIcon("ListLockOpen"),
-  },
-  {
-    label: "删除歌单",
-    key: "delete",
-    show: isUserPlaylist.value,
-    props: {
-      onClick: () => toDeletePlaylist(),
-    },
-    icon: renderIcon("Delete"),
-  },
-  {
     label: "批量操作",
     key: "batch",
     props: {
-      onClick: () =>
-        openBatchList(
-          playlistDataShow.value,
-          false,
-          isUserPlaylist.value ? playlistId.value : undefined,
-        ),
+      onClick: () => openBatchList(playlistDataShow.value, false),
     },
     icon: renderIcon("Batch"),
-  },
-  {
-    label: "打开源页面",
-    key: "open",
-    props: {
-      onClick: () => {
-        window.open(`https://music.163.com/#/playlist?id=${playlistId.value}`);
-      },
-    },
-    icon: renderIcon("Link"),
   },
 ]);
 
 // 获取歌单基础信息
-const getPlaylistDetail = async (
-  id: number,
-  options: { getList: boolean; refresh: boolean } = { getList: true, refresh: false },
-) => {
-  if (!id) return;
+const getPlaylistDetail = async (id: string, platform: string, refresh: boolean = false) => {
+  if (!id || !platform) return;
   // 设置加载状态
   loading.value = true;
-  const { getList, refresh } = options;
   // 清空数据
   clearInput();
-  if (!refresh) resetPlaylistData(getList);
+  if (!refresh) resetPlaylistData();
   // 判断是否为本地歌单，本地歌单 ID 为 16 位
   const isLocal = id.toString().length === 16;
   // 本地歌单
   if (isLocal) handleLocalPlaylist(id);
   // 在线歌单
-  else await handleOnlinePlaylist(id, getList, refresh);
+  else await handleOnlinePlaylist(id, platform);
 };
 
 // 重置歌单数据
-const resetPlaylistData = (getList: boolean) => {
+const resetPlaylistData = () => {
   playlistDetailData.value = null;
-  if (getList) {
-    playlistData.value = [];
-    listScrolling.value = false;
-  }
+  playlistData.value = [];
+  listScrolling.value = false;
 };
 
 // 获取本地歌单
-const handleLocalPlaylist = (id: number) => {
+const handleLocalPlaylist = (id: string) => {
   console.log(id);
 };
 
 // 获取在线歌单
-const handleOnlinePlaylist = async (id: number, getList: boolean, refresh: boolean) => {
+const handleOnlinePlaylist = async (id: string, platform: string) => {
   // 获取歌单详情
-  const detail = await playlistDetail(id);
-  playlistDetailData.value = formatCoverList(detail.playlist)[0];
-  // 不需要获取列表或无歌曲
-  if (!getList || playlistDetailData.value.count === 0) {
-    loading.value = false;
-    return;
-  }
-  // 如果已登录且歌曲数量少于 800，直接加载所有歌曲
-  if (isLogin() === 1 && (playlistDetailData.value?.count as number) < 800) {
-    const ids: number[] = detail.privileges.map((song: any) => song.id as number);
-    const result = await songDetail(ids);
-    playlistData.value = formatSongsList(result.songs);
-  } else {
-    await getPlaylistAllSongs(id, playlistDetailData.value.count || 0, refresh);
-  }
-  loading.value = false;
-};
-
-// 获取歌单全部歌曲
-const getPlaylistAllSongs = async (
-  id: number,
-  count: number,
-  // 是否为刷新列表
-  refresh: boolean = false,
-) => {
-  loading.value = true;
-  // 加载提示
-  loadingMsgShow(!refresh, count);
-  // 循环获取
-  let offset: number = 0;
-  const limit: number = 500;
-  const listData: SongType[] = [];
-  do {
-    const result = await playlistAllSongs(id, limit, offset);
-    const songData = formatSongsList(result.songs);
-    listData.push(...songData);
-    if (!refresh) playlistData.value = playlistData.value.concat(songData);
-    // 更新数据
-    offset += limit;
-  } while (offset < count && isPlaylistPage.value);
-  if (refresh) playlistData.value = listData;
-  // 关闭加载
-  loadingMsgShow(false);
+  playlistDetail(id, platform)
+    .then((detail) => {
+      playlistDetailData.value = detail;
+      playlistData.value = detail.songs;
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 };
 
 // 列表滚动
@@ -433,7 +347,11 @@ const loadingMsgShow = (show: boolean = true, count?: number) => {
 // 播放全部歌曲
 const playAllSongs = debounce(() => {
   if (!playlistDetailData.value || !playlistData.value?.length) return;
-  player.updatePlayList(playlistData.value, undefined, playlistId.value);
+  player.updatePlayList(playlistData.value, undefined, {
+    id: playlistDetailData.value.id,
+    platform: playlistDetailData.value.platform,
+    type: "playlist",
+  });
 }, 300);
 
 // 模糊搜索
@@ -445,66 +363,34 @@ const listSearch = debounce((val: string) => {
   searchData.value = result;
 }, 300);
 
-// 删除歌单
-const toDeletePlaylist = async () => {
-  if (!playlistDetailData.value || !playlistId.value) return;
-  window.$dialog.warning({
-    title: "删除歌单",
-    content: "确认删除这个歌单？该操作无法撤销！",
-    positiveText: "删除",
-    negativeText: "取消",
-    onPositiveClick: async () => {
-      const result = await deletePlaylist(playlistId.value);
-      if (result.code === 200) {
-        window.$message.success("歌单删除成功");
-        // 更新用户歌单
-        if (dataStore.userData.createdPlaylistCount) {
-          dataStore.userData.createdPlaylistCount -= 1;
-          await updateUserLikePlaylist();
-        }
-      }
-    },
-  });
-};
-
-// 删除指定索引歌曲
-const removeSong = (ids: number[]) => {
-  if (!playlistData.value) return;
-  playlistData.value = playlistData.value.filter((song) => !ids.includes(song.id));
-};
-
-// 编辑歌单
-const updatePlaylist = () => {
-  if (!playlistDetailData.value || !playlistId.value) return;
-  openUpdatePlaylist(playlistId.value, playlistDetailData.value, () =>
-    getPlaylistDetail(playlistId.value, { getList: false, refresh: false }),
-  );
-};
-
 onBeforeRouteUpdate((to) => {
-  const id = Number(to.query.id as string);
-  if (id) {
+  const id = to.query.id as string;
+  const platform = to.query.platform as string;
+  if (id && platform) {
     oldPlaylistId.value = id;
-    getPlaylistDetail(id);
+    oldPlatform.value = platform;
+    getPlaylistDetail(id, platform);
   }
 });
 
 onActivated(() => {
   // 是否为首次进入
-  if (oldPlaylistId.value === 0) {
+  if (oldPlaylistId.value) {
     oldPlaylistId.value = playlistId.value;
+    oldPlatform.value = platform.value;
   } else {
     // 是否不相同
-    const isSame = oldPlaylistId.value === playlistId.value;
+    const isSame = oldPlaylistId.value === playlistId.value && oldPlatform.value == platform.value;
     oldPlaylistId.value = playlistId.value;
+    oldPlatform.value = platform.value;
     // 刷新歌单
-    getPlaylistDetail(playlistId.value, { getList: true, refresh: isSame });
+    getPlaylistDetail(playlistId.value, platform.value, isSame);
   }
 });
 
 onDeactivated(() => loadingMsgShow(false));
 onUnmounted(() => loadingMsgShow(false));
-onMounted(() => getPlaylistDetail(playlistId.value));
+onMounted(() => getPlaylistDetail(playlistId.value, platform.value));
 </script>
 
 <style lang="scss" scoped>

@@ -37,19 +37,23 @@
 </template>
 
 <script setup lang="ts">
-import { useStatusStore, useDataStore } from "@/stores";
+import { useDataStore, usePlatformStore, useStatusStore } from "@/stores";
 import { searchDefault } from "@/api/search";
 import SearchInpMenu from "@/components/Menu/SearchInpMenu.vue";
-import player from "@/utils/player";
-import { songDetail } from "@/api/song";
-import { formatSongsList } from "@/utils/format";
+import SearchDefault from "@/components/Search/SearchDefault.vue";
+import SearchSuggest from "@/components/Search/SearchSuggest.vue";
+import { SearchDefaultInfo } from "@/types/main.hemusic";
+import { watch } from "vue";
 
 const router = useRouter();
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
+const platformStore = usePlatformStore();
 
 // 右键菜单
 const searchInpMenuRef = ref<InstanceType<typeof SearchInpMenu> | null>(null);
+let searchDefaultList: SearchDefaultInfo[] = [];
+let searchDefaultIndex: number = -1;
 
 // 搜索框数据
 const searchInputRef = ref<HTMLInputElement | null>(null);
@@ -80,15 +84,29 @@ const setSearchHistory = (keyword: string) => {
   }
 };
 
-// 更换搜索框关键词
-const updatePlaceholder = async () => {
+// reloadPlaceholder 重新加载
+const reloadPlaceholder = async () => {
   try {
-    const result = await searchDefault();
-    searchPlaceholder.value = result.data.showKeyword;
-    searchRealkeyword.value = result.data.realkeyword;
+    const platform = platformStore.platforms.find((item) => item.status === 1);
+    if (!platform) {
+      return;
+    }
+    const result = await searchDefault(platform?.id || "");
+    searchDefaultList = result.list || [];
   } catch (error) {
     console.error("搜索关键词获取失败：", error);
     searchPlaceholder.value = "搜索音乐 / 视频";
+  }
+};
+
+// 更换搜索框关键词
+const updatePlaceholder = () => {
+  if (searchDefaultList.length > 0) {
+    searchDefaultIndex = (searchDefaultIndex + 1) % searchDefaultList.length;
+    const result = searchDefaultList[searchDefaultIndex];
+    searchPlaceholder.value = result.key + " " + result.description;
+    searchRealkeyword.value = result.key;
+    return;
   }
 };
 
@@ -102,8 +120,7 @@ const toSearch = async (key: any, type: string = "keyword") => {
   // 关闭搜索框
   statusStore.searchFocus = false;
   searchInputRef.value?.blur();
-  // 更新推荐
-  updatePlaceholder();
+
   // 前往搜索
   switch (type) {
     case "keyword":
@@ -113,12 +130,12 @@ const toSearch = async (key: any, type: string = "keyword") => {
       });
       setSearchHistory(key);
       break;
-    case "songs": {
-      const result = await songDetail(key?.id);
-      const song = formatSongsList(result.songs)[0];
-      player.addNextSong(song, true);
-      break;
-    }
+    // case "songs": {
+    //   const result = await songDetail(key?.id);
+    //   const song = formatSongsList(result.songs)[0];
+    //   player.addNextSong(song, true);
+    //   break;
+    // }
     case "playlists":
       router.push({
         name: "playlist",
@@ -142,9 +159,24 @@ const toSearch = async (key: any, type: string = "keyword") => {
   }
 };
 
-onMounted(() => {
+const watcher = watch(
+  () => platformStore.platforms,
+  async () => {
+    watcher.stop();
+    if (searchDefaultList.length != 0) {
+      return;
+    }
+    await reloadPlaceholder();
+    updatePlaceholder();
+  },
+);
+
+onMounted(async () => {
+  await reloadPlaceholder();
+
   updatePlaceholder();
   // 每分钟更新
+  useIntervalFn(reloadPlaceholder, 600 * 1000);
   useIntervalFn(updatePlaceholder, 60 * 1000);
 });
 </script>

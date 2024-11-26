@@ -1,14 +1,12 @@
-import request from "@/utils/request";
+import request, { requestHemusic } from "@/utils/request";
 
 /**
  * 获取用户账号信息
  */
 export const userAccount = () => {
-  return request({
-    url: "/user/account",
-    params: {
-      timestamp: Date.now(),
-    },
+  return requestHemusic({
+    url: "/v1/user/info",
+    params: {},
   });
 };
 
@@ -23,114 +21,131 @@ export const userDetail = (uid: number) => {
   });
 };
 
-// 获取用户等级信息
-export const userLevel = () => {
-  return request({
-    url: "/user/level",
+// 获取用户喜欢的歌单
+export const userFavouritePlaylist = (page_size: number = 50, page_index: number = 1) => {
+  return requestHemusic({
+    url: "/v1/user/favourite/playlists",
     params: {
-      timestamp: Date.now(),
+      page_index,
+      page_size,
     },
   });
 };
 
-// 获取用户订阅信息，包括歌单、收藏、MV 和 DJ 数量
-export const userSubcount = () => {
-  return request({
-    url: "/user/subcount",
-    params: {
-      timestamp: Date.now(),
-    },
+/**
+ * 收藏歌单
+ */
+export const likePlaylist = (
+  id: string,
+  platform: string,
+  name: string,
+  cover: string,
+  creator: string,
+) => {
+  return requestHemusic({
+    url: "/v1/user/favourite/playlist",
+    method: "post",
+    data: { id, platform, name, cover, creator },
   });
 };
-
-// 获取用户歌单
-export const userPlaylist = (limit: number = 50, offset: number = 0, uid: number) => {
-  return request({
-    url: "/user/playlist",
-    params: {
-      uid,
-      limit,
-      offset,
-      timestamp: Date.now(),
-    },
+// 取消收藏歌单
+export const unlikePlaylist = (id: string, platform: string) => {
+  return requestHemusic({
+    url: "/v1/user/favourite/playlist",
+    method: "delete",
+    data: { id, platform },
   });
 };
 
 // 获取用户收藏专辑
-export const userAlbum = (limit: number = 50, offset: number = 0) => {
-  return request({
-    url: "/album/sublist",
+export const userFavouriteAlbum = (page_size: number = 50, page_index: number = 1) => {
+  return requestHemusic({
+    url: "/v1/user/favourite/albums",
     params: {
-      limit,
-      offset,
-      timestamp: Date.now(),
+      page_index,
+      page_size,
     },
+  });
+};
+
+/**
+ * 收藏歌单
+ */
+export const likeAlbum = (
+  id: string,
+  platform: string,
+  name: string,
+  cover: string,
+  singers: any[],
+) => {
+  return requestHemusic({
+    url: "/v1/user/favourite/album",
+    method: "post",
+    data: { id, platform, name, cover, singers },
+  });
+};
+// 取消收藏专辑
+export const unlikeAlbum = (id: string, platform: string) => {
+  return requestHemusic({
+    url: "/v1/user/favourite/album",
+    method: "delete",
+    data: { id, platform },
   });
 };
 
 // 获取用户收藏歌手
-export const userArtist = (limit: number = 50, offset: number = 0) => {
-  return request({
-    url: "/artist/sublist",
+export const userFavouriteArtist = (page_size: number = 50, page_index: number = 1) => {
+  return requestHemusic({
+    url: "/v1/user/favourite/singers",
     params: {
-      limit,
-      offset,
-      timestamp: Date.now(),
+      page_index,
+      page_size,
     },
   });
 };
 
-// 获取用户收藏 MV
-export const userMv = () => {
-  return request({
-    url: "/mv/sublist",
-    params: {
-      timestamp: Date.now(),
-    },
+/**
+ * 收藏歌单
+ */
+export const likeSinger = (id: string, platform: string, name: string, cover: string) => {
+  return requestHemusic({
+    url: "/v1/user/favourite/singer",
+    method: "post",
+    data: { id, platform, name, cover },
   });
 };
-
-// 获取用户收藏电台
-export const userDj = () => {
-  return request({
-    url: "/dj/sublist",
-    params: {
-      timestamp: Date.now(),
-    },
+// 取消收藏歌单
+export const unlikeSinger = (id: string, platform: string) => {
+  return requestHemusic({
+    url: "/v1/user/favourite/singer",
+    method: "delete",
+    data: { id, platform },
   });
 };
 
 // 获取用户喜欢的音乐
-export const userLike = (uid: number) => {
-  return request({
-    url: "/likelist",
-    params: {
-      uid,
-      timestamp: Date.now(),
-    },
+export const userFavouriteSong = (page_size: number = 50, page_index: number = 1) => {
+  return requestHemusic({
+    url: "/v1/user/favourite/songs",
+    params: { page_size, page_index },
   });
 };
 
-// 听歌打卡
-export const scrobble = (id: number, sourceid?: number, time?: number) => {
-  return request({
-    url: "/scrobble",
-    params: {
-      id,
-      sourceid,
-      time,
-      timestamp: Date.now(),
-    },
+/**
+ * 收藏歌单
+ */
+export const likeSong = (id: string, platform: string) => {
+  return requestHemusic({
+    url: "/v1/user/favourite/song",
+    method: "post",
+    data: { id, platform },
   });
 };
-
-// 每日签到
-export const dailySignin = (type: 0 | 1 = 0) => {
-  return request({
-    url: "/daily_signin",
-    params: {
-      type,
-      timestamp: Date.now(),
-    },
+// 取消收藏歌单
+export const unlikeSong = (id: string, platform: string) => {
+  return requestHemusic({
+    url: "/v1/user/favourite/song",
+    method: "delete",
+    data: { id, platform },
   });
 };

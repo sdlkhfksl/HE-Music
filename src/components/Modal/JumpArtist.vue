@@ -11,9 +11,9 @@
           :key="index"
           class="ar-item"
           hoverable
-          @click="jumpArtist(item.id)"
+          @click="jumpArtist(item.id, platform)"
         >
-          <n-avatar :src="item.cover || '/images/artist.jpg?assest'" class="cover" round />
+          <n-avatar :src="'/images/artist.jpg?assest'" class="cover" round />
           <n-text class="name">{{ item.name }}</n-text>
         </n-card>
       </div>
@@ -25,13 +25,18 @@
 </template>
 
 <script setup lang="ts">
-import type { SongType, MetaData } from "@/types/main";
-import { useSettingStore } from "@/stores";
-import { searchArtist } from "@/api/artist";
+import { SongInfo, SongInfoSingerInfo } from "@/types/main.hemusic";
+import { usePlatformStore, useSettingStore } from "@/stores";
+import { searchResultHemusic } from "@/api/search";
 import { uniq } from "lodash-es";
+import { FeatureSupportFlag } from "@/api/platform";
+
+const settingStore = useSettingStore();
+const platformStore = usePlatformStore();
 
 const props = defineProps<{
-  artist: SongType["artists"];
+  artist: SongInfo["singers"];
+  platform: string;
 }>();
 
 const emit = defineEmits<{
@@ -39,9 +44,8 @@ const emit = defineEmits<{
 }>();
 
 const router = useRouter();
-const settingStore = useSettingStore();
 
-const artistData = ref<MetaData[]>([]);
+const artistData = ref<SongInfoSingerInfo[]>([]);
 
 // 获取歌手信息
 const getArtistData = async () => {
@@ -50,14 +54,17 @@ const getArtistData = async () => {
   const setArtistData = (data: any, name: string) => {
     if (!data) return;
     const filteredData = data
-      .filter((ar: any) => ar.artistName === name)
+      .filter((ar: any) => ar.name === name)
       .map((ar: any) => ({
-        id: ar.artistId,
-        name: ar.artistName,
-        cover: ar.artistAvatarPicUrl,
+        id: ar.id,
+        name: ar.name,
       }));
     artistData.value.push(...filteredData);
   };
+
+  const platform = platformStore.platforms.find(
+    (p) => p.feature_support_flag & FeatureSupportFlag.SearchSinger && p.status === 1,
+  );
   if (typeof props.artist === "string") {
     let artists: string[] = [];
     // 是否有分割符
@@ -66,8 +73,14 @@ const getArtistData = async () => {
     );
     if (!hasSeparator) {
       const name = (props.artist as string).trim();
-      const result = await searchArtist(name);
-      setArtistData(result.data.list, name);
+      const result = await searchResultHemusic(
+        name,
+        10,
+        1,
+        props.platform || platform?.id || "",
+        "singers",
+      );
+      setArtistData(result.list, name);
     } else {
       // 遍历分割符，并分割歌手名字
       settingStore.localSeparators.forEach((separator) => {
@@ -81,8 +94,14 @@ const getArtistData = async () => {
       );
       // 获取歌手信息
       artists.map(async (name) => {
-        const result = await searchArtist(name);
-        setArtistData(result.data.list, name);
+        const result = await searchResultHemusic(
+          name,
+          10,
+          1,
+          props.platform || platform?.id || "",
+          "singers",
+        );
+        setArtistData(result.list, name);
       });
     }
   } else if (Array.isArray(props.artist)) {
@@ -91,10 +110,10 @@ const getArtistData = async () => {
 };
 
 // 跳转至歌手
-const jumpArtist = (id: number) => {
-  if (!id) return;
+const jumpArtist = (id: string, platform: string) => {
+  if (!id || !platform) return;
   emit("close");
-  router.push({ name: "artist", query: { id } });
+  router.push({ name: "artist", query: { id, platform } });
 };
 
 onMounted(getArtistData);

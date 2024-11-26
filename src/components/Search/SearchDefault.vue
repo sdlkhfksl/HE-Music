@@ -34,28 +34,28 @@
             v-for="(item, index) in searchHotData"
             :key="index"
             class="hot-item"
-            @click="emit('toSearch', item.searchWord)"
+            @click="emit('toSearch', item)"
           >
             <n-text class="num" depth="3">{{ index + 1 }}</n-text>
             <div class="data">
               <div class="name">
-                <n-text class="text">{{ item.searchWord }}</n-text>
-                <n-tag
-                  v-if="item.iconUrl"
-                  :type="item.iconType == 1 ? 'error' : 'warning'"
-                  :bordered="false"
-                  size="small"
-                  round
-                >
-                  {{ item.iconType === 1 ? "HOT" : "UP" }}
-                </n-tag>
+                <n-text class="text">{{ item }}</n-text>
+                <!--                <n-tag-->
+                <!--                  v-if="item.iconUrl"-->
+                <!--                  :type="item.iconType == 1 ? 'error' : 'warning'"-->
+                <!--                  :bordered="false"-->
+                <!--                  size="small"-->
+                <!--                  round-->
+                <!--                >-->
+                <!--                  {{ item.iconType === 1 ? "HOT" : "UP" }}-->
+                <!--                </n-tag>-->
               </div>
-              <n-text class="content" depth="3">{{ item.content }}</n-text>
+              <!--              <n-text class="content" depth="3">{{ item }}</n-text>-->
             </div>
-            <div class="hot">
-              <SvgIcon name="Fire" />
-              <n-text class="hot-num">{{ item.score }} </n-text>
-            </div>
+            <!--            <div class="hot">-->
+            <!--              <SvgIcon name="Fire" />-->
+            <!--              <n-text class="hot-num">{{ item.score }} </n-text>-->
+            <!--            </div>-->
           </div>
         </div>
       </n-scrollbar>
@@ -66,7 +66,8 @@
 <script setup lang="ts">
 import { searchHot } from "@/api/search";
 import { getCacheData } from "@/utils/cache";
-import { useSettingStore, useStatusStore, useDataStore } from "@/stores";
+import { useDataStore, usePlatformStore, useSettingStore, useStatusStore } from "@/stores";
+import { FeatureSupportFlag } from "@/api/platform";
 
 const emit = defineEmits<{
   toSearch: [keyword: string];
@@ -75,6 +76,7 @@ const emit = defineEmits<{
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
+const platformStore = usePlatformStore();
 
 const searchHotData = ref<any>([]);
 
@@ -90,11 +92,22 @@ const isShow = computed(() => {
 // 获取热搜数据
 const getSearchHotData = async () => {
   if (!settingStore.useOnlineService) return;
-  const result = await getCacheData(searchHot, {
-    key: "searchHotData",
-    time: 10,
-  });
-  searchHotData.value = result.data;
+
+  const platform = platformStore.platforms.find(
+    (item) => item.feature_support_flag & FeatureSupportFlag.GetSearchHotkey && item.status === 1,
+  );
+  if (!platform) {
+    return;
+  }
+  const result = await getCacheData(
+    searchHot,
+    {
+      key: "searchHotData",
+      time: 10,
+    },
+    platform?.id || "",
+  );
+  searchHotData.value = result.keys;
 };
 
 // 删除搜索历史

@@ -1,32 +1,32 @@
 <!-- 本地设置 -->
 <template>
   <div class="setting-type">
-    <div class="set-list">
-      <n-h3 prefix="bar"> 地区解锁 </n-h3>
-      <n-card class="set-item">
-        <div class="label">
-          <n-text class="name">使用真实 IP 地址</n-text>
-          <n-text class="tip" :depth="3">在海外或部分地区可能会受到限制，可开启此处尝试解决</n-text>
-        </div>
-        <n-switch class="set" v-model:value="settingStore.useRealIP" :round="false" />
-      </n-card>
-      <n-card class="set-item">
-        <div class="label">
-          <n-text class="name">真实 IP 地址</n-text>
-          <n-text class="tip" :depth="3">可在此处输入国内 IP</n-text>
-        </div>
-        <n-input
-          v-model:value="settingStore.realIP"
-          :disabled="!settingStore.useRealIP"
-          placeholder="请填写真实 IP 地址"
-          class="set"
-        >
-          <template #prefix>
-            <n-text depth="3">IP</n-text>
-          </template>
-        </n-input>
-      </n-card>
-    </div>
+    <!--    <div class="set-list">-->
+    <!--      <n-h3 prefix="bar"> 地区解锁 </n-h3>-->
+    <!--      <n-card class="set-item">-->
+    <!--        <div class="label">-->
+    <!--          <n-text class="name">使用真实 IP 地址</n-text>-->
+    <!--          <n-text class="tip" :depth="3">在海外或部分地区可能会受到限制，可开启此处尝试解决</n-text>-->
+    <!--        </div>-->
+    <!--        <n-switch class="set" v-model:value="settingStore.useRealIP" :round="false" />-->
+    <!--      </n-card>-->
+    <!--      <n-card class="set-item">-->
+    <!--        <div class="label">-->
+    <!--          <n-text class="name">真实 IP 地址</n-text>-->
+    <!--          <n-text class="tip" :depth="3">可在此处输入国内 IP</n-text>-->
+    <!--        </div>-->
+    <!--        <n-input-->
+    <!--          v-model:value="settingStore.realIP"-->
+    <!--          :disabled="!settingStore.useRealIP"-->
+    <!--          placeholder="请填写真实 IP 地址"-->
+    <!--          class="set"-->
+    <!--        >-->
+    <!--          <template #prefix>-->
+    <!--            <n-text depth="3">IP</n-text>-->
+    <!--          </template>-->
+    <!--        </n-input>-->
+    <!--      </n-card>-->
+    <!--    </div>-->
     <div v-if="isElectron" class="set-list">
       <n-h3 prefix="bar"> 网络代理 </n-h3>
       <n-card class="set-item">

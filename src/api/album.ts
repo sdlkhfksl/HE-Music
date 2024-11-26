@@ -1,18 +1,30 @@
-import request from "@/utils/request";
+import { requestHemusic } from "@/utils/request";
 
 // 获取专辑详情
-export const albumDetail = (id: number) => {
-  return request({ url: "/album", params: { id } });
-};
-
-// 收藏/取消收藏专辑
-export const likeAlbum = (id: number, t: number = 1 | 2) => {
-  return request({
-    url: "/album/sub",
+export const albumDetail = (id: string, platform: string) => {
+  return requestHemusic({
+    url: "/v1/album",
     params: {
       id,
-      t,
-      timestamp: new Date().getTime(),
+      platform,
     },
+  });
+};
+
+export const newAlbumTabs = (platform: string) => {
+  return requestHemusic({
+    url: "/v1/album/new/tab",
+    params: { platform },
+  });
+};
+export const newAlbums = (
+  platform: string,
+  tab_id: string,
+  page_index = 1,
+  page_size: number = 30,
+) => {
+  return requestHemusic({
+    url: "/v1/album/new",
+    params: { platform, tab_id, page_size, page_index },
   });
 };

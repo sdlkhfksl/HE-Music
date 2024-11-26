@@ -27,35 +27,36 @@
 </template>
 
 <script setup lang="ts">
-import type { SongType } from "@/types/main";
 import { useSettingStore } from "@/stores";
 import { isArray, some } from "lodash-es";
+import { SongInfo } from "@/types/main.hemusic";
 
-const props = defineProps<{ data: SongType[] }>();
+const props = defineProps<{ data: SongInfo[] }>();
 
 const settingStore = useSettingStore();
 
 // 歌手数据
 const chooseArtist = ref<string>("");
-const artistData = computed<Record<string, SongType[]>>(() => formatArtistsList(props.data));
+const artistData = computed<Record<string, SongInfo[]>>(() => formatArtistsList(props.data));
 
 // 区分歌手数据
 const formatArtistsList = (
-  data: SongType[],
+  data: SongInfo[],
   separators: string[] = settingStore.localSeparators,
-): Record<string, SongType[]> => {
+): Record<string, SongInfo[]> => {
   const allArtists = data.reduce(
     (acc, song) => {
       // 歌手信息
-      let artists = isArray(song.artists) ? song.artists : [song.artists];
+      let singers = isArray(song.singers) ? song.singers : [song.singers];
       // 分割歌手
       separators.forEach((separator) => {
-        artists = artists.flatMap((artist: any) =>
+        singers = singers.flatMap((artist: any) =>
           typeof artist === "string" ? artist.split(separator) : [artist],
         );
       });
       // 遍历歌手
-      artists.forEach((artist: any) => {
+      singers.forEach((artist: any) => {
+        if (!artist) return;
         // 获取歌手名称
         const artistName = typeof artist === "string" ? artist.trim() : artist.name;
         // 若还无歌手分类，初始化为空数组
@@ -65,11 +66,11 @@ const formatArtistsList = (
       });
       return acc;
     },
-    {} as Record<string, SongType[]>,
+    {} as Record<string, SongInfo[]>,
   );
   // 按字母顺序排序
   const sortedArtists = Object.keys(allArtists).sort((a, b) => a.localeCompare(b));
-  const sortedAllArtists: Record<string, SongType[]> = {};
+  const sortedAllArtists: Record<string, SongInfo[]> = {};
   sortedArtists.forEach((artist) => {
     sortedAllArtists[artist] = allArtists[artist];
   });

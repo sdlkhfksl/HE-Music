@@ -136,14 +136,13 @@
 </template>
 
 <script setup lang="ts">
-import type { SongType } from "@/types/main";
 import type { DropdownOption, MessageReactive } from "naive-ui";
 import { useLocalStore, useSettingStore } from "@/stores";
-import { formatSongsList } from "@/utils/format";
-import { uniqBy, flattenDeep, debounce } from "lodash-es";
+import { debounce, flattenDeep, uniqBy } from "lodash-es";
 import { changeLocalPath, fuzzySearch, renderIcon } from "@/utils/helper";
 import { openBatchList } from "@/utils/modal";
 import player from "@/utils/player";
+import { SongInfo } from "@/types/main.hemusic";
 
 const router = useRouter();
 const localStore = useLocalStore();
@@ -160,14 +159,14 @@ const localType = ref<string>((router.currentRoute.value?.name as string) || "lo
 
 // 模糊搜索数据
 const searchValue = ref<string>("");
-const searchData = ref<SongType[]>([]);
+const searchData = ref<SongInfo[]>([]);
 
 // 目录管理
 const defaultMusicPath = ref<string>("");
 const localPathShow = ref<boolean>(false);
 
 // 列表数据
-const listData = computed<SongType[]>(() => {
+const listData = computed<SongInfo[]>(() => {
   if (searchValue.value && searchData.value.length) return searchData.value;
   return localStore.localSongs;
 });
@@ -225,10 +224,11 @@ const getAllLocalMusic = debounce(
     const allSongData = results
       .filter((result) => result.status === "fulfilled")
       .map((result) => (result as PromiseFulfilledResult<any>).value);
+
     // 展平去重
     const songData = uniqBy(flattenDeep(allSongData), "id");
     // 处理数据
-    const listData = formatSongsList(songData);
+    const listData = songData;
     // 数据是否变化
     const oldLength = localStore.localSongs.length;
     if (oldLength === 0 && listData.length > 0) {

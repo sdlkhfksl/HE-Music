@@ -9,7 +9,7 @@
         <div class="avatar">
           <n-avatar
             v-if="dataStore.userLoginStatus"
-            :src="dataStore.userData?.avatarUrl"
+            :src="dataStore.userData?.cover"
             fallback-src="/images/avatar.jpg?assest"
             round
           />
@@ -19,21 +19,15 @@
         </div>
         <div class="user-data">
           <n-text class="name">
-            {{ dataStore.userLoginStatus ? dataStore.userData.name || "未知用户名" : "未登录" }}
+            {{ dataStore.userLoginStatus ? dataStore.userData.nickname || "未知用户名" : "未登录" }}
           </n-text>
-          <!-- VIP -->
-          <img
-            v-if="dataStore.userLoginStatus && dataStore.userData.vipType !== 0"
-            class="vip"
-            src="/images/vip.png?assest"
-          />
           <SvgIcon :class="['down', { open: userMenuShow }]" name="DropDown" :depth="3" />
         </div>
       </div>
     </template>
     <div class="user-menu" @click="userMenuShow = false">
       <!-- 喜欢数量 -->
-      <div v-if="dataStore.loginType !== 'uid'" class="like-num">
+      <div class="like-num">
         <div
           v-for="(item, index) in userLikeData"
           :key="index"
@@ -44,10 +38,6 @@
           <n-text :depth="3">{{ item.label }}</n-text>
         </div>
       </div>
-      <n-flex v-else align="center" vertical>
-        <n-text>UID 登录模式</n-text>
-        <n-text :depth="3">部分功能暂不可用</n-text>
-      </n-flex>
       <n-divider />
       <!-- 退出登录 -->
       <n-button :focusable="false" class="logout" strong secondary round @click="isLogout">
@@ -63,14 +53,7 @@
 <script setup lang="ts">
 import { useDataStore } from "@/stores";
 import { openUserLogin } from "@/utils/modal";
-import { getLoginState } from "@/api/login";
-import {
-  toLogout,
-  isLogin,
-  refreshLoginData,
-  updateUserData,
-  updateSpecialUserData,
-} from "@/utils/auth";
+import { isLogin, toLogout, updateUserData } from "@/utils/auth";
 
 const router = useRouter();
 const dataStore = useDataStore();
@@ -93,7 +76,9 @@ const userLikeData = computed(() => {
     {
       label: "歌单",
       name: "like-playlists",
-      value: dataStore.userLikeData.playlists.length,
+      value:
+        (dataStore.userLikeData.playlists?.length || 0) +
+        (dataStore.userCreatedPlaylist.length || 0),
     },
     {
       label: "专辑",
@@ -110,28 +95,7 @@ const userLikeData = computed(() => {
 
 // 检查登录状态
 const checkLoginStatus = async () => {
-  // 若为 UID 登录
-  if (dataStore.loginType === "uid") {
-    await updateSpecialUserData();
-    return;
-  }
-  // 获取登录状态
-  const loginState = await getLoginState();
-  // 登录正常
-  if (loginState.data?.profile && Object.keys(loginState.data?.profile)?.length) {
-    dataStore.userLoginStatus = true;
-    // 刷新登录
-    await refreshLoginData();
-    // 获取用户信息
-    await updateUserData();
-  }
-  // 若还有用户数据，则登录过期
-  else if (dataStore.userData.userId !== 0) {
-    dataStore.userLoginStatus = false;
-    dataStore.userData.userId = 0;
-    window.$message.warning("登录已过期，请重新登录", { duration: 2000 });
-    openUserLogin();
-  }
+  await updateUserData();
 };
 
 // 退出登录

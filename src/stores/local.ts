@@ -1,7 +1,7 @@
-import { ref, reactive } from "vue";
-import type { SongType } from "@/types/main";
+import { reactive, ref } from "vue";
 import { cloneDeep } from "lodash-es";
 import localforage from "localforage";
+import { SongInfo } from "@/types/main.hemusic";
 
 // localDB
 const localDB = localforage.createInstance({
@@ -12,13 +12,13 @@ const localDB = localforage.createInstance({
 
 export const useLocalStore = () => {
   // 本地歌曲
-  const localSongs = ref<SongType[]>([]);
+  const localSongs = ref<SongInfo[]>([]);
 
   // 读取本地歌曲
-  const readLocalSong = async (): Promise<SongType[]> => {
+  const readLocalSong = async (): Promise<SongInfo[]> => {
     try {
       const result = await localDB.getItem("local-songs");
-      localSongs.value = (result as SongType[]) || [];
+      localSongs.value = (result as SongInfo[]) || [];
       return localSongs.value;
     } catch (error) {
       console.error("Error reading local songs:", error);
@@ -27,7 +27,7 @@ export const useLocalStore = () => {
   };
 
   // 更新本地歌曲
-  const updateLocalSong = async (songs: SongType[]) => {
+  const updateLocalSong = async (songs: SongInfo[]) => {
     try {
       await localDB.setItem("local-songs", cloneDeep(songs));
       localSongs.value = songs;

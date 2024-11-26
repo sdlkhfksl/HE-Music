@@ -1,4 +1,4 @@
-import request from "@/utils/request";
+import request, { requestHemusic } from "@/utils/request";
 
 /**
  * 歌手分类列表
@@ -29,91 +29,69 @@ export const artistTypeList = (
 
 /**
  * 获取歌手详情
- * @param {number} id - 歌手id
+ * @param  id - 歌手id
+ * @param platform
  */
-export const artistDetail = (id: number) => {
-  return request({
-    url: "/artist/detail",
-    params: { id },
-  });
-};
-
-/**
- * 获取歌手部分信息和热门歌曲
- * @param {number} id - 歌手id
- */
-export const artistHotSongs = (id: number) => {
-  return request({
-    url: "/artists",
-    params: { id },
+export const artistDetail = (id: string, platform: string) => {
+  return requestHemusic({
+    url: "/v1/singer",
+    params: { id, platform },
   });
 };
 
 /**
  * 获取歌手全部歌曲
  * @param {number} id - 歌手id
- * @param {number} [limit=50] - 返回数量，默认50
- * @param {number} [offset=0] - 偏移数量，默认0
- * @param {string} order - hot: 热门, time: 时间
+ * @param platform
+ * @param page_index
+ * @param page_size
  */
 export const artistAllSongs = (
-  id: number,
-  limit: number = 50,
-  offset: number = 0,
-  order: "hot" | "time" = "hot",
+  id: string,
+  platform: string,
+  page_index: number = 1,
+  page_size: number = 50,
 ) => {
-  return request({
-    url: "/artist/songs",
-    params: { id, limit, offset, order },
+  return requestHemusic({
+    url: "/v1/singer/song",
+    params: { id, platform, page_index, page_size },
   });
 };
 
 /**
  * 获取歌手专辑
  * @param {number} id - 歌手id
- * @param {number} [limit=50] - 返回数量，默认50
- * @param {number} [offset=0] - 偏移数量，默认0
+ * @param platform
+ * @param page_index
+ * @param page_size
  */
-export const artistAblums = (id: number, limit: number = 50, offset: number = 0) => {
-  return request({
-    url: "/artist/album",
-    params: { id, limit, offset },
+export const artistAblums = (
+  id: string,
+  platform: string,
+  page_index: number = 1,
+  page_size: number = 50,
+) => {
+  return requestHemusic({
+    url: "/v1/singer/album",
+    params: { id, platform, page_index, page_size },
   });
 };
 
 /**
  * 获取歌手视频
  * @param {number} id - 歌手id
- * @param {number} [limit=50] - 返回数量，默认50
- * @param {number} [offset=0] - 偏移数量，默认0
+ * @param platform
+ * @param page_index
+ * @param page_size
  */
-export const artistVideos = (id: number, limit: number = 50, offset: number = 0) => {
-  return request({
-    url: "/artist/mv",
-    params: { id, limit, offset },
-  });
-};
-
-/**
- * 收藏/取消收藏歌手
- * @param {number} t - 操作类型，1 为收藏，其他为取消收藏
- * @param {number} id - 歌手id
- */
-export const likeArtist = (id: number, t: number = 1 | 2) => {
-  return request({
-    url: "/artist/sub",
-    params: { id, t, timestamp: new Date().getTime() },
-  });
-};
-
-/**
- * 搜索歌手
- * @param {string} keyword - 关键词
- * @param {number} [limit=10] - 返回数量
- */
-export const searchArtist = (keyword: string, limit: number = 10) => {
-  return request({
-    url: "/ugc/artist/search",
-    params: { keyword, limit },
+export const artistVideos = (
+  id: string,
+  platform: string,
+  page_index: number = 1,
+  page_size: number = 50,
+) => {
+  return requestHemusic({
+    url: "/v1/singer/mv",
+    params: { id, platform, page_index, page_size },
   });
 };

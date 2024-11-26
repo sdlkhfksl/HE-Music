@@ -1,53 +1,26 @@
-import { songLevelData } from "@/utils/meta";
-import request from "@/utils/request";
-
-// 获取歌曲详情
-export const songDetail = (ids: number | number[]) => {
-  return request({
-    url: "/song/detail",
-    method: "post",
-    params: { timestamp: Date.now() },
-    data: { ids: Array.isArray(ids) ? ids.join(",") : ids.toString() },
-  });
-};
-
-/**
- * 歌曲音质详情
- * @param id 歌曲 id
- */
-export const songQuality = (id: number) => {
-  return request({
-    url: "/song/music/detail",
-    params: { id },
-  });
-};
+import request, { requestHemusic } from "@/utils/request";
 
 // 获取歌曲 URL
 export const songUrl = (
-  id: number,
-  level:
-    | "standard"
-    | "higher"
-    | "exhigh"
-    | "lossless"
-    | "hires"
-    | "jyeffect"
-    | "sky"
-    | "jymaster" = "exhigh",
+  id: string,
+  platform: string,
+  quality: number = 320,
+  format: string = "mp3",
 ) => {
-  return request({
-    url: "/song/url/v1",
+  return requestHemusic({
+    url: "/v1/song/url",
     params: {
       id,
-      level,
-      timestamp: Date.now(),
+      platform,
+      quality,
+      format,
     },
   });
 };
 
 // 获取解锁歌曲 URL
-export const unlockSongUrl = (id: number, keyword: string, server: "netease" | "kuwo") => {
-  const params = server === "netease" ? { id } : { keyword };
+export const unlockSongUrl = (id: string, keyword: string, server: "netease" | "kuwo") => {
+  const params = server === "netease" ? { id: Number(id) } : { keyword };
   return request({
     baseURL: "/api/unblock",
     url: `/${server}`,
@@ -56,35 +29,23 @@ export const unlockSongUrl = (id: number, keyword: string, server: "netease" | "
 };
 
 // 获取歌曲歌词
-export const songLyric = (id: number) => {
+export const songLyric = (id, platform: string) => {
+  return requestHemusic({
+    url: "/v1/song/lyric",
+    params: {
+      id,
+      platform,
+    },
+  });
+};
+
+// 获取歌曲歌词
+export const neteaseSongLyric = (id: number) => {
   return request({
     url: "/lyric/new",
     params: {
       id,
     },
-  });
-};
-
-/**
- * 获取歌曲下载链接
- * @param id 音乐 id
- * @param level 播放音质等级, 分为 standard => 标准,higher => 较高, exhigh=>极高, lossless=>无损, hires=>Hi-Res, jyeffect => 高清环绕声, sky => 沉浸环绕声, `dolby` => `杜比全景声`, jymaster => 超清母带
- * @returns
- */
-export const songDownloadUrl = (id: number, level: keyof typeof songLevelData = "h") => {
-  // 获取对应音质
-  const levelName = songLevelData[level].level;
-  return request({
-    url: "/song/download/url/v1",
-    params: { id, level: levelName, timestamp: Date.now() },
-  });
-};
-
-// 喜欢歌曲
-export const likeSong = (id: number, like: boolean = true) => {
-  return request({
-    url: "/like",
-    params: { id, like, timestamp: Date.now() },
   });
 };
 
@@ -119,5 +80,23 @@ export const songDynamicCover = (id: number) => {
   return request({
     url: "/song/dynamic/cover",
     params: { id },
+  });
+};
+
+export const newSongTabs = (platform: string) => {
+  return requestHemusic({
+    url: "/v1/song/new/tab",
+    params: { platform },
+  });
+};
+export const newSongs = (
+  platform: string,
+  tab_id: string,
+  page_index = 1,
+  page_size: number = 30,
+) => {
+  return requestHemusic({
+    url: "/v1/song/new",
+    params: { platform, tab_id, page_size, page_index },
   });
 };

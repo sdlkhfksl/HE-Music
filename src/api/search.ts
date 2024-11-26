@@ -1,72 +1,51 @@
-import request from "@/utils/request";
-
-// 搜索类型枚举
-export enum SearchTypes {
-  Single = 1,
-  Album = 10,
-  Artist = 100,
-  Playlist = 1000,
-  User = 1002,
-  Mv = 1004,
-  Lyrics = 1006,
-  Radio = 1009,
-  Video = 1014,
-  All = 1018,
-  Audio = 2000,
-}
+import { requestHemusic } from "@/utils/request";
 
 // 热搜
-export const searchHot = () => {
-  return request({
-    url: "/search/hot/detail",
-  });
-};
-
-// 搜索建议
-export const searchSuggest = (keywords: string, mobile: boolean = false) => {
-  return request({
-    url: "/search/suggest",
+export const searchHot = (platform: string) => {
+  return requestHemusic({
+    url: "/v1/search/hotkey",
     params: {
-      keywords,
-      ...(mobile && { type: "mobile" }),
+      platform: platform,
     },
   });
 };
 
-// 搜索多重匹配
-export const searchMultimatch = (keywords: string) => {
-  return request({
-    url: "/search/multimatch",
+// 搜索建议
+export const searchSuggest = (keywords: string, platform: string) => {
+  return requestHemusic({
+    url: `/v1/search/suggest`,
     params: {
-      keywords,
+      key: keywords,
+      platform: platform,
     },
   });
 };
 
 // 默认搜索关键词
-export const searchDefault = () => {
-  return request({
-    url: "/search/default",
+export const searchDefault = (platform: string) => {
+  return requestHemusic({
+    url: "/v1/search/default",
     params: {
-      timestamp: Date.now(),
+      platform,
     },
   });
 };
 
 // 搜索结果
-export const searchResult = (
-  keywords: string,
-  limit: number = 50,
-  offset = 0,
-  type: SearchTypes = SearchTypes.All,
+export const searchResultHemusic = (
+  key: string,
+  page_size: number = 30,
+  page_index = 1,
+  platform: string,
+  type = "song",
 ) => {
-  return request({
-    url: "/cloudsearch",
+  return requestHemusic({
+    url: `/v1/${type}/search`,
     params: {
-      keywords,
-      limit,
-      offset,
-      type,
+      key,
+      page_size,
+      page_index,
+      platform,
     },
   });
 };

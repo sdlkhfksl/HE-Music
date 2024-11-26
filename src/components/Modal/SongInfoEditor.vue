@@ -20,8 +20,8 @@
             <n-form-item label="歌曲名" path="name">
               <n-input v-model:value="infoFormData.name" placeholder="请输入歌曲名" clearable />
             </n-form-item>
-            <n-form-item label="歌手" path="artist">
-              <n-input v-model:value="infoFormData.artist" placeholder="请输入歌手名" clearable />
+            <n-form-item label="歌手" path="singer">
+              <n-input v-model:value="infoFormData.singer" placeholder="请输入歌手名" clearable />
             </n-form-item>
             <n-form-item label="专辑" path="album">
               <n-input v-model:value="infoFormData.album" placeholder="请输入专辑名" clearable />
@@ -123,19 +123,19 @@
 </template>
 
 <script setup lang="ts">
-import type { SongType } from "@/types/main";
 import type { FormInst, FormRules } from "naive-ui";
 import type { ICommonTagsResult, IFormat } from "music-metadata";
-import { useMusicStore, useDataStore } from "@/stores";
+import { useDataStore, useMusicStore } from "@/stores";
 import { textRule } from "@/utils/rules";
 import { copyData } from "@/utils/helper";
-import { matchSong, songLyric } from "@/api/song";
+import { matchSong, neteaseSongLyric } from "@/api/song";
 import { debounce, isArray, isEmpty, isObject } from "lodash-es";
 import blob from "@/utils/blob";
 import { formatSongsList } from "@/utils/format";
+import { SongInfo } from "@/types/main.hemusic";
 
 const props = defineProps<{
-  song: SongType;
+  song: SongInfo;
 }>();
 
 const emit = defineEmits<{
@@ -146,7 +146,7 @@ const emit = defineEmits<{
 interface InfoFormType {
   name: string;
   fileName: string;
-  artist: string;
+  singer: string;
   album: string;
   alia?: string;
   lyric?: string;
@@ -174,8 +174,8 @@ const localEventBus = useEventBus("local");
 
 // 表单数据
 const infoFormRef = ref<FormInst | null>(null);
-const infoFormData = ref<InfoFormType>({ name: "", fileName: "", artist: "", album: "" });
-const infoFormRules: FormRules = { name: textRule, artist: textRule, album: textRule };
+const infoFormData = ref<InfoFormType>({ name: "", fileName: "", singer: "", album: "" });
+const infoFormRules: FormRules = { name: textRule, singer: textRule, album: textRule };
 
 // 封面数据
 const coverData = ref<string>("/images/song.jpg?assest");
@@ -191,14 +191,14 @@ const getSongInfo = async () => {
     format: IFormat;
     md5: string;
   } = await window.electron.ipcRenderer.invoke("get-music-metadata", path);
-  // console.log(infoData);
+  console.log(infoData);
   // 解构数据
   const { fileName, fileSize, common, format, md5 } = infoData;
   // 更新数据
   infoFormData.value = {
     fileName,
     name: common.title || "",
-    artist: common.artist || "",
+    singer: common.artist || "",
     album: common.album || "",
     alia: common.comment?.[0] || "",
     lyric: common.lyrics?.[0] || "",
@@ -222,7 +222,7 @@ const onlineMatch = debounce(
       if (!props.song || !infoFormData.value.md5) return;
       const { result } = await matchSong(
         infoFormData.value.name || "",
-        infoFormData.value.artist || "",
+        infoFormData.value.singer || "",
         infoFormData.value.album || "",
         infoFormData.value.duration || 0,
         infoFormData.value.md5,
@@ -238,14 +238,15 @@ const onlineMatch = debounce(
         infoFormData.value = {
           ...infoFormData.value,
           name: songData.name,
-          artist: isArray(songData.artists)
+          singer: isArray(songData.artists)
             ? songData.artists.map((ar: { name: string }) => ar.name).join(" / ")
             : songData.artists,
           album: isObject(songData.album) ? songData.album.name : songData.album,
           alia: songData.alia,
         };
         // 获取歌词
-        const result = await songLyric(songData.id);
+        const result = await neteaseSongLyric(songData.id);
+        console.log(result);
         infoFormData.value.lyric = result.lrc.lyric;
         window.$message.success("匹配成功");
       }
@@ -270,7 +271,7 @@ const updatePlaySong = (metadata: InfoFormType) => {
   // 更新数据
   const updatedSong = {
     name: metadata.name,
-    artists: metadata.artist,
+    singers: metadata.singer,
     album: metadata.album,
     alia: metadata.alia,
     cover: coverData.value || "",
@@ -289,7 +290,7 @@ const updatePlaySong = (metadata: InfoFormType) => {
 };
 
 // 保存修改
-const saveSongInfo = debounce(async (song: SongType) => {
+const saveSongInfo = debounce(async (song: SongInfo) => {
   try {
     if (!infoFormRef.value) return;
     // 校验表单
