@@ -201,6 +201,12 @@ class Player {
       volume: statusStore.playVolume,
       rate: statusStore.playRate,
     });
+
+    if (!isElectron) {
+      const audioDom = this.getAudioDom();
+      audioDom?.removeAttribute("crossorigin");
+    }
+
     // 播放器事件
     this.playerEvent({ seek });
     // 播放设备

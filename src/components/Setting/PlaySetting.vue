@@ -59,13 +59,13 @@
           class="set"
         />
       </n-card>
-      <n-card v-if="!isElectron" class="set-item">
-        <div class="label">
-          <n-text class="name">播放试听</n-text>
-          <n-text class="tip" :depth="3">是否在非会员状态下播放试听歌曲</n-text>
-        </div>
-        <n-switch v-model:value="settingStore.playSongDemo" class="set" :round="false" />
-      </n-card>
+      <!--      <n-card v-if="!isElectron" class="set-item">-->
+      <!--        <div class="label">-->
+      <!--          <n-text class="name">播放试听</n-text>-->
+      <!--          <n-text class="tip" :depth="3">是否在非会员状态下播放试听歌曲</n-text>-->
+      <!--        </div>-->
+      <!--        <n-switch v-model:value="settingStore.playSongDemo" class="set" :round="false" />-->
+      <!--      </n-card>-->
       <n-card v-if="isElectron" class="set-item">
         <div class="label">
           <n-text class="name">音乐解锁</n-text>
