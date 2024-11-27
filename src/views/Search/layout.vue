@@ -25,7 +25,7 @@
       <n-tab-pane name="song" tab="歌曲" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
-            v-for="platform in supportSearchSongPlatforms"
+            v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchSong)"
             :key="`search-song-${platform.id}`"
             :name="platform.id"
             :tab="platform.shortname"
@@ -39,7 +39,7 @@
       <n-tab-pane name="playlist" tab="歌单" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
-            v-for="platform in supportSearchPlaylistPlatforms"
+            v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchPlaylist)"
             :key="`search-playlist-${platform.id}`"
             :name="platform.id"
             :tab="platform.shortname"
@@ -53,7 +53,7 @@
       <n-tab-pane name="album" tab="专辑" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
-            v-for="platform in supportSearchAlbumPlatforms"
+            v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchAlbum)"
             :key="`search-album-${platform.id}`"
             :name="platform.id"
             :tab="platform.shortname"
@@ -67,7 +67,7 @@
       <n-tab-pane name="artists" tab="歌手" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
-            v-for="platform in supportSearchArtistPlatforms"
+            v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchSinger)"
             :key="`search-album-${platform.id}`"
             :name="platform.id"
             :tab="platform.shortname"
@@ -81,7 +81,7 @@
       <n-tab-pane name="videos" tab="视频" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
-            v-for="platform in supportSearchVideoPlatforms"
+            v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchMV)"
             :key="`search-video-${platform.id}`"
             :name="platform.id"
             :tab="platform.shortname"
@@ -118,17 +118,6 @@ import { onMounted } from "vue";
 const router = useRouter();
 
 const platformStore = usePlatformStore();
-
-const supportSearchSongPlatforms =
-  platformStore.featureSupportList(FeatureSupportFlag.SearchSong) || [];
-const supportSearchAlbumPlatforms =
-  platformStore.featureSupportList(FeatureSupportFlag.SearchAlbum) || [];
-const supportSearchPlaylistPlatforms =
-  platformStore.featureSupportList(FeatureSupportFlag.SearchPlaylist) || [];
-const supportSearchArtistPlatforms =
-  platformStore.featureSupportList(FeatureSupportFlag.SearchSinger) || [];
-const supportSearchVideoPlatforms =
-  platformStore.featureSupportList(FeatureSupportFlag.SearchMV) || [];
 
 // 搜索分类
 const searchType = ref<string>((router.currentRoute.value.query.type as string) || "song");

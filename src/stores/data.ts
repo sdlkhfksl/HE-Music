@@ -137,6 +137,11 @@ export const useDataStore = defineStore({
     },
     // 新增下一首播放歌曲
     async setNextPlaySong(song: SongInfo, index: number): Promise<number> {
+      if (this.playList.length === 0) {
+        this.playList = [song];
+        await musicDB.setItem("playList", cloneDeep(this.playList));
+        return 0;
+      }
       // 移除重复的歌曲（如果存在）
       const playList = this.playList.filter(
         (item) => item.id !== song.id || item.platform !== song.platform,

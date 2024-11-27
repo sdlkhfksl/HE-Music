@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
-import type { SortType } from "@/types/main";
-import type { PlayModeType, RGB, ColorScheme } from "@/types/main";
+import type { ColorScheme, PlayModeType, RGB, SortType } from "@/types/main";
 
 interface StatusState {
   menuCollapsed: boolean;
@@ -72,7 +71,7 @@ export const useStatusStore = defineStore({
     // 音乐频谱数据
     spectrumsData: [],
     // 当前播放索引
-    playIndex: 0,
+    playIndex: -1,
     // 歌词播放索引
     lyricIndex: -1,
     // 默认倍速

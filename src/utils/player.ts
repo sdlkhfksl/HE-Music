@@ -874,7 +874,7 @@ class Player {
     // 尝试添加
     const songIndex = await dataStore.setNextPlaySong(song, statusStore.playIndex);
     // 播放歌曲
-    if (!songIndex) return;
+    if (songIndex < 0) return;
     if (play) this.togglePlayIndex(songIndex);
     else window.$message.success("已添加至下一首播放");
   }

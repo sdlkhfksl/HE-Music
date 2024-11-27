@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { updateUserData } from "@/utils/auth";
-import { useDataStore } from "@/stores";
+import { useDataStore, usePlatformStore } from "@/stores";
 
 import LoginPassword from "@/components/Modal/Login/LoginPassword.vue";
 
@@ -34,6 +34,7 @@ const emit = defineEmits<{
 }>();
 
 const dataStore = useDataStore();
+const platformStore = usePlatformStore();
 
 // 保存登录信息
 const saveLogin = async (loginData: any) => {
@@ -47,6 +48,7 @@ const saveLogin = async (loginData: any) => {
   // 保存登录时间
   localStorage.setItem("lastLoginTime", Date.now().toString());
   await updateUserData();
+  await platformStore.loadPlatforms();
 };
 
 onBeforeMount(() => {

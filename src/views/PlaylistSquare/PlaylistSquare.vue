@@ -31,11 +31,13 @@ import { onBeforeRouteUpdate } from "vue-router";
 import PlaylistSquareResult from "@/views/PlaylistSquare/PlaylistSquareResult.vue";
 import { computed, onActivated, onMounted } from "vue";
 import { FeatureSupportFlag } from "@/api/platform";
+import { PlatformInfo } from "@/types/main.hemusic";
 
 const router = useRouter();
 const platformStore = usePlatformStore();
-const supportPlatforms = platformStore.featureSupportList(FeatureSupportFlag.GetTagList) || [];
-
+const supportPlatforms = computed<PlatformInfo[]>(
+  () => platformStore.featureSupportList(FeatureSupportFlag.GetTagList) || [],
+);
 // 搜索分类
 const platform = computed<string>(() => router.currentRoute.value.query.platform as string);
 const tag_id = computed<string>(() => router.currentRoute.value.query.tag_id as string);
@@ -62,10 +64,10 @@ const tagChange = (tag_id: string) => {
 onBeforeRouteUpdate((to) => {
   let targetPlatform = to.query.platform as string;
   if (
-    supportPlatforms.length > 0 &&
-    !supportPlatforms.find((p) => p.id === targetPlatform && p.status === 1)
+    supportPlatforms.value.length > 0 &&
+    !supportPlatforms.value.find((p) => p.id === targetPlatform && p.status === 1)
   ) {
-    platformChange(supportPlatforms[0]?.id);
+    platformChange(supportPlatforms.value[0]?.id);
   }
 });
 
@@ -75,10 +77,10 @@ onActivated(() => {
 
 onMounted(() => {
   if (
-    supportPlatforms.length > 0 &&
-    !supportPlatforms.find((p) => p.id === platform.value && p.status === 1)
+    supportPlatforms.value.length > 0 &&
+    !supportPlatforms.value.find((p) => p.id === platform.value && p.status === 1)
   ) {
-    platformChange(supportPlatforms[0]?.id);
+    platformChange(supportPlatforms.value[0]?.id);
   }
 });
 </script>

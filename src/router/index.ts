@@ -4,7 +4,6 @@ import { isElectron } from "@/utils/helper";
 import { isLogin } from "@/utils/auth";
 import routes from "./routes";
 import { usePlatformStore } from "@/stores";
-import { AxiosError } from "axios";
 
 // 基础配置
 const router: Router = createRouter({
@@ -38,11 +37,13 @@ router.beforeEach(async (to, from, next) => {
   }
   const platformStore = usePlatformStore();
   if (!to.meta.offline && !platformStore.platforms.length) {
-    platformStore.loadPlatforms().catch((e: AxiosError) => {
+    try {
+      await platformStore.loadPlatforms();
+    } catch (e: any) {
       if (e.status === 401) {
         openUserLogin();
       }
-    });
+    }
   }
   // 需要登录
   if (to.meta.needLogin && !isLogin()) {

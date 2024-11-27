@@ -68,6 +68,7 @@ import { searchHot } from "@/api/search";
 import { getCacheData } from "@/utils/cache";
 import { useDataStore, usePlatformStore, useSettingStore, useStatusStore } from "@/stores";
 import { FeatureSupportFlag } from "@/api/platform";
+import { watch } from "vue";
 
 const emit = defineEmits<{
   toSearch: [keyword: string];
@@ -126,6 +127,17 @@ const deleteSearchHistory = () => {
 onMounted(() => {
   getSearchHotData();
 });
+
+const watcher = watch(
+  () => platformStore.platforms,
+  async () => {
+    watcher.stop();
+    if (searchHotData.value.length != 0) {
+      return;
+    }
+    getSearchHotData();
+  },
+);
 </script>
 
 <style lang="scss" scoped>
