@@ -375,7 +375,7 @@ onBeforeRouteUpdate((to) => {
 
 onActivated(() => {
   // 是否为首次进入
-  if (oldPlaylistId.value) {
+  if (!oldPlaylistId.value) {
     oldPlaylistId.value = playlistId.value;
     oldPlatform.value = platform.value;
   } else {

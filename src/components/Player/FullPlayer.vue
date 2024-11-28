@@ -91,7 +91,7 @@
     <PlayerControl @mouseenter.stop="stopHide" @mouseleave.stop="playerMove" />
     <!-- 音乐频谱 -->
     <PlayerSpectrum
-      v-if="settingStore.showSpectrums"
+      v-if="isElectron && settingStore.showSpectrums"
       :color="mainColor ? `rgb(${mainColor})` : 'rgb(239 239 239)'"
       :show="!statusStore.playerMetaShow"
       :height="60"
@@ -172,7 +172,7 @@ onMounted(() => {
   console.log("播放器开启");
   statusStore.fullPlayerActive = true;
   // 音乐频谱
-  if (settingStore.showSpectrums) player.initSpectrumData();
+  if (isElectron && settingStore.showSpectrums) player.initSpectrumData();
   // 阻止息屏
   if (isElectron && settingStore.preventSleep) {
     window.electron.ipcRenderer.send("prevent-sleep", true);

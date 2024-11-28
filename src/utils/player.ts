@@ -202,11 +202,6 @@ class Player {
       rate: statusStore.playRate,
     });
 
-    if (!isElectron) {
-      const audioDom = this.getAudioDom();
-      audioDom?.removeAttribute("crossorigin");
-    }
-
     // 播放器事件
     this.playerEvent({ seek });
     // 播放设备
@@ -245,9 +240,9 @@ class Player {
     const { seek } = options;
     // 初次加载
     this.player.once("load", () => {
-      // 允许跨域
-      const audioDom = this.getAudioDom();
-      audioDom.crossOrigin = "anonymous";
+      // // 允许跨域
+      // const audioDom = this.getAudioDom();
+      // audioDom.crossOrigin = "anonymous";
       // 恢复进度（ 需距离本曲结束大于 2 秒 ）
       if (seek && statusStore.duration - statusStore.currentTime > 2) this.setSeek(seek);
       // 更新状态
@@ -419,7 +414,7 @@ class Player {
       await this.nextOrPrev("next");
     } else {
       window.$message.error("当前列表暂无可播放歌曲");
-      this.cleanPlayList();
+      // this.cleanPlayList();
     }
   }
 
@@ -958,6 +953,7 @@ class Player {
     statusStore.$patch({
       playListShow: false,
       showFullPlayer: false,
+      playIndex: -1,
     });
     musicStore.resetMusicData();
     dataStore.setPlayList([]);

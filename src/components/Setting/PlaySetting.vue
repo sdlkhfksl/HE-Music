@@ -174,7 +174,7 @@
         </div>
         <n-switch v-model:value="settingStore.showPlaylistCount" class="set" :round="false" />
       </n-card>
-      <n-card class="set-item">
+      <n-card v-if="isElectron" class="set-item">
         <div class="label">
           <n-text class="name">音乐频谱</n-text>
           <n-text class="tip" :depth="3">开启音乐频谱会极大影响性能，如遇问题请关闭</n-text>
@@ -283,7 +283,7 @@ const getOutputDevices = async () => {
 
 // 切换输出设备
 const playDeviceChange = (deviceId: string, option: SelectOption) => {
-  if (settingStore.showSpectrums) {
+  if (isElectron && settingStore.showSpectrums) {
     window.$dialog.warning({
       title: "音频通道占用",
       content:
