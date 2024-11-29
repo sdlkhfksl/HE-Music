@@ -148,19 +148,19 @@ const createTrayMenu = (
     {
       type: "separator",
     },
-    {
-      id: "setting",
-      label: "全局设置",
-      icon: showIcon("setting"),
-      click: () => {
-        win.show();
-        win.focus();
-        win.webContents.send("openSetting");
-      },
-    },
-    {
-      type: "separator",
-    },
+    // {
+    //   id: "setting",
+    //   label: "全局设置",
+    //   icon: showIcon("setting"),
+    //   click: () => {
+    //     win.show();
+    //     win.focus();
+    //     win.webContents.send("openSetting");
+    //   },
+    // },
+    // {
+    //   type: "separator",
+    // },
     {
       id: "exit",
       label: "退出",

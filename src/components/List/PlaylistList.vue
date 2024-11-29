@@ -102,6 +102,7 @@ import {
   UserFavouritePlaylistInfo,
   UserPlaylistInfo,
 } from "@/types/main.hemusic";
+import {getUserPlaylistDetail} from "@/api/userplaylist";
 
 interface Props {
   data: PlaylistInfo[] | UserPlaylistInfo[] | UserFavouritePlaylistInfo[];
@@ -157,7 +158,7 @@ const playList = debounce(
       // 开始加载
       item.loading = true;
       // 获取播放列表
-      const list = await playlistDetail(item.id, item.platform);
+      const list = item.platform? await playlistDetail(item.id, item.platform): await getUserPlaylistDetail(item.id);
       player.updatePlayList(list.songs, undefined, {
         id: item.id,
         platform: item.platform,
