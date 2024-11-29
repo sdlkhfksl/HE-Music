@@ -29,7 +29,7 @@
 import { usePlatformStore } from "@/stores";
 import { onBeforeRouteUpdate } from "vue-router";
 import PlaylistSquareResult from "@/views/PlaylistSquare/PlaylistSquareResult.vue";
-import { computed, onActivated, onMounted } from "vue";
+import { computed, onActivated, watch } from "vue";
 import { FeatureSupportFlag } from "@/api/platform";
 import { PlatformInfo } from "@/types/main.hemusic";
 
@@ -72,10 +72,6 @@ onBeforeRouteUpdate((to) => {
 });
 
 onActivated(() => {
-  console.log("playlist-square activated", platform.value, tag_id.value);
-});
-
-onMounted(() => {
   if (
     supportPlatforms.value.length > 0 &&
     !supportPlatforms.value.find((p) => p.id === platform.value && p.status === 1)
@@ -83,6 +79,19 @@ onMounted(() => {
     platformChange(supportPlatforms.value[0]?.id);
   }
 });
+
+const watcher = watch(
+  () => platformStore.platforms,
+  async () => {
+    watcher.stop();
+    if (
+      supportPlatforms.value.length > 0 &&
+      !supportPlatforms.value.find((p) => p.id === platform.value && p.status === 1)
+    ) {
+      platformChange(supportPlatforms.value[0]?.id);
+    }
+  },
+);
 </script>
 
 <style lang="scss" scoped>

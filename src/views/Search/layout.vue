@@ -113,7 +113,6 @@ import Albums from "@/views/Search/albums.vue";
 import Artists from "@/views/Search/artists.vue";
 import Videos from "@/views/Search/videos.vue";
 import { FeatureSupportFlag } from "@/api/platform";
-import { onMounted } from "vue";
 
 const router = useRouter();
 
@@ -146,10 +145,6 @@ onBeforeRouteUpdate((to) => {
   if (to.query.type) {
     searchType.value = to.query.type as string;
   }
-});
-
-onMounted(async () => {
-  await platformStore.loadPlatforms();
 });
 </script>
 

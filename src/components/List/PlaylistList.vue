@@ -134,6 +134,13 @@ const isPlaying = (item: PlaylistInfo | UserPlaylistInfo | UserFavouritePlaylist
 
 // 查看详情
 const goDetail = (item: PlaylistInfo | UserPlaylistInfo | UserFavouritePlaylistInfo) => {
+  if (!item.platform) {
+    router.push({
+      name: "user-playlist",
+      query: { id: item.id },
+    });
+    return;
+  }
   router.push({
     name: "playlist",
     query: { id: item.id, platform: item.platform || "" },

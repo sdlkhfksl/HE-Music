@@ -920,8 +920,19 @@ class Player {
       this.cleanPlayList();
       return;
     }
+
+    console.log(
+      "removeindex",
+      index,
+      "length",
+      playList.length,
+      "playIndex",
+      statusStore.playIndex,
+    );
     // 深拷贝，防止影响原数据
     const newPlaylist = cloneDeep(playList);
+    // 是否为当前播放歌曲
+    const isCurrentPlay = statusStore.playIndex === index;
     // 若将移除最后一首
     if (index === playList.length - 1) {
       statusStore.playIndex = 0;
@@ -934,7 +945,7 @@ class Player {
     newPlaylist.splice(index, 1);
     dataStore.setPlayList(newPlaylist);
     // 若为当前播放
-    if (statusStore.playIndex === index) {
+    if (isCurrentPlay) {
       this.initPlayer(statusStore.playStatus);
     }
   }

@@ -26,7 +26,7 @@ import TopListResult from "@/views/TopList/TopListResult.vue";
 import { usePlatformStore } from "@/stores";
 import { onBeforeRouteUpdate } from "vue-router";
 import { FeatureSupportFlag } from "@/api/platform";
-import { computed, onMounted } from "vue";
+import { computed, onActivated, watch } from "vue";
 import { PlatformInfo } from "@/types/main.hemusic";
 
 const router = useRouter();
@@ -57,7 +57,7 @@ onBeforeRouteUpdate((to) => {
   }
 });
 
-onMounted(() => {
+onActivated(() => {
   if (
     supportPlatforms.value.length > 0 &&
     !supportPlatforms.value.find((p) => p.id === platform.value && p.status === 1)
@@ -65,6 +65,19 @@ onMounted(() => {
     platformChange(supportPlatforms.value[0]?.id || "");
   }
 });
+
+const watcher = watch(
+  () => platformStore.platforms,
+  async () => {
+    watcher.stop();
+    if (
+      supportPlatforms.value.length > 0 &&
+      !supportPlatforms.value.find((p) => p.id === platform.value && p.status === 1)
+    ) {
+      platformChange(supportPlatforms.value[0]?.id);
+    }
+  },
+);
 </script>
 
 <style lang="scss" scoped>
