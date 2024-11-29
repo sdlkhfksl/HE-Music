@@ -836,7 +836,7 @@ class Player {
     // 是否直接播放
     if (song && typeof song === "object" && "id" in song) {
       // 是否为当前播放歌曲
-      if (musicStore.playSong.id === song.id && item.platform === song.platform) {
+      if (musicStore.playSong.id === song.id && musicStore.playSong.platform === song.platform) {
         if (play) await this.play();
       } else {
         // 查找索引
