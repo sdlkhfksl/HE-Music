@@ -27,15 +27,21 @@ win:
   # 构建类型
   target:
     # 安装版
-    - nsis
+    - target: nsis
+      arch:
+        - ia32
+        - arm64
     # 打包版
-    - portable
+    - target: portable
+      arch:
+        - ia32
+        - arm64
 # NSIS 安装器配置
 nsis:
   # 是否一键式安装
   oneClick: false
   # 安装程序的生成名称
-  artifactName: ${productName}-${version}-setup.${ext}
+  artifactName: ${productName}-${version}-${arch}-setup.${ext}
   # 创建的桌面快捷方式名称
   shortcutName: ${productName}
   # 卸载时显示的名称
