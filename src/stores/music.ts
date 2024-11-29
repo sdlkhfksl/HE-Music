@@ -82,7 +82,7 @@ export const useMusicStore = defineStore({
   actions: {
     // 恢复默认音乐数据
     resetMusicData() {
-      this.playSong = defaultMusicData;
+      this.playSong = {...defaultMusicData};
       this.songLyric = {
         lrcData: [],
         yrcData: [],

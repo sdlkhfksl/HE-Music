@@ -580,6 +580,12 @@ class Player {
    */
   async pause(changeStatus: boolean = true) {
     const statusStore = useStatusStore();
+
+    // 播放器未加载完成
+    if (this.player.state() !== "loaded"){
+      return
+    }
+
     // 淡出
     await new Promise<void>((resolve) => {
       this.player.fade(statusStore.playVolume, 0, this.getFadeTime());
@@ -830,7 +836,7 @@ class Player {
     // 是否直接播放
     if (song && typeof song === "object" && "id" in song) {
       // 是否为当前播放歌曲
-      if (musicStore.playSong.id === song.id) {
+      if (musicStore.playSong.id === song.id && item.platform === song.platform) {
         if (play) await this.play();
       } else {
         // 查找索引
@@ -876,24 +882,24 @@ class Player {
     const songIndex = await dataStore.setNextPlaySong(song, statusStore.playIndex);
     // 播放歌曲
     if (songIndex < 0) return;
-    if (play) this.togglePlayIndex(songIndex);
+    if (play) this.togglePlayIndex(songIndex,true);
     else window.$message.success("已添加至下一首播放");
   }
 
   /**
    * 切换播放索引
    * @param index 播放索引
+   * @param play 是否立即播放
    */
-  async togglePlayIndex(index: number) {
+  async togglePlayIndex(index: number,play:boolean = false) {
     const dataStore = useDataStore();
     const statusStore = useStatusStore();
     // 获取数据
     const { playList } = dataStore;
-
     // 若超出播放列表
     if (index >= playList.length) return;
     // 相同
-    if (statusStore.playIndex === index) {
+    if (!play && statusStore.playIndex === index) {
       this.play();
       return;
     }
@@ -920,15 +926,6 @@ class Player {
       this.cleanPlayList();
       return;
     }
-
-    console.log(
-      "removeindex",
-      index,
-      "length",
-      playList.length,
-      "playIndex",
-      statusStore.playIndex,
-    );
     // 深拷贝，防止影响原数据
     const newPlaylist = cloneDeep(playList);
     // 是否为当前播放歌曲
@@ -968,6 +965,8 @@ class Player {
     });
     musicStore.resetMusicData();
     dataStore.setPlayList([]);
+
+    console.log("songInfo",musicStore.playSong)
     window.$message.success("已清空播放列表");
   }
 

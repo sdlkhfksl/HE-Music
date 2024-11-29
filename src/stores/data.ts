@@ -142,17 +142,19 @@ export const useDataStore = defineStore({
         await musicDB.setItem("playList", cloneDeep(this.playList));
         return 0;
       }
-      // 移除重复的歌曲（如果存在）
+
+      const indexAdd = index + 1
+      this.playList.splice(indexAdd, 0, song)
+      // 再移除重复的歌曲
       const playList = this.playList.filter(
-        (item) => item.id !== song.id || item.platform !== song.platform,
+        (item,idx) => idx === indexAdd || item.id !== song.id || item.platform !== song.platform,
       );
-      // 在当前播放位置之后插入歌曲
-      const indexAdd = index + 1;
-      playList.splice(indexAdd, 0, song);
+
       // 更新本地存储
       this.playList = playList;
       await musicDB.setItem("playList", cloneDeep(playList));
-      return indexAdd;
+      // 返回刚刚插入的歌曲索引
+      return playList.findIndex((item) => item.id === song.id && item.platform === song.platform);
     },
     // 更改播放历史
     async setHistory(song: SongInfo) {
@@ -251,7 +253,6 @@ export const useDataStore = defineStore({
       // 获取歌单分类
       try {
         const res = await playlistTagList(platform);
-        console.log("tag", "platform", res);
         this.catData[platform] = res.group_list;
       } catch (error) {
         console.error("Error getting playlist cat list:", error);
