@@ -85,10 +85,10 @@
 import { formatNumber } from "@/utils/helper";
 import { useMusicStore, useStatusStore } from "@/stores";
 import { debounce } from "lodash-es";
-import { playlistDetail } from "@/api/playlist";
 import CoverMenu from "@/components/Menu/CoverMenu.vue";
 import player from "@/utils/player";
 import { CoverType, TopInfo } from "@/types/main.hemusic";
+import {topInfo} from "@/api/playlist";
 
 interface Props {
   data: TopInfo[];
@@ -137,8 +137,8 @@ const playList = debounce(
       // 开始加载
       item.loading = true;
       // 获取播放列表
-      const list = await playlistDetail(item.id, item.platform);
-      player.updatePlayList(list, undefined, {
+      const list = await topInfo(item.id, item.platform,1,1000);
+      player.updatePlayList(list.songs, undefined, {
         id: item.id,
         platform: item.platform,
         type: "top",
