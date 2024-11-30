@@ -58,7 +58,7 @@ export const useDataStore = defineStore({
       email: "",
       status: 0,
       nickname: "",
-      cover: "",
+      avatar: "",
     },
     // 用户喜欢数据
     userLikeData: {
@@ -217,7 +217,7 @@ export const useDataStore = defineStore({
           email: "",
           status: 0,
           nickname: "",
-          cover: "",
+          avatar: "",
         };
         await Promise.all(
           Object.keys(this.userLikeData).map(async (key) => {

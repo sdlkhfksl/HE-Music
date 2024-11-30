@@ -44,17 +44,25 @@ export const toLogout = async () => {
   window.$message.success("成功退出登录");
 };
 
+
+export const updateUserAccountInfo = async () => {
+  if (!isLogin()) return;
+  const dataStore = useDataStore();
+  // userId
+  const userInfo = await userAccount();
+  // 更改用户信息
+  dataStore.userData = {
+    ...userInfo,
+  };
+};
 // 更新用户信息
 export const updateUserData = async () => {
   try {
     if (!isLogin()) return;
-    const dataStore = useDataStore();
-    // userId
-    const userInfo = await userAccount();
-    // 更改用户信息
-    dataStore.userData = {
-      ...userInfo,
-    };
+
+    // 先更新用户信息
+    await updateUserAccountInfo();
+
     // 获取用户喜欢数据
     const allUserLikeResult = await Promise.allSettled([
       updateUserLikeSongs(),

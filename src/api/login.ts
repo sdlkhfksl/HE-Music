@@ -123,3 +123,24 @@ export const accountLogin = (username: string, password: string) => {
     },
   });
 };
+
+export const updateUserInfo = (data: {
+  nickname: string;
+  avatar: string;
+}) => {
+  return requestHemusic({
+    url: "/v1/user/info",
+    method: "put",
+    data,
+  });
+};
+export const updateUserPassword = (old_password:string,new_password:string) => {
+  return requestHemusic({
+    url: "/v1/user/password",
+    method: "put",
+    data:{
+      old_password,
+      new_password
+    }
+  });
+};

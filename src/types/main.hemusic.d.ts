@@ -214,7 +214,7 @@ export interface UserInfo {
   //状态
   status: number;
   // 头像
-  cover: string;
+  avatar: string;
 }
 
 export interface IDPlatformInfo {

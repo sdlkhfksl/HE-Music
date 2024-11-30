@@ -135,6 +135,8 @@ declare module 'vue' {
     TopList: typeof import('./src/components/List/TopList.vue')['default']
     UpdateApp: typeof import('./src/components/Modal/UpdateApp.vue')['default']
     UpdatePlaylist: typeof import('./src/components/Modal/UpdatePlaylist.vue')['default']
+    UpdateUserInfo: typeof import('./src/components/Modal/UpdateUserInfo.vue')['default']
+    UpdateUserPassword: typeof import('./src/components/Modal/UpdateUserPassword.vue')['default']
     User: typeof import('./src/components/Layout/User.vue')['default']
     UserAgreement: typeof import('./src/components/Modal/UserAgreement.vue')['default']
     VideoList: typeof import('./src/components/List/VideoList.vue')['default']

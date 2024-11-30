@@ -15,6 +15,8 @@ import DownloadSong from "@/components/Modal/DownloadSong.vue";
 import MainSetting from "@/components/Setting/MainSetting.vue";
 import UpdateApp from "@/components/Modal/UpdateApp.vue";
 import { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
+import UpdateUserPassword from "@/components/Modal/UpdateUserPassword.vue";
+import UpdateUserInfo from "@/components/Modal/UpdateUserInfo.vue";
 
 // 用户协议
 export const openUserAgreement = () => {
@@ -220,6 +222,37 @@ export const openUpdateApp = (data: UpdateInfoType) => {
     title: "发现新版本",
     content: () => {
       return h(UpdateApp, { data, onClose: () => modal.destroy() });
+    },
+  });
+};
+
+// 修改信息
+export const openUpdateUserInfo = () => {
+  const modal = window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    maskClosable: false,
+    autoFocus: false,
+    style: { width: "400px" },
+    title: "修改信息",
+    content: () => {
+      return h(UpdateUserInfo, { onClose: () => modal.destroy() });
+    },
+  });
+};
+
+
+// 修改密码
+export const openUpdateUserPassword = () => {
+  const modal = window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    maskClosable: false,
+    autoFocus: false,
+    style: { width: "400px" },
+    title: "修改密码",
+    content: () => {
+      return h(UpdateUserPassword, { onClose: () => modal.destroy() });
     },
   });
 };
