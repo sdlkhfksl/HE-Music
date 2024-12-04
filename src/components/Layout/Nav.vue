@@ -170,7 +170,7 @@ const setOptions = computed<DropdownOption[]>(() => [
   {
     key: "dev-tools",
     label: "开启控制台",
-    show: isDev,
+    show: isElectron && isDev,
     icon: renderIcon("Code"),
   },
   {
