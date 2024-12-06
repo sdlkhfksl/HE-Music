@@ -6,7 +6,7 @@
     <n-collapse-transition :show="!!song">
       <n-alert type="warning" title="请知悉" closable>
         {{
-          "本软件仅支持从官方途径合法合规的下载歌曲，并用于学习研究用途。本功能将严格按照相应账户的权限来提供基础的下载功能"
+          "本资源仅用于音乐学习和交流，禁止用于商业用途，请下载后于24小时内删除。"
         }}
       </n-alert>
       <SongDataCard :data="song" />
