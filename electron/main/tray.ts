@@ -7,7 +7,7 @@ import {
   nativeImage,
   nativeTheme,
 } from "electron";
-import { isWin, isLinux, isDev, appName } from "./utils";
+import { isWin, isLinux, isDev, appName, isMac } from "./utils";
 import { join } from "path";
 import log from "./logger";
 
@@ -270,7 +270,7 @@ class CreateTray implements MainTray {
 export const initTray = (win: BrowserWindow, lyricWin: BrowserWindow) => {
   try {
     // 若为 MacOS
-    if (isWin || isLinux || isDev) {
+    if (isWin || isLinux || isMac || isDev) {
       log.info("🚀 Tray Process Startup");
       return new CreateTray(win, lyricWin);
     }

@@ -247,14 +247,14 @@ export const getSizeCover = (song: SongInfo, size = 300) => {
   const { cover = "", platform } = song;
   switch (platform) {
     case "tidal":
-      if (size == 300){
-        size = 320
-        break
+      if (size == 300) {
+        size = 320;
+        break;
       }
       if (![80, 160, 320, 640, 1280].includes(size)) {
         size = 320;
       }
-      break
+      break;
     case "kugou":
       if (![120, 240, 480].includes(size)) {
         size = 480;

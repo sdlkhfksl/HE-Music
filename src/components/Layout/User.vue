@@ -40,11 +40,11 @@
       </div>
       <n-divider />
 
-      <n-flex >
+      <n-flex>
         <n-button :focusable="false" size="small" tertiary round @click="openUpdateUserInfo">
           修改信息
         </n-button>
-        <n-button :focusable="false"  size="small" tertiary round @click="openUpdateUserPassword">
+        <n-button :focusable="false" size="small" tertiary round @click="openUpdateUserPassword">
           修改密码
         </n-button>
       </n-flex>
@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { useDataStore } from "@/stores";
-import {openUpdateUserInfo, openUpdateUserPassword, openUserLogin} from "@/utils/modal";
+import { openUpdateUserInfo, openUpdateUserPassword, openUserLogin } from "@/utils/modal";
 import { isLogin, toLogout, updateUserData } from "@/utils/auth";
 
 const router = useRouter();

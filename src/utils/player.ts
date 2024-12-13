@@ -582,8 +582,8 @@ class Player {
     const statusStore = useStatusStore();
 
     // 播放器未加载完成
-    if (this.player.state() !== "loaded"){
-      return
+    if (this.player.state() !== "loaded") {
+      return;
     }
 
     // 淡出
@@ -733,19 +733,27 @@ class Player {
 
   /**
    * 设置播放音量
-   * @param volume 音量
+   * @param actions 音量
    */
-  setVolume(volume: number | "up" | "down") {
+  setVolume(actions: number | "up" | "down" | WheelEvent) {
     const statusStore = useStatusStore();
+    const increment = 0.05;
     // 直接设置
-    if (typeof volume === "number") {
-      volume = Math.max(0, Math.min(volume, 1));
-    } else {
-      const increment = 0.05;
+    if (typeof actions === "number") {
+      actions = Math.max(0, Math.min(actions, 1));
+    }
+    // 分类调节
+    else if (actions === "up" || actions === "down") {
       statusStore.playVolume = Math.max(
         0,
-        Math.min(statusStore.playVolume + (volume === "up" ? increment : -increment), 1),
+        Math.min(statusStore.playVolume + (actions === "up" ? increment : -increment), 1),
       );
+    }
+    // 鼠标滚轮
+    else {
+      const deltaY = actions.deltaY;
+      const volumeChange = deltaY > 0 ? -increment : increment;
+      statusStore.playVolume = Math.max(0, Math.min(statusStore.playVolume + volumeChange, 1));
     }
     // 调整音量
     this.player.volume(statusStore.playVolume);
@@ -882,7 +890,7 @@ class Player {
     const songIndex = await dataStore.setNextPlaySong(song, statusStore.playIndex);
     // 播放歌曲
     if (songIndex < 0) return;
-    if (play) this.togglePlayIndex(songIndex,true);
+    if (play) this.togglePlayIndex(songIndex, true);
     else window.$message.success("已添加至下一首播放");
   }
 
@@ -891,7 +899,7 @@ class Player {
    * @param index 播放索引
    * @param play 是否立即播放
    */
-  async togglePlayIndex(index: number,play:boolean = false) {
+  async togglePlayIndex(index: number, play: boolean = false) {
     const dataStore = useDataStore();
     const statusStore = useStatusStore();
     // 获取数据
@@ -966,7 +974,7 @@ class Player {
     musicStore.resetMusicData();
     dataStore.setPlayList([]);
 
-    console.log("songInfo",musicStore.playSong)
+    console.log("songInfo", musicStore.playSong);
     window.$message.success("已清空播放列表");
   }
 

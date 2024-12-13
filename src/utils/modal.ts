@@ -17,6 +17,7 @@ import UpdateApp from "@/components/Modal/UpdateApp.vue";
 import { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 import UpdateUserPassword from "@/components/Modal/UpdateUserPassword.vue";
 import UpdateUserInfo from "@/components/Modal/UpdateUserInfo.vue";
+import ExcludeKeywords from "@/components/Modal/ExcludeKeywords.vue";
 
 // 用户协议
 export const openUserAgreement = () => {
@@ -241,7 +242,6 @@ export const openUpdateUserInfo = () => {
   });
 };
 
-
 // 修改密码
 export const openUpdateUserPassword = () => {
   const modal = window.$modal.create({
@@ -253,6 +253,20 @@ export const openUpdateUserPassword = () => {
     title: "修改密码",
     content: () => {
       return h(UpdateUserPassword, { onClose: () => modal.destroy() });
+    },
+  });
+};
+
+// 歌词排除内容
+export const openLyricExclude = () => {
+  window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    style: { width: "600px" },
+    title: "歌词排除内容",
+    content: () => {
+      return h(ExcludeKeywords);
     },
   });
 };

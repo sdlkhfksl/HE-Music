@@ -108,7 +108,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/video",
     name: "video",
     beforeEnter: (to, _, next) => {
-      if (!to.query.id || to.query.id === "0"|| !to.query.platform) next({ path: "/403" });
+      if (!to.query.id || to.query.id === "0" || !to.query.platform) next({ path: "/403" });
       else next();
     },
     component: () => import("@/views/Video.vue"),
@@ -118,7 +118,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/album",
     name: "album",
     beforeEnter: (to, _, next) => {
-      if (!to.query.id || to.query.id === "0"|| !to.query.platform) next({ path: "/403" });
+      if (!to.query.id || to.query.id === "0" || !to.query.platform) next({ path: "/403" });
       else next();
     },
     component: () => import("@/views/List/album.vue"),
@@ -128,7 +128,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/playlist",
     name: "playlist",
     beforeEnter: (to, _, next) => {
-      if (!to.query.id || to.query.id === "0"|| !to.query.platform) next({ path: "/403" });
+      if (!to.query.id || to.query.id === "0" || !to.query.platform) next({ path: "/403" });
       else next();
     },
     component: () => import("@/views/List/playlist.vue"),
@@ -158,7 +158,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/top",
     name: "top",
     beforeEnter: (to, _, next) => {
-      if (!to.query.id || to.query.id === "0"|| !to.query.platform) next({ path: "/403" });
+      if (!to.query.id || to.query.id === "0" || !to.query.platform) next({ path: "/403" });
       else next();
     },
     component: () => import("@/views/List/top.vue"),

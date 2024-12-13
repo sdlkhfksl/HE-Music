@@ -58,17 +58,17 @@
 
 <script setup lang="ts">
 import type { FormInst, FormRules } from "naive-ui";
-import {passwordRule} from "@/utils/rules";
-import {debounce} from "lodash-es";
-import {updateUserPassword} from "@/api/login";
+import { passwordRule } from "@/utils/rules";
+import { debounce } from "lodash-es";
+import { updateUserPassword } from "@/api/login";
 
 const emit = defineEmits<{ close: [] }>();
 
 // 表单类型
 interface FormType {
   old_password: string;
-  new_password:string;
-  repeat_password:string;
+  new_password: string;
+  repeat_password: string;
 }
 
 // 表单数据
@@ -76,7 +76,7 @@ const formRef = ref<FormInst | null>(null);
 const formData = ref<FormType>({
   old_password: "",
   new_password: "",
-  repeat_password:"",
+  repeat_password: "",
 });
 
 const formRules = computed<FormRules>(() => ({
@@ -96,16 +96,14 @@ const updatePassword = debounce(
       return;
     }
 
-    updateUserPassword(formData.value.old_password,formData.value.new_password).then(()=>{
+    updateUserPassword(formData.value.old_password, formData.value.new_password).then(() => {
       emit("close");
       window.$message.success("修改密码成功");
-    })
+    });
   },
   300,
   { leading: true, trailing: false },
 );
-
-
 </script>
 
 <style lang="scss" scoped>

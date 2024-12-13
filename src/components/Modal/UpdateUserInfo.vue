@@ -40,11 +40,11 @@
 
 <script setup lang="ts">
 import type { FormInst, FormRules } from "naive-ui";
-import {textRule} from "@/utils/rules";
-import {debounce} from "lodash-es";
-import {updateUserInfo} from "@/api/login";
-import {updateUserAccountInfo} from "@/utils/auth";
-import {useDataStore} from "@/stores";
+import { textRule } from "@/utils/rules";
+import { debounce } from "lodash-es";
+import { updateUserInfo } from "@/api/login";
+import { updateUserAccountInfo } from "@/utils/auth";
+import { useDataStore } from "@/stores";
 
 const emit = defineEmits<{ close: [] }>();
 
@@ -75,18 +75,17 @@ const updateInfo = debounce(
 
     await formRef.value?.validate((errors) => errors);
 
-    updateUserInfo({nickname:formData.value.nickname,avatar:formData.value.avatar}).then(()=>{
-      updateUserAccountInfo()
-      emit("close");
-      window.$message.success("修改信息成功");
-
-    })
+    updateUserInfo({ nickname: formData.value.nickname, avatar: formData.value.avatar }).then(
+      () => {
+        updateUserAccountInfo();
+        emit("close");
+        window.$message.success("修改信息成功");
+      },
+    );
   },
   300,
   { leading: true, trailing: false },
 );
-
-
 </script>
 
 <style lang="scss" scoped>

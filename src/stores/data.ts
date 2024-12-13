@@ -36,8 +36,7 @@ const userDB = localforage.createInstance({
   storeName: "user",
 });
 
-export const useDataStore = defineStore({
-  id: "data",
+export const useDataStore = defineStore("data", {
   state: (): ListState => ({
     // 播放列表
     playList: [],
@@ -143,11 +142,11 @@ export const useDataStore = defineStore({
         return 0;
       }
 
-      const indexAdd = index + 1
-      this.playList.splice(indexAdd, 0, song)
+      const indexAdd = index + 1;
+      this.playList.splice(indexAdd, 0, song);
       // 再移除重复的歌曲
       const playList = this.playList.filter(
-        (item,idx) => idx === indexAdd || item.id !== song.id || item.platform !== song.platform,
+        (item, idx) => idx === indexAdd || item.id !== song.id || item.platform !== song.platform,
       );
 
       // 更新本地存储
@@ -264,6 +263,6 @@ export const useDataStore = defineStore({
   persist: {
     key: "data-store",
     storage: localStorage,
-    paths: ["userLoginStatus", "userData", "searchHistory", "catData", "token"],
+    pick: ["userLoginStatus", "userData", "searchHistory", "catData", "token"],
   },
 });

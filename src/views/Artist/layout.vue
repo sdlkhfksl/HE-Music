@@ -121,7 +121,7 @@
     <!-- 路由 -->
     <RouterView v-slot="{ Component }">
       <Transition :name="`router-${settingStore.routeAnimation}`" mode="out-in">
-        <KeepAlive>
+        <KeepAlive v-if="settingStore.useKeepAlive">
           <component
             ref="componentRef"
             :is="Component"
@@ -131,6 +131,15 @@
             @scroll="listScroll"
           />
         </KeepAlive>
+        <component
+          v-else
+          ref="componentRef"
+          :is="Component"
+          :id="artistId"
+          :platform="platform"
+          class="router-view"
+          @scroll="listScroll"
+        />
       </Transition>
     </RouterView>
   </div>

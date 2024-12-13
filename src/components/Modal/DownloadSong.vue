@@ -5,9 +5,7 @@
     </n-collapse-transition>
     <n-collapse-transition :show="!!song">
       <n-alert type="warning" title="请知悉" closable>
-        {{
-          "本资源仅用于音乐学习和交流，禁止用于商业用途，请下载后于24小时内删除。"
-        }}
+        {{ "本资源仅用于音乐学习和交流，禁止用于商业用途，请下载后于24小时内删除。" }}
       </n-alert>
       <SongDataCard :data="song" />
       <n-collapse :default-expanded-names="['level', 'path']" arrow-placement="right">

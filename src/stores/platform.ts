@@ -6,8 +6,7 @@ interface PlatformData {
   platforms: PlatformInfo[];
 }
 
-export const usePlatformStore = defineStore({
-  id: "platform",
+export const usePlatformStore = defineStore("platform", {
   state: (): PlatformData => ({
     platforms: [],
   }),

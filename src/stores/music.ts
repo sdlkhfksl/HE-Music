@@ -33,8 +33,7 @@ const defaultMusicData: SongInfo = {
   links: [],
 };
 
-export const useMusicStore = defineStore({
-  id: "music",
+export const useMusicStore = defineStore("music", {
   state: (): MusicState => ({
     // 当前播放歌曲
     playSong: { ...defaultMusicData },
@@ -82,7 +81,7 @@ export const useMusicStore = defineStore({
   actions: {
     // 恢复默认音乐数据
     resetMusicData() {
-      this.playSong = {...defaultMusicData};
+      this.playSong = { ...defaultMusicData };
       this.songLyric = {
         lrcData: [],
         yrcData: [],
