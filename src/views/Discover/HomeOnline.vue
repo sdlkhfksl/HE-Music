@@ -2,7 +2,7 @@
   <div class="home-online">
     <!-- 公共推荐 -->
     <div v-for="(item, index) in pageData" :key="index" class="rec-public">
-      <n-flex v-if="item.list.length > 0" class="title" align="center" justify="space-between">
+      <n-flex v-if="loading || item.list.length > 0" class="title" align="center" justify="space-between">
         <n-h3 prefix="bar">
           <n-text>{{ item.name }}</n-text>
           <SvgIcon
@@ -15,23 +15,23 @@
       </n-flex>
       <!-- 列表 -->
       <AlbumList
-        v-if="item.list.length > 0 && item.type === 'album'"
+        v-if="item.type === 'album' && (loading || item.list.length > 0)"
         :data="item.list"
         :loading="true"
       />
       <VideoList
-        v-else-if="item.list.length > 0 && item.type === 'video'"
+        v-else-if=" item.type === 'video'&& (loading || item.list.length > 0) "
         :data="item.list"
         :cols="item.cols"
         :loading="true"
       />
       <PlaylistList
-        v-else-if="item.list.length > 0 && item.type === 'playlist'"
+        v-else-if="item.type === 'playlist'&& (loading || item.list.length > 0) "
         :data="item.list"
         :loading="true"
       />
       <SongList
-        v-else-if="item.list.length > 0 && item.type === 'song'"
+        v-else-if="item.type === 'song' && (loading || item.list.length > 0) "
         :data="item.list"
         height="auto"
         :loading="true"
@@ -74,6 +74,8 @@ interface RecDataType {
   featured_playlist_list: RecItemType;
 }
 
+const loading = ref(true);
+
 // 推荐数据
 const pageData = ref<RecDataType>({
   new_song_list: {
@@ -109,10 +111,10 @@ const getAllDiscoverData = async () => {
     pageData.value.new_album_list.list = res.new_album_list;
     pageData.value.featured_mv_list.list = res.featured_mv_list;
     pageData.value.featured_playlist_list.list = res.featured_playlist_list;
-    console.log(pageData.value);
   } catch (error) {
-    console.error("Error getting playlist:", error);
+    console.error("Error getting discover page:", error);
   }
+  loading.value = false;
 };
 
 onMounted(getAllDiscoverData);

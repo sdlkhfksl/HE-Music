@@ -54,7 +54,7 @@ const commentLastId = ref<string>("");
 const getHotCommentData = async () => {
   if (!songId.value) return;
   // 获取评论
-  const result = await getComment(songId.value, songPlatform.value, "song", 1, 20, undefined, true);
+  const result = await getComment(songId.value, songPlatform.value, "song", 1, 20, "", true);
   commentHotData.value = result.list?.length > 0 ? result.list : null;
 };
 
