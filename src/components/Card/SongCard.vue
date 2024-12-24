@@ -144,14 +144,14 @@
       <!-- 时长 -->
       <n-text class="meta" depth="3">{{ secondsToTime(song.duration) }}</n-text>
       <!-- 大小 -->
-      <n-text v-if="!hiddenSize" class="meta size" depth="3"> {{ song.size }}M </n-text>
+      <n-text v-if="!hiddenSize" class="meta size" depth="3"> {{ formatFileSize(song.size || 0) }} </n-text>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useDataStore, useMusicStore, useStatusStore } from "@/stores";
-import { isElectron } from "@/utils/helper";
+import {formatFileSize, isElectron} from "@/utils/helper";
 import { openJumpArtist } from "@/utils/modal";
 import { toLikeSong } from "@/utils/auth";
 import { isObject } from "lodash-es";

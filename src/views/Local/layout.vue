@@ -106,7 +106,14 @@
           <template #prefix>
             <SvgIcon :size="20" name="FolderMusic" />
           </template>
-          <n-thing :title="defaultMusicPath" description="系统默认音乐文件夹，无法更改" />
+          <template #suffix>
+            <n-switch
+              v-model:value="settingStore.showDefaultLocalPath"
+              :round="false"
+              class="set"
+            />
+          </template>
+          <n-thing :title="defaultMusicPath" description="系统默认音乐文件夹" />
         </n-list-item>
         <n-list-item v-for="(item, index) in settingStore.localFilesPath" :key="index">
           <template #prefix>
@@ -140,7 +147,7 @@
 import type { DropdownOption, MessageReactive } from "naive-ui";
 import { useLocalStore, useSettingStore } from "@/stores";
 import { debounce, flattenDeep, uniqBy } from "lodash-es";
-import { changeLocalPath, fuzzySearch, renderIcon } from "@/utils/helper";
+import {changeLocalPath, fuzzySearch, renderIcon} from "@/utils/helper";
 import { openBatchList } from "@/utils/modal";
 import player from "@/utils/player";
 import { SongInfo } from "@/types/main.hemusic";
@@ -175,15 +182,17 @@ const listData = computed<SongInfo[]>(() => {
 // 获取音乐文件夹
 const getMusicFolder = async (): Promise<string[]> => {
   defaultMusicPath.value = await window.electron.ipcRenderer.invoke("get-default-dir", "music");
-  return [defaultMusicPath.value, ...settingStore.localFilesPath];
+  return [
+    settingStore.showDefaultLocalPath ? defaultMusicPath.value : "",
+    ...settingStore.localFilesPath,
+  ];
 };
 
 // 全部音乐大小
 const allMusicSize = computed<number>(() => {
   const total = localStore.localSongs.reduce((total, song) => (total += song?.size || 0), 0);
-  return Number((total / 1024).toFixed(2));
+  return Number((total / 1024 / 1024 / 1024).toFixed(2));
 });
-
 // 更多操作
 const moreOptions = computed<DropdownOption[]>(() => [
   {
@@ -262,7 +271,7 @@ localEventBus.on(() => getAllLocalMusic());
 
 // 本地目录变化
 watch(
-  () => settingStore.localFilesPath,
+  () => [settingStore.localFilesPath, settingStore.showDefaultLocalPath],
   async () => await getAllLocalMusic(),
   { deep: true },
 );
