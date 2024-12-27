@@ -197,18 +197,26 @@
 
 <script setup lang="ts">
 import type { DropdownOption } from "naive-ui";
-import { useDataStore, useMusicStore, useSettingStore, useStatusStore } from "@/stores";
+import {
+  useDataStore,
+  useMusicStore,
+  usePlatformStore,
+  useSettingStore,
+  useStatusStore,
+} from "@/stores";
 import { calculateCurrentTime, secondsToTime } from "@/utils/time";
 import { isElectron, renderIcon, coverLoaded } from "@/utils/helper";
 import { toLikeSong } from "@/utils/auth";
 import { openDownloadSong, openJumpArtist, openPlaylistAdd } from "@/utils/modal";
 import player from "@/utils/player";
+import { FeatureSupportFlag } from "@/api/platform";
 
 const router = useRouter();
 const dataStore = useDataStore();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
+const platformStore = usePlatformStore();
 
 // 播放模式数据
 const playModeOptions = ref([
@@ -267,7 +275,9 @@ const songMoreOptions = computed<DropdownOption[]>(() => {
     {
       key: "comment",
       label: "查看评论",
-      show: !isLocal,
+      show:
+        !isLocal &&
+        platformStore.isFeatureSupport(song.platform, FeatureSupportFlag.GetCommentList),
       props: {
         onClick: () => {
           statusStore.$patch({

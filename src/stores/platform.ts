@@ -26,5 +26,13 @@ export const usePlatformStore = defineStore("platform", {
         };
       });
     },
+    isFeatureSupport(platform: string, flag: bigint) {
+      const platformInfo = this.platforms.find((item) => item.id === platform);
+      if (!platformInfo) return false;
+      return !!(platformInfo.feature_support_flag & flag);
+    },
+    getPlatformInfo(platform: string) {
+      return this.platforms.find((item) => item.id === platform);
+    },
   },
 });

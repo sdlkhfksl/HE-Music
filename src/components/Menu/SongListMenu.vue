@@ -17,18 +17,21 @@
 
 <script setup lang="ts">
 import { type DropdownOption, NAlert } from "naive-ui";
-import { useLocalStore, useStatusStore } from "@/stores";
+import { useLocalStore, usePlatformStore, useStatusStore } from "@/stores";
 import { copyData, renderIcon } from "@/utils/helper";
 import { openDownloadSong, openPlaylistAdd, openSongInfoEditor } from "@/utils/modal";
 import { deleteSongs, isLogin } from "@/utils/auth";
 import player from "@/utils/player";
 import { SongInfo } from "@/types/main.hemusic";
+import { buildSourceUrl } from "@/api/source";
+import { FeatureSupportFlag } from "@/api/platform";
 
 const emit = defineEmits<{ removeSong: [index: SongInfo[]] }>();
 
 const router = useRouter();
 const localStore = useLocalStore();
 const statusStore = useStatusStore();
+const platformStore = usePlatformStore();
 
 // 右键菜单数据
 const dropdownX = ref<number>(0);
@@ -119,28 +122,29 @@ const openDropdown = (
               },
               icon: renderIcon("Copy", { size: 18 }),
             },
-            // {
-            //   key: "code-id",
-            //   label: `复制歌曲ID`,
-            //   show: !isLocal,
-            //   props: {
-            //     onClick: () => copyData(song.id),
-            //   },
-            //   icon: renderIcon("Copy", { size: 18 }),
-            // },
-            // {
-            //   key: "share",
-            //   label: `分享歌曲链接`,
-            //   show: !isLocal,
-            //   props: {
-            //     onClick: () =>
-            //       copyData(
-            //         `https://music.163.com/#/song?id=${song.id}`,
-            //         "已复制分享链接到剪切板",
-            //       ),
-            //   },
-            //   icon: renderIcon("Share", { size: 18 }),
-            // },
+            {
+              key: "code-id",
+              label: `复制歌曲ID`,
+              show: !isLocal,
+              props: {
+                onClick: () => copyData(song.id),
+              },
+              icon: renderIcon("Copy", { size: 18 }),
+            },
+            {
+              key: "share",
+              label: `分享歌曲链接`,
+              show:
+                !isLocal &&
+                platformStore.isFeatureSupport(song.platform, FeatureSupportFlag.BuildSourceUrl),
+              props: {
+                onClick: async () => {
+                  const { url } = await buildSourceUrl(song.platform, song.id, "song");
+                  await copyData(url, "已复制分享链接到剪切板");
+                },
+              },
+              icon: renderIcon("Share", { size: 18 }),
+            },
             {
               key: "line-2",
               type: "divider",

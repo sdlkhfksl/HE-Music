@@ -94,13 +94,13 @@
                 {{ isLikeArtist ? "取消关注" : "关注歌手" }}
               </n-button>
               <!-- 更多 -->
-              <!--              <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">-->
-              <!--                <n-button :focusable="false" class="more" circle strong secondary>-->
-              <!--                  <template #icon>-->
-              <!--                    <SvgIcon name="List" />-->
-              <!--                  </template>-->
-              <!--                </n-button>-->
-              <!--              </n-dropdown>-->
+              <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">
+                <n-button :focusable="false" class="more" circle strong secondary>
+                  <template #icon>
+                    <SvgIcon name="List" />
+                  </template>
+                </n-button>
+              </n-dropdown>
             </n-flex>
           </n-flex>
         </div>
@@ -146,17 +146,22 @@
 </template>
 
 <script setup lang="ts">
-import { coverLoaded } from "@/utils/helper";
+import { coverLoaded, renderIcon } from "@/utils/helper";
 import { renderToolbar } from "@/utils/meta";
 import { artistDetail } from "@/api/artist";
-import { useDataStore, useSettingStore } from "@/stores";
+import { useDataStore, usePlatformStore, useSettingStore } from "@/stores";
 import { toLikeArtist } from "@/utils/auth";
 import ArtistSongs from "./songs.vue";
 import { SingerInfo } from "@/types/main.hemusic";
+import { buildSourceUrl } from "@/api/source";
+import { FeatureSupportFlag } from "@/api/platform";
+import { DropdownOption } from "naive-ui";
+import { computed } from "vue";
 
 const router = useRouter();
 const dataStore = useDataStore();
 const settingStore = useSettingStore();
+const platformStore = usePlatformStore();
 
 // 路由元素
 const componentRef = ref<InstanceType<typeof ArtistSongs> | null>(null);
@@ -175,18 +180,21 @@ const artistDetailData = ref<SingerInfo | null>(null);
 const listScrolling = ref<boolean>(false);
 
 // 更多操作
-// const moreOptions = computed<DropdownOption[]>(() => [
-//   {
-//     label: "打开源页面",
-//     key: "open",
-//     props: {
-//       onClick: () => {
-//         window.open(`https://music.163.com/#/artist?id=${artistId.value}`);
-//       },
-//     },
-//     icon: renderIcon("Link"),
-//   },
-// ]);
+// 更多操作
+const moreOptions = computed<DropdownOption[]>(() => [
+  {
+    label: "打开源页面",
+    key: "open",
+    show: platformStore.isFeatureSupport(platform.value, FeatureSupportFlag.BuildSourceUrl),
+    props: {
+      onClick: async () => {
+        const { url } = await buildSourceUrl(platform.value, artistId.value, "singer");
+        window.open(url);
+      },
+    },
+    icon: renderIcon("Link"),
+  },
+]);
 
 // 是否处于收藏歌手
 const isLikeArtist = computed(() => {

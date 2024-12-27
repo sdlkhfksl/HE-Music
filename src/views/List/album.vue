@@ -109,14 +109,14 @@
                 </template>
                 {{ isLikeAlbum ? "取消收藏" : "收藏专辑" }}
               </n-button>
-              <!-- 更多 -->
-              <!--              <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">-->
-              <!--                <n-button :focusable="false" class="more" circle strong secondary>-->
-              <!--                  <template #icon>-->
-              <!--                    <SvgIcon name="List" />-->
-              <!--                  </template>-->
-              <!--                </n-button>-->
-              <!--              </n-dropdown>-->
+              <!--更多-->
+              <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">
+                <n-button :focusable="false" class="more" circle strong secondary>
+                  <template #icon>
+                    <SvgIcon name="List" />
+                  </template>
+                </n-button>
+              </n-dropdown>
             </n-flex>
             <n-flex class="right">
               <!-- 模糊搜索 -->
@@ -170,21 +170,25 @@
 
 <script setup lang="ts">
 import { albumDetail } from "@/api/album";
-import { coverLoaded, fuzzySearch } from "@/utils/helper";
+import { coverLoaded, fuzzySearch, renderIcon } from "@/utils/helper";
 import { renderToolbar } from "@/utils/meta";
-import { useDataStore, useStatusStore } from "@/stores";
+import { useDataStore, usePlatformStore, useStatusStore } from "@/stores";
 import { debounce } from "lodash-es";
 import { formatTimestamp } from "@/utils/time";
-import { openJumpArtist } from "@/utils/modal";
+import { openBatchList, openJumpArtist } from "@/utils/modal";
 import player from "@/utils/player";
 import { AlbumInfo, SongInfo } from "@/types/main.hemusic";
 import { computed } from "vue";
 import SongList from "@/components/List/SongList.vue";
 import { toLikeAlbum } from "@/utils/auth";
+import { buildSourceUrl } from "@/api/source";
+import { DropdownOption } from "naive-ui";
+import { FeatureSupportFlag } from "@/api/platform";
 
 const router = useRouter();
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
+const platformStore = usePlatformStore();
 
 // 是否激活
 const isActivated = ref<boolean>(false);
@@ -222,18 +226,28 @@ const songListHeight = computed(() => {
 });
 
 // 更多操作
-// const moreOptions = computed<DropdownOption[]>(() => [
-//   {
-//     label: "打开源页面",
-//     key: "open",
-//     props: {
-//       onClick: () => {
-//         window.open(`https://music.163.com/#/album?id=${albumId.value}`);
-//       },
-//     },
-//     icon: renderIcon("Link"),
-//   },
-// ]);
+const moreOptions = computed<DropdownOption[]>(() => [
+  {
+    label: "批量操作",
+    key: "batch",
+    props: {
+      onClick: () => openBatchList(albumDataShow.value, false),
+    },
+    icon: renderIcon("Batch"),
+  },
+  {
+    label: "打开源页面",
+    key: "open",
+    show: platformStore.isFeatureSupport(platform.value, FeatureSupportFlag.BuildSourceUrl),
+    props: {
+      onClick: async () => {
+        const { url } = await buildSourceUrl(platform.value, albumId.value, "album");
+        window.open(url);
+      },
+    },
+    icon: renderIcon("Link"),
+  },
+]);
 
 // 获取专辑基础信息
 const getAlbumDetail = async (id: string, platform: string, refresh: boolean = false) => {

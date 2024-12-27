@@ -92,7 +92,7 @@
 import type { DropdownOption } from "naive-ui";
 import { useSettingStore } from "@/stores";
 import { isElectron, isDev, renderIcon } from "@/utils/helper";
-import { openSetting } from "@/utils/modal";
+import { openParseSourceUrl, openSetting } from "@/utils/modal";
 
 const router = useRouter();
 const settingStore = useSettingStore();
@@ -174,6 +174,11 @@ const setOptions = computed<DropdownOption[]>(() => [
     icon: renderIcon("Code"),
   },
   {
+    key: "parse-source-url",
+    label: "链接解析",
+    icon: renderIcon("Parse"),
+  },
+  {
     key: "setting",
     label: "全局设置",
     icon: renderIcon("Settings"),
@@ -191,6 +196,9 @@ const setSelect = (key: string) => {
       break;
     case "dev-tools":
       window.electron.ipcRenderer.send("open-dev-tools");
+      break;
+    case "parse-source-url":
+      openParseSourceUrl();
       break;
     default:
       break;

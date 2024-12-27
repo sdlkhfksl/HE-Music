@@ -147,7 +147,7 @@
 import type { DropdownOption, MessageReactive } from "naive-ui";
 import { useLocalStore, useSettingStore } from "@/stores";
 import { debounce, flattenDeep, uniqBy } from "lodash-es";
-import {changeLocalPath, fuzzySearch, renderIcon} from "@/utils/helper";
+import { changeLocalPath, fuzzySearch, renderIcon } from "@/utils/helper";
 import { openBatchList } from "@/utils/modal";
 import player from "@/utils/player";
 import { SongInfo } from "@/types/main.hemusic";

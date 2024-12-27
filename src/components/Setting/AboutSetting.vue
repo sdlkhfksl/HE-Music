@@ -89,7 +89,12 @@ const statusStore = useStatusStore();
 // 社区数据
 const communityData = [
   {
-    name: "GitHub",
+    name: "SPlayer",
+    url: "https://github.com/imsyy/SPlayer",
+    icon: "Github",
+  },
+  {
+    name: "HE-Music",
     url: packageJson.github,
     icon: "Github",
   },

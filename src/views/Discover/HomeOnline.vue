@@ -2,7 +2,12 @@
   <div class="home-online">
     <!-- 公共推荐 -->
     <div v-for="(item, index) in pageData" :key="index" class="rec-public">
-      <n-flex v-if="loading || item.list.length > 0" class="title" align="center" justify="space-between">
+      <n-flex
+        v-if="loading || item.list.length > 0"
+        class="title"
+        align="center"
+        justify="space-between"
+      >
         <n-h3 prefix="bar">
           <n-text>{{ item.name }}</n-text>
           <SvgIcon
@@ -20,18 +25,18 @@
         :loading="true"
       />
       <VideoList
-        v-else-if=" item.type === 'video'&& (loading || item.list.length > 0) "
+        v-else-if="item.type === 'video' && (loading || item.list.length > 0)"
         :data="item.list"
         :cols="item.cols"
         :loading="true"
       />
       <PlaylistList
-        v-else-if="item.type === 'playlist'&& (loading || item.list.length > 0) "
+        v-else-if="item.type === 'playlist' && (loading || item.list.length > 0)"
         :data="item.list"
         :loading="true"
       />
       <SongList
-        v-else-if="item.type === 'song' && (loading || item.list.length > 0) "
+        v-else-if="item.type === 'song' && (loading || item.list.length > 0)"
         :data="item.list"
         height="auto"
         :loading="true"

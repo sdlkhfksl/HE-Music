@@ -18,6 +18,7 @@ import { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 import UpdateUserPassword from "@/components/Modal/UpdateUserPassword.vue";
 import UpdateUserInfo from "@/components/Modal/UpdateUserInfo.vue";
 import ExcludeKeywords from "@/components/Modal/ExcludeKeywords.vue";
+import ParseSourceUrl from "@/components/Modal/ParseSourceUrl.vue";
 
 // 用户协议
 export const openUserAgreement = () => {
@@ -267,6 +268,19 @@ export const openLyricExclude = () => {
     title: "歌词排除内容",
     content: () => {
       return h(ExcludeKeywords);
+    },
+  });
+};
+// 歌词排除内容
+export const openParseSourceUrl = () => {
+  const modal = window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    style: { width: "600px" },
+    title: "解析链接",
+    content: () => {
+      return h(ParseSourceUrl, { onClose: () => modal.destroy() });
     },
   });
 };

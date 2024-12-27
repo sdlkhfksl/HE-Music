@@ -205,17 +205,19 @@ import { coverLoaded, formatNumber, fuzzySearch, renderIcon } from "@/utils/help
 import { renderToolbar } from "@/utils/meta";
 import { toLikePlaylist } from "@/utils/auth";
 import { debounce } from "lodash-es";
-import { useDataStore, useStatusStore } from "@/stores";
+import { useDataStore, usePlatformStore, useStatusStore } from "@/stores";
 import { openBatchList } from "@/utils/modal";
 import player from "@/utils/player";
 import { PlaylistInfo, SongInfo } from "@/types/main.hemusic";
 import { computed } from "vue";
 import SongList from "@/components/List/SongList.vue";
+import { buildSourceUrl } from "@/api/source";
+import { FeatureSupportFlag } from "@/api/platform";
 
 const router = useRouter();
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
-
+const platformStore = usePlatformStore();
 // 歌单数据
 const playlistData = shallowRef<SongInfo[]>([]);
 const playlistDetailData = ref<PlaylistInfo | null>(null);
@@ -271,6 +273,18 @@ const moreOptions = computed<DropdownOption[]>(() => [
       onClick: () => openBatchList(playlistDataShow.value, false),
     },
     icon: renderIcon("Batch"),
+  },
+  {
+    label: "打开源页面",
+    key: "open",
+    show: platformStore.isFeatureSupport(platform.value, FeatureSupportFlag.BuildSourceUrl),
+    props: {
+      onClick: async () => {
+        const { url } = await buildSourceUrl(platform.value, playlistId.value, "playlist");
+        window.open(url);
+      },
+    },
+    icon: renderIcon("Link"),
   },
 ]);
 

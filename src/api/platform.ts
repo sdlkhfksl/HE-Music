@@ -48,6 +48,10 @@ export const FeatureSupportFlag = {
   GetNewAlbumList: 1n << 31n, // 获取新碟列表
   GetRecommendPage: 1n << 32n, // 获取推荐页
   GetDiscoverPage: 1n << 33n, // 获取发现页
+
+  // 来源链接
+  BuildSourceUrl: 1n << 34n, // 构建来源链接
+  ParseSourceUrl: 1n << 33n, // 解析来源链接
 };
 
 // 获取发现页面

@@ -96,18 +96,23 @@
 </template>
 
 <script setup lang="ts">
-import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
+import { useMusicStore, usePlatformStore, useSettingStore, useStatusStore } from "@/stores";
 import { isElectron } from "@/utils/helper";
 import { throttle } from "lodash-es";
 import player from "@/utils/player";
+import { FeatureSupportFlag } from "@/api/platform";
 
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
+const platformStore = usePlatformStore();
 
 // 是否显示评论
 const isShowComment = computed<boolean>(
-  () => !musicStore.playSong.path && statusStore.showPlayerComment,
+  () =>
+    !musicStore.playSong.path &&
+    statusStore.showPlayerComment &&
+    platformStore.isFeatureSupport(musicStore.playSong.platform, FeatureSupportFlag.GetCommentList),
 );
 // 主内容 key
 const playerContentKey = computed(() => {

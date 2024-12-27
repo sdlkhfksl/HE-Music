@@ -100,3 +100,9 @@ export const newSongs = (
     params: { platform, tab_id, page_size, page_index },
   });
 };
+export const songInfo = (platform: string, id: string) => {
+  return requestHemusic({
+    url: "/v1/song",
+    params: { ids: id, platform },
+  });
+};
