@@ -8,7 +8,7 @@
             minRows: 4,
             maxRows: 6,
           }"
-          :maxlength="200"
+          :maxlength="300"
           placeholder="请输入分享链接"
           type="textarea"
           show-count
