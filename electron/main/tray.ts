@@ -189,8 +189,8 @@ class CreateTray implements MainTray {
   constructor(win: BrowserWindow, lyricWin: BrowserWindow) {
     // 托盘图标
     const icon = trayIcon(isWin ? "tray.ico" : "tray@32.png").resize({
-      height: 32,
-      width: 32,
+      height: isWin ? 32 : 18,
+      width: isWin ? 32 : 18,
     });
     // 初始化数据
     this._win = win;
