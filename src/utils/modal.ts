@@ -49,9 +49,13 @@ export const openUserAgreement = () => {
   });
 };
 
+
+let isLoginModalOpened = false;
 // 用户登录
 export const openUserLogin = (showTip: boolean = false) => {
   if (showTip) window.$message.warning("请登录后使用");
+  if (isLoginModalOpened) return;
+  isLoginModalOpened = true;
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -62,6 +66,9 @@ export const openUserLogin = (showTip: boolean = false) => {
     style: { width: "400px" },
     content: () => {
       return h(Login, { onClose: () => modal.destroy() });
+    },
+    onAfterLeave: () => {
+      isLoginModalOpened = false;
     },
   });
 };

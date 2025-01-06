@@ -39,10 +39,11 @@ router.beforeEach(async (to, from, next) => {
   if (!to.meta.offline && !platformStore.platforms.length) {
     try {
       await platformStore.loadPlatforms();
-    } catch (e: any) {
-      if (e.status === 401) {
-        openUserLogin();
-      }
+    }
+    catch (error) {
+      console.error(error);
+      if (!isElectron) window.$loadingBar.error();
+      return;
     }
   }
   // 需要登录
@@ -56,6 +57,7 @@ router.beforeEach(async (to, from, next) => {
   else if (to.meta.needApp && !isElectron) {
     window.$message.warning("该功能为客户端独占功能");
     next("/403");
+    return;
   }
   next();
 });
