@@ -244,21 +244,24 @@ export const getSizeCover = (song: SongInfo, size = 300) => {
   if (!song) {
     return "/images/song.jpg?assest";
   }
+
+  // 如果传的小数 说明要最大的
+  if (size < 0) {
+    size = 1000;
+  }
   const { cover = "", platform } = song;
   switch (platform) {
     case "tidal":
-      if (size == 300) {
-        size = 320;
-        break;
-      }
-      if (![80, 160, 320, 640, 1280].includes(size)) {
-        size = 320;
-      }
+      size = [80, 160, 320, 640, 1280].find((item) => item >= size) || 1280;
       break;
     case "kugou":
-      if (![120, 240, 480].includes(size)) {
-        size = 480;
-      }
+      size = [120, 240, 480, 720, 1080].find((item) => item >= size) || 1080;
+      break;
+    case "qq":
+      size = [120, 150, 180, 300, 500, 800, 1200, 1500].find((item) => item >= size) || 1500;
+      break;
+    case "joox":
+      size = [100, 300, 500, 1000].find((item) => item >= size) || 1000;
       break;
   }
 

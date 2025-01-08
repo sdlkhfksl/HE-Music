@@ -39,8 +39,7 @@ router.beforeEach(async (to, from, next) => {
   if (!to.meta.offline && !platformStore.platforms.length) {
     try {
       await platformStore.loadPlatforms();
-    }
-    catch (error) {
+    } catch (error) {
       console.error(error);
       if (!isElectron) window.$loadingBar.error();
       return;

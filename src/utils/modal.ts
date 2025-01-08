@@ -49,7 +49,6 @@ export const openUserAgreement = () => {
   });
 };
 
-
 let isLoginModalOpened = false;
 // 用户登录
 export const openUserLogin = (showTip: boolean = false) => {

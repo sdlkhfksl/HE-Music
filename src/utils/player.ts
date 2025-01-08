@@ -325,6 +325,11 @@ class Player {
       artwork: settingStore.smtcOutputHighQualityCover
         ? [
             {
+              src: musicStore.getSongCover(1000),
+              sizes: "1000x1000",
+              type: "image/jpeg",
+            },
+            {
               src: musicStore.getSongCover(700),
               sizes: "700x700",
               type: "image/jpeg",

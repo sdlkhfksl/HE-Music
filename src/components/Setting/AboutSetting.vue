@@ -53,7 +53,7 @@
                 </n-tag>
                 <n-text :depth="3" class="time">{{ item?.time }}</n-text>
               </n-flex>
-              <div class="markdown-body" v-html="item?.changelog" @click="jumpLink"/>
+              <div class="markdown-body" v-html="item?.changelog" @click="jumpLink" />
             </n-card>
           </n-collapse-item>
         </n-collapse>
