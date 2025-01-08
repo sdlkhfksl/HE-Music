@@ -787,7 +787,7 @@ class Player {
     const statusStore = useStatusStore();
     // 创建图像元素
     const image = new Image();
-    image.crossOrigin = "Anonymous";
+    image.crossOrigin = "anonymous";
     image.src = coverUrl;
     // 图像加载完成
     image.onload = () => {
