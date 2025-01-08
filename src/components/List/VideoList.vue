@@ -284,7 +284,6 @@ const playList = debounce(
     &:hover {
       background-color: rgba(var(--primary), 0.12);
       .cover {
-        border-radius: 16px 16px 0 0;
         .cover-img {
           transform: scale(1.1);
           filter: brightness(0.8);
