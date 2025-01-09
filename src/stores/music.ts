@@ -79,16 +79,6 @@ export const useMusicStore = defineStore("music", {
       },
   },
   actions: {
-    // 恢复默认音乐数据
-    resetMusicData() {
-      this.playSong = { ...defaultMusicData };
-      this.songLyric = {
-        lrcData: [],
-        yrcData: [],
-        lrcAMData: [],
-        yrcAMData: [],
-      };
-    },
     // 获取歌曲封面
     getSongCover(size: number = 300) {
       return this.playSong.path ? this.playSong.cover : getSizeCover(this.playSong, size);

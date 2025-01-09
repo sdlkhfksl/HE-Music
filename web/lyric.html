@@ -426,7 +426,12 @@
         // 监听 IPC 事件
         setupIPCListeners() {
           window.electron.ipcRenderer.on("play-song-change", (_, title) => {
-            if (!title) return;
+            if (!title) {
+              this.songNameDom.innerHTML = "HE-Music";
+              this.songArtistDom.innerHTML = "未知艺术家";
+              this.updateLyrics("该歌曲暂无歌词");
+              return;
+            }
             const [songName, songArtist] = title.split(" - ");
             this.songNameDom.innerHTML = songName;
             this.songArtistDom.innerHTML = songArtist;

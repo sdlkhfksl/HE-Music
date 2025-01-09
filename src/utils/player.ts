@@ -976,11 +976,17 @@ class Player {
       showFullPlayer: false,
       playIndex: -1,
     });
-    musicStore.resetMusicData();
+    musicStore.$reset();
     dataStore.setPlayList([]);
 
     console.log("songInfo", musicStore.playSong);
     window.$message.success("已清空播放列表");
+
+    // ipc
+    if (isElectron) {
+      window.electron.ipcRenderer.send("play-song-change", "");
+      window.electron.ipcRenderer.send("like-status-change", false);
+    }
   }
 
   /**

@@ -22,6 +22,7 @@ let playName: string = "未播放歌曲";
 let likeSong: boolean = false;
 let desktopLyricShow: boolean = false;
 let desktopLyricLock: boolean = false;
+let songValid: boolean = false;
 
 export interface MainTray {
   setTitle(title: string): void;
@@ -32,6 +33,7 @@ export interface MainTray {
   setDesktopLyricShow(show: boolean): void;
   setDesktopLyricLock(lock: boolean): void;
   destroyTray(): void;
+  setSongValid(valid: boolean): void;
 }
 
 // 托盘图标
@@ -49,9 +51,11 @@ const createTrayMenu = (
   lyricWin: BrowserWindow,
 ): MenuItemConstructorOptions[] => {
   // 区分明暗图标
-  const showIcon = (iconName: string) => {
+  const showIcon = (iconName: string, enabled = true) => {
     const isDark = nativeTheme.shouldUseDarkColors;
-    return trayIcon(`${iconName}${isDark ? "-dark" : "-light"}.png`).resize({
+    return trayIcon(
+      `${iconName}${isDark ? "-dark" : "-light"}${enabled ? "" : "-disabled"}.png`,
+    ).resize({
       width: 16,
       height: 16,
     });
@@ -60,7 +64,7 @@ const createTrayMenu = (
   const menu: MenuItemConstructorOptions[] = [
     {
       id: "name",
-      label: playName,
+      label: songValid ? playName : "未播放歌曲",
       icon: showIcon("music"),
       click: () => {
         win.show();
@@ -73,14 +77,16 @@ const createTrayMenu = (
     {
       id: "toogleLikeSong",
       label: likeSong ? "从我喜欢中移除" : "添加到我喜欢",
-      icon: showIcon(likeSong ? "like" : "unlike"),
+      icon: showIcon(likeSong ? "like" : "unlike", songValid),
       click: () => win.webContents.send("toogleLikeSong"),
+      enabled: songValid,
     },
     {
       id: "changeMode",
       label:
         playMode === "repeat" ? "列表循环" : playMode === "repeat-once" ? "单曲循环" : "随机播放",
-      icon: showIcon(playMode),
+      icon: showIcon(playMode, songValid),
+      enabled: songValid,
       submenu: [
         {
           id: "repeat",
@@ -114,20 +120,23 @@ const createTrayMenu = (
     {
       id: "playNext",
       label: "上一曲",
-      icon: showIcon("prev"),
+      icon: showIcon("prev", songValid),
       click: () => win.webContents.send("playPrev"),
+      enabled: songValid,
     },
     {
       id: "playOrPause",
       label: playState === "pause" ? "播放" : "暂停",
-      icon: showIcon(playState === "pause" ? "play" : "pause"),
+      icon: showIcon(playState === "pause" ? "play" : "pause", songValid),
       click: () => win.webContents.send(playState === "pause" ? "play" : "pause"),
+      enabled: songValid,
     },
     {
       id: "playNext",
       label: "下一曲",
-      icon: showIcon("next"),
+      icon: showIcon("next", songValid),
       click: () => win.webContents.send("playNext"),
+      enabled: songValid,
     },
     {
       type: "separator",
@@ -186,12 +195,16 @@ class CreateTray implements MainTray {
   private _menu: MenuItemConstructorOptions[];
   private _contextMenu: Menu;
 
-  constructor(win: BrowserWindow, lyricWin: BrowserWindow) {
-    // 托盘图标
-    const icon = trayIcon(isWin ? "tray.ico" : "tray@32.png").resize({
+  trayIcon() {
+    return trayIcon(isWin ? "tray.ico" : `music-dark.png`).resize({
       height: isWin ? 32 : 18,
       width: isWin ? 32 : 18,
     });
+  }
+
+  constructor(win: BrowserWindow, lyricWin: BrowserWindow) {
+    // 托盘图标
+    const icon = this.trayIcon();
     // 初始化数据
     this._win = win;
     this._lyricWin = lyricWin;
@@ -208,11 +221,12 @@ class CreateTray implements MainTray {
     this._menu = createTrayMenu(this._win, this._lyricWin);
     this._contextMenu = Menu.buildFromTemplate(this._menu);
     this._tray.setContextMenu(this._contextMenu);
+    this._tray.setImage(this.trayIcon());
   }
   // 托盘事件
   private initEvents() {
     // 点击
-    this._tray.on("click", () => this._win.show());
+    // this._tray.on("click", () => this._win.show());
     // 明暗变化
     nativeTheme.on("updated", () => {
       this.initTrayMenu();
@@ -224,7 +238,7 @@ class CreateTray implements MainTray {
     this._tray.setToolTip(title);
   }
   // 设置播放名称
-  setPlayName(name: string) {
+  setPlayName(name: string = "") {
     // 超长处理
     if (name.length > 20) name = name.slice(0, 20) + "...";
     playName = name;
@@ -264,6 +278,10 @@ class CreateTray implements MainTray {
   // 销毁托盘
   destroyTray() {
     this._tray.destroy();
+  }
+  // 设置歌曲是否有效
+  setSongValid(valid: boolean) {
+    songValid = valid;
   }
 }
 

@@ -15,9 +15,9 @@ import { getFonts } from "font-list";
 import { MainTray } from "./tray";
 import { Thumbar } from "./thumbar";
 import { StoreType } from "./store";
-import { getFileID, getFileMD5, isDev } from "./utils";
+import { appName, getFileID, getFileMD5, isDev } from "./utils";
 import { isShortcutRegistered, registerShortcut, unregisterShortcuts } from "./shortcut";
-import { join, basename, resolve, relative, isAbsolute } from "path";
+import { basename, isAbsolute, join, relative, resolve } from "path";
 import { download } from "electron-dl";
 import { checkUpdate, startDownloadUpdate } from "./update";
 import fs from "fs/promises";
@@ -547,7 +547,7 @@ const initLyricIpcMain = (
 ): void => {
   // 音乐名称更改
   ipcMain.on("play-song-change", (_, title) => {
-    if (!title) return;
+    // if (!title) return;
     lyricWin?.webContents.send("play-song-change", title);
   });
 
@@ -647,10 +647,11 @@ const initTrayIpcMain = (
 
   // 音乐名称更改
   ipcMain.on("play-song-change", (_, title) => {
-    if (!title) return;
+    // if (!title) return;
     // 更改标题
-    win?.setTitle(title);
-    tray?.setTitle(title);
+    win?.setTitle(title || appName);
+    tray?.setSongValid(!!title);
+    tray?.setTitle(title || appName);
     tray?.setPlayName(title);
   });
 
