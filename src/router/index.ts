@@ -42,7 +42,6 @@ router.beforeEach(async (to, from, next) => {
     } catch (error) {
       console.error(error);
       if (!isElectron) window.$loadingBar.error();
-      return;
     }
   }
   // 需要登录
