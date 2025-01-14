@@ -186,7 +186,7 @@ const initWinIpcMain = (
         // 判断音质等级
         let quality: string;
         if ((format.sampleRate || 0) >= 96000 || (format.bitsPerSample || 0) > 16) {
-          quality = "Hi-Res";
+          quality = "HIRES";
         } else if ((format.sampleRate || 0) >= 44100) {
           quality = "HQ";
         } else {

@@ -43,13 +43,13 @@
             </n-ellipsis>
             <!-- 音质 -->
             <n-tag
-              v-if="song?.path && song?.quality"
+              v-if="quality.name"
               :bordered="false"
-              :type="song.quality === 'Hi-Res' ? 'warning' : 'info'"
+              :type="quality.type || 'default'"
               class="quality"
               round
             >
-              {{ song.quality }}
+              {{ quality.name }}
             </n-tag>
             <!-- 特权 -->
             <!--            <n-tag v-if="song.originCoverType === 1" :bordered="false" type="primary" round>-->
@@ -162,6 +162,7 @@ import player from "@/utils/player";
 import blob from "@/utils/blob";
 import { SongInfo } from "@/types/main.hemusic";
 import { getSizeCover } from "@/utils/format";
+import { TagProps } from "naive-ui";
 
 const props = defineProps<{
   // 歌曲
@@ -192,6 +193,57 @@ const localCover = async (show: boolean) => {
   const { data, format } = coverData;
   const blobURL = blob.createBlobURL(data, format, song.value.path);
   if (blobURL) song.value.cover = blobURL;
+};
+
+const getQuality = (song: SongInfo) => {
+  if (song.path) {
+    switch (song.quality) {
+      case "HIRES":
+        return {
+          name: song.quality,
+          type: "error",
+        };
+      case "SQ":
+        return {
+          name: song.quality,
+          type: "warning",
+        };
+      case "HQ":
+        return {
+          name: song.quality,
+          type: "success",
+        };
+      default:
+        return {};
+    }
+  }
+
+  const link = song.links.at(-1);
+  if (!link) return {};
+
+  if (link.quality >= 2000) {
+    return {
+      name: link.name.toUpperCase(),
+      type: "error",
+    };
+  }
+  if (link.quality >= 1000) {
+    return {
+      name: "SQ",
+      type: "warning",
+    };
+  }
+  if (link.quality >= 192) {
+    return {
+      name: "HQ",
+      type: "success",
+    };
+  }
+  return {};
+};
+const quality = getQuality(song.value) as {
+  name?: string;
+  type: TagProps["type"];
 };
 </script>
 
