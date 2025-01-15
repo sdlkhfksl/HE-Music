@@ -111,6 +111,8 @@
           v-if="isObject(song.album)"
           class="album-text"
           @click="
+            IsValidId(song.album?.id) &&
+            platformStore.isFeatureSupport(song.platform, FeatureSupportFlag.GetAlbumInfo) &&
             router.push({
               name: 'album',
               query: { id: song.album?.id, platform: song.platform },
@@ -152,7 +154,7 @@
 </template>
 
 <script setup lang="ts">
-import { useDataStore, useMusicStore, useStatusStore } from "@/stores";
+import { useDataStore, useMusicStore, usePlatformStore, useStatusStore } from "@/stores";
 import { formatFileSize, isElectron } from "@/utils/helper";
 import { openJumpArtist } from "@/utils/modal";
 import { toLikeSong } from "@/utils/auth";
@@ -163,6 +165,8 @@ import blob from "@/utils/blob";
 import { SongInfo } from "@/types/main.hemusic";
 import { getSizeCover } from "@/utils/format";
 import { TagProps } from "naive-ui";
+import { IsValidId } from "@/utils/song";
+import { FeatureSupportFlag } from "@/api/platform";
 
 const props = defineProps<{
   // 歌曲
@@ -179,6 +183,7 @@ const router = useRouter();
 const dataStore = useDataStore();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
+const platformStore = usePlatformStore();
 
 // 歌曲数据
 const song = toRef(props, "song");

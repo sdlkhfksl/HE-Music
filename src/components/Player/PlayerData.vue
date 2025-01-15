@@ -30,6 +30,11 @@
           :key="ar.id"
           class="ar"
           @click="
+            IsValidId(ar.id) &&
+            platformStore.isFeatureSupport(
+              musicStore.playSong.platform,
+              FeatureSupportFlag.GetSingerInfo,
+            ) &&
             jumpPage({
               name: 'artist',
               query: { id: ar.id, platform: musicStore.playSong.platform },
@@ -50,6 +55,11 @@
         v-if="isObject(musicStore.playSong.album)"
         class="name-text text-hidden"
         @click="
+          IsValidId(musicStore.playSong.album.id) &&
+          platformStore.isFeatureSupport(
+            musicStore.playSong.platform,
+            FeatureSupportFlag.GetAlbumInfo,
+          ) &&
           jumpPage({
             name: 'album',
             query: { id: musicStore.playSong.album.id, platform: musicStore.playSong.platform },
@@ -67,8 +77,10 @@
 
 <script setup lang="ts">
 import type { RouteLocationRaw } from "vue-router";
-import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
+import { useMusicStore, usePlatformStore, useSettingStore, useStatusStore } from "@/stores";
 import { debounce, isObject } from "lodash-es";
+import { IsValidId } from "@/utils/song";
+import { FeatureSupportFlag } from "@/api/platform";
 
 defineProps<{
   center?: boolean;
@@ -79,6 +91,7 @@ const router = useRouter();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
+const platformStore = usePlatformStore();
 
 const jumpPage = debounce(
   (go: RouteLocationRaw) => {

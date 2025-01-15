@@ -33,3 +33,7 @@ export const getSongCanPlayLinks = ({ links, platform }: SongInfo) => {
   });
   return res;
 };
+
+export const IsValidId = (id: string) => {
+  return id != "" && Number(id) != 0;
+};

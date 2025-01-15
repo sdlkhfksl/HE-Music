@@ -19,6 +19,8 @@ import UpdateUserPassword from "@/components/Modal/UpdateUserPassword.vue";
 import UpdateUserInfo from "@/components/Modal/UpdateUserInfo.vue";
 import ExcludeKeywords from "@/components/Modal/ExcludeKeywords.vue";
 import ParseSourceUrl from "@/components/Modal/ParseSourceUrl.vue";
+import { usePlatformStore } from "@/stores";
+import { FeatureSupportFlag } from "@/api/platform";
 
 // 用户协议
 export const openUserAgreement = () => {
@@ -74,6 +76,11 @@ export const openUserLogin = (showTip: boolean = false) => {
 
 // 跳转到歌手
 export const openJumpArtist = (platform: string, data: SongInfo["singers"]) => {
+  const platformStore = usePlatformStore();
+  if (!platformStore.isFeatureSupport(platform, FeatureSupportFlag.GetSingerInfo)) {
+    return;
+  }
+
   // 若 data 为数组且只有一个元素，则直接跳转
   if (isArray(data) && data.length === 1) {
     const id = data[0].id;
