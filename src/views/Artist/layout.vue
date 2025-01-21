@@ -33,21 +33,21 @@
             <n-flex class="meta">
               <div
                 class="item"
-                @click="router.push({ name: 'artist-songs', query: { id: artistId } })"
+                @click="router.push({ name: 'artist-songs', query: { id: artistId, platform } })"
               >
                 <SvgIcon name="Music" :depth="3" />
                 <n-text>{{ artistDetailData.song_num || 0 }}</n-text>
               </div>
               <div
                 class="item"
-                @click="router.push({ name: 'artist-albums', query: { id: artistId } })"
+                @click="router.push({ name: 'artist-albums', query: { id: artistId, platform } })"
               >
                 <SvgIcon name="Album" :depth="3" />
                 <n-text>{{ artistDetailData.album_num || 0 }}</n-text>
               </div>
               <div
                 class="item"
-                @click="router.push({ name: 'artist-videos', query: { id: artistId } })"
+                @click="router.push({ name: 'artist-videos', query: { id: artistId, platform } })"
               >
                 <SvgIcon name="Video" :depth="3" />
                 <n-text>{{ artistDetailData.mv_num || 0 }}</n-text>
