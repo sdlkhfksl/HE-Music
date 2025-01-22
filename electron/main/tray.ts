@@ -196,9 +196,18 @@ class CreateTray implements MainTray {
   private _contextMenu: Menu;
 
   trayIcon() {
-    return trayIcon(isWin ? "tray.ico" : `music-dark.png`).resize({
-      height: isWin ? 32 : 18,
-      width: isWin ? 32 : 18,
+    if (isWin) {
+      return trayIcon("tray.ico").resize({ height: 32, width: 32 });
+    }
+    if (isMac) {
+      const icon = trayIcon(`trayTemplate.png`).resize({ height: 18, width: 18 });
+      icon.setTemplateImage(true);
+      return icon;
+    }
+
+    return trayIcon("tray.png").resize({
+      height: 32,
+      width: 32,
     });
   }
 
@@ -221,7 +230,7 @@ class CreateTray implements MainTray {
     this._menu = createTrayMenu(this._win, this._lyricWin);
     this._contextMenu = Menu.buildFromTemplate(this._menu);
     this._tray.setContextMenu(this._contextMenu);
-    this._tray.setImage(this.trayIcon());
+    // this._tray.setImage(this.trayIcon());
   }
   // 托盘事件
   private initEvents() {
