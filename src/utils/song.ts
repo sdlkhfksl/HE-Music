@@ -1,4 +1,5 @@
 import { Link, SongInfo } from "@/types/main.hemusic";
+import { API_URL } from "@/utils/request";
 
 export const songEquals = (a: SongInfo, b: SongInfo) => {
   return a?.id === b?.id && a?.platform === b?.platform;

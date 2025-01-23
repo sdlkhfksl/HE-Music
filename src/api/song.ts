@@ -1,4 +1,4 @@
-import request, { requestHemusic } from "@/utils/request";
+import request, { API_URL, requestHemusic } from "@/utils/request";
 
 // 获取歌曲 URL
 export const songUrl = (
@@ -106,3 +106,12 @@ export const songInfo = (platform: string, id: string) => {
     params: { ids: id, platform },
   });
 };
+
+export const getCoverUrlStr = (platform, id: string, quality = 300, redirect = true, token = "") =>
+  `${API_URL}/v1/song/cover?${new URLSearchParams({
+    id,
+    platform,
+    quality: quality.toString(),
+    redirect: redirect.toString(),
+    token,
+  }).toString()}`;

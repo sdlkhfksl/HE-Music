@@ -2,6 +2,8 @@ import type { SongType, CoverType, ArtistType, CommentType, MetaData, CatType } 
 import { msToTime } from "./time";
 import { flatMap, isArray, uniqBy } from "lodash-es";
 import { SongInfo } from "@/types/main.hemusic";
+import { getCoverUrlStr } from "@/api/song";
+import { useDataStore } from "@/stores";
 
 type CoverDataType = {
   cover: string;
@@ -249,7 +251,7 @@ export const getSizeCover = (song: SongInfo, size = 300) => {
   if (size < 0) {
     size = 1000;
   }
-  const { cover = "", platform } = song;
+  const { cover = "", platform, id } = song;
   switch (platform) {
     case "tidal":
       size = [80, 160, 320, 640, 1280].find((item) => item >= size) || 1280;
@@ -268,5 +270,6 @@ export const getSizeCover = (song: SongInfo, size = 300) => {
   if (cover) {
     return cover.replaceAll("{x}", size.toString()).replaceAll("{y}", size.toString());
   }
-  return "/images/song.jpg?assest";
+  const dataStore = useDataStore();
+  return getCoverUrlStr(platform, song.id, size, true, dataStore.token);
 };
