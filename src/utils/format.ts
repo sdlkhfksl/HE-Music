@@ -271,5 +271,5 @@ export const getSizeCover = (song: SongInfo, size = 300) => {
     return cover.replaceAll("{x}", size.toString()).replaceAll("{y}", size.toString());
   }
   const dataStore = useDataStore();
-  return getCoverUrlStr(platform, song.id, size, true, dataStore.token);
+  return getCoverUrlStr(platform, id, size, true, dataStore.token);
 };
