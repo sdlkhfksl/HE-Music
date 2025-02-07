@@ -215,7 +215,7 @@ const initWinIpcMain = (
   // 获取音乐元信息
   ipcMain.handle("get-music-metadata", async (_, path: string) => {
     try {
-      const { common, format } = await parseFile(path);
+      const { common, format, native } = await parseFile(path);
       return {
         // 文件名称
         fileName: basename(path),
@@ -225,6 +225,8 @@ const initWinIpcMain = (
         common,
         // 音质信息
         format,
+        // 原生信息
+        native,
         // md5
         md5: await getFileMD5(path),
       };
@@ -364,7 +366,7 @@ const initWinIpcMain = (
   // 修改音乐元信息
   ipcMain.handle("set-music-metadata", async (_, path: string, metadata: any) => {
     try {
-      const { name, singers, album, alia, lyric, cover } = metadata;
+      const { name, singer, album, alia, lyric, cover } = metadata;
       // 规范化路径
       const songPath = resolve(path);
       const coverPath = cover ? resolve(cover) : null;
@@ -376,9 +378,9 @@ const initWinIpcMain = (
       Id3v2Settings.forceDefaultVersion = true;
       Id3v2Settings.defaultVersion = 3;
       songFile.tag.title = name || "未知曲目";
-      songFile.tag.performers = [singers || "未知艺术家"];
+      songFile.tag.performers = [singer || "未知艺术家"];
       songFile.tag.album = album || "未知专辑";
-      songFile.tag.albumArtists = [singers || "未知艺术家"];
+      songFile.tag.albumArtists = [singer || "未知艺术家"];
       songFile.tag.lyrics = lyric || "";
       songFile.tag.description = alia || "";
       songFile.tag.comment = alia || "";

@@ -125,7 +125,7 @@
 <script setup lang="ts">
 import type { FormInst, FormRules } from "naive-ui";
 import type { ICommonTagsResult, IFormat } from "music-metadata";
-import { useDataStore, useMusicStore } from "@/stores";
+import { useDataStore, useMusicStore, useSettingStore } from "@/stores";
 import { textRule } from "@/utils/rules";
 import { copyData } from "@/utils/helper";
 import { matchSong, neteaseSongLyric } from "@/api/song";
@@ -133,6 +133,7 @@ import { debounce, isArray, isEmpty, isObject } from "lodash-es";
 import blob from "@/utils/blob";
 import { formatSongsList } from "@/utils/format";
 import { SongInfo } from "@/types/main.hemusic";
+import { INativeTags } from "music-metadata/lib/type";
 
 const props = defineProps<{
   song: SongInfo;
@@ -168,6 +169,7 @@ interface InfoFormType {
 
 const dataStore = useDataStore();
 const musicStore = useMusicStore();
+const settingStore = useSettingStore();
 
 // 本地歌曲总线
 const localEventBus = useEventBus("local");
@@ -175,7 +177,7 @@ const localEventBus = useEventBus("local");
 // 表单数据
 const infoFormRef = ref<FormInst | null>(null);
 const infoFormData = ref<InfoFormType>({ name: "", fileName: "", singer: "", album: "" });
-const infoFormRules: FormRules = { name: textRule, singer: textRule, album: textRule };
+const infoFormRules: FormRules = { name: textRule };
 
 // 封面数据
 const coverData = ref<string>("/images/song.jpg?assest");
@@ -190,10 +192,9 @@ const getSongInfo = async () => {
     common: ICommonTagsResult;
     format: IFormat;
     md5: string;
-  } = await window.electron.ipcRenderer.invoke("get-music-metadata", path);
-  console.log(infoData);
-  // 解构数据
-  const { fileName, fileSize, common, format, md5 } = infoData;
+    native: INativeTags;
+  } = await window.electron.ipcRenderer.invoke("get-music-metadata", path);// 解构数据
+  const { fileName, fileSize, common, format, md5, native } = infoData;
   // 更新数据
   infoFormData.value = {
     fileName,
@@ -201,7 +202,11 @@ const getSongInfo = async () => {
     singer: common.artist || "",
     album: common.album || "",
     alia: common.comment?.[0] || "",
-    lyric: common.lyrics?.[0] || "",
+    lyric:
+      common.lyrics?.[0] ||
+      (native["ID3v2.3"] || native["ID3v2.4"])
+        ?.find((tag) => tag.id === "USLT")
+        ?.value?.text?.toString(),
     type: format.codec,
     duration: format.duration ? Number(format.duration.toFixed(2)) : 0,
     size: fileSize,
@@ -247,7 +252,13 @@ const onlineMatch = debounce(
         // 获取歌词
         const result = await neteaseSongLyric(songData.id);
         console.log(result);
-        infoFormData.value.lyric = result.lrc.lyric;
+        infoFormData.value.lyric = [
+          result.lrc.lyric,
+          settingStore.downloadLyric && settingStore.downloadLyricTran ? result.tlyric?.lyric : "",
+          settingStore.downloadLyric && settingStore.downloadLyricRoma ? result.romalrc?.lyric : "",
+        ]
+          .filter(item => !!item)
+          .join("\n\n");
         window.$message.success("匹配成功");
       }
     } catch (error) {

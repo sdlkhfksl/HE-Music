@@ -138,12 +138,25 @@ const download = async () => {
 
 // 客户端下载
 const electronDownload = async (url: string, songName: string, fileType: string) => {
-  const { downloadMeta, downloadCover, downloadLyric, saveMetaFile } = settingStore;
+  const {
+    downloadMeta,
+    downloadCover,
+    downloadLyric,
+    downloadLyricTran,
+    downloadLyricRoma,
+    saveMetaFile,
+  } = settingStore;
   // 获取歌词
   let lyric = "";
   if (downloadLyric) {
     const lyricResult = await songLyric(props.song.id, props.song.platform);
-    lyric = removeWordLyric(lyricResult?.lyric) || "";
+    lyric = [
+      removeWordLyric(lyricResult?.lyric) || "",
+      downloadLyricTran ? removeWordLyric(lyricResult?.trans) : "",
+      downloadLyricRoma ? removeWordLyric(lyricResult?.spelling) : "",
+    ]
+      .filter(item => !!item)
+      .join("\n\n");
   }
   // 下载歌曲
   const config = {

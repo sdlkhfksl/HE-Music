@@ -1,7 +1,7 @@
 <template>
   <div class="exclude">
     <n-alert :show-icon="false">请勿添加过多，以免影响歌词的正常显示</n-alert>
-    <n-dynamic-tags v-model:value="settingStore.excludeKeywords" />
+    <n-dynamic-tags v-model:value="settingStore.lyricExcludeKeywords" />
   </div>
 </template>
 

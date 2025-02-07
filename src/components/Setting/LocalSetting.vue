@@ -109,6 +109,30 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
+          <n-text class="name">下载歌词翻译</n-text>
+          <n-text class="tip" :depth="3">下载歌词时同时下载翻译</n-text>
+        </div>
+        <n-switch
+          v-model:value="settingStore.downloadLyricTran"
+          :disabled="!settingStore.downloadMeta || !settingStore.downloadLyric"
+          :round="false"
+          class="set"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">下载歌词音译</n-text>
+          <n-text class="tip" :depth="3">下载歌词时同时下载音译</n-text>
+        </div>
+        <n-switch
+          v-model:value="settingStore.downloadLyricRoma"
+          :disabled="!settingStore.downloadMeta || !settingStore.downloadLyric"
+          :round="false"
+          class="set"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
           <n-text class="name">保留元信息文件</n-text>
           <n-text class="tip" :depth="3">是否在下载目录中保留元信息文件</n-text>
         </div>

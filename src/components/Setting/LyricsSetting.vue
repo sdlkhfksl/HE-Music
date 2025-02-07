@@ -234,10 +234,23 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">歌词排除内容</n-text>
+          <n-text class="name">歌词排除</n-text>
           <n-text class="tip" :depth="3"> 歌词中包含的关键词将不会显示 </n-text>
         </div>
-        <n-button type="primary" strong secondary @click="openLyricExclude">配置</n-button>
+        <n-switch v-model:value="settingStore.lyricExclude" class="set" :round="false" />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">歌词排除内容</n-text>
+        </div>
+        <n-button
+          type="primary"
+          strong
+          secondary
+          :disabled="!settingStore.lyricExclude"
+          @click="openLyricExclude"
+          >配置</n-button
+        >
       </n-card>
     </div>
     <div class="set-list">

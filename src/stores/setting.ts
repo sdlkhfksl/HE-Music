@@ -40,6 +40,8 @@ interface SettingState {
   downloadMeta: boolean;
   downloadCover: boolean;
   downloadLyric: boolean;
+  downloadLyricTran: boolean;
+  downloadLyricRoma: boolean;
   saveMetaFile: boolean;
   proxyProtocol: "off" | "http" | "https";
   proxyServe: string;
@@ -75,7 +77,8 @@ interface SettingState {
   realIP: string;
   fullPlayerCache: boolean;
   useKeepAlive: boolean;
-  excludeKeywords: string[];
+  lyricExclude: boolean;
+  lyricExcludeKeywords: string[];
   showDefaultLocalPath: boolean;
 }
 
@@ -134,7 +137,8 @@ export const useSettingStore = defineStore("setting", {
     lyricsBlur: false, // 歌词模糊
     lyricsScrollPosition: "start", // 歌词滚动位置
     lrcMousePause: false, // 鼠标悬停暂停
-    excludeKeywords: keywords, // 排除歌词关键字
+    lyricExclude: true, // 歌词排除
+    lyricExcludeKeywords: keywords, // 歌词排除关键字
     // 本地
     localFilesPath: [],
     showDefaultLocalPath: true, // 显示默认本地路径
@@ -145,6 +149,8 @@ export const useSettingStore = defineStore("setting", {
     downloadMeta: true, // 同时下载元信息
     downloadCover: true, // 同时下载封面
     downloadLyric: true, // 同时下载歌词
+    downloadLyricTran: false, // 下载歌词翻译
+    downloadLyricRoma: false, // 下载歌词音译
     saveMetaFile: false, // 保留为独立文件
     // 网络
     proxyProtocol: "off", // 代理协议

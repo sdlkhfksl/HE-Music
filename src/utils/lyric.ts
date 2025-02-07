@@ -1,11 +1,11 @@
-import { LyricLine, LyricWord, parseLrc } from "@applemusic-like-lyrics/lyric";
+import { LyricLine, LyricWord } from "@applemusic-like-lyrics/lyric";
 import { LyricType } from "@/types/main";
 import { useMusicStore, useSettingStore } from "@/stores";
 import { msToS } from "./time";
 // 歌词排除内容
 const getExcludeKeywords = () => {
   const settingStore = useSettingStore();
-  return settingStore.excludeKeywords;
+  return settingStore.lyricExclude ? settingStore.lyricExcludeKeywords : [];
 };
 
 // 恢复默认
@@ -144,7 +144,7 @@ export const parseLocalLyric = (lyric: string) => {
   }
   const musicStore = useMusicStore();
   // 解析
-  const lrc: LyricLine[] = parseLrc(lyric);
+  const lrc: LyricLine[] = parseLineLyric({ lyric }).line;
   const lrcData: LyricType[] = parseLrcData(lrc);
   // 处理结果
   const lrcDataParsed: LyricType[] = [];
@@ -155,7 +155,8 @@ export const parseLocalLyric = (lyric: string) => {
     // 是否具有翻译
     const existingObj = lrcDataParsed.find((v) => v.time === lrcItem.time);
     if (existingObj) {
-      existingObj.tran = lrcItem.content;
+      if (!existingObj.tran) existingObj.tran = lrcItem.content;
+      else if (!existingObj.roma) existingObj.roma = lrcItem.content;
     } else {
       lrcDataParsed.push(lrcItem);
     }
@@ -192,7 +193,7 @@ export const parseLyric = ({ lyric, spelling, trans }) => {
   return parseFontLyric({ lyric, spelling, trans });
 };
 
-export const parseFontLyric = ({ lyric, spelling, trans }) => {
+export const parseFontLyric = ({ lyric = "", spelling = "", trans = "" }) => {
   const parsedLyrics: LyricLine[] = [];
 
   const lyrics = parse(lyric);
@@ -242,7 +243,7 @@ export const removeWordLyric = (str: string) => {
   return str.replace(wordTimestampRegex, "");
 };
 
-export const parseLineLyric = ({ lyric, spelling, trans }) => {
+export const parseLineLyric = ({ lyric = "", spelling = "", trans = "" }) => {
   lyric = lyric.replace(wordTimestampRegex, "");
   const parsedLyrics: LyricLine[] = [];
 
@@ -282,10 +283,10 @@ export const parseLineLyric = ({ lyric, spelling, trans }) => {
   return { line: parsedLyrics, metadata: {} };
 };
 
-function trimContent(content: string) {
+const trimContent = (content: string) => {
   const t = content.trim();
   return t.length < 1 ? content : t;
-}
+};
 
 const parse = (lrc: string) => {
   const parsedLyrics: { rawTime: string; time: number; content: string }[] = [];
@@ -300,7 +301,7 @@ const parse = (lrc: string) => {
       const mid = Math.floor((low + high) / 2);
       const midTime = parsedLyrics[mid].time;
       if (midTime === time) {
-        return mid;
+        low = mid + 1;
       } else if (midTime < time) {
         low = mid + 1;
       } else {
