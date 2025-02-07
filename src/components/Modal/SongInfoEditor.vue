@@ -133,7 +133,6 @@ import { debounce, isArray, isEmpty, isObject } from "lodash-es";
 import blob from "@/utils/blob";
 import { formatSongsList } from "@/utils/format";
 import { SongInfo } from "@/types/main.hemusic";
-import { INativeTags } from "music-metadata/lib/type";
 
 const props = defineProps<{
   song: SongInfo;
@@ -188,28 +187,24 @@ const getSongInfo = async () => {
   const path = props.song.path;
   const infoData: {
     fileName: string;
-    fileSize: number;
+    size: number;
     common: ICommonTagsResult;
     format: IFormat;
     md5: string;
-    native: INativeTags;
-  } = await window.electron.ipcRenderer.invoke("get-music-metadata", path);// 解构数据
-  const { fileName, fileSize, common, format, md5, native } = infoData;
+  } = await window.electron.ipcRenderer.invoke("get-music-metadata", path); // 解构数据
+  const { fileName, size, common, format, md5 } = infoData;
+  console.log(infoData);
   // 更新数据
   infoFormData.value = {
     fileName,
     name: common.title || "",
     singer: common.artist || "",
     album: common.album || "",
-    alia: common.comment?.[0] || "",
-    lyric:
-      common.lyrics?.[0] ||
-      (native["ID3v2.3"] || native["ID3v2.4"])
-        ?.find((tag) => tag.id === "USLT")
-        ?.value?.text?.toString(),
+    alia: (common.comment?.[0] as string) || "",
+    lyric: common.lyrics?.[0].text || "",
     type: format.codec,
     duration: format.duration ? Number(format.duration.toFixed(2)) : 0,
-    size: fileSize,
+    size: size,
     br: format.bitrate ? Math.floor(format.bitrate / 1000 || 0) : 0,
     frequency: format.sampleRate,
     md5,
@@ -217,7 +212,7 @@ const getSongInfo = async () => {
   // 获取封面
   const coverBuff = common.picture?.[0]?.data || "";
   const coverType = common.picture?.[0]?.format || "";
-  if (coverBuff) coverData.value = blob.createBlobURL(coverBuff, coverType, path);
+  if (coverBuff) coverData.value = blob.createBlobURL(coverBuff as Buffer, coverType, path);
 };
 
 // 在线匹配
@@ -257,7 +252,7 @@ const onlineMatch = debounce(
           settingStore.downloadLyric && settingStore.downloadLyricTran ? result.tlyric?.lyric : "",
           settingStore.downloadLyric && settingStore.downloadLyricRoma ? result.romalrc?.lyric : "",
         ]
-          .filter(item => !!item)
+          .filter((item) => !!item)
           .join("\n\n");
         window.$message.success("匹配成功");
       }

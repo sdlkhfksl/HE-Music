@@ -155,7 +155,7 @@ const electronDownload = async (url: string, songName: string, fileType: string)
       downloadLyricTran ? removeWordLyric(lyricResult?.trans) : "",
       downloadLyricRoma ? removeWordLyric(lyricResult?.spelling) : "",
     ]
-      .filter(item => !!item)
+      .filter((item) => !!item)
       .join("\n\n");
   }
   // 下载歌曲
