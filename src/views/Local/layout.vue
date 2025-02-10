@@ -234,7 +234,6 @@ const getAllLocalMusic = debounce(
     const allSongData = results
       .filter((result) => result.status === "fulfilled")
       .map((result) => (result as PromiseFulfilledResult<any>).value);
-
     // 展平去重
     const songData = uniqBy(flattenDeep(allSongData), "id");
     // 处理数据

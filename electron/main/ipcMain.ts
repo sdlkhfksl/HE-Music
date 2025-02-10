@@ -175,37 +175,48 @@ const initWinIpcMain = (
       // 规范化路径
       const filePath = resolve(dirPath);
       // 查找指定目录下的所有音乐文件
-      const musicFiles = await fg("**/*.{mp3,wav,flac}", { cwd: filePath });
+      const musicFiles = await fg("**/*.{mp3,aac,m4a,ogg,flac,ape,wav}", { cwd: filePath });
       // 解析元信息
       const metadataPromises = musicFiles.map(async (file) => {
         const filePath = join(dirPath, file);
-        // 处理元信息
-        const { common, format } = await parseFile(filePath);
-        // 获取文件大小
-        const { size } = await fs.stat(filePath);
-        // 判断音质等级
-        let quality: string;
-        if ((format.sampleRate || 0) >= 96000 || (format.bitsPerSample || 0) > 16) {
-          quality = "HIRES";
-        } else if ((format.sampleRate || 0) >= 44100) {
-          quality = "HQ";
-        } else {
-          quality = "SQ";
+
+        try {
+          // 处理元信息
+          const { common, format } = await parseFile(filePath);
+          // 获取文件大小
+          const { size } = await fs.stat(filePath);
+          // 判断音质等级
+          let quality: string = "";
+          const { lossless, bitsPerSample = 0, sampleRate = 0, bitrate = 0 } = format;
+          // 判断是否为 HI-Res
+          // 母带质量判断：采样率大于 384 kHz 或者位深度大于 32 位浮动
+          if (sampleRate > 384000 || bitsPerSample >= 32) {
+            quality = "MASTER"; // Master Quality
+          } else if ((sampleRate > 44100 || bitsPerSample > 16) && lossless) {
+            quality = "HIRES"; // High-Resolution
+          } else if (lossless) {
+            quality = "SQ";
+          } else if (bitrate >= 192000) {
+            quality = "HQ"; // High Quality
+          }
+          return {
+            id: getFileID(filePath),
+            name: common.title || basename(filePath),
+            singers: common.artists?.join(" / ") || common.artist,
+            album: common.album || "",
+            alia: common.comment?.[0],
+            duration: format?.duration ?? 0,
+            size: size,
+            path: filePath,
+            quality,
+          };
+        } catch {
+          // log.error("❌ Error parse music metadata:", error);
+          return null;
         }
-        return {
-          id: getFileID(filePath),
-          name: common.title || basename(filePath),
-          singers: common.artists?.[0] || common.artist,
-          album: common.album || "",
-          alia: common.comment?.[0],
-          duration: format?.duration ?? 0,
-          size: size,
-          path: filePath,
-          quality,
-        };
       });
       const metadataArray = await Promise.all(metadataPromises);
-      return metadataArray;
+      return metadataArray.filter((item) => !!item);
     } catch (error) {
       log.error("❌ Error fetching music metadata:", error);
       throw error;

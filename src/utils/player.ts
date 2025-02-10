@@ -14,7 +14,7 @@ import { Link, SongInfo } from "@/types/main.hemusic";
 // Howler.js
 
 // 允许播放格式
-const allowPlayFormat = ["mp3", "aac", "m4a", "ogg", "flac", "ape", "wav", "dff"];
+const allowPlayFormat = ["mp3", "aac", "m4a", "ogg", "flac", "ape", "wav"];
 
 class Player {
   // 播放器

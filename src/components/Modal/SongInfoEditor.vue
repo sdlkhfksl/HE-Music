@@ -193,15 +193,15 @@ const getSongInfo = async () => {
     md5: string;
   } = await window.electron.ipcRenderer.invoke("get-music-metadata", path); // 解构数据
   const { fileName, size, common, format, md5 } = infoData;
-  console.log(infoData);
+
   // 更新数据
   infoFormData.value = {
     fileName,
     name: common.title || "",
-    singer: common.artist || "",
+    singer: common.artists?.join(" / ") || common.artist || "",
     album: common.album || "",
     alia: (common.comment?.[0] as string) || "",
-    lyric: common.lyrics?.[0].text || "",
+    lyric: (common.lyrics?.[0] as unknown as string) || "",
     type: format.codec,
     duration: format.duration ? Number(format.duration.toFixed(2)) : 0,
     size: size,

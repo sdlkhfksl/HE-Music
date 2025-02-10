@@ -1,9 +1,9 @@
 <template>
   <div class="song-card">
-    <div :class="['song-content', { play: musicStore.playSong.id === song.id }]">
+    <div :class="['song-content', { play: songEqual(musicStore.playSong, song) }]">
       <!-- 序号 -->
       <div class="num" @dblclick.stop>
-        <n-text v-if="musicStore.playSong.id !== song.id" depth="3">
+        <n-text v-if="!songEqual(musicStore.playSong, song)" depth="3">
           {{ index + 1 }}
         </n-text>
         <SvgIcon v-else :size="22" name="Music" />
@@ -165,7 +165,7 @@ import blob from "@/utils/blob";
 import { SongInfo } from "@/types/main.hemusic";
 import { getSizeCover } from "@/utils/format";
 import { TagProps } from "naive-ui";
-import { IsValidId } from "@/utils/song";
+import { IsValidId, songEqual } from "@/utils/song";
 import { FeatureSupportFlag } from "@/api/platform";
 
 const props = defineProps<{
@@ -203,6 +203,7 @@ const localCover = async (show: boolean) => {
 const getQuality = (song: SongInfo) => {
   if (song.path) {
     switch (song.quality) {
+      case "MASTER":
       case "HIRES":
         return {
           name: song.quality,
