@@ -254,6 +254,11 @@ const onlineMatch = debounce(
         ]
           .filter((item) => !!item)
           .join("\n\n");
+
+        if (songData.coverSize?.l) {
+          coverData.value = songData.coverSize?.l;
+        }
+
         window.$message.success("匹配成功");
       }
     } catch (error) {

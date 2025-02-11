@@ -2,6 +2,7 @@ import {
   app,
   BrowserWindow,
   dialog,
+  DownloadItem,
   ipcMain,
   net,
   powerSaveBlocker,
@@ -370,11 +371,16 @@ const initWinIpcMain = (
 
   // 修改音乐元信息
   ipcMain.handle("set-music-metadata", async (_, path: string, metadata: any) => {
+    if (!win) return false;
+    let coverDownload: DownloadItem | null = null;
     try {
       const { name, singer, album, alia, lyric, cover } = metadata;
       // 规范化路径
       const songPath = resolve(path);
-      const coverPath = cover ? resolve(cover) : null;
+      if (cover && cover.startsWith("http")) {
+        coverDownload = await download(win, cover);
+      }
+      const coverPath = coverDownload ? coverDownload.getSavePath() : cover ? resolve(cover) : null;
       // 读取歌曲文件
       const songFile = File.createFromPath(songPath);
       // 读取封面文件
@@ -397,6 +403,8 @@ const initWinIpcMain = (
     } catch (error) {
       log.error("❌ Error setting music metadata:", error);
       throw error;
+    } finally {
+      if (coverDownload) await fs.unlink(coverDownload.getSavePath());
     }
   });
 
