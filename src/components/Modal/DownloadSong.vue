@@ -167,7 +167,7 @@ const electronDownload = async (url: string, songName: string, fileType: string)
     downloadCover,
     downloadLyric,
     saveMetaFile,
-    songData: { ...cloneDeep(props.song), cover: getSizeCover(props.song, 1000) },
+    songData: { ...cloneDeep(props.song), cover: getSizeCover(props.song, -1) },
     lyric,
   };
   // 开始下载

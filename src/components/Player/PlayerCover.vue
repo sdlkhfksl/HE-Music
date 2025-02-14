@@ -8,8 +8,8 @@
     />
     <!-- 专辑图片 -->
     <s-image
-      :key="musicStore.getSongCover()"
-      :src="musicStore.getSongCover(500)"
+      :key="musicStore.getSongCover(-1)"
+      :src="musicStore.getSongCover(-1)"
       class="cover-img"
     />
   </div>
