@@ -253,7 +253,7 @@ const initWinIpcMain = (
       const filePath = resolve(path).replace(/\\/g, "/");
       const { common } = await parseFile(filePath);
       const lyric = common?.lyrics;
-      if (lyric && lyric.length > 0) return lyric[0].text || "";
+      if (lyric && lyric.length > 0) return lyric[0] as unknown as string || "";
       // 如果歌词数据不存在，尝试读取同名的 lrc 文件
       else {
         const lrcFilePath = filePath.replace(/\.[^.]+$/, ".lrc");
