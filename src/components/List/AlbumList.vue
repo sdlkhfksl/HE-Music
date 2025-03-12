@@ -42,7 +42,7 @@
               <n-text class="name text-hidden">{{ item.name }}</n-text>
               <!-- 专辑信息 -->
               <div class="meta">
-                <n-text class="count" depth="3">{{ item?.song_num || 0 }}首</n-text>
+                <n-text class="count" depth="3">{{ item?.song_count || 0 }}首</n-text>
                 <n-text class="date" depth="3">{{
                   formatTimestamp(Number(item.publish_time) * 1000)
                 }}</n-text>

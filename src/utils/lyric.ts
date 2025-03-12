@@ -186,18 +186,18 @@ const wordLineRegex = /<(?<begin>\d+),(?<end>\d+)>(?<word>.*?)(?=<\d+,\d+>|$)/g;
 const extractLrcRegex = /^(?<lyricTimestamps>(?:\[.+?\])+)(?!\[)(?<content>.+)$/gm;
 const extractTimestampRegex = /\[(?<min>\d+):(?<sec>\d+)(?:\.|:)*(?<ms>\d+)*\]/g;
 
-export const parseLyric = ({ lyric, spelling, trans }) => {
+export const parseLyric = ({ lyric, roma, trans }) => {
   if (!wordTimestampRegex.test(lyric)) {
-    return parseLineLyric({ lyric, spelling, trans });
+    return parseLineLyric({ lyric, roma, trans });
   }
-  return parseFontLyric({ lyric, spelling, trans });
+  return parseFontLyric({ lyric, roma, trans });
 };
 
-export const parseFontLyric = ({ lyric = "", spelling = "", trans = "" }) => {
+export const parseFontLyric = ({ lyric = "", roma = "", trans = "" }) => {
   const parsedLyrics: LyricLine[] = [];
 
   const lyrics = parse(lyric);
-  const spells = parse(spelling);
+  const spells = parse(roma);
   const transLyrics = parse(trans);
 
   for (const { rawTime, time, content } of lyrics) {
@@ -243,12 +243,12 @@ export const removeWordLyric = (str: string) => {
   return str.replace(wordTimestampRegex, "");
 };
 
-export const parseLineLyric = ({ lyric = "", spelling = "", trans = "" }) => {
+export const parseLineLyric = ({ lyric = "", roma = "", trans = "" }) => {
   lyric = lyric.replace(wordTimestampRegex, "");
   const parsedLyrics: LyricLine[] = [];
 
   const lyrics = parse(lyric);
-  const spells = parse(spelling);
+  const spells = parse(roma);
   const transLyrics = parse(trans);
 
   for (const { rawTime, time, content } of lyrics) {

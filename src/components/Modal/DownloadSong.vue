@@ -153,7 +153,7 @@ const electronDownload = async (url: string, songName: string, fileType: string)
     lyric = [
       removeWordLyric(lyricResult?.lyric) || "",
       downloadLyricTran ? removeWordLyric(lyricResult?.trans) : "",
-      downloadLyricRoma ? removeWordLyric(lyricResult?.spelling) : "",
+      downloadLyricRoma ? removeWordLyric(lyricResult?.roma) : "",
     ]
       .filter((item) => !!item)
       .join("\n\n");

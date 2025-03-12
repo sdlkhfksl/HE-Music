@@ -65,7 +65,7 @@
               <!--              </div>-->
               <div class="item">
                 <SvgIcon name="Music" :depth="3" />
-                <n-text>{{ playlistDetailData.total_num || 0 }}</n-text>
+                <n-text>{{ playlistDetailData.total_count || 0 }}</n-text>
               </div>
             </n-flex>
           </n-collapse-transition>
@@ -89,10 +89,10 @@
                     ? isSamePlaylist
                       ? "更新中..."
                       : `加载中... (${
-                          playlistData.length === Number(playlistDetailData.total_num)
+                          playlistData.length === Number(playlistDetailData.total_count)
                             ? 0
                             : playlistData.length
-                        }/${playlistDetailData.total_num})`
+                        }/${playlistDetailData.total_count})`
                     : "播放"
                 }}
               </n-button>

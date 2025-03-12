@@ -156,7 +156,7 @@ export const toLikeSong = debounce(
 
       const likeSongList = dataStore.userCreatedPlaylist.find((item) => item.is_default == 1);
       if (likeSongList) {
-        likeSongList.song_num = likeList.length.toString();
+        likeSongList.song_count = likeList.length.toString();
       }
       // ipc
       if (isElectron) window.electron.ipcRenderer.send("like-status-change", like);

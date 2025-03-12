@@ -68,7 +68,7 @@
               </div>
               <div class="item">
                 <SvgIcon name="Music" :depth="3" />
-                <n-text>{{ albumDetailData.song_num }}</n-text>
+                <n-text>{{ albumDetailData.song_count }}</n-text>
               </div>
               <!--              <div v-if="albumDetailData.updateTime" class="item">-->
               <!--                <SvgIcon name="Update" :depth="3" />-->

@@ -53,7 +53,7 @@ const getSearchResult = async () => {
       // 是否还有
       hasMore.value = result?.has_more;
       // 搜索总数
-      searchCount.value = result?.total_num;
+      searchCount.value = result?.total_count;
       // 处理数据
       searchResultData.value = searchResultData.value?.concat(result?.list);
     })

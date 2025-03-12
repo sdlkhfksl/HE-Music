@@ -29,6 +29,7 @@ export default {
     "createGlobalState": true,
     "createInjectionState": true,
     "createReactiveFn": true,
+    "createRef": true,
     "createReusableTemplate": true,
     "createSharedComposable": true,
     "createTemplatePromise": true,

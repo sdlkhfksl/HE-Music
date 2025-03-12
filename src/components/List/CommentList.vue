@@ -46,7 +46,7 @@
             <!-- 点赞 -->
             <div class="item like">
               <SvgIcon name="ThumbUp" :depth="1" />
-              <n-text :depth="1">{{ item.praise_num }}</n-text>
+              <n-text :depth="1">{{ item.praise_count }}</n-text>
             </div>
           </n-flex>
         </div>

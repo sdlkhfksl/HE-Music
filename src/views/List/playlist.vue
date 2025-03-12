@@ -65,7 +65,7 @@
               </div>
               <div class="item">
                 <SvgIcon name="Music" :depth="3" />
-                <n-text>{{ playlistDetailData.song_num || 0 }}</n-text>
+                <n-text>{{ playlistDetailData.song_count || 0 }}</n-text>
               </div>
               <!--              <div v-if="playlistDetailData.updateTime" class="item">-->
               <!--                <SvgIcon name="Update" :depth="3" />-->
@@ -116,10 +116,10 @@
                     ? isSamePlaylist
                       ? "更新中..."
                       : `加载中... (${
-                          playlistData.length === Number(playlistDetailData.song_num)
+                          playlistData.length === Number(playlistDetailData.song_count)
                             ? 0
                             : playlistData.length
-                        }/${playlistDetailData.song_num})`
+                        }/${playlistDetailData.song_count})`
                     : "播放"
                 }}
               </n-button>

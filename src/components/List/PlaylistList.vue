@@ -52,7 +52,7 @@
               <!-- 创建者 -->
 
               <div class="meta">
-                <n-text class="count" depth="3">{{ item.song_num || 0 }}首</n-text>
+                <n-text class="count" depth="3">{{ item.song_count || 0 }}首</n-text>
                 <n-text v-if="item.creator" class="creator" depth="3">
                   {{ item.creator || "未知" }}
                 </n-text>

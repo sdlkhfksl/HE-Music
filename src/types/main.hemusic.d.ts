@@ -29,9 +29,9 @@ export interface SingerInfo {
   cover: string;
   platform: string;
   description: string;
-  mv_num: string;
-  song_num: string;
-  album_num: string;
+  mv_count: string;
+  song_count: string;
+  album_count: string;
   alias: string;
 }
 
@@ -59,7 +59,7 @@ export interface PlaylistInfo extends CoverType {
   id: string;
   cover: string;
   creator: string;
-  song_num: string;
+  song_count: string;
   play_count: string;
   songs: SongInfo[];
   platform: string;
@@ -72,7 +72,7 @@ export interface AlbumInfo extends CoverType {
   id: string;
   cover: string;
   singers: SongInfoSingerInfo[];
-  song_num: string;
+  song_count: string;
   publish_time: string;
   songs: SongInfo[];
   description: string;
@@ -87,7 +87,7 @@ export interface LyricInfo {
   lyric: string;
   trans: string;
   platform: string;
-  spelling: string;
+  roma: string;
 }
 
 export interface MVInfo extends CoverType {
@@ -109,10 +109,10 @@ export interface CommentInfo {
   id: string;
   content: string;
   timestamp: string;
-  praise_num: string;
+  praise_count: string;
   user: CommentInfoUser;
   be_replied: CommentInfo;
-  reply_num: string;
+  reply_count: string;
   sub_comments: CommentInfo[];
 }
 
@@ -126,7 +126,7 @@ export interface TopInfo extends CoverType {
   description: string;
   page_index: number;
   page_size: number;
-  total_num: string;
+  total_count: string;
   last_id: string;
   has_more: boolean;
 }
@@ -170,7 +170,7 @@ export interface UserPlaylistInfo extends PlaylistInfo {
   id: string;
   cover: string;
   creator: string;
-  song_num: string;
+  song_count: string;
   songs: SongInfo[];
   description: string;
 

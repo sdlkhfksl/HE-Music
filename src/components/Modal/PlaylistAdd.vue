@@ -36,7 +36,7 @@
               </template>
               <n-thing :title="index === 0 ? '我喜欢的音乐' : item.name">
                 <template #description>
-                  <n-text depth="3" class="size">{{ item.song_num }} 首音乐</n-text>
+                  <n-text depth="3" class="size">{{ item.song_count }} 首音乐</n-text>
                 </template>
               </n-thing>
             </n-list-item>

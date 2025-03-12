@@ -35,17 +35,17 @@
               <!-- 数量 -->
 
               <div class="item">
-                <div v-if="item.song_num" class="num">
+                <div v-if="item.song_count" class="num">
                   <SvgIcon name="Music" :depth="3" />
-                  <n-text class="num" :depth="3">{{ item.song_num }}</n-text>
+                  <n-text class="num" :depth="3">{{ item.song_count }}</n-text>
                 </div>
-                <div v-if="item.album_num" class="num">
+                <div v-if="item.album_count" class="num">
                   <SvgIcon name="Album" :depth="3" />
-                  <n-text class="num" :depth="3">{{ item.album_num }}</n-text>
+                  <n-text class="num" :depth="3">{{ item.album_count }}</n-text>
                 </div>
-                <div v-if="item.mv_num" class="num">
+                <div v-if="item.mv_count" class="num">
                   <SvgIcon name="Video" :depth="3" />
-                  <n-text class="num" :depth="3">{{ item.mv_num }}</n-text>
+                  <n-text class="num" :depth="3">{{ item.mv_count }}</n-text>
                 </div>
               </div>
             </div>
