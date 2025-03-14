@@ -114,6 +114,12 @@ export interface CommentInfo {
   be_replied: CommentInfo;
   reply_count: string;
   sub_comments: CommentInfo[];
+
+  // 子评论用
+  sub_has_more: boolean;
+  sub_loading: boolean;
+  sub_last_id: string;
+  sub_page_index: number;
 }
 
 export interface TopInfo extends CoverType {

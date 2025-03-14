@@ -9,7 +9,12 @@
             <span>热门评论</span>
           </div>
         </div>
-        <CommentList :data="commentHotData" :loading="commentHotData?.length === 0" transparent />
+        <CommentList
+          :data="commentHotData"
+          :loading="commentHotData?.length === 0"
+          transparent
+          @loadSubMore="loadSubMore"
+        />
       </template>
       <div class="placeholder">
         <div class="title">
@@ -24,6 +29,7 @@
         :loadMore="commentHasMore"
         transparent
         @loadMore="loadMoreComment"
+        @loadSubMore="loadSubMore"
       />
       <div class="placeholder" />
     </n-scrollbar>
@@ -32,7 +38,7 @@
 
 <script setup lang="ts">
 import { useMusicStore } from "@/stores";
-import { getComment } from "@/api/comment";
+import { getComment, getSubComment } from "@/api/comment";
 import { isEmpty } from "lodash-es";
 import { CommentInfo } from "@/types/main.hemusic";
 
@@ -52,9 +58,17 @@ const commentLastId = ref<string>("");
 
 // 获取热门评论
 const getHotCommentData = async () => {
-  if (!songId.value) return;
+  if (!songId.value || !songPlatform.value) return;
   // 获取评论
   const result = await getComment(songId.value, songPlatform.value, "song", 1, 20, "", true);
+
+  for (let item of result.list) {
+    item.sub_has_more = item.reply_count > 0 && item.reply_count > item.sub_comments.length;
+    item.sub_loading = false;
+    item.sub_last_id = "";
+    item.sub_page_index = 1;
+  }
+
   commentHotData.value = result.list?.length > 0 ? result.list : null;
 };
 
@@ -76,6 +90,7 @@ const getAllComment = async () => {
     commentLoading.value = false;
     return;
   }
+
   commentData.value = commentData.value.concat(result.list);
   // 是否还有
   commentHasMore.value = result.has_more;
@@ -87,6 +102,31 @@ const getAllComment = async () => {
 const loadMoreComment = () => {
   commentPage.value += 1;
   getAllComment();
+};
+
+const loadSubMore = async (item: CommentInfo) => {
+  item.sub_loading = true;
+  try {
+    const result = await getSubComment(
+      songId.value,
+      songPlatform.value,
+      item.id,
+      "song",
+      item.sub_page_index,
+      15,
+      item.sub_last_id,
+    );
+    if (item.sub_page_index === 1) {
+      item.sub_comments = result.list;
+    } else {
+      item.sub_comments = item.sub_comments.concat(result.list);
+    }
+    item.sub_has_more = result.has_more;
+    item.sub_last_id = result.last_id;
+    item.sub_page_index++;
+  } finally {
+    item.sub_loading = false;
+  }
 };
 
 onMounted(() => {

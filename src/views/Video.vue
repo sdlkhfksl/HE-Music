@@ -113,6 +113,7 @@
         :loading="commentLoading"
         :loadMore="commentHasMore"
         @loadMore="loadMoreComment"
+        @loadSubMore="loadSubMore"
       />
     </div>
   </div>
@@ -123,7 +124,7 @@ import { useDataStore, usePlatformStore, useStatusStore } from "@/stores";
 import { getMVUrlStr, videoDetail } from "@/api/video";
 import { isEmpty } from "lodash-es";
 import { formatNumber } from "@/utils/helper";
-import { getComment } from "@/api/comment";
+import { getComment, getSubComment } from "@/api/comment";
 import player from "@/utils/player";
 // Plyr
 import Plyr from "plyr";
@@ -268,6 +269,14 @@ const getCommentData = async (id: string, platform: string, clean: boolean = tru
       commentLoading.value = false;
       return;
     }
+
+    for (let item of result.list) {
+      item.sub_has_more = item.reply_count > 0 && item.reply_count > item.sub_comments.length;
+      item.sub_loading = false;
+      item.sub_last_id = "";
+      item.sub_page_index = 1;
+    }
+
     // 处理数据
     commentData.value = commentData.value.concat(result.list);
     // 是否还有
@@ -285,6 +294,31 @@ const getCommentData = async (id: string, platform: string, clean: boolean = tru
 const loadMoreComment = () => {
   commentPage.value++;
   if (commentHasMore.value) getCommentData(videoId.value, videoPlatform.value, false);
+};
+
+const loadSubMore = async (item: CommentInfo) => {
+  item.sub_loading = true;
+  try {
+    const result = await getSubComment(
+      videoId.value,
+      videoPlatform.value,
+      item.id,
+      "video",
+      item.sub_page_index,
+      15,
+      item.sub_last_id,
+    );
+    if (item.sub_page_index === 1) {
+      item.sub_comments = result.list;
+    } else {
+      item.sub_comments = item.sub_comments.concat(result.list);
+    }
+    item.sub_has_more = result.has_more;
+    item.sub_last_id = result.last_id;
+    item.sub_page_index++;
+  } finally {
+    item.sub_loading = false;
+  }
 };
 
 // 关闭音乐播放

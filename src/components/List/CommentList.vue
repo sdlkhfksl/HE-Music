@@ -51,14 +51,22 @@
           </n-flex>
           <!-- 回复 -->
           <div class="reply" v-if="item.sub_comments.length > 0">
-            <CommentList :data="item.sub_comments" />
+            <CommentList
+              :data="item.sub_comments"
+              :load-more="item.sub_has_more"
+              :loading="item.sub_loading"
+              @loadMore="emit('loadSubMore', item)"
+              sub
+              :subCount="item.sub_page_index === 1"
+              :total="Number(item.reply_count)"
+            />
           </div>
         </div>
       </n-flex>
       <!-- 加载更多 -->
       <n-flex v-if="loadMore" class="load-more" justify="center">
         <n-button :loading="loading" size="large" strong secondary round @click="emit('loadMore')">
-          加载更多
+          {{ sub ? (subCount && total ? `${total}条评论` : "查看更多评论") : "加载更多" }}
         </n-button>
       </n-flex>
     </n-flex>
@@ -74,8 +82,10 @@
 import { coverLoaded } from "@/utils/helper";
 import { formatCommentTime } from "@/utils/time";
 import { CommentInfo } from "@/types/main.hemusic";
-
 defineProps<{
+  sub?: boolean;
+  subCount?: boolean;
+  total?: number;
   data: CommentInfo[];
   loading?: boolean;
   loadMore?: boolean;
@@ -86,6 +96,8 @@ defineProps<{
 const emit = defineEmits<{
   // 加载更多
   loadMore: [];
+  // 加载子评论
+  loadSubMore: [item: CommentInfo];
 }>();
 
 // 获取评论内容
