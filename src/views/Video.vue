@@ -31,7 +31,7 @@
     <!-- 视频播放器 -->
     <div class="player" v-visible>
       <Transition name="fade" mode="out-in">
-        <video :key="videoData?.id" ref="videoRef" />
+        <video :key="`${videoPlatform}-${videoId}`" ref="videoRef" />
       </Transition>
     </div>
     <!-- 菜单 -->
@@ -65,29 +65,35 @@
     <!--      </n-flex>-->
     <!--    </Transition>-->
     <!--     简介及标签-->
-    <Transition name="fade" mode="out-in">
-      <div v-if="videoData" class="desc">
-        <!--        <n-divider />-->
-        <!--        <n-ellipsis :line-clamp="3" :tooltip="{ placement: 'bottom', width: 'trigger' }">-->
-        <!--          {{ "该视频暂无简介" }}-->
-        <!--        </n-ellipsis>-->
-        <!--        <n-flex v-if="videoData?.tags" class="tags">-->
-        <!--          <n-tag v-for="(item, index) in videoData.tags" :key="index" :bordered="false" round>-->
-        <!--            {{ item }}-->
-        <!--          </n-tag>-->
-        <!--        </n-flex>-->
-        <n-divider />
-      </div>
-      <div v-else class="desc">
-        <n-skeleton :repeat="3" text round />
-      </div>
-    </Transition>
+    <!--    <Transition name="fade" mode="out-in">-->
+    <!--      <div v-if="videoData" class="desc">-->
+    <!--        &lt;!&ndash;        <n-divider />&ndash;&gt;-->
+    <!--        &lt;!&ndash;        <n-ellipsis :line-clamp="3" :tooltip="{ placement: 'bottom', width: 'trigger' }">&ndash;&gt;-->
+    <!--        &lt;!&ndash;          {{ "该视频暂无简介" }}&ndash;&gt;-->
+    <!--        &lt;!&ndash;        </n-ellipsis>&ndash;&gt;-->
+    <!--        &lt;!&ndash;        <n-flex v-if="videoData?.tags" class="tags">&ndash;&gt;-->
+    <!--        &lt;!&ndash;          <n-tag v-for="(item, index) in videoData.tags" :key="index" :bordered="false" round>&ndash;&gt;-->
+    <!--        &lt;!&ndash;            {{ item }}&ndash;&gt;-->
+    <!--        &lt;!&ndash;          </n-tag>&ndash;&gt;-->
+    <!--        &lt;!&ndash;        </n-flex>&ndash;&gt;-->
+    <!--        <n-divider />-->
+    <!--      </div>-->
+    <!--      <div v-else class="desc">-->
+    <!--        <n-skeleton :repeat="3" text round />-->
+    <!--      </div>-->
+    <!--    </Transition>-->
+    <n-divider />
     <!-- 评论 -->
-    <div class="comment">
+    <div
+      v-if="platformStore.isFeatureSupport(videoPlatform, FeatureSupportFlag.GetCommentList)"
+      class="comment"
+    >
       <n-flex class="title" justify="space-between">
         <n-h3 prefix="bar">
           评论
-          <n-text class="num" depth="3">{{ 0 }}</n-text>
+          <n-text v-if="commentTotalCount > 0" class="num" depth="3">{{
+            commentTotalCount
+          }}</n-text>
         </n-h3>
         <n-flex class="tag">
           <n-tag
@@ -96,6 +102,7 @@
             :bordered="false"
             :type="key === commentType ? 'primary' : 'default'"
             round
+            @click="changeCommentType(key)"
           >
             {{ item }}
           </n-tag>
@@ -112,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { useDataStore, useStatusStore } from "@/stores";
+import { useDataStore, usePlatformStore, useStatusStore } from "@/stores";
 import { getMVUrlStr, videoDetail } from "@/api/video";
 import { isEmpty } from "lodash-es";
 import { formatNumber } from "@/utils/helper";
@@ -122,10 +129,12 @@ import player from "@/utils/player";
 import Plyr from "plyr";
 import "plyr/dist/plyr.css";
 import { CommentInfo, MVInfo } from "@/types/main.hemusic";
+import { FeatureSupportFlag } from "@/api/platform";
 
 const router = useRouter();
 const statusStore = useStatusStore();
 const dataStore = useDataStore();
+const platformStore = usePlatformStore();
 
 // 是否激活
 const isActivated = ref<boolean>(false);
@@ -147,6 +156,7 @@ const commentPage = ref<number>(1);
 const commentHasMore = ref<boolean>(true);
 const commentText = { hot: "最热", new: "最新" };
 const commentLastId = ref<string>("");
+const commentTotalCount = ref<number>(0);
 
 // 播放器配置
 const playerOptions: Plyr.Options = {
@@ -167,12 +177,9 @@ const playerOptions: Plyr.Options = {
   ratio: "16:9",
   invertTime: false,
   autoplay: true,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
   quality: {
     default: 1080,
-    // options: [],
-    // options: [1080, 720, 480, 240],
+    options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
   },
   i18n: {
     play: "播放",
@@ -220,7 +227,6 @@ const getVideoData = async (id: string, platform: string) => {
           size: item.quality,
         };
       }) || [];
-
     // 更改播放地址
     videoPlayer.value.source = {
       type: "video",
@@ -228,8 +234,10 @@ const getVideoData = async (id: string, platform: string) => {
       sources,
       poster: videoData.value?.cover,
     };
-    // 获取评论
-    getCommentData(id, platform);
+    if (platformStore.isFeatureSupport(platform, FeatureSupportFlag.GetCommentList)) {
+      // 获取评论
+      getCommentData(id, platform);
+    }
   } catch (error) {
     console.error("Error getting video data:", error);
     window.$message.error("获取视频数据失败");
@@ -241,7 +249,10 @@ const getCommentData = async (id: string, platform: string, clean: boolean = tru
   try {
     if (!id || !platform) return;
     commentLoading.value = true;
-    if (clean) commentData.value = [];
+    if (clean) {
+      commentData.value = [];
+      commentPage.value = 1;
+    }
     // 获取评论
     const result = await getComment(
       id,
@@ -261,6 +272,7 @@ const getCommentData = async (id: string, platform: string, clean: boolean = tru
     commentData.value = commentData.value.concat(result.list);
     // 是否还有
     commentHasMore.value = result.has_more;
+    commentTotalCount.value = result.total_count;
     commentLastId.value = result.last_id;
     commentLoading.value = false;
   } catch (error) {
@@ -279,6 +291,12 @@ const loadMoreComment = () => {
 const closeMusic = (close: boolean = true) => {
   statusStore.showPlayBar = !close;
   if (close) player.pause();
+};
+
+const changeCommentType = (type: "hot" | "new") => {
+  if (type === commentType.value) return;
+  commentType.value = type;
+  getCommentData(videoId.value, videoPlatform.value, true);
 };
 
 onActivated(() => {

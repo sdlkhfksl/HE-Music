@@ -2,7 +2,7 @@
   <Transition name="fade" mode="out-in">
     <n-flex v-if="data.length > 0" :size="20" :class="['comment-list', { transparent }]" vertical>
       <n-flex v-for="(item, index) in data" :key="index" :size="20" class="comments">
-        <div v-if="!transparent" class="user">
+        <div class="user">
           <div class="avatar">
             <n-image
               :src="item.user?.avatar && item.user.avatar.replace(/^http:/, 'https:')"
@@ -49,6 +49,10 @@
               <n-text :depth="1">{{ item.praise_count }}</n-text>
             </div>
           </n-flex>
+          <!-- 回复 -->
+          <div class="reply" v-if="item.sub_comments.length > 0">
+            <CommentList :data="item.sub_comments" />
+          </div>
         </div>
       </n-flex>
       <!-- 加载更多 -->
@@ -73,7 +77,7 @@ import { CommentInfo } from "@/types/main.hemusic";
 
 defineProps<{
   data: CommentInfo[];
-  loading: boolean;
+  loading?: boolean;
   loadMore?: boolean;
   // 透明
   transparent?: boolean;
@@ -155,10 +159,6 @@ const getContent = (content: string) => {
           border-radius: 50%;
         }
       }
-      .vip {
-        height: 16px;
-        margin-top: 12px;
-      }
     }
     .data {
       display: flex;
@@ -176,11 +176,11 @@ const getContent = (content: string) => {
       }
       .reply {
         width: 100%;
-        padding: 4px 8px;
+        padding: 4px 0;
         border-radius: 8px;
         font-size: 13px;
         margin-top: 6px;
-        background-color: rgba(var(--primary), 0.12);
+        //background-color: rgba(var(--primary), 0.12);
       }
       .meta {
         padding-top: 12px;

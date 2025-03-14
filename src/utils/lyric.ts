@@ -39,7 +39,7 @@ export const parsedLyricsData = (lyricData: any) => {
   // 逐字歌词
   if (wordTimestampRegex.test(lyricData.lyric)) {
     // 普通歌词
-    yrcParseData = parseFontLyric(lyricData).line;
+    yrcParseData = parseWordLyric(lyricData).line;
     yrcData = parseYrcData(yrcParseData);
   }
 
@@ -190,15 +190,15 @@ export const parseLyric = ({ lyric, roma, trans }) => {
   if (!wordTimestampRegex.test(lyric)) {
     return parseLineLyric({ lyric, roma, trans });
   }
-  return parseFontLyric({ lyric, roma, trans });
+  return parseWordLyric({ lyric, roma, trans });
 };
 
-export const parseFontLyric = ({ lyric = "", roma = "", trans = "" }) => {
+export const parseWordLyric = ({ lyric = "", roma = "", trans = "" }) => {
   const parsedLyrics: LyricLine[] = [];
 
   const lyrics = parse(lyric);
-  const spells = parse(roma);
-  const transLyrics = parse(trans);
+  const spells = parse(removeWordLyric(roma));
+  const transLyrics = parse(removeWordLyric(trans));
 
   for (const { rawTime, time, content } of lyrics) {
     // content
@@ -244,12 +244,11 @@ export const removeWordLyric = (str: string) => {
 };
 
 export const parseLineLyric = ({ lyric = "", roma = "", trans = "" }) => {
-  lyric = lyric.replace(wordTimestampRegex, "");
   const parsedLyrics: LyricLine[] = [];
 
-  const lyrics = parse(lyric);
-  const spells = parse(roma);
-  const transLyrics = parse(trans);
+  const lyrics = parse(removeWordLyric(lyric));
+  const spells = parse(removeWordLyric(roma));
+  const transLyrics = parse(removeWordLyric(trans));
 
   for (const { rawTime, time, content } of lyrics) {
     const lrc: LyricLine = {

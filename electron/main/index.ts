@@ -188,7 +188,7 @@ class MainProcess {
       // 窗口不能进入全屏状态
       fullscreenable: false,
       // 窗口不能有阴影
-      hasShadow:false,
+      hasShadow: false,
       show: false,
     });
     // 渲染路径

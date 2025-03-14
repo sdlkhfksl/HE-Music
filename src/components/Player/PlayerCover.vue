@@ -79,7 +79,8 @@ const settingStore = useSettingStore();
       animation-play-state: paused;
       border-radius: 50%;
       border: 1vh solid #ffffff30;
-      background: linear-gradient(black 0%, transparent, black 98%),
+      background:
+        linear-gradient(black 0%, transparent, black 98%),
         radial-gradient(
           #000 52%,
           #555,
