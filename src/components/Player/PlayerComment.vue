@@ -63,7 +63,7 @@ const getHotCommentData = async () => {
   const result = await getComment(songId.value, songPlatform.value, "song", 1, 20, "", true);
 
   for (let item of result.list) {
-    item.sub_has_more = item.reply_count > 0 && item.reply_count > item.sub_comments.length;
+    item.sub_has_more = item.reply_count > item.sub_comments.length;
     item.sub_loading = false;
     item.sub_last_id = "";
     item.sub_page_index = 1;
@@ -89,6 +89,13 @@ const getAllComment = async () => {
     commentHasMore.value = false;
     commentLoading.value = false;
     return;
+  }
+
+  for (let item of result.list) {
+    item.sub_has_more = item.reply_count > item.sub_comments.length;
+    item.sub_loading = false;
+    item.sub_last_id = "";
+    item.sub_page_index = 1;
   }
 
   commentData.value = commentData.value.concat(result.list);

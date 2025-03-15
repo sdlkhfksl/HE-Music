@@ -1,6 +1,11 @@
 <template>
   <Transition name="fade" mode="out-in">
-    <n-flex v-if="data.length > 0" :size="20" :class="['comment-list', { transparent }]" vertical>
+    <n-flex
+      v-if="data.length > 0 || loadMore"
+      :size="20"
+      :class="['comment-list', { transparent }]"
+      vertical
+    >
       <n-flex v-for="(item, index) in data" :key="index" :size="20" class="comments">
         <div class="user">
           <div class="avatar">
@@ -24,10 +29,13 @@
           <!-- 评论 -->
           <div class="content">
             <n-text class="name">{{ item.user.name || "未知用户名" }}：</n-text>
+            <n-text class="name" v-if="item.be_replied && !item.be_replied.content"
+              >回复 @ {{ item.be_replied.user.name || "未知用户名" }}：</n-text
+            >
             <n-text class="text" v-dompurify-html="getContent(item.content)" />
           </div>
           <!-- 回复 -->
-          <div class="reply" v-if="item.be_replied">
+          <div class="reply" v-if="item.be_replied && item.be_replied.content">
             <n-text class="name" :depth="3">
               @ {{ item.be_replied.user.name || "未知用户名" }}：
             </n-text>
@@ -50,7 +58,10 @@
             </div>
           </n-flex>
           <!-- 回复 -->
-          <div class="reply" v-if="item.sub_comments.length > 0">
+          <div
+            class="sub-comment"
+            v-if="item.sub_comments.length > 0 || Number(item.reply_count) > 0"
+          >
             <CommentList
               :data="item.sub_comments"
               :load-more="item.sub_has_more"
@@ -192,8 +203,17 @@ const getContent = (content: string) => {
         border-radius: 8px;
         font-size: 13px;
         margin-top: 6px;
-        //background-color: rgba(var(--primary), 0.12);
+        background-color: rgba(var(--main-color), 0.08);
       }
+
+      .sub-comment {
+        width: 100%;
+        padding: 4px 0;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-top: 6px;
+      }
+
       .meta {
         padding-top: 12px;
         margin-top: auto;
