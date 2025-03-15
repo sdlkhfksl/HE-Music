@@ -6,7 +6,12 @@
       :class="['comment-list', { transparent }]"
       vertical
     >
-      <n-flex v-for="(item, index) in data" :key="index" :size="20" class="comments">
+      <n-flex
+        v-for="(item, index) in data"
+        :key="`${item.id}-${index}`"
+        :size="20"
+        class="comments"
+      >
         <div class="user">
           <div class="avatar">
             <n-image
@@ -64,7 +69,7 @@
           >
             <CommentList
               :data="item.sub_comments"
-              :load-more="item.sub_has_more"
+              :loadMore="item.sub_has_more"
               :loading="item.sub_loading"
               @loadMore="emit('loadSubMore', item)"
               sub
