@@ -17,7 +17,9 @@
                 <n-flex>
                   <n-text class="name">{{ item.name }}</n-text>
                   <!-- 文件预估大小 -->
-                  <n-text depth="3">{{ formatFileSize(Number(item.size) || 0) }}</n-text>
+                  <n-text v-if="Number(item.size) > 0" depth="3">{{
+                    formatFileSize(Number(item.size) || 0)
+                  }}</n-text>
                 </n-flex>
               </n-radio>
             </n-flex>
