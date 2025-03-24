@@ -12,6 +12,7 @@ declare module 'vue' {
     AlbumList: typeof import('./src/components/List/AlbumList.vue')['default']
     ArtistList: typeof import('./src/components/List/ArtistList.vue')['default']
     BatchList: typeof import('./src/components/Modal/batchList.vue')['default']
+    Captcha: typeof import('./src/components/Modal/Captcha.vue')['default']
     CommentList: typeof import('./src/components/List/CommentList.vue')['default']
     CountDown: typeof import('./src/components/Player/CountDown.vue')['default']
     CoverMenu: typeof import('./src/components/Menu/CoverMenu.vue')['default']

@@ -5,6 +5,8 @@ import { createPinia } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 // vue-dompurify-html
 import VueDOMPurifyHTML from "vue-dompurify-html";
+// go-captcha
+import GoCaptcha from "go-captcha-vue";
 // router
 import router from "@/router";
 // 自定义指令
@@ -15,6 +17,7 @@ import initIpc from "@/utils/initIpc";
 import "@/style/main.scss";
 import "@/style/animate.scss";
 import "github-markdown-css/github-markdown.css";
+import "go-captcha-vue/dist/style.css";
 
 // 初始化 ipc
 initIpc();
@@ -29,6 +32,8 @@ app.use(pinia);
 app.use(router);
 // vue-dompurify-html
 app.use(VueDOMPurifyHTML);
+// go-captcha
+app.use(GoCaptcha);
 // 自定义指令
 app.directive("debounce", debounceDirective);
 app.directive("throttle", throttleDirective);

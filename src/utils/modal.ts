@@ -21,6 +21,7 @@ import ExcludeKeywords from "@/components/Modal/ExcludeKeywords.vue";
 import ParseSourceUrl from "@/components/Modal/ParseSourceUrl.vue";
 import { usePlatformStore } from "@/stores";
 import { FeatureSupportFlag } from "@/api/platform";
+import Captcha from "@/components/Modal/Captcha.vue";
 
 // 用户协议
 export const openUserAgreement = () => {
@@ -294,6 +295,20 @@ export const openParseSourceUrl = () => {
     title: "解析链接",
     content: () => {
       return h(ParseSourceUrl, { onClose: () => modal.destroy() });
+    },
+  });
+};
+
+export const openCaptcha = (scene: number, meta: string) => {
+  const modal = window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    style: { width: "375px" },
+    title: "验证操作",
+    maskClosable: false,
+    content: () => {
+      return h(Captcha, { scene, meta, onClose: () => modal.destroy() });
     },
   });
 };

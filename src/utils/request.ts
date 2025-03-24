@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } f
 import { isDev } from "./helper";
 import { useDataStore, useSettingStore } from "@/stores";
 import { isLogin } from "./auth";
-import { openUserLogin } from "@/utils/modal";
+import { openCaptcha, openUserLogin } from "@/utils/modal";
 
 export const API_URL = String(isDev ? "http://127.0.0.1:8001" : import.meta.env["VITE_API_URL"]);
 // 全局地址
@@ -62,13 +62,16 @@ serverHemusic.interceptors.response.use(
     switch (response?.status) {
       case 400:
         console.error("客户端错误：", response.status, response.statusText);
+        if (response && (response.data as { reason?: string }).reason === "CAPTCHA_REQUIRED") {
+          const { metadata } = response.data as { metadata: { scene: string; meta: string } };
+          openCaptcha(Number(metadata.scene), metadata.meta);
+        }
         // 执行客户端错误的处理逻辑
         break;
       case 401:
         console.error("未授权：", response.status, response.statusText);
         useDataStore().userLoginStatus = false;
         openUserLogin();
-        // 执行未授权的处理逻辑
         break;
       case 403:
         console.error("禁止访问：", response.status, response.statusText);
