@@ -178,6 +178,7 @@ export interface UserPlaylistInfo extends PlaylistInfo {
   creator: string;
   song_count: string;
   songs: SongInfo[];
+  song_ids: IDPlatformInfo[];
   description: string;
 
   user_id: string;

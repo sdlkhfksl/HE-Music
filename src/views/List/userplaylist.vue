@@ -272,10 +272,7 @@ const handleOnlinePlaylist = async (id: string) => {
   loading.value = false;
   // 默认歌单
   if (detail.is_default === 1) {
-    await dataStore.setUserLikeData(
-      "songs",
-      detail.songs.map((item) => ({ id: item.id, platform: item.platform })),
-    );
+    await dataStore.setUserLikeData("songs", detail.song_ids);
   }
 };
 
