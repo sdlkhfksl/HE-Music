@@ -17,6 +17,15 @@
                 class="cover-img"
                 once
               />
+              <template v-if="item.play_count && Number(item.play_count) > 0">
+                <!-- 遮罩 -->
+                <div class="cover-mask" />
+                <!-- 播放量 -->
+                <div class="play-count">
+                  <SvgIcon name="Play" />
+                  <span class="num">{{ formatNumber(Number(item.play_count) || 0) }}</span>
+                </div>
+              </template>
               <!-- 简介 -->
               <div v-if="item.description" class="description">
                 <n-text class="text-hidden"> {{ item.description }}</n-text>
@@ -101,6 +110,7 @@ import CoverMenu from "@/components/Menu/CoverMenu.vue";
 import player from "@/utils/player";
 import { formatTimestamp } from "@/utils/time";
 import { AlbumInfo, CoverType, UserFavouriteAlbumInfo } from "@/types/main.hemusic";
+import { formatNumber } from "@/utils/helper";
 
 interface Props {
   data: AlbumInfo[] | UserFavouriteAlbumInfo[];

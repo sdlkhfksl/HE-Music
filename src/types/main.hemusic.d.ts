@@ -81,6 +81,7 @@ export interface AlbumInfo extends CoverType {
   genre: string;
   type: number;
   is_finished: boolean;
+  play_count: string;
 }
 
 export interface LyricInfo {
