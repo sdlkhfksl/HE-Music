@@ -79,7 +79,8 @@ export interface AlbumInfo extends CoverType {
   platform: string;
   language: string;
   genre: string;
-  type: string;
+  type: number;
+  is_finished: boolean;
 }
 
 export interface LyricInfo {

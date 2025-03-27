@@ -51,7 +51,9 @@ export const FeatureSupportFlag = {
 
   // 来源链接
   BuildSourceUrl: 1n << 34n, // 构建来源链接
-  ParseSourceUrl: 1n << 33n, // 解析来源链接
+  ParseSourceUrl: 1n << 35n, // 解析来源链接
+
+  SearchAudiobook: 1n << 36n, // 搜索有声书
 };
 
 // 获取发现页面

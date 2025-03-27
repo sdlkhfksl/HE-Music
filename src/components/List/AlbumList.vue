@@ -39,7 +39,10 @@
             </div>
             <!-- 信息 -->
             <div class="cover-data">
-              <n-text class="name text-hidden">{{ item.name }}</n-text>
+              <n-text class="name text-hidden">
+                <n-tag v-if="item.is_finished" size="small" class="finished">完结</n-tag>
+                {{ item.name }}
+              </n-text>
               <!-- 专辑信息 -->
               <div class="meta">
                 <n-text class="count" depth="3">{{ item?.song_count || 0 }}首</n-text>

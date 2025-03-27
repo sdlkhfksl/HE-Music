@@ -64,6 +64,20 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
+      <n-tab-pane name="audiobook" tab="听书" display-directive="show:lazy">
+        <n-tabs class="tabs" type="bar" animated>
+          <n-tab-pane
+            v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchAudiobook)"
+            :key="`search-audiobook-${platform.id}`"
+            :name="platform.id"
+            :tab="platform.shortname"
+            :disabled="platform.status !== 1"
+            display-directive="show:lazy"
+          >
+            <Audiobook :keyword="searchKeyword" :platform="platform.id" />
+          </n-tab-pane>
+        </n-tabs>
+      </n-tab-pane>
       <n-tab-pane name="artists" tab="歌手" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
@@ -112,6 +126,7 @@ import Playlists from "@/views/Search/playlists.vue";
 import Albums from "@/views/Search/albums.vue";
 import Artists from "@/views/Search/artists.vue";
 import Videos from "@/views/Search/videos.vue";
+import Audiobook from "@/views/Search/audiobook.vue";
 import { FeatureSupportFlag } from "@/api/platform";
 
 const router = useRouter();
