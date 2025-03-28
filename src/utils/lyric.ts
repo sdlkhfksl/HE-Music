@@ -85,8 +85,8 @@ export const parseYrcData = (yrcData: LyricLine[]): LyricType[] => {
   const yrcList = yrcData
     .map((line) => {
       const words = line.words;
-      const time = msToS(words[0].startTime);
-      const endTime = msToS(words[words.length - 1].endTime);
+      const time = msToS(words[0]?.startTime);
+      const endTime = msToS(words[words.length - 1]?.endTime);
       const contents = words.map((word) => {
         return {
           time: msToS(word.startTime),
@@ -204,20 +204,30 @@ export const parseWordLyric = ({ lyric = "", roma = "", trans = "" }) => {
     // content
     // <0,648>Love<648,162> <810,810>Story<1620,162> <1782,162>-<1944,162> <2106,972>Taylor<3078,162> <3240,810>
     const words: LyricWord[] = [];
-    for (const line of content.matchAll(wordLineRegex)) {
-      if (!line.groups) continue;
-      const { begin, end, word } = line.groups as {
-        begin: string;
-        end: string;
-        word: string;
-      };
-      // console.log("begin:",begin,"end:", end,"word:", word)
+
+    if (!wordLineRegex.test(content)) {
       words.push({
-        startTime: time + parseInt(begin),
-        endTime: time + parseInt(begin) + parseInt(end),
-        word: word,
+        startTime: time,
+        endTime: time,
+        word: content,
       });
+    } else {
+      for (const line of content.matchAll(wordLineRegex)) {
+        if (!line.groups) continue;
+        const { begin, end, word } = line.groups as {
+          begin: string;
+          end: string;
+          word: string;
+        };
+        // console.log("begin:",begin,"end:", end,"word:", word)
+        words.push({
+          startTime: time + parseInt(begin),
+          endTime: time + parseInt(begin) + parseInt(end),
+          word: word,
+        });
+      }
     }
+
     const lrc: LyricLine = {
       words: words,
       translatedLyric:

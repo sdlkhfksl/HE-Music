@@ -796,9 +796,13 @@ class Player {
     image.src = coverUrl;
     // 图像加载完成
     image.onload = () => {
-      // 获取图片数据
-      const coverColorData = getCoverColorData(image);
-      if (coverColorData) statusStore.songCoverTheme = coverColorData;
+      try {
+        // 获取图片数据
+        const coverColorData = getCoverColorData(image);
+        if (coverColorData) statusStore.songCoverTheme = coverColorData;
+      } catch (e: any) {
+        console.error("❌ Error getting cover color data:", e);
+      }
       // 移除元素
       image.remove();
     };
