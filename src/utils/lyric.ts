@@ -205,6 +205,7 @@ export const parseWordLyric = ({ lyric = "", roma = "", trans = "" }) => {
     // <0,648>Love<648,162> <810,810>Story<1620,162> <1782,162>-<1944,162> <2106,972>Taylor<3078,162> <3240,810>
     const words: LyricWord[] = [];
 
+    wordLineRegex.lastIndex = 0;
     if (!wordLineRegex.test(content)) {
       words.push({
         startTime: time,
@@ -212,6 +213,7 @@ export const parseWordLyric = ({ lyric = "", roma = "", trans = "" }) => {
         word: content,
       });
     } else {
+      wordLineRegex.lastIndex = 0;
       for (const line of content.matchAll(wordLineRegex)) {
         if (!line.groups) continue;
         const { begin, end, word } = line.groups as {
