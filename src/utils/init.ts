@@ -110,6 +110,7 @@ const keyDownEvent = debounce((event: KeyboardEvent) => {
 // 版本输出
 const printVersion = async () => {
   log.success(`🚀 ${packageJson.version}`, packageJson.productName);
+  log.info(`👤 imsyy`, `https://github.com/imsyy/SPlayer`);
   log.info(`👤 ${packageJson.author}`, packageJson.github);
 };
 

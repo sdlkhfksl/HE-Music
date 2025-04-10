@@ -4,7 +4,7 @@
       <n-h3 prefix="bar"> 关于软件 </n-h3>
       <n-card class="set-item">
         <n-flex align="center" class="about">
-          <SvgIcon name="HE-Music" size="26" />
+          <SvgIcon name="HEMusic" size="26" />
           <n-text class="logo-name">HE-Music</n-text>
           <n-tag :bordered="false" size="small" type="primary">
             {{ packageJson.version }}

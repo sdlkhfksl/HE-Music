@@ -2,7 +2,11 @@
 appId: com.serioussnow.hemusic
 # 应用程序的产品名称
 productName: HE-Music
-copyright: Copyright © serious-snow 2023
+copyright: Copyright © serious-snow 2025
+protocols:
+  name: he-music-protocol
+  schemes:
+    - hemusic
 # 构建资源所在的目录
 directories:
   buildResources: public
