@@ -41,6 +41,8 @@
                 trigger: 'click',
                 placement: 'bottom',
                 width: 'trigger',
+                scrollable: true,
+                contentStyle: 'white-space: pre-line; max-height:400px',
               }"
             >
               {{ playlistDetailData.description || "这个人很懒，什么都没有留下" }}

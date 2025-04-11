@@ -61,6 +61,8 @@
                 trigger: 'click',
                 placement: 'bottom',
                 width: 'trigger',
+                scrollable: true,
+                contentStyle: 'white-space: pre-line; max-height:400px',
               }"
             >
               {{ artistDetailData.description }}
