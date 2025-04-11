@@ -11,7 +11,7 @@
       <n-collapse :default-expanded-names="['level', 'path']" arrow-placement="right">
         <n-collapse-item title="音质选择" name="level">
           <!-- 音质选择 -->
-          <n-radio-group v-model:value="songLevelChoosed" name="level">
+          <n-radio-group v-model:value="songLevelChosen" name="level">
             <n-flex>
               <n-radio v-for="(item, index) in song.links" :key="index" :value="item.name">
                 <n-flex>
@@ -77,8 +77,11 @@ const settingStore = useSettingStore();
 // 下载数据
 const loading = ref<boolean>(false);
 const downloadPath = ref<string>(settingStore.downloadPath);
-const songLevelChoosed = ref<string>("320mp3");
+const songLevelChosen = ref<string>("320mp3");
 
+if (!props.song.links?.find((item) => item.name === songLevelChosen.value)){
+  songLevelChosen.value = props.song.links?.at(-1)?.name || "";
+}
 // 获取歌曲详情
 const getSongDetail = async (): Promise<any> => {
   // if (!props.id) return;
@@ -103,7 +106,7 @@ const download = async () => {
   try {
     // 获取下载链接
 
-    const link = props.song.links?.find((item) => item.name === songLevelChoosed.value);
+    const link = props.song.links?.find((item) => item.name === songLevelChosen.value);
     if (!link) return;
 
     const result = await songUrl(props.song.id, props.song.platform, link.quality, link.format);
