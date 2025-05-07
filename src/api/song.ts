@@ -107,7 +107,13 @@ export const songInfo = (platform: string, id: string) => {
   });
 };
 
-export const getCoverUrlStr = (platform: string, id: string, quality = 300, redirect = true, token = "") =>
+export const getCoverUrlStr = (
+  platform: string,
+  id: string,
+  quality = 300,
+  redirect = true,
+  token = "",
+) =>
   `${API_URL}/v1/song/cover?${new URLSearchParams({
     id,
     platform,

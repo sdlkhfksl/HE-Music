@@ -17,7 +17,7 @@
                 class="cover-img"
                 once
               />
-              <template v-if="item.play_count">
+              <template v-if="item.play_count && Number(item.play_count) > 0">
                 <!-- 遮罩 -->
                 <div class="cover-mask" />
                 <!-- 播放量 -->

@@ -79,7 +79,7 @@ const loading = ref<boolean>(false);
 const downloadPath = ref<string>(settingStore.downloadPath);
 const songLevelChosen = ref<string>("320mp3");
 
-if (!props.song.links?.find((item) => item.name === songLevelChosen.value)){
+if (!props.song.links?.find((item) => item.name === songLevelChosen.value)) {
   songLevelChosen.value = props.song.links?.at(-1)?.name || "";
 }
 // 获取歌曲详情
@@ -126,7 +126,7 @@ const download = async () => {
     // 下载相关数据
     const songName = player.getPlayerInfo(props.song) || "未知曲目";
 
-    const format = result.format?.toLowerCase() || link.format.toLowerCase() ;
+    const format = result.format?.toLowerCase() || link.format.toLowerCase();
     // 区分设备下载
     if (isElectron) {
       await electronDownload(result.url, songName, format);
