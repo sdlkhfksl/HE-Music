@@ -29,7 +29,13 @@
           <div v-if="searchSuggestData?.length" ref="searchSuggestRef" class="all-suggest">
             <div v-for="(suggestItem, index) in searchSuggestData" :key="index" class="suggest">
               <div class="suggest-item" @click="emit('toSearch', suggestItem, 'keyword')">
-                <n-text class="name">{{ suggestItem }}</n-text>
+                <!--                <n-text class="name">{{ suggestItem }}</n-text>-->
+                <n-highlight
+                  class="name"
+                  :text="suggestItem"
+                  :patterns="[statusStore.searchInputValue.trim()]"
+                  highlightClass="highlight"
+                ></n-highlight>
               </div>
             </div>
           </div>
@@ -161,6 +167,10 @@ watchDebounced(
         cursor: pointer;
         .name {
           white-space: normal;
+          :deep(.highlight) {
+            color: var(--primary-hex);
+            background-color: initial;
+          }
         }
         .artist {
           &::before {
