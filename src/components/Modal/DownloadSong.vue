@@ -125,11 +125,13 @@ const download = async () => {
     }
     // 下载相关数据
     const songName = player.getPlayerInfo(props.song) || "未知曲目";
+
+    const format = result.format?.toLowerCase() || link.format.toLowerCase() ;
     // 区分设备下载
     if (isElectron) {
-      await electronDownload(result.url, songName, link.format.toLowerCase());
+      await electronDownload(result.url, songName, format);
     } else {
-      saveAs(result.url, `${songName}.${link.format.toLowerCase() || "mp3"}`);
+      saveAs(result.url, `${songName}.${format || "mp3"}`);
     }
     emit("close");
     window.$message.success("歌曲下载成功");
