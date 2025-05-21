@@ -26,7 +26,7 @@
           @toBottom="onToBottom"
         >
           <!-- 悬浮顶栏 -->
-          <template #stickyHeader>
+          <template v-if="showHeader" #stickyHeader>
             <div class="list-header song-card">
               <n-text class="num">#</n-text>
               <n-dropdown
@@ -148,6 +148,7 @@ const props = withDefaults(
     };
     // 显示底部
     showFooter?: boolean;
+    showHeader?: boolean;
     hiddenSize?: boolean;
   }>(),
   {
@@ -156,6 +157,7 @@ const props = withDefaults(
     playListId: "",
     showFooter: true,
     hiddenSize: true,
+    showHeader: true,
   },
 );
 

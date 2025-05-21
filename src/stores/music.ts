@@ -31,6 +31,7 @@ const defaultMusicData: SongInfo = {
   mv_id: "",
   subtitle: "",
   links: [],
+  sublist: [],
 };
 
 export const useMusicStore = defineStore("music", {

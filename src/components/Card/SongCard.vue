@@ -101,8 +101,21 @@
           >
             <n-text class="ar"> {{ song.singers || "未知艺术家" }} </n-text>
           </div>
-          <!-- 别名 -->
-          <!--          <n-text v-if="song.alia" class="alia text-hidden" depth="3">{{ song.alia }}</n-text>-->
+          <!--别名-->
+          <n-text v-if="song.subtitle" class="alia text-hidden" depth="3">{{
+            song.subtitle
+          }}</n-text>
+          <!--更多版本-->
+          <n-collapse
+            class="sublist-btn"
+            v-if="song.sublist?.length > 0"
+            arrow-placement="right"
+            @item-header-click="toggleSublist"
+            @dblclick.stop=""
+          >
+            <n-collapse-item title="更多版本" name="1"> </n-collapse-item>
+          </n-collapse>
+          <!--          <n-text v-if="song.sublist?.length > 0" @click.stop="toggleSublist">更多版本 {{showSublist? '收起' : '展开' }} </n-text>-->
         </div>
       </div>
       <!-- 专辑 -->
@@ -150,6 +163,17 @@
         {{ formatFileSize(song.size || 0) }}
       </n-text>
     </div>
+
+    <!-- 更多版本折叠面板 (新增) -->
+    <n-collapse-transition class="sublist-content" :show="showSublist">
+      <SongList
+        :data="song.sublist"
+        height="auto"
+        :loading="false"
+        :showFooter="false"
+        :showHeader="false"
+      />
+    </n-collapse-transition>
   </div>
 </template>
 
@@ -167,6 +191,7 @@ import { getSizeCover } from "@/utils/format";
 import { TagProps } from "naive-ui";
 import { IsValidId, songEqual } from "@/utils/song";
 import { FeatureSupportFlag } from "@/api/platform";
+import SongList from "@/components/List/SongList.vue";
 
 const props = defineProps<{
   // 歌曲
@@ -250,6 +275,14 @@ const getQuality = (song: SongInfo) => {
 const quality = getQuality(song.value) as {
   name?: string;
   type: TagProps["type"];
+};
+
+// 子列表控制
+const showSublist = ref(false);
+
+// 切换子列表显示状态
+const toggleSublist = (data: any) => {
+  showSublist.value = data.expanded;
 };
 </script>
 
@@ -417,10 +450,21 @@ const quality = getQuality(song.value) as {
         font-size: 12px;
         opacity: 0.8;
       }
+
+      .sublist-btn {
+        margin-top: 2px;
+        :deep(.n-collapse-item__header-main) {
+          opacity: 0.8;
+          font-size: 12px;
+        }
+        :deep(.n-collapse-item__content-wrapper) {
+          display: none;
+        }
+      }
     }
     .sort {
       margin-left: 6px;
-      &::after {
+      s &::after {
         content: " )";
       }
       &::before {
@@ -495,6 +539,10 @@ const quality = getQuality(song.value) as {
         }
       }
     }
+  }
+
+  .sublist-content {
+    background-color: rgba(var(--primary), 0.05);
   }
 }
 </style>

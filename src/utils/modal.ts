@@ -305,7 +305,7 @@ export const openCaptcha = (scene: number, meta: string) => {
     transformOrigin: "center",
     autoFocus: false,
     style: { width: "375px" },
-    title: "验证操作",
+    title: "安全验证",
     maskClosable: false,
     content: () => {
       return h(Captcha, { scene, meta, onClose: () => modal.destroy() });
