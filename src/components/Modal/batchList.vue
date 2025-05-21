@@ -122,7 +122,7 @@ const tableData = computed<DataType[]>(() =>
       ? // 拼接歌手
         song?.singers.map((ar: { name: string }) => ar.name).join(" / ")
       : song?.singers || "未知歌手",
-    album: isObject(song?.album) ? song?.album.name : song?.album || "未知专辑",
+    album: isObject(song?.album) ? song?.album.name : song?.album || "-",
     // 原始数据
     origin: song,
   })),

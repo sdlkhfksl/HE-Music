@@ -132,10 +132,10 @@
             })
           "
         >
-          {{ song.album?.name || "未知专辑" }}
+          {{ song.album?.name || "-" }}
         </n-text>
         <n-text v-else class="album-text">
-          {{ song.album || "未知专辑" }}
+          {{ song.album || "-" }}
         </n-text>
       </div>
       <!-- 操作 -->
