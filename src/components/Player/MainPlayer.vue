@@ -147,6 +147,16 @@
         <div v-if="isElectron" class="menu-icon" @click.stop="player.toggleDesktopLyric">
           <SvgIcon name="DesktopLyric" :depth="statusStore.showDesktopLyric ? 1 : 3" />
         </div>
+        <!-- 音质切换 -->
+        <n-dropdown
+          :options="qualityOptions"
+          :show-arrow="true"
+          @select="(quality) => changeQuality(quality)"
+        >
+          <div class="menu-icon quality-selector" title="音质设置">
+            <span class="current-quality">{{ statusStore.playQuality }}</span>
+          </div>
+        </n-dropdown>
         <!-- 播放模式 -->
         <n-dropdown
           :options="playModeOptions"
@@ -318,6 +328,23 @@ const instantLyrics = computed(() => {
     ? `${content?.content}（ ${content?.tran} ）`
     : content?.content;
 });
+
+// 音质选项
+const qualityOptions = computed(() => {
+  return musicStore.playSong?.links.map((item) => {
+    return {
+      label: item.name,
+      key: item.name,
+    };
+  });
+});
+
+// 切换音质
+const changeQuality = async (quality: string) => {
+  if (statusStore.playQuality === quality) return;
+  statusStore.playQuality = quality;
+  await player.initPlayer(true, statusStore.currentTime, quality);
+};
 </script>
 
 <style lang="scss" scoped>
@@ -530,6 +557,18 @@ const instantLyrics = computed(() => {
         }
       }
     }
+    .quality-selector {
+      display: flex;
+      align-items: center;
+      //gap: 4px;
+    }
+
+    .current-quality {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--primary-hex);
+    }
+
     .menu-icon {
       display: flex;
       align-items: center;

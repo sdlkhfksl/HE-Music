@@ -35,6 +35,7 @@ interface StatusState {
   showDesktopLyric: boolean;
   showPlayerComment: boolean;
   updateCheck: boolean;
+  playQuality: string;
 }
 
 export const useStatusStore = defineStore("status", {
@@ -92,6 +93,8 @@ export const useStatusStore = defineStore("status", {
     showPlayerComment: false,
     // 更新检查
     updateCheck: false,
+    // 播放音质
+    playQuality: "320mp3",
   }),
   getters: {
     // 播放音量图标
@@ -141,6 +144,7 @@ export const useStatusStore = defineStore("status", {
       "songCoverTheme",
       "listSort",
       "showDesktopLyric",
+      "playQuality",
     ],
   },
 });

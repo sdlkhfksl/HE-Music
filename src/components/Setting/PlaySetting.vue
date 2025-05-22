@@ -230,29 +230,44 @@ const showSpectrums = ref<boolean>(settingStore.showSpectrums);
 // 音质数据
 const songLevelData = {
   "128mp3": {
-    label: "标准音质",
+    label: "128mp3",
     tip: "标准音质 128kbps",
     value: "128mp3",
   },
   "192mp3": {
-    label: "较高音质",
+    label: "192mp3",
     tip: "较高音质 192kbps",
     value: "192mp3",
   },
   "320mp3": {
-    label: "极高 HQ",
-    tip: "近 CD 品质的细节体验，最高 320kbps",
+    label: "320mp3",
+    tip: "超高音质 320kbps",
     value: "320mp3",
   },
   flac: {
-    label: "无损 SQ",
+    label: "flac",
     tip: "高保真无损音质，最高 48kHz/16bit",
     value: "flac",
   },
   hires: {
-    label: "HI-RES",
-    tip: "环绕声体验，声音听感增强，96kHz/24bit",
+    label: "hires",
+    tip: "更饱满清晰的高解析度音质，最高192kHz/24bit",
     value: "hires",
+  },
+  dolby: {
+    label: "dolby",
+    tip: "杜比全景声音乐，沉浸式聆听体验",
+    value: "dolby",
+  },
+  galaxy: {
+    label: "galaxy",
+    tip: "臻品全景声",
+    value: "galaxy",
+  },
+  master: {
+    label: "master",
+    tip: "还原音频细节，192kHz/24bit",
+    value: "master",
   },
   // jymaster: {
   //   label: "超清母带 Master",

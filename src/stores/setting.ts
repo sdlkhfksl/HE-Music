@@ -46,7 +46,7 @@ interface SettingState {
   proxyProtocol: "off" | "http" | "https";
   proxyServe: string;
   proxyPort: number;
-  songLevel: "128mp3" | "192mp3" | "320mp3" | "flac" | "hires";
+  songLevel: string;
   playDevice: "default" | string;
   autoPlay: boolean;
   songVolumeFade: boolean;

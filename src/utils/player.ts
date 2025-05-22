@@ -488,8 +488,9 @@ class Player {
    * 核心外部调用
    * @param autoPlay 是否自动播放
    * @param seek 播放位置
+   * @param quality 播放音质
    */
-  async initPlayer(autoPlay: boolean = true, seek: number = 0) {
+  async initPlayer(autoPlay: boolean = true, seek: number = 0, quality: string = "") {
     const dataStore = useDataStore();
     const musicStore = useMusicStore();
     const statusStore = useStatusStore();
@@ -498,7 +499,7 @@ class Player {
       // 获取播放数据
       const playSongData = this.getPlaySongData();
       if (!playSongData) return;
-      const { id, platform, links = [], path } = playSongData;
+      const { id, platform, path } = playSongData;
       // 更改当前播放歌曲
       musicStore.playSong = playSongData;
       // 更改状态
@@ -511,7 +512,9 @@ class Player {
       }
       // 在线歌曲
       else if (id && platform && dataStore.playList.length) {
-        const link = links.find((item) => item.name === settingStore.songLevel) || links[0];
+        const link = this.selectPlayQuality(playSongData, quality);
+        if (!link) throw new Error("Get song link error");
+        statusStore.playQuality = link.name;
         console.log("Getting online song url...", id, platform, link);
         const songId = id;
         if (!songId) throw new Error("Get song id error");
@@ -520,6 +523,9 @@ class Player {
         if (url) {
           statusStore.playUblock = false;
           await this.createPlayer(url, autoPlay, seek);
+          if (quality) {
+            window.$message.success(`已切换音质为 ${quality}`);
+          }
         }
         // 尝试解灰
         else if (isElectron && settingStore.useSongUnlock) {
@@ -1079,6 +1085,49 @@ class Player {
     // } catch (error) {
     //   console.error("Failed to scrobble song:", error);
     // }
+  }
+
+  async updatePlayQuality(quality: string) {
+    const statusStore = useStatusStore();
+    const songData = this.getPlaySongData();
+    if (!songData) return;
+    if (songData.path) return;
+
+    const link = songData.links.find((item) => item.name === quality);
+    if (!link) {
+      return;
+    }
+
+    statusStore.playQuality = quality;
+
+    // 获取歌曲
+  }
+
+  selectPlayQuality(songInfo: SongInfo, quality: string): Link | null {
+    const statusStore = useStatusStore();
+    const settingStore = useSettingStore();
+    const currentQuality = statusStore.playQuality;
+    const songLevel = settingStore.songLevel;
+
+    if (songInfo.links?.length == 0) {
+      return null;
+    }
+
+    let link = songInfo.links.find((item) => item.name === quality);
+    if (link) {
+      return link;
+    }
+
+    link = songInfo.links.find((item) => item.name === songLevel);
+    if (link) {
+      return link;
+    }
+
+    link = songInfo.links.find((item) => item.name === currentQuality);
+    if (link) {
+      return link;
+    }
+    return songInfo.links[0];
   }
 }
 
