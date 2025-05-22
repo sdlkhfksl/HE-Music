@@ -229,6 +229,11 @@ const showSpectrums = ref<boolean>(settingStore.showSpectrums);
 
 // 音质数据
 const songLevelData = {
+  auto: {
+    label: "自动",
+    tip: "自动选择音质 上一曲音质>hires>flac>320mp3>128mp3",
+    value: "auto",
+  },
   "128mp3": {
     label: "128mp3",
     tip: "标准音质 128kbps",

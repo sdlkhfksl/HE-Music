@@ -153,7 +153,7 @@
           :show-arrow="true"
           @select="(quality) => changeQuality(quality)"
         >
-          <div class="menu-icon quality-selector" title="音质设置">
+          <div class="menu-icon quality-selector">
             <span class="current-quality">{{ statusStore.playQuality }}</span>
           </div>
         </n-dropdown>

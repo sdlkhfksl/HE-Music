@@ -1113,20 +1113,36 @@ class Player {
       return null;
     }
 
+    // 如果有quality 说明是切换音质
     let link = songInfo.links.find((item) => item.name === quality);
     if (link) {
       return link;
     }
 
+    // 自动音质
+    if (songLevel === "auto") {
+      // 按照这个顺序找音质
+      const qualityList = [currentQuality, "hires", "flac", "320mp3", "128mp3"];
+      for (const quality of qualityList) {
+        link = songInfo.links.find((item) => item.name === quality);
+        if (link) {
+          return link;
+        }
+      }
+    }
+
+    // 找到设置的音质
     link = songInfo.links.find((item) => item.name === songLevel);
     if (link) {
       return link;
     }
 
+    // 找到当前播放的音质
     link = songInfo.links.find((item) => item.name === currentQuality);
     if (link) {
       return link;
     }
+    // 默认返回第一个
     return songInfo.links[0];
   }
 }
