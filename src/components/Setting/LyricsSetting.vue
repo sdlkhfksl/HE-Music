@@ -207,23 +207,13 @@
         <div class="label">
           <n-text class="name">显示歌词翻译</n-text>
         </div>
-        <n-switch
-          v-model:value="settingStore.showTran"
-          class="set"
-          :round="false"
-          :disabled="settingStore.useAMLyrics"
-        />
+        <n-switch v-model:value="settingStore.showTran" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
           <n-text class="name">显示歌词音译</n-text>
         </div>
-        <n-switch
-          v-model:value="settingStore.showRoma"
-          class="set"
-          :round="false"
-          :disabled="settingStore.useAMLyrics"
-        />
+        <n-switch v-model:value="settingStore.showRoma" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">

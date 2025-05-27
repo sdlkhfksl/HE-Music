@@ -1087,22 +1087,6 @@ class Player {
     // }
   }
 
-  async updatePlayQuality(quality: string) {
-    const statusStore = useStatusStore();
-    const songData = this.getPlaySongData();
-    if (!songData) return;
-    if (songData.path) return;
-
-    const link = songData.links.find((item) => item.name === quality);
-    if (!link) {
-      return;
-    }
-
-    statusStore.playQuality = quality;
-
-    // 获取歌曲
-  }
-
   selectPlayQuality(songInfo: SongInfo, quality: string): Link | null {
     const statusStore = useStatusStore();
     const settingStore = useSettingStore();
