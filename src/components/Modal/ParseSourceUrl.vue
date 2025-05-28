@@ -29,6 +29,7 @@
         :hidden-scrollbar="true"
         :hidden-album="true"
         :disabled-sort="true"
+        :show-header="false"
       />
 
       <!-- 解析结果 有loading中-->

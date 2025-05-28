@@ -122,7 +122,6 @@
 <script setup lang="ts">
 import { useDataStore, usePlatformStore, useStatusStore } from "@/stores";
 import { getMVUrlStr, videoDetail } from "@/api/video";
-import { isEmpty } from "lodash-es";
 import { formatNumber } from "@/utils/helper";
 import { getComment, getSubComment } from "@/api/comment";
 import player from "@/utils/player";
@@ -264,11 +263,6 @@ const getCommentData = async (id: string, platform: string, clean: boolean = tru
       commentLastId.value,
       commentType.value === "hot",
     );
-    if (isEmpty(result.list)) {
-      commentHasMore.value = false;
-      commentLoading.value = false;
-      return;
-    }
 
     for (let item of result.list) {
       item.sub_has_more = item.reply_count > 0 && item.reply_count > item.sub_comments.length;
