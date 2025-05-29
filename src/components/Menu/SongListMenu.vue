@@ -162,7 +162,7 @@ const openDropdown = (
               icon: renderIcon("EditNote", { size: 20 }),
             },
             {
-              key: "line-two",
+              key: "line-1-1",
               type: "divider",
             },
             {
@@ -176,7 +176,7 @@ const openDropdown = (
           ],
         },
         {
-          key: "line-two",
+          key: "line-3",
           type: "divider",
         },
         {

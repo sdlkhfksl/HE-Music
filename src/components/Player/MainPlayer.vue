@@ -151,7 +151,7 @@
         <n-dropdown
           :options="qualityOptions"
           :show-arrow="true"
-          @select="(quality) => changeQuality(quality)"
+          @select="(quality) => player.changeQuality(quality)"
         >
           <div class="menu-icon quality-selector">
             <span class="current-quality">{{ statusStore.playQuality }}</span>
@@ -331,20 +331,24 @@ const instantLyrics = computed(() => {
 
 // 音质选项
 const qualityOptions = computed(() => {
-  return musicStore.playSong?.links.map((item) => {
+  return musicStore.playSong?.links.map((item): DropdownOption => {
     return {
       label: item.name,
       key: item.name,
     };
   });
+  // .flatMap((item: DropdownOption, idx: number): DropdownOption[] =>
+  //   idx === musicStore.playSong?.links.length - 1
+  //     ? [item]
+  //     : [
+  //         item,
+  //         {
+  //           key: `line-${idx}`,
+  //           type: "divider",
+  //         },
+  //       ],
+  // );
 });
-
-// 切换音质
-const changeQuality = async (quality: string) => {
-  if (statusStore.playQuality === quality) return;
-  statusStore.playQuality = quality;
-  await player.initPlayer(true, statusStore.currentTime, quality);
-};
 </script>
 
 <style lang="scss" scoped>

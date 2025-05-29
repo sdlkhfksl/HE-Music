@@ -1087,6 +1087,14 @@ class Player {
     // }
   }
 
+  // 切换音质
+  async changeQuality(quality: string) {
+    const statusStore = useStatusStore();
+    if (statusStore.playQuality === quality) return;
+    statusStore.playQuality = quality;
+    await this.initPlayer(true, statusStore.currentTime, quality);
+  }
+
   selectPlayQuality(songInfo: SongInfo, quality: string): Link | null {
     const statusStore = useStatusStore();
     const settingStore = useSettingStore();
