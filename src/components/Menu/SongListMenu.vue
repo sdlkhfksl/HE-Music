@@ -161,6 +161,18 @@ const openDropdown = (
               },
               icon: renderIcon("EditNote", { size: 20 }),
             },
+            {
+              key: "line-two",
+              type: "divider",
+            },
+            {
+              key: "source",
+              label: platformStore.getPlatformInfo(song.platform)?.name || song.platform,
+
+              show: !isLocal,
+              disabled: true,
+              icon: renderIcon("Source"),
+            },
           ],
         },
         {

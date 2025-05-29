@@ -12,9 +12,27 @@ export const usePlatformStore = defineStore("platform", {
   }),
 
   getters: {
-    featureSupportList: (state) => (flag) =>
-      state.platforms.filter((item) => item.feature_support_flag & flag),
+    featureSupportList(state) {
+      return (flag: bigint): PlatformInfo[] =>
+        state.platforms.filter((item) => item.feature_support_flag & flag);
+    },
+
+    isFeatureSupport() {
+      return (platform: string, flag: bigint): boolean => {
+        const platformInfo = this.getPlatformInfo(platform);
+        return !!platformInfo && !!(platformInfo.feature_support_flag & flag);
+      };
+    },
+
+    getPlatformInfo(state) {
+      return (platform: string): PlatformInfo | undefined =>
+        state.platforms.find((item) => item.id === platform);
+    },
+    getPlatformShortName() {
+      return (platform: string): string => this.getPlatformInfo(platform)?.shortname || platform;
+    },
   },
+
   actions: {
     async loadPlatforms() {
       if (this.platforms.length) return;
@@ -25,14 +43,6 @@ export const usePlatformStore = defineStore("platform", {
           feature_support_flag: BigInt(item.feature_support_flag),
         };
       });
-    },
-    isFeatureSupport(platform: string, flag: bigint) {
-      const platformInfo = this.platforms.find((item) => item.id === platform);
-      if (!platformInfo) return false;
-      return !!(platformInfo.feature_support_flag & flag);
-    },
-    getPlatformInfo(platform: string) {
-      return this.platforms.find((item) => item.id === platform);
     },
   },
 });

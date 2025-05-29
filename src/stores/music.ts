@@ -78,13 +78,14 @@ export const useMusicStore = defineStore("music", {
           state.playPlaylist.type === type
         );
       },
-  },
-  actions: {
     // 获取歌曲封面
-    getSongCover(size: number = 300) {
-      return this.playSong.path ? this.playSong.cover : getSizeCover(this.playSong, size);
-    },
+    getSongCover:
+      (state) =>
+      (size: number = 300): string => {
+        return state.playSong.path ? state.playSong.cover : getSizeCover(state.playSong, size);
+      },
   },
+  actions: {},
   // 持久化
   persist: {
     key: "music-store",
