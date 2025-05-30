@@ -560,7 +560,7 @@ class Player {
     } catch (error) {
       console.error("❌ 初始化音乐播放器出错：", error);
       window.$message.error("播放器遇到错误，请尝试软件热重载");
-      // this.errorNext();
+      this.errorNext();
     }
   }
 
