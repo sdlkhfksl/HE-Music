@@ -9,6 +9,7 @@ import { calculateProgress } from "./time";
 import { isDev, isElectron } from "./helper";
 import blob from "./blob";
 import { Link, SongInfo } from "@/types/main.hemusic";
+import { AxiosError } from "axios";
 
 // 播放器核心
 // Howler.js
@@ -518,7 +519,17 @@ class Player {
         console.log("Getting online song url...", id, platform, link);
         const songId = id;
         if (!songId) throw new Error("Get song id error");
-        const url = await this.getOnlineUrl(songId, platform, link);
+
+        let url: string | null = null;
+        try {
+          url = await this.getOnlineUrl(songId, platform, link);
+        } catch (error) {
+          console.log("Getting online song url error:", error);
+          // 如果是 AxiosError 的 401 就忽略
+          if (error instanceof AxiosError && error.response?.status === 401) {
+            return;
+          }
+        }
         // 正常播放地址
         if (url) {
           statusStore.playUblock = false;

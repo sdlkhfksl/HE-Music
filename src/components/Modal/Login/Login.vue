@@ -25,9 +25,10 @@
 
 <script setup lang="ts">
 import { updateUserData } from "@/utils/auth";
-import { useDataStore, usePlatformStore } from "@/stores";
+import { useDataStore, usePlatformStore, useSettingStore, useStatusStore } from "@/stores";
 
 import LoginPassword from "@/components/Modal/Login/LoginPassword.vue";
+import player from "@/utils/player";
 
 const emit = defineEmits<{
   close: [];
@@ -35,6 +36,8 @@ const emit = defineEmits<{
 
 const dataStore = useDataStore();
 const platformStore = usePlatformStore();
+const statusStore = useStatusStore();
+const settingStore = useSettingStore();
 
 // 保存登录信息
 const saveLogin = async (loginData: any) => {
@@ -49,6 +52,9 @@ const saveLogin = async (loginData: any) => {
   localStorage.setItem("lastLoginTime", Date.now().toString());
   await updateUserData();
   await platformStore.loadPlatforms();
+  if (statusStore.playLoading) {
+    player.initPlayer(settingStore.autoPlay, player.getSeek());
+  }
 };
 
 onBeforeMount(() => {
