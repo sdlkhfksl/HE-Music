@@ -33,16 +33,17 @@
         <div class="data">
           <!-- 评论 -->
           <div class="content">
-            <n-text class="name">{{ item.user.name || "未知用户名" }}：</n-text>
+            <n-text class="name">{{ item.user.name || t("common.unknown_user") }}：</n-text>
             <n-text class="name" v-if="item.be_replied && !item.be_replied.content"
-              >回复 @ {{ item.be_replied.user.name || "未知用户名" }}：</n-text
+              >{{ t("common.reply") }} @
+              {{ item.be_replied.user.name || t("common.unknown_user") }}：</n-text
             >
             <n-text class="text" v-dompurify-html="getContent(item.content)" />
           </div>
           <!-- 回复 -->
           <div class="reply" v-if="item.be_replied && item.be_replied.content">
             <n-text class="name" :depth="3">
-              @ {{ item.be_replied.user.name || "未知用户名" }}：
+              @ {{ item.be_replied.user.name || t("common.unknown_user") }}：
             </n-text>
             <n-text class="text" v-dompurify-html="getContent(item.be_replied.content)" />
           </div>
@@ -82,7 +83,13 @@
       <!-- 加载更多 -->
       <n-flex v-if="loadMore" class="load-more" justify="center">
         <n-button :loading="loading" size="large" strong secondary round @click="emit('loadMore')">
-          {{ sub ? (subCount && total ? `${total}条评论` : "查看更多评论") : "加载更多" }}
+          {{
+            sub
+              ? subCount && total
+                ? t("common.comment_count_noun", { count: total })
+                : t("common.view_more_comment")
+              : t("common.load_more")
+          }}
         </n-button>
       </n-flex>
     </n-flex>
@@ -90,7 +97,7 @@
       <n-skeleton :repeat="20" />
     </div>
     <!-- 空列表 -->
-    <n-empty v-else description="空空如也，怎么什么都没有啊" size="large" />
+    <n-empty v-else :description="t('common.list_empty')" size="large" />
   </Transition>
 </template>
 
@@ -98,6 +105,9 @@
 import { coverLoaded } from "@/utils/helper";
 import { formatCommentTime } from "@/utils/time";
 import { CommentInfo } from "@/types/main.hemusic";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
+
 defineProps<{
   sub?: boolean;
   subCount?: boolean;

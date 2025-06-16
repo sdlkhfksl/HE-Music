@@ -1,11 +1,13 @@
 <template>
   <div class="local">
     <div class="title">
-      <n-text class="keyword">本地歌曲</n-text>
+      <n-text class="keyword">{{ t("common.local_music") }}</n-text>
       <n-flex class="status">
         <n-text class="item">
           <SvgIcon name="Music" :depth="3" />
-          <n-number-animation :from="0" :to="localStore.localSongs?.length || 0" /> 首歌曲
+          <n-number-animation :from="0" :to="localStore.localSongs?.length || 0" />{{
+            t("common.song_count_noun")
+          }}
         </n-text>
         <n-text class="item">
           <SvgIcon name="Storage" :depth="3" />
@@ -28,7 +30,7 @@
           <template #icon>
             <SvgIcon name="Play" />
           </template>
-          播放
+          {{ t("common.play") }}
         </n-button>
         <n-button
           :focusable="false"
@@ -58,7 +60,7 @@
           v-model:value="searchValue"
           :input-props="{ autocomplete: 'off' }"
           class="search"
-          placeholder="模糊搜索"
+          :placeholder="t('common.fuzzy_search')"
           clearable
           round
           @input="listSearch"
@@ -73,9 +75,13 @@
           type="segment"
           @update:value="(name: string) => router.push({ name })"
         >
-          <n-tab name="local-songs"> 单曲 </n-tab>
-          <n-tab :disabled="listData.length === 0" name="local-artists"> 歌手 </n-tab>
-          <n-tab :disabled="listData.length === 0" name="local-albums"> 专辑 </n-tab>
+          <n-tab name="local-songs"> {{ t("common.song") }} </n-tab>
+          <n-tab :disabled="listData.length === 0" name="local-artists">
+            {{ t("common.artist") }}
+          </n-tab>
+          <n-tab :disabled="listData.length === 0" name="local-albums">
+            {{ t("common.album") }}
+          </n-tab>
         </n-tabs>
       </n-flex>
     </n-flex>
@@ -94,13 +100,15 @@
       :close-on-esc="false"
       :mask-closable="false"
       preset="card"
-      title="目录管理"
+      :title="t('local.manage_local_music_folder')"
       transform-origin="center"
       style="width: 600px"
     >
       <n-list class="local-list" hoverable clickable bordered>
         <template #header>
-          <n-text>请选择本地音乐文件夹，将自动扫描您添加的目录，歌曲增删实时同步</n-text>
+          <n-text>
+            <n-text>{{ t("local.select_local_music_folder") }}</n-text>
+          </n-text>
         </template>
         <n-list-item v-if="defaultMusicPath">
           <template #prefix>
@@ -113,7 +121,10 @@
               class="set"
             />
           </template>
-          <n-thing :title="defaultMusicPath" description="系统默认音乐文件夹" />
+          <n-thing
+            :title="defaultMusicPath"
+            :description="t('local.system_default_music_folder')"
+          />
         </n-list-item>
         <n-list-item v-for="(item, index) in settingStore.localFilesPath" :key="index">
           <template #prefix>
@@ -135,7 +146,7 @@
             <template #icon>
               <SvgIcon name="FolderPlus" />
             </template>
-            添加文件夹
+            {{ t("local.add_folder") }}}
           </n-button>
         </n-flex>
       </template>
@@ -151,6 +162,8 @@ import { changeLocalPath, fuzzySearch, renderIcon } from "@/utils/helper";
 import { openBatchList } from "@/utils/modal";
 import player from "@/utils/player";
 import { SongInfo } from "@/types/main.hemusic";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const router = useRouter();
 const localStore = useLocalStore();
@@ -196,7 +209,7 @@ const allMusicSize = computed<number>(() => {
 // 更多操作
 const moreOptions = computed<DropdownOption[]>(() => [
   {
-    label: "本地目录管理",
+    label: t("local.local_music_folder_manage"),
     key: "folder",
     props: {
       onClick: () => (localPathShow.value = true),
@@ -204,7 +217,7 @@ const moreOptions = computed<DropdownOption[]>(() => [
     icon: renderIcon("FolderCog"),
   },
   {
-    label: "批量操作",
+    label: t("common.batch_operation"),
     key: "batch",
     props: {
       onClick: () => openBatchList(listData.value, true),
@@ -221,7 +234,7 @@ const getAllLocalMusic = debounce(
     if (!allPath || !allPath.length) return;
     // 加载提示
     if (showTip) {
-      loadingMsg.value = window.$message.loading("正在获取本地歌曲", {
+      loadingMsg.value = window.$message.loading(t("message.loading_local_music"), {
         duration: 0,
       });
     }
@@ -241,11 +254,14 @@ const getAllLocalMusic = debounce(
     // 数据是否变化
     const oldLength = localStore.localSongs.length;
     if (oldLength === 0 && listData.length > 0) {
-      window.$message.success(`发现 ${listData.length} 首歌曲`);
+      window.$message.success(t("message.found_local_music_count", { count: listData.length }));
     } else if (listData.length > oldLength) {
-      window.$message.success(`新增 ${listData.length - oldLength} 首歌曲`);
+      window.$message.success(
+        t("message.added_local_music_count", { count: listData.length - oldLength }),
+      );
     }
-    if (showTip) window.$message.success(`已发现 ${listData.length} 首`);
+    if (showTip)
+      window.$message.success(t("message.found_local_music_count", { count: listData.length }));
     // 保存并更新
     localStore.updateLocalSong(listData);
     // 关闭加载

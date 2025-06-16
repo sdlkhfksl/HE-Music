@@ -11,13 +11,17 @@
     </n-flex>
     <n-scrollbar style="max-height: 500px">
       <div v-if="data?.releaseNotes" class="markdown-body" v-html="data.releaseNotes" />
-      <div v-else class="markdown-body">暂无更新日志</div>
+      <div v-else class="markdown-body">{{ t("modal.no_update_log") }}</div>
     </n-scrollbar>
     <n-flex class="menu" justify="end">
-      <n-button strong secondary @click="emit('close')"> 取消 </n-button>
-      <n-button type="warning" strong secondary @click="goDownload"> 前往下载 </n-button>
+      <n-button strong secondary @click="emit('close')"> {{ t("common.cancel") }} </n-button>
+      <n-button type="warning" strong secondary @click="goDownload">
+        {{ t("modal.click_download") }}
+      </n-button>
       <n-button :loading="downloadStatus" type="primary" @click="startDownload">
-        {{ downloadStatus ? `下载中 ${downloadProgress}%` : "立即更新" }}
+        {{
+          downloadStatus ? `${t("modal.downloading")} ${downloadProgress}%` : t("modal.update_now")
+        }}
       </n-button>
     </n-flex>
   </div>
@@ -26,6 +30,8 @@
 <script setup lang="ts">
 import type { UpdateInfoType } from "@/types/main";
 import packageJson from "@/../package.json";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 defineProps<{ data: UpdateInfoType }>();
 
@@ -47,13 +53,13 @@ const startDownload = async () => {
   window.electron.ipcRenderer.on("update-error", (_, error) => {
     downloadStatus.value = false;
     console.error("Error updating:", error);
-    window.$message.error("更新过程出现错误");
+    window.$message.error(t("message.update_error"));
   });
   // 更新完成
   window.electron.ipcRenderer.on("update-downloaded", () => {
     emit("close");
     downloadStatus.value = false;
-    window.$message.success("更新下载完成");
+    window.$message.success(t("message.update_download_complete"));
   });
 };
 

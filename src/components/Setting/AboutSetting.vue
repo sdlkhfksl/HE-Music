@@ -1,7 +1,9 @@
 <template>
   <div class="setting-type">
     <div class="set-list">
-      <n-h3 prefix="bar"> 关于软件 </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.about.about_software") }}
+      </n-h3>
       <n-card class="set-item">
         <n-flex align="center" class="about">
           <SvgIcon name="HEMusic" size="26" />
@@ -17,18 +19,24 @@
           secondary
           @click="checkUpdate"
         >
-          {{ statusStore.updateCheck ? "检查更新中" : "检查更新" }}
+          {{
+            statusStore.updateCheck
+              ? t("setting.about.checking_update")
+              : t("setting.about.check_update")
+          }}
         </n-button>
       </n-card>
       <n-collapse-transition :show="!!updateData">
         <n-card class="set-item update-data">
           <n-flex class="version">
-            <n-text>最新版本</n-text>
+            <n-text>
+              {{ t("setting.about.latest_version") }}
+            </n-text>
             <n-tag :bordered="false" size="small" type="primary">
               {{ newVersion?.version || "v0.0.0" }}
             </n-tag>
             <n-tag v-if="newVersion?.prerelease" class="test" size="small" type="warning">
-              测试版
+              {{ t("setting.about.beta_version") }}
             </n-tag>
             <n-text :depth="3" class="time">{{ newVersion?.time }}</n-text>
           </n-flex>
@@ -37,7 +45,9 @@
       </n-collapse-transition>
     </div>
     <div class="set-list">
-      <n-h3 prefix="bar"> 历史版本 </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.about.history_version") }}
+      </n-h3>
       <n-collapse-transition :show="oldVersion?.length > 0">
         <n-collapse accordion>
           <n-collapse-item
@@ -60,7 +70,9 @@
       </n-collapse-transition>
     </div>
     <div class="set-list">
-      <n-h3 prefix="bar"> 社区与资讯 </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.about.community_and_news") }}
+      </n-h3>
       <n-flex class="link">
         <n-card
           v-for="(item, index) in communityData"
@@ -83,7 +95,9 @@ import { getUpdateLog, isElectron, openLink } from "@/utils/helper";
 import { debounce } from "lodash-es";
 import { useStatusStore } from "@/stores";
 import packageJson from "@/../package.json";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const statusStore = useStatusStore();
 
 // 社区数据
@@ -99,7 +113,7 @@ const communityData = [
     icon: "Github",
   },
   {
-    name: "官方博客",
+    name: computed(() => t("setting.about.official_blog")),
     url: packageJson.blog,
     icon: "RssFeed",
   },

@@ -3,6 +3,7 @@ import { isDev } from "./helper";
 import { useDataStore, useSettingStore } from "@/stores";
 import { isLogin } from "./auth";
 import { openCaptcha, openUserLogin } from "@/utils/modal";
+import { t } from "@/locale";
 
 export const API_URL = String(isDev ? "http://127.0.0.1:8001" : import.meta.env["VITE_API_URL"]);
 // 全局地址
@@ -91,10 +92,10 @@ serverHemusic.interceptors.response.use(
     }
 
     window.$notification.error({
-      title: "请求错误",
-      description: `状态码: ${response?.status || ""}`,
+      title: t("message.request_error"),
+      description: `${t("common.status_code")}: ${response?.status || ""}`,
       content: (response && (response.data as { message?: string }).message) || error.message,
-      meta: "若持续发生，可尝试软件热重载",
+      meta: t("message.request_error_tips"),
       duration: 5000,
     });
     // 返回错误

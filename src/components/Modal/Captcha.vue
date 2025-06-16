@@ -41,6 +41,8 @@ import { Click, Rotate, Slide, SlideRegion } from "go-captcha-vue";
 import { getCaptcha, verifyCaptcha } from "@/api/captcha";
 import { ClickDot } from "go-captcha-vue/dist/components/click/meta/data";
 import { debounce } from "lodash-es";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 interface CaptchaDataType {
   thumbX: number;
   thumbY: number;
@@ -111,19 +113,19 @@ const verify = debounce(
     try {
       const res = await verifyCaptcha(props.scene, props.meta, angle, point, dots);
       if (res.is_expired) {
-        window.$message.error("验证码已过期，请重试");
+        window.$message.error(t("message.captcha_expired"));
         refreshCaptcha(reset);
         return;
       }
       if (!res.is_success) {
-        window.$message.error("验证失败，请重试");
+        window.$message.error(t("message.captcha_fail"));
         refreshCaptcha(reset);
         return;
       }
-      window.$message.success("验证成功，请继续操作");
+      window.$message.success(t("message.captcha_success"));
       emit("close");
     } catch (e: any) {
-      window.$message.error(e?.message || "验证失败，请重试");
+      window.$message.error(e?.message || t("message.captcha_fail"));
       refreshCaptcha(reset);
     }
   },

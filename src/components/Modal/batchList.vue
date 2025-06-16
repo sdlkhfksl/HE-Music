@@ -8,7 +8,9 @@
       @update:checked-row-keys="tableCheck"
     />
     <n-flex class="batch-footer" justify="space-between" align="center">
-      <n-text :depth="3" class="count">已选择 {{ checkCount }} 首</n-text>
+      <n-text :depth="3" class="count">{{
+        t("modal.already_selected_song_counter", { count: checkCount })
+      }}</n-text>
       <n-flex class="menu">
         <!-- 批量删除 -->
         <n-button
@@ -27,7 +29,7 @@
           <template #icon>
             <SvgIcon name="Delete" />
           </template>
-          删除选中的歌曲
+          {{ t("modal.delete_selected_songs") }}
         </n-button>
         <!-- 添加到歌单 -->
         <n-button
@@ -40,7 +42,7 @@
           <template #icon>
             <SvgIcon name="AddList" />
           </template>
-          添加到歌单
+          {{ t("menu.add_to_playlist") }}
         </n-button>
       </n-flex>
     </n-flex>
@@ -53,6 +55,8 @@ import { isArray, isObject } from "lodash-es";
 import { openPlaylistAdd } from "@/utils/modal";
 import { deleteSongs } from "@/utils/auth";
 import { SongInfo } from "@/types/main.hemusic";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 interface DataType {
   key?: number;
@@ -89,21 +93,21 @@ const columnsData = computed<DataTableColumns<DataType>>(() => [
     width: 80,
   },
   {
-    title: "标题",
+    title: t("common.title"),
     key: "name",
     ellipsis: {
       tooltip: true,
     },
   },
   {
-    title: "歌手",
+    title: t("common.artist"),
     key: "artists",
     ellipsis: {
       tooltip: true,
     },
   },
   {
-    title: "专辑",
+    title: t("common.album"),
     key: "album",
     ellipsis: {
       tooltip: true,
@@ -117,11 +121,11 @@ const tableData = computed<DataType[]>(() =>
     key: index + 1,
     id: song?.id,
     platform: song?.platform,
-    name: song?.name || "未知曲目",
+    name: song?.name,
     artists: isArray(song?.singers)
       ? // 拼接歌手
         song?.singers.map((ar: { name: string }) => ar.name).join(" / ")
-      : song?.singers || "未知歌手",
+      : song?.singers || t("common.unknown_artist"),
     album: isObject(song?.album) ? song?.album.name : song?.album || "-",
     // 原始数据
     origin: song,

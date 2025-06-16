@@ -1,7 +1,9 @@
 <template>
   <div class="like">
     <div class="title">
-      <n-text class="keyword">我的收藏</n-text>
+      <n-text class="keyword">
+        {{ t("nav.my_collection") }}
+      </n-text>
       <n-flex class="status">
         <div
           v-for="(item, index) in likeData"
@@ -21,9 +23,9 @@
       type="segment"
       @update:value="(name: string) => router.push({ name })"
     >
-      <n-tab name="like-playlists"> 歌单 </n-tab>
-      <n-tab name="like-albums"> 专辑 </n-tab>
-      <n-tab name="like-artists"> 歌手 </n-tab>
+      <n-tab name="like-playlists"> {{ t("common.playlist") }} </n-tab>
+      <n-tab name="like-albums"> {{ t("common.album") }} </n-tab>
+      <n-tab name="like-artists"> {{ t("common.artist") }} </n-tab>
       <!--      <n-tab name="like-videos"> 视频 </n-tab>-->
     </n-tabs>
     <!-- 路由 -->
@@ -40,6 +42,8 @@
 
 <script setup lang="ts">
 import { useDataStore, useSettingStore } from "@/stores";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const router = useRouter();
 const dataStore = useDataStore();

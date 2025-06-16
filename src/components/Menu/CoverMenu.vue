@@ -18,6 +18,8 @@ import type { DropdownOption } from "naive-ui";
 import { renderIcon } from "@/utils/helper";
 import { useMusicStore, useStatusStore } from "@/stores";
 import { CoverType } from "@/types/main.hemusic";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const emit = defineEmits<{
   // 直接搜索
@@ -48,7 +50,7 @@ const openDropdown = async (
       dropdownOptions.value = [
         {
           key: "open",
-          label: "查看详情",
+          label: t("common.view_detail"),
           props: {
             onClick: () =>
               router.push({
@@ -60,7 +62,7 @@ const openDropdown = async (
         },
         {
           key: "play",
-          label: "播放",
+          label: t("common.play"),
           show:
             !musicStore.isPlayingPlaylist(item.id, item.platform, type) || !statusStore.playStatus,
           props: {
@@ -70,7 +72,7 @@ const openDropdown = async (
         },
         {
           key: "pause",
-          label: "暂停",
+          label: t("common.pause"),
           show:
             musicStore.isPlayingPlaylist(item.id, item.platform, type) && statusStore.playStatus,
           props: {
@@ -86,7 +88,7 @@ const openDropdown = async (
     });
   } catch (error) {
     console.error("右键菜单出现异常：", error);
-    window.$message.error("右键菜单出现异常");
+    window.$message.error(t("message.right_click_menu_error"));
   }
 };
 

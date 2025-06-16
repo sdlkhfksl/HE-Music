@@ -11,8 +11,12 @@
     <n-drawer-content :native-scrollbar="false" closable>
       <template #header>
         <div class="playlist-header">
-          <n-text class="name">播放队列</n-text>
-          <n-text class="count" depth="3"> {{ dataStore.playList.length }} 首歌曲 </n-text>
+          <n-text class="name">
+            {{ t("common.play_queue") }}
+          </n-text>
+          <n-text class="count" depth="3">
+            {{ t("common.song_count_noun", { count: dataStore.playList.length }) }}
+          </n-text>
         </div>
       </template>
       <Transition name="fade" mode="out-in">
@@ -50,14 +54,16 @@
               </div>
               <!-- 信息 -->
               <div class="data">
-                <n-text class="name text-hidden">{{ songData.name || "未知曲目" }}</n-text>
+                <n-text class="name text-hidden">{{ songData.name }}</n-text>
                 <div v-if="Array.isArray(songData?.singers)" class="artists">
                   <n-text v-for="ar in songData.singers" :key="ar.id" depth="3" class="ar">
                     {{ ar.name }}
                   </n-text>
                 </div>
                 <div v-else class="artists">
-                  <n-text class="ar" depth="3"> {{ songData?.singers || "未知艺术家" }} </n-text>
+                  <n-text class="ar" depth="3">
+                    {{ songData?.singers || t("common.unknown_artist") }}
+                  </n-text>
                 </div>
               </div>
               <!-- 移除 -->
@@ -69,7 +75,7 @@
         </n-virtual-list>
         <n-empty
           v-else
-          description="播放列表暂无歌曲，快去添加吧"
+          :description="t('play.no_songs')"
           class="tip"
           size="large"
           style="margin-top: 60px"
@@ -88,7 +94,7 @@
               <template #icon>
                 <SvgIcon name="DeleteSweep" />
               </template>
-              清空列表
+              {{ t("common.clear_list") }}
             </n-button>
           </n-gi>
           <n-gi>
@@ -102,7 +108,7 @@
               <template #icon>
                 <SvgIcon name="Location" />
               </template>
-              当前播放
+              {{ t("common.current_play") }}
             </n-button>
           </n-gi>
         </n-grid>
@@ -115,6 +121,8 @@
 import { useStatusStore, useDataStore } from "@/stores";
 import type { VirtualListInst } from "naive-ui";
 import player from "@/utils/player";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const dataStore = useDataStore();
 const statusStore = useStatusStore();

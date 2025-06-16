@@ -80,6 +80,7 @@ interface SettingState {
   lyricExclude: boolean;
   lyricExcludeKeywords: string[];
   showDefaultLocalPath: boolean;
+  language: string;
 }
 
 export const useSettingStore = defineStore("setting", {
@@ -96,6 +97,7 @@ export const useSettingStore = defineStore("setting", {
     showSearchHistory: true, // 显示搜索历史
     menuShowCover: true, // 菜单显示封面
     routeAnimation: "slide", // 路由动画
+    language: "zh-CN", // 语言
     // 系统
     useOnlineService: true, // 是否使用在线服务
     showCloseAppTip: true, // 显示关闭应用提示
@@ -175,19 +177,6 @@ export const useSettingStore = defineStore("setting", {
       } else {
         this.themeMode = mode;
       }
-      window.$message.info(
-        `已切换至
-        ${
-          this.themeMode === "auto"
-            ? "跟随系统"
-            : this.themeMode === "light"
-              ? "浅色模式"
-              : "深色模式"
-        }`,
-        {
-          showIcon: false,
-        },
-      );
     },
   },
   // 持久化

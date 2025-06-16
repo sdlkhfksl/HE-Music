@@ -13,7 +13,7 @@
           }"
           class="player-tip"
         >
-          <span>该歌曲暂时无法播放，为您采用其他音源，可能会与原曲存在差别</span>
+          <span>{{ t("play.unlock_music_tip") }}</span>
         </div>
       </n-popover>
     </div>
@@ -81,6 +81,8 @@ import { useMusicStore, usePlatformStore, useSettingStore, useStatusStore } from
 import { debounce, isObject } from "lodash-es";
 import { IsValidId } from "@/utils/song";
 import { FeatureSupportFlag } from "@/api/platform";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 defineProps<{
   center?: boolean;

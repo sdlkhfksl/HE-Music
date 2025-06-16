@@ -3,6 +3,7 @@ import { openUpdateApp } from "./modal";
 import { useMusicStore, useDataStore, useStatusStore } from "@/stores";
 import player from "./player";
 import { toLikeSong } from "./auth";
+import { t } from "@/locale";
 // 关闭更新状态
 const closeUpdateStatus = () => {
   const statusStore = useStatusStore();
@@ -35,12 +36,12 @@ const initIpc = () => {
       await toLikeSong(musicStore.playSong, !dataStore.isLikeSong(musicStore.playSong));
     });
     // 桌面歌词开关
-    window.electron.ipcRenderer.on("toogleDesktopLyric", () => player.toggleDesktopLyric());
+    window.electron.ipcRenderer.on("toggleDesktopLyric", () => player.toggleDesktopLyric());
     window.electron.ipcRenderer.on("closeDesktopLyric", () => player.toggleDesktopLyric());
     // 无更新
     window.electron.ipcRenderer.on("update-not-available", () => {
       closeUpdateStatus();
-      window.$message.success("当前已是最新版本");
+      window.$message.success(t("message.already_latest_version"));
     });
     // 有更新
     window.electron.ipcRenderer.on("update-available", (_, info) => {
@@ -51,7 +52,7 @@ const initIpc = () => {
     window.electron.ipcRenderer.on("update-error", (_, error) => {
       console.error("Error updating:", error);
       closeUpdateStatus();
-      window.$message.error("更新过程出现错误");
+      window.$message.error(t("message.update_error"));
     });
   } catch (error) {
     console.log(error);

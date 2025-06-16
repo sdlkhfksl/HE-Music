@@ -6,7 +6,7 @@
       <div v-if="videoData" class="info">
         <n-h2 class="name">
           <n-ellipsis :line-clamp="1" :tooltip="{ placement: 'bottom' }">
-            {{ videoData.name || "未知视频" }}
+            {{ videoData.name || t("common.unknown_video") }}
           </n-ellipsis>
         </n-h2>
         <n-flex class="meta" align="center">
@@ -90,7 +90,7 @@
     >
       <n-flex class="title" justify="space-between">
         <n-h3 prefix="bar">
-          评论
+          {{ t("common.comment") }}
           <n-text v-if="commentTotalCount > 0" class="num" depth="3">{{
             commentTotalCount
           }}</n-text>
@@ -130,6 +130,8 @@ import Plyr from "plyr";
 import "plyr/dist/plyr.css";
 import { CommentInfo, MVInfo } from "@/types/main.hemusic";
 import { FeatureSupportFlag } from "@/api/platform";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const router = useRouter();
 const statusStore = useStatusStore();
@@ -154,7 +156,7 @@ const commentData = ref<CommentInfo[]>([]);
 const commentType = ref<"hot" | "new">("hot");
 const commentPage = ref<number>(1);
 const commentHasMore = ref<boolean>(true);
-const commentText = { hot: "最热", new: "最新" };
+const commentText = computed(() => ({ hot: t("common.hottest"), new: t("common.newest") }));
 const commentLastId = ref<string>("");
 const commentTotalCount = ref<number>(0);
 
@@ -182,17 +184,17 @@ const playerOptions: Plyr.Options = {
     options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
   },
   i18n: {
-    play: "播放",
-    pause: "暂停",
-    speed: "速度",
-    settings: "设置",
-    normal: "正常",
-    quality: "画质",
-    pip: "画中画",
-    enterFullscreen: "开启全屏",
-    exitFullscreen: "退出全屏",
-    mute: "音量",
-    unmute: "静音",
+    play: t("common.play"),
+    pause: t("common.pause"),
+    speed: t("common.speed"),
+    settings: t("common.setting"),
+    normal: t("common.normal"),
+    quality: t("common.quality"),
+    pip: t("common.pip"),
+    enterFullscreen: t("common.enter_full_screen"),
+    exitFullscreen: t("common.exit_full_screen"),
+    mute: t("common.mute"),
+    unmute: t("common.unmute"),
   },
   tooltips: {
     controls: true,
@@ -240,7 +242,7 @@ const getVideoData = async (id: string, platform: string) => {
     }
   } catch (error) {
     console.error("Error getting video data:", error);
-    window.$message.error("获取视频数据失败");
+    window.$message.error(t("message.get_video_data_fail"));
   }
 };
 
@@ -280,7 +282,7 @@ const getCommentData = async (id: string, platform: string, clean: boolean = tru
     commentLoading.value = false;
   } catch (error) {
     console.error("Error getting comment data:", error);
-    window.$message.error("获取评论数据失败");
+    window.$message.error(t("message.get_comment_data_fail"));
   }
 };
 

@@ -37,17 +37,17 @@
                 @select="sortSelect"
               >
                 <div class="title has-sort">
-                  <n-text>标题</n-text>
+                  <n-text>{{ t("common.title") }}</n-text>
                   <n-text v-if="statusStore.listSort !== 'default'" class="sort" depth="3">
-                    {{ sortOptions[statusStore.listSort].name }}
+                    {{ t(`sort.${snakeCase(statusStore.listSort)}`) }}
                   </n-text>
                 </div>
               </n-dropdown>
-              <n-text v-else class="title">标题</n-text>
-              <n-text v-if="!hiddenAlbum" class="album">专辑</n-text>
-              <n-text class="actions">操作</n-text>
-              <n-text class="meta">时长</n-text>
-              <n-text v-if="!hiddenSize" class="meta">大小</n-text>
+              <n-text v-else class="title">{{ t("common.title") }}</n-text>
+              <n-text v-if="!hiddenAlbum" class="album">{{ t("common.album") }}</n-text>
+              <n-text class="actions"></n-text>
+              <n-text class="meta">{{ t("common.duration") }}</n-text>
+              <n-text v-if="!hiddenSize" class="meta">{{ t("common.size") }}</n-text>
             </div>
           </template>
           <!-- 主内容 -->
@@ -69,9 +69,9 @@
             <div v-if="showFooter" class="load-more">
               <n-flex v-if="loadMore && loading">
                 <n-spin size="small" />
-                <n-text>{{ loadingText || "努力加载中" }}</n-text>
+                <n-text>{{ loadingText || t("common.effort_loading") }}</n-text>
               </n-flex>
-              <n-divider v-else dashed> 没有更多啦 ~ </n-divider>
+              <n-divider v-else dashed> {{ t("common.no_more_data") }} ~ </n-divider>
             </div>
           </template>
         </VirtList>
@@ -103,7 +103,7 @@
       <n-skeleton :repeat="10" text />
     </div>
     <!-- 空列表 -->
-    <n-empty v-else description="列表光秃秃的，啥都没有哦" size="large" class="song-list empty" />
+    <n-empty v-else :description="t('common.list_empty')" size="large" class="song-list empty" />
   </Transition>
 </template>
 
@@ -112,12 +112,14 @@ import type { DropdownOption } from "naive-ui";
 import type { SortType } from "@/types/main";
 import { useMusicStore, useStatusStore } from "@/stores";
 import { VirtList } from "vue-virt-list";
-import { cloneDeep, entries, isEmpty } from "lodash-es";
+import { cloneDeep, entries, isEmpty, snakeCase } from "lodash-es";
 import { sortOptions } from "@/utils/meta";
 import { renderIcon } from "@/utils/helper";
 import SongListMenu from "@/components/Menu/SongListMenu.vue";
 import player from "@/utils/player";
 import { SongInfo } from "@/types/main.hemusic";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -153,7 +155,7 @@ const props = withDefaults(
   }>(),
   {
     type: "song",
-    loadingText: "努力加载中...",
+    loadingText: "",
     playListId: "",
     showFooter: true,
     hiddenSize: true,
@@ -232,9 +234,9 @@ const { height: songListHeight, stop: stopCalcHeight } = useElementSize(songList
 
 // 列表排序菜单
 const sortMenuOptions = computed<DropdownOption[]>(() =>
-  entries(sortOptions).map(([key, { name, show, icon }]) => ({
+  entries(sortOptions).map(([key, { show, icon }]) => ({
     key,
-    label: name,
+    label: t(`sort.${snakeCase(key)}`),
     show: show === "all" ? true : show === props.type,
     icon: renderIcon(icon),
   })),

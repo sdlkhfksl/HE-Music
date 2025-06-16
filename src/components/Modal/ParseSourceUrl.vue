@@ -9,7 +9,7 @@
             maxRows: 6,
           }"
           :maxlength="300"
-          placeholder="请输入分享链接"
+          :placeholder="t('modal.url_placeholder')"
           type="textarea"
           show-count
           clearable
@@ -19,7 +19,7 @@
     <n-divider style="margin-bottom: 0; margin-top: 0" />
     <div class="parse-url-result">
       <n-skeleton v-if="loading" animated text height="50px" :repeat="2" />
-      <n-empty v-else-if="!parseResult.success" description="解析失败" size="large" />
+      <n-empty v-else-if="!parseResult.success" :description="t('modal.parse_fail')" size="large" />
       <SongList
         height="auto"
         v-else-if="parseResult.type === 'song'"
@@ -36,10 +36,10 @@
       <n-table v-else :bordered="false" :single-line="false">
         <thead>
           <tr>
-            <th>平台</th>
+            <th>{{ t("common.source") }}</th>
             <th>ID</th>
-            <th>类型</th>
-            <th>操作</th>
+            <th>{{ t("common.type") }}</th>
+            <th>{{ t("common.operation") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -52,28 +52,36 @@
             </td>
             <td>{{ parseResult.id }}</td>
             <td>{{ typeNameMap[parseResult.type] || parseResult.type }}</td>
-            <td><n-button quaternary type="primary" @click="toJump"> 跳转 </n-button></td>
+            <td>
+              <n-button quaternary type="primary" @click="toJump">
+                {{ t("common.view_detail") }}
+              </n-button>
+            </td>
           </tr>
         </tbody>
       </n-table>
     </div>
     <n-divider style="margin-bottom: 0; margin-top: 0" />
-    <n-button class="create" type="primary" @click="toParseSourceUrl"> 解析 </n-button>
+    <n-button class="create" type="primary" @click="toParseSourceUrl">
+      {{ t("common.parse") }}
+    </n-button>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { FormInst, FormRules } from "naive-ui";
-import { textRule } from "@/utils/rules";
+import { useFormRule } from "@/utils/rules";
 import { debounce } from "lodash-es";
 import { parseSourceUrl } from "@/api/source";
 import SongList from "@/components/List/SongList.vue";
 import { usePlatformStore } from "@/stores";
 import { songInfo } from "@/api/song";
-
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 const platformStore = usePlatformStore();
 const router = useRouter();
-
+const { textRule } = useFormRule();
 const emit = defineEmits<{ close: [] }>();
 
 // 表单类型
@@ -81,13 +89,13 @@ interface FormType {
   url: string;
 }
 
-const typeNameMap = {
-  song: "歌曲",
-  playlist: "歌单",
-  album: "专辑",
-  singer: "歌手",
-  mv: "视频",
-};
+const typeNameMap = computed(() => ({
+  song: t("common.song"),
+  playlist: t("common.playlist"),
+  album: t("common.album"),
+  singer: t("common.artist"),
+  mv: t("common.video"),
+}));
 
 const parseResult = ref({
   success: false,
@@ -114,7 +122,7 @@ const toParseSourceUrl = debounce(
     parseSourceUrl(formData.value.url)
       .then(async ({ id, platform, type }) => {
         if (!id || !platform || !type) {
-          window.$message.error("解析失败");
+          window.$message.error(t("message.parse_fail"));
           return;
         }
         switch (type) {

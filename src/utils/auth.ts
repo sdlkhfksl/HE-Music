@@ -24,6 +24,7 @@ import {
   SongInfo,
 } from "@/types/main.hemusic";
 import { deleteSongFromPlaylist, getUserPlaylists } from "@/api/userplaylist";
+import { t } from "@/locale";
 
 /**
  * 用户是否登录
@@ -41,7 +42,7 @@ export const toLogout = async () => {
   sessionStorage.clear();
   // 清除用户数据
   await dataStore.clearUserData();
-  window.$message.success("成功退出登录");
+  window.$message.success(t("message.logout_success"));
 };
 
 export const updateUserAccountInfo = async () => {
@@ -130,13 +131,13 @@ export const updateUserCreatedPlaylist = async () => {
 export const toLikeSong = debounce(
   async (song: SongInfo, like: boolean) => {
     if (!isLogin()) {
-      window.$message.warning("请登录后使用");
+      window.$message.warning(t("message.login_required"));
       return;
     }
     const dataStore = useDataStore();
     const { id, platform, path } = song;
     if (path) {
-      window.$message.warning("本地歌曲暂不支持该操作");
+      window.$message.warning(t("message.local_song_not_support_operation"));
       return;
     }
     const likeList = dataStore.userLikeData.songs;
@@ -145,12 +146,12 @@ export const toLikeSong = debounce(
       if (like) {
         await likeSong(id, platform);
         likeList.push({ id, platform });
-        window.$message.success("已添加到我喜欢的音乐");
+        window.$message.success(t("message.my_favorite_music_added"));
       } else {
         await unlikeSong(id, platform);
         const idx = likeList.findIndex((item) => item.id === id && item.platform === platform);
         likeList.splice(idx, 1);
-        window.$message.success("已取消喜欢");
+        window.$message.success(t("message.my_favorite_mussic_deleted"));
       }
       dataStore.setUserLikeData("songs", likeList);
 
@@ -161,7 +162,11 @@ export const toLikeSong = debounce(
       // ipc
       if (isElectron) window.electron.ipcRenderer.send("like-status-change", like);
     } catch {
-      window.$message.error(`${like ? "喜欢" : "取消"}音乐时发生错误`);
+      window.$message.error(
+        like
+          ? t("message.my_favorite_music_added_fail")
+          : t("message.my_favorite_music_deleted_fail"),
+      );
       return;
     }
   },
@@ -174,7 +179,7 @@ export const toLikePlaylist = debounce(
   async (info: PlaylistInfo, like: boolean) => {
     if (!info || !info.id || !info.platform) return;
     if (!isLogin()) {
-      window.$message.warning("请登录后使用");
+      window.$message.warning(t("message.login_required"));
       return;
     }
 
@@ -186,9 +191,13 @@ export const toLikePlaylist = debounce(
       }
       await updateUserLikePlaylist();
       // 更新歌单
-      window.$message.success((like ? "收藏" : "取消收藏") + "歌单成功");
+      window.$message.success(
+        like ? t("message.collected_playlist_added") : t("message.collected_deleted"),
+      );
     } catch {
-      window.$message.success((like ? "收藏" : "取消收藏") + "歌单失败，请重试");
+      window.$message.success(
+        like ? t("message.collected_playlist_added_fail") : t("message.collected_deleted_fail"),
+      );
       return;
     }
   },
@@ -201,7 +210,7 @@ export const toLikeArtist = debounce(
   async (info: SingerInfo, like: boolean) => {
     if (!info || !info.id || !info.platform) return;
     if (!isLogin()) {
-      window.$message.warning("请登录后使用");
+      window.$message.warning(t("message.login_required"));
       return;
     }
     try {
@@ -211,10 +220,13 @@ export const toLikeArtist = debounce(
         await unlikeSinger(info.id, info.platform);
       }
       await updateUserLikeArtists();
-      // 更新歌单
-      window.$message.success((like ? "收藏" : "取消收藏") + "歌手成功");
+      window.$message.success(
+        like ? t("message.collected_artist_added") : t("message.collected_deleted"),
+      );
     } catch {
-      window.$message.success((like ? "收藏" : "取消收藏") + "歌手失败，请重试");
+      window.$message.success(
+        like ? t("message.collected_artist_added_fail") : t("message.collected_deleted_fail"),
+      );
       return;
     }
   },
@@ -227,7 +239,7 @@ export const toLikeAlbum = debounce(
   async (info: AlbumInfo, like: boolean) => {
     if (!info || !info.id || !info.platform) return;
     if (!isLogin()) {
-      window.$message.warning("请登录后使用");
+      window.$message.warning(t("message.login_required"));
       return;
     }
 
@@ -239,9 +251,13 @@ export const toLikeAlbum = debounce(
       }
       await updateUserLikeAlbums();
       // 更新歌单
-      window.$message.success((like ? "收藏" : "取消收藏") + "专辑成功");
+      window.$message.success(
+        like ? t("message.collected_album_added") : t("message.collected_deleted"),
+      );
     } catch {
-      window.$message.success((like ? "收藏" : "取消收藏") + "专辑失败，请重试");
+      window.$message.success(
+        like ? t("message.collected_album_added_fail") : t("message.collected_deleted_fail"),
+      );
       return;
     }
   },
@@ -257,17 +273,17 @@ export const toLikeAlbum = debounce(
 export const deleteSongs = async (pid: string, ids: IDPlatformInfo[], callback?: () => void) => {
   try {
     window.$dialog.warning({
-      title: "删除歌曲",
-      content: ids?.length > 1 ? "确定删除这些选中的歌曲吗？" : "确定删除这个歌曲吗？",
-      positiveText: "删除",
-      negativeText: "取消",
+      title: t("common.delete"),
+      content: t("modal.song_delete_confirm", ids.length),
+      positiveText: t("common.delete"),
+      negativeText: t("common.cancel"),
       onPositiveClick: async () => {
         try {
           await deleteSongFromPlaylist(pid, ids);
           if (isFunction(callback)) callback();
-          window.$message.success("删除成功");
+          window.$message.success(t("message.delete_success"));
         } catch {
-          window.$message.error("删除歌曲失败，请重试");
+          window.$message.error(t("message.delete_fail"));
         }
       },
     });

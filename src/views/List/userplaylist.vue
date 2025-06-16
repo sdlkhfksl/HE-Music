@@ -28,14 +28,14 @@
           <n-h2 class="name text-hidden">
             {{
               playlistDetailData.is_default == 1
-                ? "我喜欢的音乐"
-                : playlistDetailData.name || "未知歌单"
+                ? t("playlist.my_favorite_music")
+                : playlistDetailData.name || t("common.unknown_playlist")
             }}
           </n-h2>
           <n-collapse-transition :show="!listScrolling" class="collapse">
             <!-- 简介 -->
             <n-ellipsis
-              v-if="playlistDetailData.description || '这个人很懒，什么都没有留下'"
+              v-if="playlistDetailData.description || t('playlist.empty_description')"
               :line-clamp="1"
               :tooltip="{
                 trigger: 'click',
@@ -45,13 +45,13 @@
                 contentStyle: 'white-space: pre-line; max-height:400px',
               }"
             >
-              {{ playlistDetailData.description || "这个人很懒，什么都没有留下" }}
+              {{ playlistDetailData.description || t("playlist.empty_description") }}
             </n-ellipsis>
             <!-- 信息 -->
             <n-flex class="meta">
               <div class="item">
                 <SvgIcon name="Person" :depth="3" />
-                <n-text>{{ playlistDetailData.creator || "未知用户名" }}</n-text>
+                <n-text>{{ playlistDetailData.creator || t("common.unknown_user") }}</n-text>
               </div>
               <div class="item">
                 <SvgIcon name="Music" :depth="3" />
@@ -85,20 +85,20 @@
                 {{
                   loading
                     ? isSamePlaylist
-                      ? "更新中..."
-                      : `加载中... (${
+                      ? t("common.updating") + "..."
+                      : `${t("common.loading")}... (${
                           playlistData.length === Number(playlistDetailData.song_count)
                             ? 0
                             : playlistData.length
                         }/${playlistDetailData.song_count})`
-                    : "播放"
+                    : t("common.play")
                 }}
               </n-button>
               <n-button :focusable="false" strong secondary round @click="updatePlaylist">
                 <template #icon>
                   <SvgIcon name="EditNote" />
                 </template>
-                编辑歌单
+                {{ t("common.edit") }}
               </n-button>
               <!-- 更多 -->
               <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">
@@ -116,7 +116,7 @@
                 v-model:value="searchValue"
                 :input-props="{ autocomplete: 'off' }"
                 class="search"
-                placeholder="模糊搜索"
+                :placeholder="t('search.fuzzy_search')"
                 clearable
                 round
                 @input="listSearch"
@@ -152,7 +152,7 @@
       />
       <n-empty
         v-else
-        :description="`搜不到关于 ${searchValue} 的任何歌曲呀`"
+        :description="t('search.no_song_result', { keyword: searchValue })"
         style="margin-top: 60px"
         size="large"
       >
@@ -179,6 +179,8 @@ import { computed } from "vue";
 import SongList from "@/components/List/SongList.vue";
 import { deleteUserPlaylist, getUserPlaylistDetail } from "@/api/userplaylist";
 import { formatTimestamp } from "@/utils/time";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const router = useRouter();
 const statusStore = useStatusStore();
@@ -219,7 +221,7 @@ const isSamePlaylist = computed<boolean>(() => oldPlaylistId.value === playlistI
 // 更多操作
 const moreOptions = computed<DropdownOption[]>(() => [
   {
-    label: "删除歌单",
+    label: t("common.delete_playlist"),
     key: "delete",
     show: playlistDetailData.value?.is_default !== 1,
     props: {
@@ -228,7 +230,7 @@ const moreOptions = computed<DropdownOption[]>(() => [
     icon: renderIcon("Delete"),
   },
   {
-    label: "批量操作",
+    label: t("common.batch_operation"),
     key: "batch",
     props: {
       onClick: () => openBatchList(playlistDataShow.value, false, playlistId.value),
@@ -296,7 +298,7 @@ const loadingMsgShow = (show: boolean = true, count?: number) => {
   if (show) {
     if (count && count <= 800) return;
     loadingMsg.value?.destroy();
-    loadingMsg.value = window.$message.loading("该歌单歌曲数量过多，请稍等", {
+    loadingMsg.value = window.$message.loading(t("message.playlist_too_many_songs"), {
       duration: 0,
       closable: true,
     });
@@ -330,13 +332,13 @@ const listSearch = debounce((val: string) => {
 const toDeletePlaylist = async () => {
   if (!playlistDetailData.value || !playlistId.value) return;
   window.$dialog.warning({
-    title: "删除歌单",
-    content: "确认删除这个歌单？该操作无法撤销！",
-    positiveText: "删除",
-    negativeText: "取消",
+    title: t("common.delete_playlist"),
+    content: t("message.delete_playlist_confirm"),
+    positiveText: t("common.ok"),
+    negativeText: t("common.cancel"),
     onPositiveClick: async () => {
       await deleteUserPlaylist(playlistId.value);
-      window.$message.success("歌单删除成功");
+      window.$message.success(t("message.delete_playlist_success"));
       await updateUserCreatedPlaylist();
     },
   });

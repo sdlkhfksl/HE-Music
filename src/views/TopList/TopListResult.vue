@@ -22,7 +22,9 @@
                   <n-text v-if="Array.isArray(song.singers)" class="desc" depth="3">{{
                     song.singers?.[0]?.name
                   }}</n-text>
-                  <n-text v-else class="desc" depth="3">{{ song.singers || "未知艺术家" }}</n-text>
+                  <n-text v-else class="desc" depth="3">{{
+                    song.singers || t("common.unknown_artist")
+                  }}</n-text>
                 </div>
               </template>
             </SongListCard>
@@ -54,6 +56,8 @@
 import TopList from "@/components/List/TopList.vue";
 import { TopInfo } from "@/types/main.hemusic";
 import { getTopList } from "@/api/playlist";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const router = useRouter();
 

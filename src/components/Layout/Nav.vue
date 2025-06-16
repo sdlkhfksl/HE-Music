@@ -23,7 +23,7 @@
       <User v-if="settingStore.useOnlineService" />
       <!-- 设置菜单 -->
       <n-dropdown :options="setOptions" trigger="click" show-arrow @select="setSelect">
-        <n-button :focusable="false" title="设置" tertiary circle>
+        <n-button :focusable="false" :title="t('common.setting')" tertiary circle>
           <template #icon>
             <SvgIcon name="Settings" />
           </template>
@@ -33,14 +33,14 @@
     <!-- 客户端控制 -->
     <n-flex v-if="isElectron" align="center" class="client-control">
       <n-divider class="divider" vertical />
-      <n-button :focusable="false" title="最小化" tertiary circle @click="min">
+      <n-button :focusable="false" :title="t('nav.minimize')" tertiary circle @click="min">
         <template #icon>
           <SvgIcon name="WindowMinimize" />
         </template>
       </n-button>
       <n-button
         :focusable="false"
-        :title="isMax ? '还原' : '最大化'"
+        :title="isMax ? t('nav.restore') : t('nav.maximize')"
         tertiary
         circle
         @click="maxOrRes"
@@ -49,7 +49,7 @@
           <SvgIcon :name="isMax ? 'WindowRestore' : 'WindowMaximize'" />
         </template>
       </n-button>
-      <n-button :focusable="false" title="关闭" tertiary circle @click="tryClose">
+      <n-button :focusable="false" :title="t('common.close')" tertiary circle @click="tryClose">
         <template #icon>
           <SvgIcon name="WindowClose" />
         </template>
@@ -59,28 +59,30 @@
     <n-modal
       v-model:show="showCloseModal"
       :auto-focus="false"
-      title="关闭软件"
+      :title="t('nav.close_software')"
       style="width: 600px"
       preset="card"
       transform-origin="center"
       bordered
       @after-leave="rememberNotAsk = false"
     >
-      <n-text class="tip">确认关闭软件吗？</n-text>
-      <n-checkbox v-model:checked="rememberNotAsk" class="checkbox"> 记住且不再询问 </n-checkbox>
+      <n-text class="tip">{{ t("message.close_software_confirm") }}</n-text>
+      <n-checkbox v-model:checked="rememberNotAsk" class="checkbox">
+        {{ t("message.remember_and_do_not_ask_again") }}
+      </n-checkbox>
       <template #footer>
         <n-flex justify="end">
           <n-button strong secondary @click="hideOrClose('exit')">
             <template #icon>
               <SvgIcon name="ExitToApp" />
             </template>
-            关闭
+            {{ t("common.close") }}
           </n-button>
           <n-button type="primary" strong secondary @click="hideOrClose('hide')">
             <template #icon>
               <SvgIcon name="WindowHide" />
             </template>
-            隐藏到托盘
+            {{ t("nav.hide_to_tray") }}
           </n-button>
         </n-flex>
       </template>
@@ -93,6 +95,8 @@ import type { DropdownOption } from "naive-ui";
 import { useSettingStore } from "@/stores";
 import { isElectron, isDev, renderIcon } from "@/utils/helper";
 import { openParseSourceUrl, openSetting } from "@/utils/modal";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const router = useRouter();
 const settingStore = useSettingStore();
@@ -142,10 +146,10 @@ const setOptions = computed<DropdownOption[]>(() => [
   {
     label:
       settingStore.themeMode === "auto"
-        ? "浅色模式"
+        ? t("setting.general.theme_mode_value_light")
         : settingStore.themeMode === "light"
-          ? "深色模式"
-          : "跟随系统",
+          ? t("setting.general.theme_mode_value_dark")
+          : t("setting.general.theme_mode_value_auto"),
     key: "themeMode",
     icon: renderIcon(
       settingStore.themeMode === "auto"
@@ -162,25 +166,25 @@ const setOptions = computed<DropdownOption[]>(() => [
   {
     // 重启
     key: "restart",
-    label: "软件热重载",
+    label: t("nav.software_hot_reload"),
     show: isElectron,
     props: { onClick: () => window.location.reload() },
     icon: renderIcon("Restart"),
   },
   {
     key: "dev-tools",
-    label: "开启控制台",
+    label: t("nav.open_dev_tool"),
     show: isElectron && isDev,
     icon: renderIcon("Code"),
   },
   {
     key: "parse-source-url",
-    label: "链接解析",
+    label: t("nav.parse_source_url"),
     icon: renderIcon("Parse"),
   },
   {
     key: "setting",
-    label: "全局设置",
+    label: t("nav.global_setting"),
     icon: renderIcon("Settings"),
   },
 ]);

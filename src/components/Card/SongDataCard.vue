@@ -9,7 +9,7 @@
     </n-image>
     <Transition name="fade" mode="out-in">
       <div v-if="data" class="data">
-        <n-text class="name">{{ data.name || "未知曲目" }}</n-text>
+        <n-text class="name">{{ data.name }}</n-text>
         <div v-if="Array.isArray(data.singers)" class="artists text-hidden">
           <SvgIcon name="Artist" :depth="3" />
           <n-text v-for="ar in data.singers" :key="ar.id" class="ar">
@@ -18,15 +18,15 @@
         </div>
         <div v-else class="artists text-hidden">
           <SvgIcon name="Artist" :depth="3" />
-          <n-text class="ar"> {{ data.singers || "未知艺术家" }} </n-text>
+          <n-text class="ar"> {{ data.singers || t("common.unknown_artist") }} </n-text>
         </div>
         <div class="album text-hidden">
           <SvgIcon name="Album" :depth="3" />
           <n-text v-if="isObject(data.album)" class="album-text">
-            {{ data.album?.name || "未知专辑" }}
+            {{ data.album?.name || t("common.unknown_album") }}
           </n-text>
           <n-text v-else class="album-text">
-            {{ data.album || "未知专辑" }}
+            {{ data.album || t("common.unknown_album") }}
           </n-text>
         </div>
       </div>
@@ -42,6 +42,8 @@ import { coverLoaded } from "@/utils/helper";
 import { isObject } from "lodash-es";
 import { getSizeCover } from "@/utils/format";
 import { SongInfo } from "@/types/main.hemusic";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 defineProps<{
   data: SongInfo;

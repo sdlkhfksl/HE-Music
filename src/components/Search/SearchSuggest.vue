@@ -22,7 +22,9 @@
           @click="emit('toSearch', statusStore.searchInputValue, 'keyword')"
         >
           <SvgIcon name="Search" :depth="3" />
-          <n-text class="text text-hidden">直接搜索：{{ statusStore.searchInputValue }}</n-text>
+          <n-text class="text text-hidden">{{
+            `${t("search.direct_search")} ${statusStore.searchInputValue}`
+          }}</n-text>
         </div>
         <!-- 搜索建议 -->
         <Transition name="fade" mode="out-in" @after-leave="calcSearchSuggestHeights">
@@ -49,6 +51,8 @@
 import { searchSuggest } from "@/api/search";
 import { usePlatformStore, useStatusStore } from "@/stores";
 import { FeatureSupportFlag } from "@/api/platform";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const emit = defineEmits<{
   toSearch: [key: number | string, type: string];

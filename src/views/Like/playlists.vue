@@ -22,12 +22,15 @@
 <script setup lang="ts">
 import { useDataStore } from "@/stores";
 import PlaylistList from "@/components/List/PlaylistList.vue";
+import { useI18n } from "vue-i18n";
+import { computed } from "vue";
+const { t } = useI18n();
 
 const dataStore = useDataStore();
 
 // 歌单分类
-const plTypeChoose = ref(0);
-const plTypeName = ["我创建的", "我收藏的"];
+const plTypeChoose = ref<number>(0);
+const plTypeName = computed<string[]>(() => [t("playlist.my_created"), t("playlist.my_collected")]);
 
 // 歌单列表内容
 const listData = computed(() =>

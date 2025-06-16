@@ -32,12 +32,14 @@ import { RouterLink, useRouter } from "vue-router";
 import { isElectron, renderIcon } from "@/utils/helper";
 import { openCreatePlaylist } from "@/utils/modal";
 import { PlaylistInfo, UserFavouritePlaylistInfo, UserPlaylistInfo } from "@/types/main.hemusic";
+import { useI18n } from "vue-i18n";
 
 const router = useRouter();
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 
+const { t } = useI18n();
 // 菜单数据
 const menuRef = ref<MenuInst | null>(null);
 const menuActiveKey = ref<string | number>((router.currentRoute.value.name as string) || "home");
@@ -59,7 +61,7 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
         {
           key: "discover",
           link: "discover",
-          label: "发现音乐",
+          label: t("nav.discover"),
           icon: renderIcon("Discover", {
             style: {
               transform: "translateY(-1px)",
@@ -69,7 +71,7 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
         {
           key: "playlist-square",
           link: "playlist-square",
-          label: "歌单广场",
+          label: t("nav.playlist_square"),
           icon: renderIcon("Square", {
             style: {
               transform: "translateY(-1px)",
@@ -79,7 +81,7 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
         {
           key: "top-list",
           link: "top-list",
-          label: "排行榜",
+          label: t("common.rank"),
           icon: renderIcon("TopList", {
             style: {
               transform: "translateY(-1px)",
@@ -99,20 +101,20 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
         {
           key: "like",
           link: "like",
-          label: "我的收藏",
+          label: t("nav.my_collection"),
           icon: renderIcon("Star"),
         },
         {
           key: "local",
           link: "local",
-          label: "本地歌曲",
+          label: t("common.local_music"),
           show: isElectron,
           icon: renderIcon("FolderMusic"),
         },
         {
           key: "history",
           link: "history",
-          label: "最近播放",
+          label: t("nav.play_history"),
           icon: renderIcon("History"),
         },
         {
@@ -125,7 +127,7 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
           icon: statusStore.menuCollapsed ? renderIcon("PlaylistAdd") : undefined,
           label: () =>
             h("div", { class: "user-list" }, [
-              h(NText, { depth: 3 }, () => ["创建的歌单"]),
+              h(NText, { depth: 3 }, () => [t("nav.created_playlist")]),
               h(NButton, {
                 type: "tertiary",
                 round: true,
@@ -148,7 +150,7 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
             h(
               "div",
               { class: "user-list" },
-              h(NText, { depth: 3 }, () => ["收藏的歌单"]),
+              h(NText, { depth: 3 }, () => [t("nav.collected_playlist")]),
             ),
           children: [...likedPlaylist.value],
         },

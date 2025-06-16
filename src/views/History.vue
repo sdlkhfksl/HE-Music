@@ -1,8 +1,12 @@
 <template>
   <div class="history">
     <div class="title">
-      <n-text class="keyword">最近播放</n-text>
-      <n-text class="size" depth="3">共 {{ dataStore.historyList?.length || 0 }} 首</n-text>
+      <n-text class="keyword">
+        {{ t("nav.play_history") }}
+      </n-text>
+      <n-text class="size" depth="3">{{
+        t("common.total_song_count", { count: dataStore.historyList?.length || 0 })
+      }}</n-text>
     </div>
     <n-flex class="menu">
       <n-button
@@ -17,7 +21,7 @@
         <template #icon>
           <SvgIcon name="Play" />
         </template>
-        播放
+        {{ t("common.play") }}
       </n-button>
       <n-button
         :focusable="false"
@@ -31,7 +35,7 @@
         <template #icon>
           <SvgIcon name="Delete" />
         </template>
-        清空列表
+        {{ t("common.clear_list") }}
       </n-button>
     </n-flex>
     <Transition name="fade" mode="out-in">
@@ -42,12 +46,7 @@
         hiddenCover
         hiddenSize
       />
-      <n-empty
-        v-else
-        description="暂无记录，快去播放一些歌曲吧"
-        style="margin-top: 60px"
-        size="large"
-      >
+      <n-empty v-else :description="t('history.no_record')" style="margin-top: 60px" size="large">
         <template #icon>
           <SvgIcon name="SearchOff" />
         </template>
@@ -60,19 +59,21 @@
 import { useDataStore } from "@/stores";
 import player from "@/utils/player";
 import SongList from "@/components/List/SongList.vue";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const dataStore = useDataStore();
 
 // 清空最近播放
 const cleanHistory = () => {
   window.$dialog.warning({
-    title: "清空列表",
-    content: "确认清空最近播放列表？该操作不可撤销！",
-    positiveText: "确认",
-    negativeText: "取消",
+    title: t("common.clear_list"),
+    content: t("message.clear_history_confirm"),
+    positiveText: t("common.ok"),
+    negativeText: t("common.cancel"),
     onPositiveClick: async () => {
       await dataStore.clearHistory();
-      window.$message.success("最近播放列表已清空");
+      window.$message.success(t("message.clear_history_success"));
     },
   });
 };

@@ -10,6 +10,7 @@ import { isDev, isElectron } from "./helper";
 import blob from "./blob";
 import { Link, SongInfo } from "@/types/main.hemusic";
 import { AxiosError } from "axios";
+import { t } from "@/locale";
 
 // 播放器核心
 // Howler.js
@@ -406,7 +407,7 @@ class Player {
     if (this.testNumber > 5) {
       this.testNumber = 0;
       this.resetStatus();
-      window.$message.error("当前重试次数过多，请稍后再试");
+      window.$message.error(t("message.retry_too_many_times"));
       return;
     }
     // 错误 2 通常为网络地址过期
@@ -419,7 +420,7 @@ class Player {
     if (dataStore.playList.length > 1) {
       await this.nextOrPrev("next");
     } else {
-      window.$message.error("当前列表暂无可播放歌曲");
+      window.$message.error(t("message.no_playable_song"));
       // this.cleanPlayList();
     }
   }
@@ -461,7 +462,7 @@ class Player {
       // 更新媒体会话
       this.updateMediaSession();
     } catch (error) {
-      window.$message.error("获取本地歌曲元信息失败");
+      window.$message.error(t("message.get_local_music_meta_fail"));
       console.error("Failed to parse local music info:", error);
     }
   }
@@ -476,11 +477,11 @@ class Player {
     const playSongData = song || this.getPlaySongData();
     if (!playSongData) return null;
     // 标题
-    const title = `${playSongData.name || "未知歌曲"}`;
+    const title = `${playSongData.name}`;
     // 歌手
     const artist = Array.isArray(playSongData.singers)
       ? playSongData.singers.map((artists: { name: string }) => artists.name).join(sep)
-      : String(playSongData?.singers || "未知歌手");
+      : String(playSongData?.singers || t("common.unknown_artist"));
     return `${title} - ${artist}`;
   }
 
@@ -535,7 +536,7 @@ class Player {
           statusStore.playUblock = false;
           await this.createPlayer(url, autoPlay, seek);
           if (quality) {
-            window.$message.success(`已切换音质为 ${quality}`);
+            window.$message.success(t("message.change_quality_to", { quality }));
           }
         }
         // 尝试解灰
@@ -550,27 +551,27 @@ class Player {
             // 是否为最后一首
             if (statusStore.playIndex === dataStore.playList.length - 1) {
               statusStore.$patch({ playStatus: false, playLoading: false });
-              window.$message.warning("当前列表歌曲无法播放，请更换歌曲");
+              window.$message.warning(t("message.no_playable_song_tip"));
             } else {
-              window.$message.error("该歌曲暂无音源，跳至下一首");
+              window.$message.error(t("message.no_song_link"));
               this.nextOrPrev("next");
             }
           }
         } else {
           if (dataStore.playList.length === 1) {
             this.resetStatus();
-            window.$message.warning("当前播放列表已无可播放歌曲，请更换");
+            window.$message.warning(t("message.no_playable_song_tip"));
             return;
           } else {
-            window.$message.error("该歌曲无法播放，跳至下一首");
-            this.nextOrPrev();
+            window.$message.error(t("message.song_play_fail"));
+            this.errorNext();
             return;
           }
         }
       }
     } catch (error) {
       console.error("❌ 初始化音乐播放器出错：", error);
-      window.$message.error("播放器遇到错误，请尝试软件热重载");
+      window.$message.error(t("message.player_error"));
       this.errorNext();
     }
   }
@@ -909,7 +910,7 @@ class Player {
     // 是否为当前播放歌曲
     if (musicStore.playSong.id === song.id && musicStore.playSong.platform === song.platform) {
       this.play();
-      window.$message.success("已开始播放");
+      window.$message.success(t("message.play_started"));
       return;
     }
     // 尝试添加
@@ -917,7 +918,7 @@ class Player {
     // 播放歌曲
     if (songIndex < 0) return;
     if (play) this.togglePlayIndex(songIndex, true);
-    else window.$message.success("已添加至下一首播放");
+    else window.$message.success(t("message.added_to_next_play"));
   }
 
   /**
@@ -1001,7 +1002,7 @@ class Player {
     dataStore.setPlayList([]);
 
     console.log("songInfo", musicStore.playSong);
-    window.$message.success("已清空播放列表");
+    window.$message.success(t("message.play_list_cleared"));
 
     // ipc
     if (isElectron) {
@@ -1070,7 +1071,9 @@ class Player {
     const show = !statusStore.showDesktopLyric;
     statusStore.showDesktopLyric = show;
     window.electron.ipcRenderer.send("change-desktop-lyric", show);
-    window.$message.success(`${show ? "已开启" : "已关闭"}桌面歌词`);
+    window.$message.success(
+      show ? t("message.desktop_lyrics_opened") : t("message.desktop_lyrics_closed"),
+    );
   }
 
   /**

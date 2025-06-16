@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import localizedFormat from "dayjs/plugin/localizedFormat";
+import { t } from "@/locale";
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
@@ -53,12 +54,12 @@ export const formatCommentTime = (timestamp: number): string => {
   const now = dayjs();
   const diff = now.diff(dayjs(timestamp), "minute");
   if (diff < 1) {
-    return "刚刚发布";
+    return t("time.just_now");
   } else if (diff < 60) {
-    return `${diff}分钟前`;
+    return t("time.minutes_ago", { count: diff });
   } else if (diff < 1440) {
     // 1天 = 24小时 * 60分钟
-    return `${Math.floor(diff / 60)}小时前`;
+    return t("time.hours_ago", { count: Math.floor(diff / 60) });
   } else if (diff < 525600) {
     // 1年约等于 525600分钟
     return dayjs(timestamp).format("MM-DD HH:mm");
@@ -92,30 +93,6 @@ export const calculateCurrentTime = (progress: number, duration: number): number
 
   const currentTime = (progress / 100) * duration;
   return Math.round(currentTime * 100) / 100;
-};
-
-/**
- * 获取当前时间段的问候语
- */
-export const getGreeting = () => {
-  const hour = dayjs().hour();
-  if (hour < 6) {
-    return "凌晨好";
-  } else if (hour < 9) {
-    return "早上好";
-  } else if (hour < 12) {
-    return "上午好";
-  } else if (hour < 14) {
-    return "中午好";
-  } else if (hour < 17) {
-    return "下午好";
-  } else if (hour < 19) {
-    return "傍晚好";
-  } else if (hour < 22) {
-    return "晚上好";
-  } else {
-    return "夜深了";
-  }
 };
 
 /**

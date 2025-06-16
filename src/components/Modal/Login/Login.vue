@@ -18,7 +18,7 @@
       <template #icon>
         <SvgIcon name="WindowClose" />
       </template>
-      取消
+      {{ t("common.cancel") }}
     </n-button>
   </div>
 </template>
@@ -29,6 +29,8 @@ import { useDataStore, usePlatformStore, useSettingStore, useStatusStore } from 
 
 import LoginPassword from "@/components/Modal/Login/LoginPassword.vue";
 import player from "@/utils/player";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const emit = defineEmits<{
   close: [];
@@ -47,7 +49,7 @@ const saveLogin = async (loginData: any) => {
   emit("close");
   dataStore.userLoginStatus = true;
   dataStore.token = loginData.token;
-  window.$message.success("登录成功");
+  window.$message.success(t("modal.login_success"));
   // 保存登录时间
   localStorage.setItem("lastLoginTime", Date.now().toString());
   await updateUserData();
@@ -59,7 +61,7 @@ const saveLogin = async (loginData: any) => {
 
 onBeforeMount(() => {
   if (dataStore.userLoginStatus) {
-    window.$message.warning("已登录，请勿再次操作");
+    window.$message.warning(t("modal.already_login"));
     emit("close");
   }
 });

@@ -1,15 +1,15 @@
 <template>
   <div class="download-song">
     <n-collapse-transition :show="!song">
-      <n-text class="loading"> 正在加载歌曲信息... </n-text>
+      <n-text class="loading"> {{ t("modal.loading_song_info") }} </n-text>
     </n-collapse-transition>
     <n-collapse-transition :show="!!song">
-      <n-alert type="warning" title="请知悉" closable>
-        {{ "本资源仅用于音乐学习和交流，禁止用于商业用途，请下载后于24小时内删除。" }}
+      <n-alert type="warning" :title="t('modal.please_know')" closable>
+        {{ t("modal.song_download_warning") }}
       </n-alert>
       <SongDataCard :data="song" />
       <n-collapse :default-expanded-names="['level', 'path']" arrow-placement="right">
-        <n-collapse-item title="音质选择" name="level">
+        <n-collapse-item :title="t('common.song_quality')" name="level">
           <!-- 音质选择 -->
           <n-radio-group v-model:value="songLevelChosen" name="level">
             <n-flex>
@@ -25,9 +25,9 @@
             </n-flex>
           </n-radio-group>
         </n-collapse-item>
-        <n-collapse-item v-if="isElectron" title="本次下载路径" name="path">
+        <n-collapse-item v-if="isElectron" :title="t('modal.download_path')" name="path">
           <n-input-group>
-            <n-input :value="downloadPath || '未配置下载目录'" disabled>
+            <n-input :value="downloadPath || t('modal.download_path_not_configured')" disabled>
               <template #prefix>
                 <SvgIcon name="Folder" />
               </template>
@@ -41,15 +41,17 @@
               <template #icon>
                 <SvgIcon name="Settings" />
               </template>
-              更多设置
+              {{ t("modal.more_setting") }}
             </n-button>
           </n-input-group>
         </n-collapse-item>
       </n-collapse>
     </n-collapse-transition>
     <n-flex class="menu" justify="end">
-      <n-button strong secondary @click="emit('close')"> 取消 </n-button>
-      <n-button :loading="loading" type="primary" @click="download"> 下载歌曲 </n-button>
+      <n-button strong secondary @click="emit('close')"> {{ t("common.cancel") }} </n-button>
+      <n-button :loading="loading" type="primary" @click="download">
+        {{ t("common.download_song") }}
+      </n-button>
     </n-flex>
   </div>
 </template>
@@ -65,6 +67,8 @@ import player from "@/utils/player";
 import { SongInfo } from "@/types/main.hemusic";
 import { removeWordLyric } from "@/utils/lyric";
 import { getSizeCover } from "@/utils/format";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const props = defineProps<{ song: SongInfo }>();
 const emit = defineEmits<{ close: [] }>();
@@ -111,7 +115,7 @@ const download = async () => {
 
     const result = await songUrl(props.song.id, props.song.platform, link.quality, link.format);
     if (!result.url) {
-      window.$message.error(result.message || "获取下载链接失败，请重试");
+      window.$message.error(result.message || t("message.get_url_fail"));
       return;
     }
     // 校验下载路径
@@ -124,7 +128,7 @@ const download = async () => {
       return;
     }
     // 下载相关数据
-    const songName = player.getPlayerInfo(props.song) || "未知曲目";
+    const songName = player.getPlayerInfo(props.song) || "未知歌曲";
 
     const format = result.format?.toLowerCase() || link.format.toLowerCase();
     // 区分设备下载
@@ -134,10 +138,10 @@ const download = async () => {
       saveAs(result.url, `${songName}.${format || "mp3"}`);
     }
     emit("close");
-    window.$message.success("歌曲下载成功");
+    window.$message.success(t("message.song_download_success"));
   } catch (error) {
     console.error("Error downloading song:", error);
-    window.$message.error("下载歌曲出现错误，请重试");
+    window.$message.error(t("message.song_download_fail"));
   } finally {
     loading.value = false;
   }
@@ -179,7 +183,7 @@ const electronDownload = async (url: string, songName: string, fileType: string)
   };
   // 开始下载
   const isSuccess = await window.electron.ipcRenderer.invoke("download-file", url, config);
-  if (!isSuccess) throw new Error("下载歌曲出现错误，请重试");
+  if (!isSuccess) throw new Error(t("message.song_download_fail"));
 };
 
 onMounted(() => getSongDetail());

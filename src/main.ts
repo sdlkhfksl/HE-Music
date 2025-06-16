@@ -13,6 +13,7 @@ import router from "@/router";
 import { debounceDirective, throttleDirective, visibleDirective } from "@/utils/instruction";
 // ipc
 import initIpc from "@/utils/initIpc";
+import i18n from "@/locale";
 // 全局样式
 import "@/style/main.scss";
 import "@/style/animate.scss";
@@ -34,6 +35,8 @@ app.use(router);
 app.use(VueDOMPurifyHTML);
 // go-captcha
 app.use(GoCaptcha);
+// i18n
+app.use(i18n);
 // 自定义指令
 app.directive("debounce", debounceDirective);
 app.directive("throttle", throttleDirective);

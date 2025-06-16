@@ -21,7 +21,7 @@
           <n-text class="name">{{ key }}</n-text>
           <n-text class="num" depth="3">
             <SvgIcon name="Music" :depth="3" />
-            {{ item.length }} 首
+            {{ t("common.song_counter", { count: item.length }) }}
           </n-text>
         </div>
       </n-card>
@@ -41,6 +41,8 @@
 import { some } from "lodash-es";
 import blob from "@/utils/blob";
 import { SongInfo } from "@/types/main.hemusic";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const props = defineProps<{ data: SongInfo[] }>();
 

@@ -52,9 +52,11 @@
               <!-- 创建者 -->
 
               <div class="meta">
-                <n-text class="count" depth="3">{{ item.song_count || 0 }}首</n-text>
+                <n-text class="count" depth="3">{{
+                  t("common.song_counter", { count: item.song_count || 0 })
+                }}</n-text>
                 <n-text v-if="item.creator" class="creator" depth="3">
-                  {{ item.creator || "未知" }}
+                  {{ item.creator || t("common.unknown") }}
                 </n-text>
               </div>
             </div>
@@ -64,7 +66,7 @@
       <!-- 加载更多 -->
       <n-flex v-if="loadMore" class="load-more" justify="center">
         <n-button :loading="loading" size="large" strong secondary round @click="emit('loadMore')">
-          加载更多
+          {{ t("common.load_more") }}
         </n-button>
       </n-flex>
       <!-- 右键菜单 -->
@@ -85,7 +87,7 @@
       </n-grid>
     </div>
     <!-- 空列表 -->
-    <n-empty v-else description="空空如也，怎么什么都没有啊" size="large" />
+    <n-empty v-else :description="t('common.list_empty')" size="large" />
   </Transition>
 </template>
 
@@ -103,6 +105,8 @@ import {
   UserPlaylistInfo,
 } from "@/types/main.hemusic";
 import { getUserPlaylistDetail } from "@/api/userplaylist";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 interface Props {
   data: PlaylistInfo[] | UserPlaylistInfo[] | UserFavouritePlaylistInfo[];

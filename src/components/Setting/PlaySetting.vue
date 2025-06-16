@@ -2,12 +2,16 @@
 <template>
   <div class="setting-type">
     <div class="set-list">
-      <n-h3 prefix="bar"> 歌曲播放 </n-h3>
+      <n-h3 prefix="bar"> {{ t("setting.play.play_setting") }} </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">自动播放</n-text>
-          <n-text v-if="isElectron" class="tip" :depth="3">启动时是否自动播放</n-text>
-          <n-text v-else class="tip" :depth="3">网页端不支持该功能</n-text>
+          <n-text class="name">{{ t("setting.play.auto_play") }}</n-text>
+          <n-text v-if="isElectron" class="tip" :depth="3">{{
+            t("setting.play.auto_play_tip")
+          }}</n-text>
+          <n-text v-else class="tip" :depth="3">{{
+            t("setting.play.auto_play_not_support_tip")
+          }}</n-text>
         </div>
         <n-switch
           v-model:value="settingStore.autoPlay"
@@ -18,22 +22,24 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">记忆上次播放位置</n-text>
-          <n-text class="tip" :depth="3">程序启动时恢复上次播放位置</n-text>
+          <n-text class="name">{{ t("setting.play.memory_last_seek") }}</n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.play.memory_last_seek_tip") }}</n-text>
         </div>
         <n-switch v-model:value="settingStore.memoryLastSeek" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">音乐渐入渐出</n-text>
+          <n-text class="name"> {{ t("setting.play.song_volume_fade") }}</n-text>
         </div>
         <n-switch v-model:value="settingStore.songVolumeFade" class="set" :round="false" />
       </n-card>
       <n-collapse-transition :show="settingStore.songVolumeFade">
         <n-card class="set-item">
           <div class="label">
-            <n-text class="name">渐入渐出时长</n-text>
-            <n-text class="tip" :depth="3">单位 ms，最小 200，最大 2000</n-text>
+            <n-text class="name"> {{ t("setting.play.song_volume_fade_time") }}</n-text>
+            <n-text class="tip" :depth="3">
+              {{ t("setting.play.song_volume_fade_time_tip") }}</n-text
+            >
           </div>
           <n-input-number
             v-model:value="settingStore.songVolumeFadeTime"
@@ -41,7 +47,7 @@
             :max="2000"
             :show-button="false"
             class="set"
-            placeholder="请输入渐入渐出时长"
+            :placeholder="t('setting.play.song_volume_fade_time_placeholder')"
           >
             <template #suffix> ms </template>
           </n-input-number>
@@ -49,7 +55,7 @@
       </n-collapse-transition>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">在线歌曲音质</n-text>
+          <n-text class="name"> {{ t("setting.play.online_song_quality") }}</n-text>
           <n-text class="tip" :depth="3"> {{ songLevelData[settingStore.songLevel]?.tip }}</n-text>
         </div>
         <n-select
@@ -68,8 +74,8 @@
       <!--      </n-card>-->
       <n-card v-if="isElectron" class="set-item">
         <div class="label">
-          <n-text class="name">音乐解锁</n-text>
-          <n-text class="tip" :depth="3">在无法正常播放时进行替换，可能会与原曲不符</n-text>
+          <n-text class="name">{{ t("setting.play.unlock_music") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.play.unlock_music_tip") }}</n-text>
         </div>
         <n-switch v-model:value="settingStore.useSongUnlock" class="set" :round="false" />
       </n-card>
@@ -82,8 +88,8 @@
       <!--      </n-card>-->
       <n-card v-if="isElectron" class="set-item">
         <div class="label">
-          <n-text class="name">音频输出设备</n-text>
-          <n-text class="tip" :depth="3">新增或移除音频设备后请重新打开设置</n-text>
+          <n-text class="name">{{ t("setting.play.output_device") }}</n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.play.output_device_tip") }}</n-text>
         </div>
         <n-select
           v-model:value="settingStore.playDevice"
@@ -95,21 +101,21 @@
       </n-card>
     </div>
     <div class="set-list">
-      <n-h3 prefix="bar"> 播放器 </n-h3>
+      <n-h3 prefix="bar"> {{ t("common.player") }} </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">播放器样式</n-text>
-          <n-text class="tip" :depth="3">播放器主体样式</n-text>
+          <n-text class="name"> {{ t("setting.play.player_type") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.play.player_type_tip") }}</n-text>
         </div>
         <n-select
           v-model:value="settingStore.playerType"
           :options="[
             {
-              label: '封面模式',
+              label: t('setting.play.player_tip_value_cover'),
               value: 'cover',
             },
             {
-              label: '唱片模式',
+              label: t('setting.play.player_tip_value_record'),
               value: 'record',
             },
           ]"
@@ -118,28 +124,28 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">播放器背景样式</n-text>
-          <n-text class="tip" :depth="3">切换播放器背景类型</n-text>
+          <n-text class="name"> {{ t("setting.play.player_background_type") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.play.player_background_type_tip") }}</n-text>
         </div>
         <n-select
           v-model:value="settingStore.playerBackgroundType"
           :options="[
             {
-              label: '流体效果',
+              label: t('setting.play.player_background_type_value_animation'),
               disabled: true,
               value: 'animation',
             },
             {
-              label: '封面模糊',
+              label: t('setting.play.player_background_type_value_blur'),
               value: 'blur',
             },
             {
-              label: '封面主色',
+              label: t('setting.play.player_background_type_value_color'),
               disabled: true,
               value: 'color',
             },
             {
-              label: '无背景',
+              label: t('setting.play.player_background_type_value_none'),
               disabled: true,
               value: 'none',
             },
@@ -149,35 +155,35 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">全屏播放器留存</n-text>
-          <n-text class="tip" :depth="3">在播放器收起时是否销毁，开启将会增大内存占用</n-text>
+          <n-text class="name">{{ t("setting.play.full_player_cache") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.play.full_player_cache_tip") }}</n-text>
         </div>
         <n-switch v-model:value="settingStore.fullPlayerCache" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">显示前奏倒计时</n-text>
-          <n-text class="tip" :depth="3">部分歌曲前奏可能存在显示错误</n-text>
+          <n-text class="name">{{ t("setting.play.count_down_show") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.play.count_down_show_tip") }}</n-text>
         </div>
         <n-switch v-model:value="settingStore.countDownShow" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">底栏歌词显示</n-text>
-          <n-text class="tip" :depth="3">在播放时将歌手信息更改为歌词</n-text>
+          <n-text class="name">{{ t("setting.play.bar_lyric_show") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.play.bar_lyric_show_tip") }}</n-text>
         </div>
         <n-switch v-model:value="settingStore.barLyricShow" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">播放列表歌曲数量</n-text>
+          <n-text class="name">{{ t("setting.play.show_playlist_count") }}</n-text>
         </div>
         <n-switch v-model:value="settingStore.showPlaylistCount" class="set" :round="false" />
       </n-card>
       <n-card v-if="isElectron" class="set-item">
         <div class="label">
-          <n-text class="name">音乐频谱</n-text>
-          <n-text class="tip" :depth="3">开启音乐频谱会极大影响性能，如遇问题请关闭</n-text>
+          <n-text class="name">{{ t("setting.play.show_spectrum") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.play.show_spectrum_tip") }}</n-text>
         </div>
         <n-switch
           class="set"
@@ -188,18 +194,20 @@
       </n-card>
     </div>
     <div class="set-list">
-      <n-h3 prefix="bar"> 系统集成 </n-h3>
+      <n-h3 prefix="bar"> {{ t("setting.play.system_integration") }} </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">开启 SMTC</n-text>
-          <n-text class="tip" :depth="3">与系统集成以显示媒体元数据</n-text>
+          <n-text class="name">{{ t("setting.play.smtc") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.play.smtc_tip") }}</n-text>
         </div>
         <n-switch v-model:value="settingStore.smtcOpen" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">输出高清封面</n-text>
-          <n-text class="tip" :depth="3">开启 SMTC 时是否输出高清封面</n-text>
+          <n-text class="name">{{ t("setting.play.smtc_output_high_quality_cover") }}</n-text>
+          <n-text class="tip" :depth="3">{{
+            t("setting.play.smtc_output_high_quality_cover_tip")
+          }}</n-text>
         </div>
         <n-switch
           v-model:value="settingStore.smtcOutputHighQualityCover"
@@ -218,7 +226,9 @@ import { useSettingStore } from "@/stores";
 import { isElectron, renderOption } from "@/utils/helper";
 import { uniqBy } from "lodash";
 import player from "@/utils/player";
-
+import { useI18n } from "vue-i18n";
+import { computed } from "vue";
+const { t } = useI18n();
 const settingStore = useSettingStore();
 
 // 输出设备数据
@@ -228,50 +238,50 @@ const outputDevices = ref<SelectOption[]>([]);
 const showSpectrums = ref<boolean>(settingStore.showSpectrums);
 
 // 音质数据
-const songLevelData = {
+const songLevelData = computed(() => ({
   auto: {
-    label: "自动",
-    tip: "自动选择音质 上一曲音质>hires>flac>320mp3>128mp3",
+    label: t("common.auto"),
+    tip: t("setting.play.song_quality_value_auto_tip"),
     value: "auto",
   },
   "128mp3": {
     label: "128mp3",
-    tip: "标准音质 128kbps",
+    tip: t("setting.play.song_quality_value_128mp3_tip"),
     value: "128mp3",
   },
   "192mp3": {
     label: "192mp3",
-    tip: "较高音质 192kbps",
+    tip: t("setting.play.song_quality_value_192mp3_tip"),
     value: "192mp3",
   },
   "320mp3": {
     label: "320mp3",
-    tip: "超高音质 320kbps",
+    tip: t("setting.play.song_quality_value_320mp3_tip"),
     value: "320mp3",
   },
   flac: {
     label: "flac",
-    tip: "高保真无损音质，最高 48kHz/16bit",
+    tip: t("setting.play.song_quality_value_flac_tip"),
     value: "flac",
   },
   hires: {
     label: "hires",
-    tip: "更饱满清晰的高解析度音质，最高192kHz/24bit",
+    tip: t("setting.play.song_quality_value_hires_tip"),
     value: "hires",
   },
   dolby: {
     label: "dolby",
-    tip: "杜比全景声音乐，沉浸式聆听体验",
+    tip: t("setting.play.song_quality_value_dolby_tip"),
     value: "dolby",
   },
   galaxy: {
     label: "galaxy",
-    tip: "臻品全景声",
+    tip: t("setting.play.song_quality_value_galaxy_tip"),
     value: "galaxy",
   },
   master: {
     label: "master",
-    tip: "还原音频细节，192kHz/24bit",
+    tip: t("setting.play.song_quality_value_master_tip"),
     value: "master",
   },
   // jymaster: {
@@ -284,7 +294,7 @@ const songLevelData = {
   //   tip: "沉浸式体验，最高 5.1 声道",
   //   value: "sky",
   // },
-};
+}));
 
 // 获取全部输出设备
 const getOutputDevices = async () => {
@@ -305,11 +315,10 @@ const getOutputDevices = async () => {
 const playDeviceChange = (deviceId: string, option: SelectOption) => {
   if (isElectron && settingStore.showSpectrums) {
     window.$dialog.warning({
-      title: "音频通道占用",
-      content:
-        "由于系统限制，切换音频输出设备会导致音乐频谱失效，将会关闭音乐频谱，并将于热重载后生效（ 请点击右上角的设置菜单中的热重载按钮 ），是否继续？",
-      positiveText: "继续",
-      negativeText: "取消",
+      title: t("setting.play.output_device_audio_channel_occupancy"),
+      content: t("message.output_device_audio_channel_occupancy_confirm"),
+      positiveText: t("common.continue"),
+      negativeText: t("common.cancel"),
       closeOnEsc: false,
       closable: false,
       maskClosable: false,
@@ -318,7 +327,9 @@ const playDeviceChange = (deviceId: string, option: SelectOption) => {
         showSpectrums.value = false;
         settingStore.showSpectrums = false;
         player.toggleOutputDevice(deviceId);
-        window.$message.success(`已切换输出设备为 ${option.label}`);
+        window.$message.success(
+          t("message.output_device_change_success", { device: option.label }),
+        );
       },
       onNegativeClick: () => {
         settingStore.playDevice = "default";
@@ -326,7 +337,7 @@ const playDeviceChange = (deviceId: string, option: SelectOption) => {
     });
   } else {
     player.toggleOutputDevice(deviceId);
-    window.$message.success(`已切换输出设备为 ${option.label}`);
+    window.$message.success(t("message.output_device_change_success", { device: option.label }));
   }
 };
 
@@ -335,10 +346,10 @@ const showSpectrumsChange = (value: boolean) => {
   if (value) {
     if (settingStore.playDevice !== "default") {
       window.$dialog.warning({
-        title: "音频通道占用",
-        content: "开启音乐频谱会导致自定义音频输出设备失效，将会恢复默认输出设备，是否继续开启？",
-        positiveText: "开启",
-        negativeText: "取消",
+        title: t("setting.play.spectrum_audio_channel_occupancy"),
+        content: t("message.spectrum_audio_channel_occupancy_confirm"),
+        positiveText: t("common.ok"),
+        negativeText: t("common.cancel"),
         onPositiveClick: () => {
           showSpectrums.value = true;
           settingStore.showSpectrums = true;

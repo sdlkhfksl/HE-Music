@@ -2,7 +2,9 @@
   <div :key="searchKeyword" class="search">
     <div class="title">
       <n-text class="keyword">{{ searchKeyword }}</n-text>
-      <n-text depth="3">的相关搜索</n-text>
+      <n-text depth="3">
+        {{ t("search.search_result") }}
+      </n-text>
     </div>
     <!-- 标签页 -->
     <n-tabs
@@ -22,7 +24,7 @@
 
       <!--      <n-tab name="search-radios"> 播客 </n-tab>-->
 
-      <n-tab-pane name="song" tab="歌曲" display-directive="show:lazy">
+      <n-tab-pane name="song" :tab="t('common.song')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchSong)"
@@ -36,7 +38,7 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
-      <n-tab-pane name="playlist" tab="歌单" display-directive="show:lazy">
+      <n-tab-pane name="playlist" :tab="t('common.playlist')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchPlaylist)"
@@ -50,7 +52,7 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
-      <n-tab-pane name="album" tab="专辑" display-directive="show:lazy">
+      <n-tab-pane name="album" :tab="t('common.album')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchAlbum)"
@@ -64,7 +66,7 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
-      <n-tab-pane name="audiobook" tab="听书" display-directive="show:lazy">
+      <n-tab-pane name="audiobook" :tab="t('common.audiobook')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchAudiobook)"
@@ -78,7 +80,7 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
-      <n-tab-pane name="artists" tab="歌手" display-directive="show:lazy">
+      <n-tab-pane name="artists" :tab="t('common.artist')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchSinger)"
@@ -92,7 +94,7 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
-      <n-tab-pane name="videos" tab="视频" display-directive="show:lazy">
+      <n-tab-pane name="videos" :tab="t('common.video')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchMV)"
@@ -128,6 +130,8 @@ import Artists from "@/views/Search/artists.vue";
 import Videos from "@/views/Search/videos.vue";
 import Audiobook from "@/views/Search/audiobook.vue";
 import { FeatureSupportFlag } from "@/api/platform";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const router = useRouter();
 

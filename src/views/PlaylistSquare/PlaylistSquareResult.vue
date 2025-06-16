@@ -49,7 +49,9 @@
     >
       <template #header>
         <n-flex align="center" class="cat-header">
-          <n-text>歌单分类</n-text>
+          <n-text>
+            {{ t("playlist.category") }}
+          </n-text>
           <!--          <n-tag-->
           <!--            :type="catName == '全部歌单' ? 'primary' : 'default'"-->
           <!--            :bordered="false"-->
@@ -95,6 +97,8 @@ import { PlaylistInfo, TagInfo } from "@/types/main.hemusic";
 import PlaylistList from "@/components/List/PlaylistList.vue";
 import { watch } from "vue";
 import { tagPlaylistList } from "@/api/playlist";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const props = defineProps<{
   platform: string;

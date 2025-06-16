@@ -2,7 +2,7 @@
 <template>
   <div class="playlist-add">
     <n-tabs :default-value="isLocal ? 'local' : 'online'" type="segment" animated>
-      <n-tab-pane :disabled="isLocal" name="online" tab="在线歌单">
+      <n-tab-pane :disabled="isLocal" name="online" :tab="t('modal.online_playlist')">
         <n-scrollbar style="max-height: 70vh">
           <n-list class="playlists-list" hoverable clickable>
             <!-- 新建歌单 -->
@@ -10,7 +10,7 @@
               <template #prefix>
                 <SvgIcon name="Add" :size="20" />
               </template>
-              <n-thing title="创建新歌单" />
+              <n-thing :title="t('modal.create_playlist')" />
             </n-list-item>
             <!-- 已有歌单 -->
             <n-list-item
@@ -34,17 +34,19 @@
                   </template>
                 </n-image>
               </template>
-              <n-thing :title="index === 0 ? '我喜欢的音乐' : item.name">
+              <n-thing :title="index === 0 ? t('playlist.my_favorite_music') : item.name">
                 <template #description>
-                  <n-text depth="3" class="size">{{ item.song_count }} 首音乐</n-text>
+                  <n-text depth="3" class="size">{{
+                    t("common.song_count_noun", { count: item.song_count })
+                  }}</n-text>
                 </template>
               </n-thing>
             </n-list-item>
           </n-list>
         </n-scrollbar>
       </n-tab-pane>
-      <n-tab-pane name="local" tab="本地歌单">
-        <n-empty description="暂未实现" />
+      <n-tab-pane name="local" :tab="t('modal.local_playlist')">
+        <n-empty :description="t('modal.unimplemented')" />
       </n-tab-pane>
     </n-tabs>
   </div>
@@ -59,6 +61,8 @@ import { updateUserCreatedPlaylist, updateUserLikeSongs } from "@/utils/auth";
 import { openCreatePlaylist } from "@/utils/modal";
 import { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 import { addSongToPlaylist } from "@/api/userplaylist";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const props = defineProps<{
   data: SongInfo[];
@@ -77,7 +81,9 @@ const loadingMsg = ref<MessageReactive>();
 // 添加到歌单
 const addPlaylist = debounce(
   async (info: UserPlaylistInfo) => {
-    loadingMsg.value = window.$message.loading("正在添加歌曲至歌单", { duration: 0 });
+    loadingMsg.value = window.$message.loading(t("message.adding_song_to_playlist"), {
+      duration: 0,
+    });
     const ids = props.data
       .map((item) => {
         return {
@@ -92,12 +98,12 @@ const addPlaylist = debounce(
     }
     try {
       await addSongToPlaylist(info.id, ids);
-      window.$message.success("添加歌曲至歌单成功");
+      window.$message.success(t("message.add_song_to_playlist_success"));
       emit("close");
       if (info.is_default === 1) await updateUserLikeSongs();
       await updateUserCreatedPlaylist();
     } catch (e: any) {
-      window.$message.error(e?.message || "添加失败，请重试");
+      window.$message.error(e?.message || t("message.add_fail"));
     }
   },
   500,

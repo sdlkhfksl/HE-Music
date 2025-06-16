@@ -39,7 +39,7 @@
               }"
               class="name-text"
             >
-              {{ song?.name || "未知曲目" }}
+              {{ song?.name }}
             </n-ellipsis>
             <!-- 音质 -->
             <n-tag
@@ -99,7 +99,7 @@
             class="artists text-hidden"
             @click="openJumpArtist(song.platform, song.singers)"
           >
-            <n-text class="ar"> {{ song.singers || "未知艺术家" }} </n-text>
+            <n-text class="ar"> {{ song.singers || t("unknown_artist") }} </n-text>
           </div>
           <!--别名-->
           <n-text v-if="song.subtitle" class="alia text-hidden" depth="3">{{
@@ -113,7 +113,7 @@
             @item-header-click="toggleSublist"
             @dblclick.stop=""
           >
-            <n-collapse-item title="更多版本" name="1"> </n-collapse-item>
+            <n-collapse-item :title="t('search.more_version')" name="1"> </n-collapse-item>
           </n-collapse>
           <!--          <n-text v-if="song.sublist?.length > 0" @click.stop="toggleSublist">更多版本 {{showSublist? '收起' : '展开' }} </n-text>-->
         </div>
@@ -192,6 +192,8 @@ import { TagProps } from "naive-ui";
 import { IsValidId, songEqual } from "@/utils/song";
 import { FeatureSupportFlag } from "@/api/platform";
 import SongList from "@/components/List/SongList.vue";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const props = defineProps<{
   // 歌曲

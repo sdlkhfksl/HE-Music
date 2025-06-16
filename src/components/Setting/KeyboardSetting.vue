@@ -3,11 +3,13 @@
 <template>
   <div class="setting-type">
     <div class="set-list">
-      <n-h3 prefix="bar"> 全局快捷键 </n-h3>
+      <n-h3 prefix="bar"> {{ t("setting.shortcut.global_shortcut") }} </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">开启全局快捷键</n-text>
-          <n-text class="tip" :depth="3">可能会导致与其他软件相互冲突，请谨慎开启</n-text>
+          <n-text class="name">{{ t("setting.shortcut.open_global_shortcut") }}</n-text>
+          <n-text class="tip" :depth="3">{{
+            t("setting.shortcut.open_global_shortcut_tip")
+          }}</n-text>
         </div>
         <n-switch
           class="set"
@@ -18,18 +20,18 @@
       </n-card>
     </div>
     <div class="set-list">
-      <n-h3 prefix="bar"> 快捷键更改 </n-h3>
+      <n-h3 prefix="bar"> {{ t("setting.shortcut.change_shortcut") }} </n-h3>
       <n-card id="shortcut-list" class="set-item">
         <n-list v-for="(item, key, index) in shortcutList" :key="index" class="shortcut" hoverable>
           <n-list-item>
             <template #prefix>
-              <n-text class="name">{{ item.name }}</n-text>
+              <n-text class="name">{{ t("common." + snakeCase(key)) }}</n-text>
             </template>
             <n-thing>
               <n-flex>
                 <n-input
                   :value="item.shortcut"
-                  placeholder="快捷键为空"
+                  :placeholder="t('setting.shortcut.shortcut_placeholder')"
                   readonly
                   @focus="inputFocus(key)"
                   @blur="inputBlur"
@@ -40,7 +42,7 @@
                   :value="item.globalShortcut"
                   :disabled="!shortcutStore.globalOpen"
                   :status="item?.isRegistered ? 'error' : 'success'"
-                  placeholder="快捷键为空"
+                  :placeholder="t('setting.shortcut.shortcut_placeholder')"
                   readonly
                   @focus="inputFocus(key, true)"
                   @blur="inputBlur"
@@ -48,7 +50,9 @@
                   @keyup="keyHandled = ''"
                 >
                   <template #prefix>
-                    <n-text :depth="3">全局</n-text>
+                    <n-text :depth="3">
+                      {{ t("common.global") }}
+                    </n-text>
                   </template>
                 </n-input>
               </n-flex>
@@ -58,9 +62,13 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">恢复默认</n-text>
+          <n-text class="name">
+            {{ t("setting.shortcut.reset") }}
+          </n-text>
         </div>
-        <n-button type="primary" strong secondary @click="resetShortcut"> 恢复默认 </n-button>
+        <n-button type="primary" strong secondary @click="resetShortcut">
+          {{ t("common.reset_default") }}
+        </n-button>
       </n-card>
     </div>
   </div>
@@ -69,7 +77,10 @@
 <script setup lang="ts">
 import { useShortcutStore } from "@/stores";
 import { formatForGlobalShortcut } from "@/utils/helper";
-import { cloneDeep, debounce, includes, some } from "lodash-es";
+import { cloneDeep, debounce, includes, snakeCase, some } from "lodash-es";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const shortcutStore = useShortcutStore();
 
@@ -188,7 +199,7 @@ const inputKeyDown = async (e: KeyboardEvent) => {
   console.log(keyCode, e, [isCtrl && "CmdOrCtrl", isShift && "Shift", isAlt && "Alt", keyCode]);
   // 更改快捷键
   if (isRepeat(shortcut)) {
-    window.$message.warning("快捷键设置冲突");
+    window.$message.warning(t("message.shortcut_repeat"));
   } else {
     // 全局快捷键
     if (selectGlobal.value) {
@@ -203,7 +214,7 @@ const inputKeyDown = async (e: KeyboardEvent) => {
       changeShortcut(globalShortcut);
     } else {
       changeShortcut(shortcut);
-      window.$message.success("快捷键设置成功");
+      window.$message.success(t("message.shortcut_set_success"));
     }
   }
 };
@@ -233,12 +244,12 @@ const checkRegistered = debounce(async (shortcut: string) => {
       "is-shortcut-registered",
       formatForGlobalShortcut(shortcut),
     );
-    if (isRegistered) window.$message.warning("快捷键已被占用");
+    if (isRegistered) window.$message.warning(t("message.shortcut_registered"));
     // 更新状态
     shortcutList.value[selectShortcut.value].isRegistered = isRegistered;
   } catch (error) {
     console.error("Error checking shortcut registration:", error);
-    window.$message.error("快捷键检查出现错误");
+    window.$message.error(t("message.shortcut_registered_fail"));
     changeShortcut("");
   }
 }, 500);
@@ -252,14 +263,14 @@ const updateGlobalOpen = (val: boolean) => {
 // 重置快捷键
 const resetShortcut = () => {
   window.$dialog.warning({
-    title: "重置快捷键",
-    content: "确定重置当前快捷键配置？",
-    positiveText: "重置",
-    negativeText: "取消",
+    title: t("setting.shortcut.reset"),
+    content: t("message.shortcut_reset_confirm"),
+    positiveText: t("common.reset"),
+    negativeText: t("common.cancel"),
     onPositiveClick: () => {
       shortcutStore.$reset();
       shortcutList.value = cloneDeep(shortcutStore.shortcutList);
-      window.$message.success("快捷键重置成功");
+      window.$message.success(t("message.shortcut_reset_success"));
     },
   });
 };

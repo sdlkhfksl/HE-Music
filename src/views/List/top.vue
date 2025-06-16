@@ -31,7 +31,7 @@
         </div>
         <div class="data">
           <n-h2 class="name text-hidden">
-            {{ playlistDetailData.name || "未知歌单" }}
+            {{ playlistDetailData.name || t("common.unknown_playlist") }}
             <!-- 隐私歌单 -->
             <!--            <n-popover-->
             <!--              v-if="playlistDetailData?.privacy === 10"-->
@@ -89,13 +89,13 @@
                 {{
                   loading
                     ? isSamePlaylist
-                      ? "更新中..."
-                      : `加载中... (${
+                      ? t("common.updating") + "..."
+                      : `${t("common.loading")}... (${
                           playlistData.length === Number(playlistDetailData.total_count)
                             ? 0
                             : playlistData.length
                         }/${playlistDetailData.total_count})`
-                    : "播放"
+                    : t("common.play")
                 }}
               </n-button>
 
@@ -115,7 +115,7 @@
                 v-model:value="searchValue"
                 :input-props="{ autocomplete: 'off' }"
                 class="search"
-                placeholder="模糊搜索"
+                :placeholder="t('search.fuzzy_search')"
                 clearable
                 round
                 @input="listSearch"
@@ -148,7 +148,7 @@
       />
       <n-empty
         v-else
-        :description="`搜不到关于 ${searchValue} 的任何歌曲呀`"
+        :description="t('search.no_song_result', { keyword: searchValue })"
         style="margin-top: 60px"
         size="large"
       >
@@ -172,6 +172,8 @@ import player from "@/utils/player";
 import { SongInfo, TopInfo } from "@/types/main.hemusic";
 import { computed } from "vue";
 import SongList from "@/components/List/SongList.vue";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const router = useRouter();
 const statusStore = useStatusStore();
@@ -221,7 +223,7 @@ const isSamePlaylist = computed<boolean>(
 // 更多操作
 const moreOptions = computed<DropdownOption[]>(() => [
   {
-    label: "批量操作",
+    label: t("common.batch_operation"),
     key: "batch",
     props: {
       onClick: () => openBatchList(playlistDataShow.value, false),
@@ -284,7 +286,7 @@ const loadingMsgShow = (show: boolean = true, count?: number) => {
   if (show) {
     if (count && count <= 800) return;
     loadingMsg.value?.destroy();
-    loadingMsg.value = window.$message.loading("该歌单歌曲数量过多，请稍等", {
+    loadingMsg.value = window.$message.loading(t("message.playlist_too_many_songs"), {
       duration: 0,
       closable: true,
     });

@@ -4,7 +4,7 @@
     <Transition name="fade" mode="out-in">
       <div v-if="artistData?.length" class="ar-list">
         <n-alert v-if="typeof artist === 'string'" :show-icon="false">
-          以下结果来自在线搜索，仅供参考
+          {{ t("modal.jump_string_artist_warning") }}
         </n-alert>
         <n-card
           v-for="(item, index) in artistData"
@@ -30,6 +30,8 @@ import { usePlatformStore, useSettingStore } from "@/stores";
 import { searchResultHemusic } from "@/api/search";
 import { uniq } from "lodash-es";
 import { FeatureSupportFlag } from "@/api/platform";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const settingStore = useSettingStore();
 const platformStore = usePlatformStore();
@@ -78,7 +80,7 @@ const getArtistData = async () => {
         10,
         1,
         props.platform || platform?.id || "",
-        "singers",
+        "singer",
       );
       setArtistData(result.list, name);
     } else {

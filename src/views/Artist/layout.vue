@@ -23,9 +23,11 @@
         </div>
         <div class="data">
           <div class="name text-hidden">
-            <n-text class="name-text">{{ artistDetailData.name || "未知艺术家" }}</n-text>
+            <n-text class="name-text">{{
+              artistDetailData.name || t("common.unknown_artist")
+            }}</n-text>
             <n-text v-if="artistDetailData?.alias" class="name-alias" depth="3">
-              {{ artistDetailData.alias || "未知艺术家" }}
+              {{ artistDetailData.alias || t("common.unknown_artist") }}
             </n-text>
           </div>
           <n-collapse-transition :show="!listScrolling" class="collapse">
@@ -81,7 +83,7 @@
                 <template #icon>
                   <SvgIcon name="Play" />
                 </template>
-                播放
+                {{ t("common.play") }}
               </n-button>
               <n-button
                 :focusable="false"
@@ -116,9 +118,9 @@
     </Transition>
     <!-- 标签页 -->
     <n-tabs v-model:value="artistType" class="tabs" type="segment" @update:value="tabChange">
-      <n-tab name="artist-songs"> 单曲 </n-tab>
-      <n-tab name="artist-albums"> 专辑 </n-tab>
-      <n-tab name="artist-videos"> 视频 </n-tab>
+      <n-tab name="artist-songs"> {{ t("common.single_song") }} </n-tab>
+      <n-tab name="artist-albums"> {{ t("common.album") }} </n-tab>
+      <n-tab name="artist-videos"> {{ t("common.video") }} </n-tab>
     </n-tabs>
     <!-- 路由 -->
     <RouterView v-slot="{ Component }">
@@ -159,6 +161,8 @@ import { buildSourceUrl } from "@/api/source";
 import { FeatureSupportFlag } from "@/api/platform";
 import { DropdownOption } from "naive-ui";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const router = useRouter();
 const dataStore = useDataStore();

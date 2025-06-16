@@ -28,27 +28,35 @@
     <!--      </n-card>-->
     <!--    </div>-->
     <div v-if="isElectron" class="set-list">
-      <n-h3 prefix="bar"> 网络代理 </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.other.network_proxy") }}
+      </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">网络代理</n-text>
-          <n-text class="tip" :depth="3">修改后请点击保存或重启软件以应用</n-text>
+          <n-text class="name">
+            {{ t("setting.other.network_proxy") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.other.proxy_tip") }}
+          </n-text>
         </div>
         <n-flex>
-          <n-button type="primary" strong secondary @click="setProxy"> 保存并应用 </n-button>
+          <n-button type="primary" strong secondary @click="setProxy">
+            {{ t("common.save_and_apply") }}
+          </n-button>
           <n-select
             v-model:value="settingStore.proxyProtocol"
             :options="[
               {
-                label: '关闭代理',
+                label: t('common.close'),
                 value: 'off',
               },
               {
-                label: 'HTTP 代理',
+                label: 'HTTP',
                 value: 'HTTP',
               },
               {
-                label: 'HTTPS 代理',
+                label: 'HTTPS',
                 value: 'HTTPS',
               },
             ]"
@@ -58,13 +66,17 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">代理服务器地址</n-text>
-          <n-text class="tip" :depth="3">请填写代理服务器地址，如 127.0.0.1</n-text>
+          <n-text class="name">
+            {{ t("setting.other.proxy_server") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.other.proxy_server_tip") }}
+          </n-text>
         </div>
         <n-input
           v-model:value="settingStore.proxyServe"
           :disabled="settingStore.proxyProtocol === 'off'"
-          placeholder="请填写代理服务器地址"
+          :placeholder="t('setting.other.proxy_server_placeholder')"
           class="set"
         >
           <template #prefix>
@@ -76,8 +88,12 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">代理服务器端口</n-text>
-          <n-text class="tip" :depth="3">请填写代理服务器端口，如 80</n-text>
+          <n-text class="name">
+            {{ t("setting.other.proxy_port") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.other.proxy_port_tip") }}
+          </n-text>
         </div>
         <n-input-number
           v-model:value="settingStore.proxyPort"
@@ -85,37 +101,55 @@
           :show-button="false"
           :min="1"
           :max="65535"
-          placeholder="请填写代理服务器端口"
+          :placeholder="t('setting.other.proxy_port_placeholder')"
           class="set"
         />
       </n-card>
       <n-collapse-transition :show="settingStore.proxyProtocol !== 'off'">
         <n-card class="set-item">
           <div class="label">
-            <n-text class="name">测试代理</n-text>
-            <n-text class="tip" :depth="3">测试代理配置是否可正常连通</n-text>
+            <n-text class="name">
+              {{ t("setting.other.proxy_test") }}
+            </n-text>
+            <n-text class="tip" :depth="3">
+              {{ t("setting.other.proxy_test_tip") }}
+            </n-text>
           </div>
           <n-button :loading="testProxyLoading" type="primary" strong secondary @click="testProxy">
-            测试代理
+            {{ t("setting.other.proxy_test") }}
           </n-button>
         </n-card>
       </n-collapse-transition>
     </div>
     <div class="set-list">
-      <n-h3 prefix="bar"> 重置 </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("common.reset") }}
+      </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">重置所有设置</n-text>
-          <n-text class="tip" :depth="3">重置所有设置，恢复软件默认值</n-text>
+          <n-text class="name">
+            {{ t("setting.other.reset_setting") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.other.reset_setting_tip") }}
+          </n-text>
         </div>
-        <n-button type="warning" strong secondary @click="resetSetting"> 重置设置 </n-button>
+        <n-button type="warning" strong secondary @click="resetSetting">
+          {{ t("setting.other.reset_setting_btn") }}
+        </n-button>
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">清除全部数据</n-text>
-          <n-text class="tip" :depth="3">重置所有设置，清除全部数据</n-text>
+          <n-text class="name">
+            {{ t("setting.other.clear_all_data") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.other.clear_all_data_tip") }}
+          </n-text>
         </div>
-        <n-button type="error" strong secondary @click="clearAllData"> 清除全部 </n-button>
+        <n-button type="error" strong secondary @click="clearAllData">
+          {{ t("setting.other.clear_all_data_btn") }}
+        </n-button>
       </n-card>
     </div>
   </div>
@@ -125,7 +159,9 @@
 import { useSettingStore, useDataStore } from "@/stores";
 import { isElectron } from "@/utils/helper";
 import { debounce } from "lodash-es";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const dataStore = useDataStore();
 const settingStore = useSettingStore();
 
@@ -142,11 +178,11 @@ const proxyConfig = computed(() => ({
 const setProxy = debounce(() => {
   if (settingStore.proxyProtocol === "off" || !settingStore.proxyServe || !settingStore.proxyPort) {
     window.electron.ipcRenderer.send("remove-proxy");
-    window.$message.success("成功关闭网络代理");
+    window.$message.success(t("message.proxy_close_success"));
     return;
   }
   window.electron.ipcRenderer.send("set-proxy", proxyConfig.value);
-  window.$message.success("网络代理配置完成，请重启软件");
+  window.$message.success(t("message.proxy_set_success"));
 }, 300);
 
 // 测试代理
@@ -154,9 +190,9 @@ const testProxy = async () => {
   testProxyLoading.value = true;
   const result = await window.electron.ipcRenderer.invoke("test-proxy", proxyConfig.value);
   if (result) {
-    window.$message.success("该代理可正常使用");
+    window.$message.success(t("message.proxy_test_success"));
   } else {
-    window.$message.error("代理测试失败，请重试");
+    window.$message.error(t("message.proxy_test_fail"));
   }
   testProxyLoading.value = false;
 };
@@ -164,15 +200,15 @@ const testProxy = async () => {
 // 重置设置
 const resetSetting = () => {
   window.$dialog.warning({
-    title: "警告",
-    content: "此操作将重置所有设置，是否继续?",
-    positiveText: "确定",
-    negativeText: "取消",
+    title: t("common.warning"),
+    content: t("message.reset_setting_confirm"),
+    positiveText: t("common.ok"),
+    negativeText: t("common.cancel"),
     onPositiveClick: () => {
       settingStore.$reset();
       // electron
       if (isElectron) window.electron.ipcRenderer.send("reset-setting");
-      window.$message.success("设置重置完成");
+      window.$message.success(t("message.reset_setting_success"));
     },
   });
 };
@@ -180,10 +216,10 @@ const resetSetting = () => {
 // 清除全部数据
 const clearAllData = () => {
   window.$dialog.warning({
-    title: "高危操作",
-    content: "此操作将重置所有设置并清除全部数据，同时将退出登录状态，是否继续?",
-    positiveText: "确定",
-    negativeText: "取消",
+    title: t("common.warning"),
+    content: t("message.clear_all_data_confirm"),
+    positiveText: t("common.ok"),
+    negativeText: t("common.cancel"),
     onPositiveClick: async () => {
       // 重置设置
       window.localStorage.clear();
@@ -192,7 +228,7 @@ const clearAllData = () => {
       await dataStore.deleteDB();
       // electron
       if (isElectron) window.electron.ipcRenderer.send("reset-setting");
-      window.$message.loading("数据清除完成，软件即将热重载", {
+      window.$message.loading(t("message.clear_all_data_success"), {
         duration: 3000,
         onAfterLeave: () => window.location.reload(),
       });

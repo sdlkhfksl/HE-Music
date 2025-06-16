@@ -2,26 +2,38 @@
 <template>
   <div class="setting-type">
     <div class="set-list">
-      <n-h3 prefix="bar"> 主题设置 </n-h3>
+      <n-h3 prefix="bar"> {{ t("setting.general.theme_setting") }} </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">主题模式</n-text>
-          <n-text class="tip" :depth="3">调整全局主题明暗模式</n-text>
+          <n-text class="name">{{ t("common.language") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.general.language_tip") }}</n-text>
+        </div>
+        <n-select
+          v-model:value="settingStore.language"
+          class="set"
+          :options="languageOptions"
+          @update:value="languageChange"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{ t("setting.general.theme_mode") }}</n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.general.theme_mode_tip") }}</n-text>
         </div>
         <n-select
           v-model:value="settingStore.themeMode"
           class="set"
           :options="[
             {
-              label: '跟随系统',
+              label: t('setting.general.theme_mode_value_auto'),
               value: 'auto',
             },
             {
-              label: '浅色模式',
+              label: t('setting.general.theme_mode_value_dark'),
               value: 'light',
             },
             {
-              label: '深色模式',
+              label: t('setting.general.theme_mode_value_light'),
               value: 'dark',
             },
           ]"
@@ -29,8 +41,8 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">全局主题色</n-text>
-          <n-text class="tip" :depth="3">更改全局主题色</n-text>
+          <n-text class="name"> {{ t("setting.general.theme_color") }}</n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.general.theme_color_tip") }}</n-text>
         </div>
         <n-select
           v-model:value="settingStore.themeColorType"
@@ -44,8 +56,10 @@
       >
         <n-card class="set-item">
           <div class="label">
-            <n-text class="name">自定义主题色</n-text>
-            <n-text class="tip" :depth="3">可在此处自定义全局主题色</n-text>
+            <n-text class="name"> {{ t("setting.general.theme_color_custom") }}</n-text>
+            <n-text class="tip" :depth="3">{{
+              t("setting.general.theme_color_custom_tip")
+            }}</n-text>
           </div>
           <n-color-picker
             v-model:value="settingStore.themeCustomColor"
@@ -57,8 +71,8 @@
       </n-collapse-transition>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">全局着色</n-text>
-          <n-text class="tip" :depth="3">是否将主题色应用至所有元素</n-text>
+          <n-text class="name">{{ t("setting.general.theme_global_color") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.general.theme_global_color_tip") }}</n-text>
         </div>
         <n-switch
           v-model:value="settingStore.themeGlobalColor"
@@ -69,8 +83,8 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">全局动态取色</n-text>
-          <n-text class="tip" :depth="3">主题色是否跟随封面，目前感觉不好看</n-text>
+          <n-text class="name">{{ t("setting.general.theme_follow_cover") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.general.theme_follow_cover_tip") }}</n-text>
         </div>
         <n-switch
           v-model:value="settingStore.themeFollowCover"
@@ -81,53 +95,53 @@
       </n-card>
     </div>
     <div class="set-list">
-      <n-h3 prefix="bar"> 杂项设置 </n-h3>
+      <n-h3 prefix="bar"> {{ t("setting.general.misc_setting") }} </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">显示搜索历史</n-text>
+          <n-text class="name">{{ t("setting.general.show_search_history") }}</n-text>
         </div>
         <n-switch class="set" v-model:value="settingStore.showSearchHistory" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">侧边栏显示封面</n-text>
-          <n-text class="tip" :depth="3">是否显示歌单的封面，如果有</n-text>
+          <n-text class="name">{{ t("setting.general.menu_show_cover") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.general.menu_show_cover_tip") }}</n-text>
         </div>
         <n-switch class="set" v-model:value="settingStore.menuShowCover" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">开启页面缓存</n-text>
-          <n-text class="tip" :depth="3">是否开启部分页面的缓存，这将会增加内存占用</n-text>
+          <n-text class="name"> {{ t("setting.general.use_keep_alive") }}</n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.general.use_keep_alive_tip") }}</n-text>
         </div>
         <n-switch class="set" v-model:value="settingStore.useKeepAlive" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">页面切换动画</n-text>
-          <n-text class="tip" :depth="3">选择页面切换时的动画效果</n-text>
+          <n-text class="name"> {{ t("setting.general.route_animation") }}</n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.general.route_animation_tip") }}</n-text>
         </div>
         <n-select
           v-model:value="settingStore.routeAnimation"
           :options="[
             {
-              label: '无动画',
+              label: t('setting.general.route_animation_value_none'),
               value: 'none',
             },
             {
-              label: '淡入淡出',
+              label: t('setting.general.route_animation_value_fade'),
               value: 'fade',
             },
             {
-              label: '缩放',
+              label: t('setting.general.route_animation_value_zoom'),
               value: 'zoom',
             },
             {
-              label: '滑动',
+              label: t('setting.general.route_animation_value_slide'),
               value: 'slide',
             },
             {
-              label: '上浮',
+              label: t('setting.general.route_animation_value_up'),
               value: 'up',
             },
           ]"
@@ -136,18 +150,18 @@
       </n-card>
     </div>
     <div v-if="isElectron" class="set-list">
-      <n-h3 prefix="bar"> 系统设置 </n-h3>
+      <n-h3 prefix="bar"> {{ t("setting.general.system_setting") }} </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">在线服务</n-text>
-          <n-text class="tip" :depth="3">是否开启软件的在线服务</n-text>
+          <n-text class="name">{{ t("setting.general.use_online_service") }}</n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.general.use_online_service_tip") }}</n-text>
         </div>
         <n-switch class="set" :value="useOnlineService" :round="false" @update:value="modeChange" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">自定义字体</n-text>
-          <n-text class="tip" :depth="3"> 更改软件内全局字体 </n-text>
+          <n-text class="name">{{ t("setting.general.custom_font") }}</n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.general.custom_font_tip") }} </n-text>
         </div>
         <n-flex>
           <Transition name="fade" mode="out-in">
@@ -158,7 +172,7 @@
               secondary
               @click="settingStore.globalFont = 'default'"
             >
-              恢复默认
+              {{ t("common.reset_default") }}
             </n-button>
           </Transition>
           <n-select v-model:value="settingStore.globalFont" :options="allFontsData" class="set" />
@@ -166,8 +180,8 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">歌词区域字体</n-text>
-          <n-text class="tip" :depth="3"> 是否独立更改歌词区域字体 </n-text>
+          <n-text class="name"> {{ t("setting.general.lyric_font") }}</n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.general.lyric_font_tip") }} </n-text>
         </div>
         <n-flex>
           <Transition name="fade" mode="out-in">
@@ -178,13 +192,13 @@
               secondary
               @click="settingStore.LyricFont = 'follow'"
             >
-              恢复默认
+              {{ t("common.reset_default") }}
             </n-button>
           </Transition>
           <n-select
             v-model:value="settingStore.LyricFont"
             :options="[
-              { label: '跟随全局', value: 'follow' },
+              { label: t('setting.general.lyric_font_follow_global'), value: 'follow' },
               ...allFontsData.filter((v) => v.value !== 'default'),
             ]"
             class="set"
@@ -193,19 +207,19 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">关闭软件时</n-text>
-          <n-text class="tip" :depth="3">选择关闭软件的方式</n-text>
+          <n-text class="name">{{ t("setting.general.close_software") }}</n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.general.close_software_tip") }}</n-text>
         </div>
         <n-select
           v-model:value="settingStore.closeAppMethod"
           :disabled="settingStore.showCloseAppTip"
           :options="[
             {
-              label: '最小化到任务栏',
+              label: t('setting.general.close_software_value_hide'),
               value: 'hide',
             },
             {
-              label: '直接退出',
+              label: t('setting.general.close_software_value_close'),
               value: 'close',
             },
           ]"
@@ -214,14 +228,16 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">每次关闭前都进行提醒</n-text>
+          <n-text class="name">{{ t("setting.general.show_close_app_tip") }}</n-text>
         </div>
         <n-switch v-model:value="settingStore.showCloseAppTip" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">任务栏显示播放进度</n-text>
-          <n-text class="tip" :depth="3"> 是否在任务栏显示歌曲播放进度 </n-text>
+          <n-text class="name"> {{ t("setting.general.show_taskbar_progress") }}</n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.show_taskbar_progress_tip") }}
+          </n-text>
         </div>
         <n-switch
           v-model:value="settingStore.showTaskbarProgress"
@@ -232,15 +248,17 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">阻止系统息屏</n-text>
-          <n-text class="tip" :depth="3">是否在播放界面阻止系统息屏</n-text>
+          <n-text class="name"> {{ t("setting.general.prevent_sleep") }}</n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.general.prevent_sleep_tip") }}</n-text>
         </div>
         <n-switch v-model:value="settingStore.preventSleep" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">自动检查更新</n-text>
-          <n-text class="tip" :depth="3">在每次开启软件时自动检查更新</n-text>
+          <n-text class="name"> {{ t("setting.general.check_update_on_start") }}</n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.check_update_on_start_tip") }}</n-text
+          >
         </div>
         <n-switch v-model:value="settingStore.checkUpdateOnStart" class="set" :round="false" />
       </n-card>
@@ -255,7 +273,11 @@ import { isElectron } from "@/utils/helper";
 import { isEmpty } from "lodash-es";
 import themeColor from "@/assets/data/themeColor.json";
 import player from "@/utils/player";
+import { useI18n } from "vue-i18n";
+import { computed } from "vue";
 
+// 国际化
+const { locale, t } = useI18n();
 const musicStore = useMusicStore();
 const settingStore = useSettingStore();
 const statusStore = useStatusStore();
@@ -267,15 +289,23 @@ const allFontsData = ref<SelectOption[]>([]);
 const useOnlineService = ref(settingStore.useOnlineService);
 
 // 全局主题色配置
-const themeColorOptions: SelectOption[] = [
-  // { label: "关闭主题色", value: "close" },
-  ...Object.keys(themeColor).map((key) => ({
-    value: key,
-    label: themeColor[key].name,
-    style: {
-      color: themeColor[key].color,
-    },
-  })),
+const themeColorOptions = computed(() => {
+  return [
+    // { label: "关闭主题色", value: "close" },
+    ...Object.keys(themeColor).map((key) => ({
+      value: key,
+      label: t(`setting.general.theme_color_value_${key}`),
+      style: {
+        color: themeColor[key].color,
+      },
+    })),
+  ];
+});
+
+const languageOptions: SelectOption[] = [
+  // { label: "跟随系统", value: "auth" },
+  { label: "简体中文", value: "zh-CN" },
+  { label: "English", value: "en" },
 ];
 
 // 关闭任务栏进度
@@ -299,7 +329,7 @@ const getAllSystemFonts = async () => {
   });
   // 添加默认选项
   allFontsData.value.unshift({
-    label: "系统默认",
+    label: t("common.system_default"),
     value: "default",
     style: {
       fontFamily:
@@ -345,6 +375,11 @@ const modeChange = (val: boolean) => {
 // 全局着色更改
 const themeGlobalColorChange = (val: boolean) => {
   if (val) player.getCoverColor(musicStore.songCover);
+};
+
+const languageChange = (value: string) => {
+  locale.value = value;
+  document.documentElement?.setAttribute("lang", value);
 };
 
 onMounted(() => {

@@ -44,6 +44,8 @@ import SearchDefault from "@/components/Search/SearchDefault.vue";
 import SearchSuggest from "@/components/Search/SearchSuggest.vue";
 import { SearchDefaultInfo } from "@/types/main.hemusic";
 import { watch } from "vue";
+import { useI18n } from "vue-i18n";
+const { t, locale } = useI18n();
 
 const router = useRouter();
 const dataStore = useDataStore();
@@ -57,8 +59,8 @@ let searchDefaultIndex: number = -1;
 
 // 搜索框数据
 const searchInputRef = ref<HTMLInputElement | null>(null);
-const searchPlaceholder = ref<string>("搜索音乐 / 视频");
-const searchRealkeyword = ref<string>("");
+const searchPlaceholder = ref<string>(t("search.placeholder"));
+const searchRealKeyword = ref<string>("");
 
 // 搜索框输入限制
 const noSideSpace = (value: string) => !value.startsWith(" ");
@@ -95,7 +97,7 @@ const reloadPlaceholder = async () => {
     searchDefaultList = result.list || [];
   } catch (error) {
     console.error("搜索关键词获取失败：", error);
-    searchPlaceholder.value = "搜索音乐 / 视频";
+    searchPlaceholder.value = t("search.placeholder");
   }
 };
 
@@ -105,7 +107,7 @@ const updatePlaceholder = () => {
     searchDefaultIndex = (searchDefaultIndex + 1) % searchDefaultList.length;
     const result = searchDefaultList[searchDefaultIndex];
     searchPlaceholder.value = result.key + " " + result.description;
-    searchRealkeyword.value = result.key;
+    searchRealKeyword.value = result.key;
     return;
   }
 };
@@ -113,9 +115,9 @@ const updatePlaceholder = () => {
 // 前往搜索
 const toSearch = async (key: any, type: string = "keyword") => {
   // 未输入内容且不存在推荐
-  if (!key && searchPlaceholder.value === "搜索音乐 / 视频") return;
-  if (!key && searchPlaceholder.value !== "搜索音乐 / 视频" && searchRealkeyword.value) {
-    key = searchRealkeyword.value?.trim();
+  if (!key && searchPlaceholder.value === t("search.placeholder")) return;
+  if (!key && searchPlaceholder.value !== t("search.placeholder") && searchRealKeyword.value) {
+    key = searchRealKeyword.value?.trim();
   }
   // 关闭搜索框
   statusStore.searchFocus = false;
@@ -170,6 +172,13 @@ const watcher = watch(
     updatePlaceholder();
   },
 );
+
+watch(locale, () => {
+  if (searchDefaultList.length !== 0) {
+    return;
+  }
+  searchPlaceholder.value = t("search.placeholder");
+});
 
 onMounted(async () => {
   await reloadPlaceholder();

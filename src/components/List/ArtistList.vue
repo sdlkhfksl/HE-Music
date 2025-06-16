@@ -55,7 +55,7 @@
       <!-- 加载更多 -->
       <n-flex v-if="loadMore" class="load-more" justify="center">
         <n-button :loading="loading" size="large" strong secondary round @click="emit('loadMore')">
-          加载更多
+          {{ t("common.load_more") }}
         </n-button>
       </n-flex>
     </div>
@@ -74,12 +74,14 @@
       </n-grid>
     </div>
     <!-- 空列表 -->
-    <n-empty v-else description="空空如也，怎么什么都没有啊" size="large" />
+    <n-empty v-else :description="t('common.list_empty')" size="large" />
   </Transition>
 </template>
 
 <script setup lang="ts">
 import { SingerInfo, UserFavouriteSingerInfo } from "@/types/main.hemusic";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 interface Props {
   data: SingerInfo[] | UserFavouriteSingerInfo[];

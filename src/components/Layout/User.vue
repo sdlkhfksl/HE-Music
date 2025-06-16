@@ -19,7 +19,11 @@
         </div>
         <div class="user-data">
           <n-text class="name">
-            {{ dataStore.userLoginStatus ? dataStore.userData.nickname || "未知用户名" : "未登录" }}
+            {{
+              dataStore.userLoginStatus
+                ? dataStore.userData.nickname || t("common.unknow_user")
+                : t("nav.un_login")
+            }}
           </n-text>
           <SvgIcon :class="['down', { open: userMenuShow }]" name="DropDown" :depth="3" />
         </div>
@@ -42,10 +46,10 @@
 
       <n-flex>
         <n-button :focusable="false" size="small" tertiary round @click="openUpdateUserInfo">
-          修改信息
+          {{ t("nav.modify_info") }}
         </n-button>
         <n-button :focusable="false" size="small" tertiary round @click="openUpdateUserPassword">
-          修改密码
+          {{ t("nav.modify_password") }}
         </n-button>
       </n-flex>
       <!-- 退出登录 -->
@@ -55,7 +59,7 @@
         <template #icon>
           <SvgIcon name="Power" />
         </template>
-        退出登录
+        {{ t("nav.exit_login") }}
       </n-button>
     </div>
   </n-popover>
@@ -65,6 +69,8 @@
 import { useDataStore } from "@/stores";
 import { openUpdateUserInfo, openUpdateUserPassword, openUserLogin } from "@/utils/modal";
 import { isLogin, toLogout, updateUserData } from "@/utils/auth";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const router = useRouter();
 const dataStore = useDataStore();
@@ -85,19 +91,19 @@ const openMenu = () => {
 const userLikeData = computed(() => {
   return [
     {
-      label: "歌单",
+      label: t("common.playlist"),
       name: "like-playlists",
       value:
         (dataStore.userLikeData.playlists?.length || 0) +
         (dataStore.userCreatedPlaylist.length || 0),
     },
     {
-      label: "专辑",
+      label: t("common.album"),
       name: "like-albums",
       value: dataStore.userLikeData.albums.length,
     },
     {
-      label: "歌手",
+      label: t("common.artist"),
       name: "like-artists",
       value: dataStore.userLikeData.artists.length,
     },
@@ -116,10 +122,10 @@ const isLogout = () => {
     return;
   }
   window.$dialog.warning({
-    title: "退出登录",
-    content: "确认退出当前用户登录？",
-    positiveText: "确认登出",
-    negativeText: "取消",
+    title: t("nav.exit_login"),
+    content: t("message.logout_confirm"),
+    positiveText: t("common.ok"),
+    negativeText: t("common.cancel"),
     onPositiveClick: () => toLogout(),
   });
 };

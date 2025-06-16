@@ -55,8 +55,10 @@ import AlbumList from "@/components/List/AlbumList.vue";
 import SongList from "@/components/List/SongList.vue";
 import VideoList from "@/components/List/VideoList.vue";
 import PlaylistList from "@/components/List/PlaylistList.vue";
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const props = defineProps<{
   platform: string;
@@ -65,7 +67,7 @@ const props = defineProps<{
 const router = useRouter();
 
 interface RecItemType {
-  name: string;
+  name: ComputedRef<string>;
   list: any[];
   type: string;
   path?: string;
@@ -84,25 +86,25 @@ const loading = ref(true);
 // 推荐数据
 const pageData = ref<RecDataType>({
   new_song_list: {
-    name: "新歌速递",
+    name: computed(() => t("discover.new_song")),
     list: [] as SongInfo[],
     type: "song",
     path: "new-song",
   },
   new_album_list: {
-    name: "新碟上架",
+    name: computed(() => t("discover.new_album")),
     list: [] as AlbumInfo[],
     type: "album",
     path: "new-album",
   },
   featured_mv_list: {
-    name: "视频",
+    name: computed(() => t("discover.featured_videos")),
     list: [] as MVInfo[],
     type: "video",
     cols: "2 600:2 800:3 900:4 1200:5 1400:6",
   },
   featured_playlist_list: {
-    name: "精选歌单",
+    name: computed(() => t("discover.featured_playlist")),
     type: "playlist",
     list: [] as PlaylistInfo[],
   },

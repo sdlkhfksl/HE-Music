@@ -2,8 +2,8 @@
   <div class="setting">
     <div class="set-left">
       <div class="title">
-        <n-h1>设置</n-h1>
-        <n-text :depth="3">个性化与全局设置</n-text>
+        <n-h1>{{ t("common.setting") }}</n-h1>
+        <!-- <n-text :depth="3">个性化与全局设置</n-text> -->
       </div>
       <!-- 设置菜单 -->
       <n-menu
@@ -43,7 +43,7 @@
         <!-- 关于 -->
         <AboutSetting v-else-if="activeKey === 'about'" />
         <!-- 空白 -->
-        <n-text v-else class="error">暂无该设置项</n-text>
+        <n-text v-else class="error">{{ t("setting.none_key") }}</n-text>
       </Transition>
     </n-scrollbar>
   </div>
@@ -54,6 +54,10 @@ import type { MenuOption, NScrollbar } from "naive-ui";
 import type { SettingType } from "@/types/main";
 import { isElectron, renderIcon } from "@/utils/helper";
 import packageJson from "@/../package.json";
+import { useI18n } from "vue-i18n";
+import { computed } from "vue";
+
+const { t } = useI18n();
 
 const props = defineProps<{ type: SettingType }>();
 
@@ -64,45 +68,45 @@ const setScrollbar = ref<InstanceType<typeof NScrollbar> | null>(null);
 const activeKey = ref<SettingType>(props.type);
 
 // 菜单内容
-const menuOptions: MenuOption[] = [
+const menuOptions = computed<MenuOption[]>(() => [
   {
     key: "general",
-    label: "常规设置",
+    label: t("setting.general.general_setting"),
     icon: renderIcon("SettingsLine"),
   },
   {
     key: "play",
-    label: "播放设置",
+    label: t("setting.play.play_setting"),
     icon: renderIcon("Music"),
   },
   {
     key: "lyrics",
-    label: "歌词设置",
+    label: t("setting.lyrics.lyrics_setting"),
     icon: renderIcon("Lyrics"),
   },
   {
     key: "keyboard",
-    label: "快捷键设置",
+    label: t("setting.shortcut.shortcut_setting"),
     show: isElectron,
     icon: renderIcon("Keyboard"),
   },
   {
     key: "local",
-    label: "本地与下载",
+    label: t("setting.local.local_setting"),
     show: isElectron,
     icon: renderIcon("Storage"),
   },
   {
     key: "other",
-    label: "其他设置",
+    label: t("setting.other.other_setting"),
     icon: renderIcon("SettingsOther"),
   },
   {
     key: "about",
-    label: "关于",
+    label: t("common.about"),
     icon: renderIcon("Info"),
   },
-];
+]);
 
 // 跳转
 const toGithub = () => {

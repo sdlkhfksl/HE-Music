@@ -1,15 +1,21 @@
 <template>
   <div class="create-playlist">
     <n-tabs v-model:value="playlistType" type="segment" animated>
-      <n-tab-pane :disabled="!isLogin()" name="online" tab="在线歌单">
+      <n-tab-pane :disabled="!isLogin()" name="online" :tab="t('modal.online_playlist')">
         <n-form ref="onlineFormRef" :model="onlineFormData" :rules="onlineFormRules">
-          <n-form-item label="歌单名称" path="name">
-            <n-input v-model:value="onlineFormData.name" placeholder="请输入歌单名称" />
+          <n-form-item :label="t('modal.playlist_name')" path="name">
+            <n-input
+              v-model:value="onlineFormData.name"
+              :placeholder="t('modal.playlist_name_placeholder')"
+            />
           </n-form-item>
-          <n-form-item label="歌单图片地址" path="cover">
-            <n-input v-model:value="onlineFormData.cover" placeholder="请输入歌单图片地址" />
+          <n-form-item :label="t('modal.playlist_cover_url')" path="cover">
+            <n-input
+              v-model:value="onlineFormData.cover"
+              :placeholder="t('modal.playlist_cover_url_placeholder')"
+            />
           </n-form-item>
-          <n-form-item label="歌单描述" path="description">
+          <n-form-item :label="t('modal.playlist_description')" path="description">
             <n-input
               v-model:value="onlineFormData.description"
               :autosize="{
@@ -17,7 +23,7 @@
                 maxRows: 6,
               }"
               :maxlength="800"
-              placeholder="请输入歌单描述"
+              :placeholder="t('modal.playlist_description_placeholder')"
               type="textarea"
               show-count
               clearable
@@ -25,21 +31,25 @@
           </n-form-item>
         </n-form>
       </n-tab-pane>
-      <n-tab-pane name="local" tab="本地歌单">
-        <n-empty description="暂未实现" />
+      <n-tab-pane name="local" :tab="t('modal.local_playlist')">
+        <n-empty :description="t('modal.unimplemented')" />
       </n-tab-pane>
     </n-tabs>
-    <n-button class="create" type="primary" @click="toCreatePlaylist"> 新建 </n-button>
+    <n-button class="create" type="primary" @click="toCreatePlaylist">
+      {{ t("modal.create") }}
+    </n-button>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { FormInst, FormRules } from "naive-ui";
-import { textRule } from "@/utils/rules";
+import { useFormRule } from "@/utils/rules";
 import { debounce } from "lodash-es";
 import { isLogin, updateUserCreatedPlaylist } from "@/utils/auth";
 import { createUserPlaylist } from "@/api/userplaylist";
-
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
+const { textRule } = useFormRule();
 const emit = defineEmits<{ close: [] }>();
 
 // 表单类型
@@ -71,7 +81,7 @@ const toCreatePlaylist = debounce(
         onlineFormData.value.description || "",
       ).then(() => {
         emit("close");
-        window.$message.success("新建歌单成功");
+        window.$message.success(t("message.create_playlist_success"));
         updateUserCreatedPlaylist();
       });
     }

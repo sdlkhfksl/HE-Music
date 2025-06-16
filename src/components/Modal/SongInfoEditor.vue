@@ -1,47 +1,63 @@
 <template>
   <div class="song-info-editor">
     <n-tabs type="segment" animated>
-      <n-tab-pane name="info" tab="信息" display-directive="show">
+      <n-tab-pane name="info" :tab="t('common.info')" display-directive="show">
         <!-- 在线匹配 -->
         <n-flex class="match" justify="space-between" align="center">
-          <n-text>不想手动填写标签？</n-text>
+          <n-text>{{ t("modal.auto_match_tag_tip") }}</n-text>
           <n-button type="primary" strong secondary @click="onlineMatch">
             <template #icon>
               <SvgIcon name="AutoFix" />
             </template>
-            自动匹配标签
+            {{ t("modal.auto_match_tag") }}
           </n-button>
         </n-flex>
         <n-scrollbar class="scrollbar">
           <n-form ref="infoFormRef" :model="infoFormData" :rules="infoFormRules" class="phone-form">
-            <n-form-item label="文件名" path="fileName">
+            <n-form-item :label="t('common.filename')" path="fileName">
               <n-input v-model:value="infoFormData.fileName" disabled />
             </n-form-item>
-            <n-form-item label="歌曲名" path="name">
-              <n-input v-model:value="infoFormData.name" placeholder="请输入歌曲名" clearable />
+            <n-form-item :label="t('common.song_name')" path="name">
+              <n-input
+                v-model:value="infoFormData.name"
+                :placeholder="t('modal.song_name_placeholder')"
+                clearable
+              />
             </n-form-item>
-            <n-form-item label="歌手" path="singer">
-              <n-input v-model:value="infoFormData.singer" placeholder="请输入歌手名" clearable />
+            <n-form-item :label="t('common.artist')" path="singer">
+              <n-input
+                v-model:value="infoFormData.singer"
+                :placeholder="t('modal.artist_placeholder')"
+                clearable
+              />
             </n-form-item>
-            <n-form-item label="专辑" path="album">
-              <n-input v-model:value="infoFormData.album" placeholder="请输入专辑名" clearable />
+            <n-form-item :label="t('common.album')" path="album">
+              <n-input
+                v-model:value="infoFormData.album"
+                :placeholder="t('modal.album_placeholder')"
+                clearable
+              />
             </n-form-item>
-            <n-form-item label="别名" path="alia">
-              <n-input v-model:value="infoFormData.alia" placeholder="请输入别名" clearable />
+            <n-form-item :label="t('common.alias')" path="alia">
+              <n-input
+                v-model:value="infoFormData.alia"
+                :placeholder="t('modal.alias_placeholder')"
+                clearable
+              />
             </n-form-item>
-            <n-form-item label="歌词" path="lyric">
+            <n-form-item :label="t('common.lyrics')" path="lyric">
               <n-input
                 v-model:value="infoFormData.lyric"
                 :autosize="{ minRows: 3, maxRows: 6 }"
-                placeholder="请输入歌词"
+                :placeholder="t('modal.lyrics_placeholder')"
                 type="textarea"
               />
             </n-form-item>
             <n-grid :cols="24" :x-gap="24">
-              <n-form-item-gi :span="12" label="类型" path="type">
+              <n-form-item-gi :span="12" :label="t('common.type')" path="type">
                 <n-input v-model:value="infoFormData.type" disabled />
               </n-form-item-gi>
-              <n-form-item-gi :span="12" label="码率" path="br">
+              <n-form-item-gi :span="12" :label="t('common.bitrate')" path="br">
                 <n-input-number
                   v-model:value="infoFormData.br"
                   :show-button="false"
@@ -65,7 +81,7 @@
                   </template>
                 </n-input-number>
               </n-form-item-gi>
-              <n-form-item-gi :span="12" label="频率" path="br">
+              <n-form-item-gi :span="12" :label="t('common.frequency')" path="br">
                 <n-input-number
                   v-model:value="infoFormData.frequency"
                   :show-button="false"
@@ -77,7 +93,7 @@
                   </template>
                 </n-input-number>
               </n-form-item-gi>
-              <n-form-item-gi :span="12" label="路径" path="path">
+              <n-form-item-gi :span="12" :label="t('common.path')" path="path">
                 <n-input-group>
                   <n-input :value="song.path" disabled />
                   <n-button type="primary" ghost @click="copyData(song.path)">
@@ -101,7 +117,7 @@
           </n-form>
         </n-scrollbar>
       </n-tab-pane>
-      <n-tab-pane name="cover" tab="封面" display-directive="show">
+      <n-tab-pane name="cover" :tab="t('common.cover')" display-directive="show">
         <n-image
           :src="coverData"
           :preview-disabled="true"
@@ -111,13 +127,17 @@
           @click="changeCover"
         />
         <n-flex class="menu" justify="center">
-          <n-text depth="3">点击封面以更换</n-text>
+          <n-text depth="3">{{ t("modal.click_to_change_cover") }}</n-text>
         </n-flex>
       </n-tab-pane>
     </n-tabs>
     <n-flex class="menu" justify="center">
-      <n-button class="btn" strong secondary @click="emit('close')">取消</n-button>
-      <n-button class="btn" type="primary" @click="saveSongInfo(song)">保存修改</n-button>
+      <n-button class="btn" strong secondary @click="emit('close')">{{
+        t("common.cancel")
+      }}</n-button>
+      <n-button class="btn" type="primary" @click="saveSongInfo(song)">{{
+        "common.save"
+      }}</n-button>
     </n-flex>
   </div>
 </template>
@@ -126,14 +146,16 @@
 import type { FormInst, FormRules } from "naive-ui";
 import type { ICommonTagsResult, IFormat } from "music-metadata";
 import { useDataStore, useMusicStore, useSettingStore } from "@/stores";
-import { textRule } from "@/utils/rules";
+import { useFormRule } from "@/utils/rules";
 import { copyData } from "@/utils/helper";
 import { matchSong, neteaseSongLyric } from "@/api/song";
 import { debounce, isArray, isEmpty, isObject } from "lodash-es";
 import blob from "@/utils/blob";
 import { formatSongsList } from "@/utils/format";
 import { SongInfo } from "@/types/main.hemusic";
-
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
+const { textRule } = useFormRule();
 const props = defineProps<{
   song: SongInfo;
 }>();
@@ -229,7 +251,7 @@ const onlineMatch = debounce(
       );
       const song = result.songs?.[0];
       if (isEmpty(song)) {
-        window.$message.error("无法匹配，请修改信息后重试");
+        window.$message.error(t("message.match_fail"));
         return;
       } else {
         const songData = formatSongsList([song])[0];
@@ -259,11 +281,11 @@ const onlineMatch = debounce(
           coverData.value = songData.coverSize?.l;
         }
 
-        window.$message.success("匹配成功");
+        window.$message.success(t("message.match_success"));
       }
     } catch (error) {
       console.error("Error online matching:", error);
-      window.$message.error("匹配出错，请重试");
+      window.$message.error(t("message.match_fail"));
     }
   },
   300,
@@ -316,13 +338,13 @@ const saveSongInfo = debounce(async (song: SongInfo) => {
     };
     console.log(song.path, metadata);
     await window.electron.ipcRenderer.invoke("set-music-metadata", song.path, metadata);
-    window.$message.success("歌曲信息修改成功");
+    window.$message.success(t("message.song_info_modify_success"));
     // 修改音乐信息
     updatePlaySong(metadata);
     emit("close");
   } catch (error) {
     console.error("Error saving song info:", error);
-    window.$message.error("歌曲信息修改失败，请重试");
+    window.$message.error(t("message.song_info_modify_fail"));
   }
 }, 300);
 

@@ -1,80 +1,87 @@
 import type { FormItemRule } from "naive-ui";
+import { useI18n } from "vue-i18n";
+export function useFormRule() {
+  const { t } = useI18n();
 
-// 普通文本
-export const textRule: FormItemRule = {
-  required: true,
-  message: "请填写必要信息",
-  trigger: ["blur"],
-};
+  // 普通文本
+  const textRule: FormItemRule = {
+    required: true,
+    message: t("rule.required"),
+    trigger: ["blur"],
+  };
+  const numberRule: FormItemRule = {
+    required: true,
+    type: "number",
+    message: t("rule.number_required"),
+    trigger: ["input", "blur"],
+  };
 
-// 数字验证
-export const numberRule: FormItemRule = {
-  required: true,
-  type: "number",
-  message: "请输入数字",
-  trigger: ["input", "blur"],
-};
+  const emailRule: FormItemRule = {
+    required: true,
+    message: t("rule.email_required"),
+    trigger: ["input", "blur"],
+    validator: (_: FormItemRule, value: any) => {
+      if (!value) return new Error(t("rule.email_required"));
+      else if (
+        !/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+          value,
+        )
+      ) {
+        return new Error(t("rule.email_invalid"));
+      }
+      return true;
+    },
+  };
+  const phoneRule: FormItemRule = {
+    required: true,
+    type: "number",
+    message: t("rule.phone_required"),
+    trigger: ["input", "blur"],
+    validator: (_: FormItemRule, value: any) => {
+      if (!value) return new Error(t("rule.phone_required"));
+      else if (!/^1(3\d|4[5-9]|5[0-35-9]|6[567]|7[0-8]|8\d|9[0-35-9])\d{8}$/.test(value)) {
+        return new Error(t("rule.phone_invalid"));
+      }
+      return true;
+    },
+  };
+  const passwordRule: FormItemRule = {
+    required: true,
+    type: "string",
+    message: t("rule.password_required"),
+    trigger: ["input", "blur"],
+    validator: (_: FormItemRule, value: any) => {
+      if (!value) return new Error(t("rule.password_required"));
+      else if (value.length < 6 || value.length > 18) {
+        return new Error(t("rule.password_length_invalid"));
+      }
+      return true;
+    },
+  };
 
-// 邮箱验证
-export const emailRule: FormItemRule = {
-  required: true,
-  message: "请输入正确的邮箱",
-  trigger: ["input", "blur"],
-  validator: (_: FormItemRule, value: any) => {
-    if (!value) return new Error("请输入电子邮箱");
-    else if (
-      !/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-        value,
-      )
-    ) {
-      return new Error("请输入正确的电子邮箱");
-    }
-    return true;
-  },
-};
+  const usernameRule: FormItemRule = {
+    required: true,
+    type: "string",
+    message: t("rule.username_required"),
+    trigger: ["input", "blur"],
+    validator: (_: FormItemRule, value: any) => {
+      if (!value) return new Error(t("rule.username_required"));
+      else if (value.length < 4 || value.length > 18) {
+        return new Error(t("rule.username_length_invalid"));
+      }
+      if (!/^[0-9a-zA-Z_]{4,18}$/.test(value)) {
+        return new Error(t("rule.username_format_invalid"));
+      }
+      return true;
+    },
+  };
 
-// 手机号验证
-export const phoneRule: FormItemRule = {
-  required: true,
-  type: "number",
-  message: "请输入正确的手机号",
-  trigger: ["input", "blur"],
-  validator: (_: FormItemRule, value: any) => {
-    if (!value) return new Error("请输入手机号");
-    else if (!/^1(3\d|4[5-9]|5[0-35-9]|6[567]|7[0-8]|8\d|9[0-35-9])\d{8}$/.test(value)) {
-      return new Error("请输入正确的手机号");
-    }
-    return true;
-  },
-};
-
-export const passwordRule: FormItemRule = {
-  required: true,
-  type: "string",
-  // message: "密码长度为6-18位",
-  trigger: ["input", "blur"],
-  validator: (_: FormItemRule, value: any) => {
-    if (!value) return new Error("请输入密码");
-    else if (value.length < 6 || value.length > 18) {
-      return new Error("密码长度为6-18位");
-    }
-    return true;
-  },
-};
-
-export const usernameRule: FormItemRule = {
-  required: true,
-  type: "string",
-  // message: "用户名",
-  trigger: ["input", "blur"],
-  validator: (_: FormItemRule, value: any) => {
-    if (!value) return new Error("请输入用户名");
-    else if (value.length < 4 || value.length > 18) {
-      return new Error("用户名长度为6-18位");
-    }
-    if (!/^[0-9a-zA-Z_]{4,18}$/.test(value)) {
-      return new Error("用户名只能包含字母、数字、下划线");
-    }
-    return true;
-  },
-};
+  return {
+    textRule,
+    numberRule,
+    emailRule,
+    phoneRule,
+    passwordRule,
+    usernameRule,
+  };
+}

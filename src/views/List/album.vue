@@ -25,7 +25,7 @@
         <div class="data">
           <n-h2 class="name">
             <n-ellipsis :line-clamp="1" :tooltip="{ placement: 'bottom' }">
-              {{ albumDetailData.name || "未知专辑" }}
+              {{ albumDetailData.name || t("common.unknown_album") }}
             </n-ellipsis>
           </n-h2>
           <n-collapse-transition :show="!listScrolling" class="collapse">
@@ -57,7 +57,7 @@
                     :key="arIndex"
                     class="ar"
                   >
-                    {{ ar.name || "未知艺术家" }}
+                    {{ ar.name || t("common.unknown_artist") }}
                   </n-text>
                 </div>
                 <div
@@ -65,7 +65,9 @@
                   class="artists text-hidden"
                   @click="openJumpArtist(albumDetailData.platform, albumDetailData.singers || '')"
                 >
-                  <n-text class="ar"> {{ albumDetailData.singers || "未知艺术家" }} </n-text>
+                  <n-text class="ar">
+                    {{ albumDetailData.singers || t("common.unknown_artist") }}
+                  </n-text>
                 </div>
               </div>
               <div class="item">
@@ -97,7 +99,7 @@
                 <template #icon>
                   <SvgIcon name="Play" />
                 </template>
-                {{ loading ? "加载中..." : "播放" }}
+                {{ loading ? t("common.loading") + "..." : t("common.play") }}
               </n-button>
               <n-button
                 :focusable="false"
@@ -109,7 +111,7 @@
                 <template #icon>
                   <SvgIcon :name="isLikeAlbum ? 'Favorite' : 'FavoriteBorder'" />
                 </template>
-                {{ isLikeAlbum ? "取消收藏" : "收藏专辑" }}
+                {{ isLikeAlbum ? t("common.cancel_collect") : t("common.collect") }}
               </n-button>
               <!--更多-->
               <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">
@@ -127,7 +129,7 @@
                 v-model:value="searchValue"
                 :input-props="{ autocomplete: 'off' }"
                 class="search"
-                placeholder="模糊搜索"
+                :placeholder="t('search.fuzzy_search')"
                 clearable
                 round
                 @input="listSearch"
@@ -158,7 +160,7 @@
       />
       <n-empty
         v-else
-        :description="`搜不到关于 ${searchValue} 的任何歌曲呀`"
+        :description="t('search.no_song_result', { keyword: searchValue })"
         style="margin-top: 60px"
         size="large"
       >
@@ -186,6 +188,8 @@ import { toLikeAlbum } from "@/utils/auth";
 import { buildSourceUrl } from "@/api/source";
 import { DropdownOption } from "naive-ui";
 import { FeatureSupportFlag } from "@/api/platform";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const router = useRouter();
 const dataStore = useDataStore();
@@ -230,7 +234,7 @@ const songListHeight = computed(() => {
 // 更多操作
 const moreOptions = computed<DropdownOption[]>(() => [
   {
-    label: "批量操作",
+    label: t("common.batch_operation"),
     key: "batch",
     props: {
       onClick: () => openBatchList(albumDataShow.value, false),
@@ -238,7 +242,7 @@ const moreOptions = computed<DropdownOption[]>(() => [
     icon: renderIcon("Batch"),
   },
   {
-    label: "打开源页面",
+    label: t("common.open_source_page"),
     key: "open",
     show: platformStore.isFeatureSupport(platform.value, FeatureSupportFlag.BuildSourceUrl),
     props: {

@@ -1,17 +1,20 @@
 <template>
   <div class="update-playlist">
     <n-form ref="updateFormRef" :model="updateFormData" :rules="updateFormRules">
-      <n-form-item label="歌单名" path="name">
+      <n-form-item :label="t('modal.playlist_name')" path="name">
         <n-input
           v-model:value="updateFormData.name"
           :disabled="isLiked"
-          placeholder="请输入歌单名"
+          :placeholder="t('modal.playlist_name_placeholder')"
         />
       </n-form-item>
-      <n-form-item label="歌单图片地址" path="cover">
-        <n-input v-model:value="updateFormData.cover" placeholder="请输入歌单图片地址" />
+      <n-form-item :label="t('modal.playlist_cover_url')" path="cover">
+        <n-input
+          v-model:value="updateFormData.cover"
+          :placeholder="t('modal.playlist_cover_url_placeholder')"
+        />
       </n-form-item>
-      <n-form-item label="歌单描述" path="description">
+      <n-form-item :label="t('modal.playlist_description')" path="description">
         <n-input
           v-model:value="updateFormData.description"
           :autosize="{
@@ -19,25 +22,29 @@
             maxRows: 6,
           }"
           :maxlength="800"
-          placeholder="请输入歌单描述"
+          :placeholder="t('modal.playlist_description_placeholder')"
           type="textarea"
           show-count
           clearable
         />
       </n-form-item>
     </n-form>
-    <n-button class="create" type="primary" @click="toUpdatePlaylist"> 编辑 </n-button>
+    <n-button class="create" type="primary" @click="toUpdatePlaylist">
+      {{ t("common.edit") }}
+    </n-button>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { FormInst, FormRules } from "naive-ui";
-import { textRule } from "@/utils/rules";
+import { useFormRule } from "@/utils/rules";
 import { debounce } from "lodash-es";
 import { updateUserCreatedPlaylist } from "@/utils/auth";
 import { UserPlaylistInfo } from "@/types/main.hemusic";
 import { updateUserPlaylist } from "@/api/userplaylist";
-
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
+const { textRule } = useFormRule();
 // 表单类型
 interface UpdateFormType {
   name: string;
@@ -58,7 +65,7 @@ const isLiked = props.data.is_default === 1;
 // 表单数据
 const updateFormRef = ref<FormInst | null>(null);
 const updateFormData = ref<UpdateFormType>({
-  name: isLiked ? "我喜欢的音乐" : props.data.name,
+  name: isLiked ? t("playlist.my_favorite_music") : props.data.name,
   description: props.data.description,
   cover: props.data.cover,
 });
@@ -78,7 +85,7 @@ const toUpdatePlaylist = debounce(
       updateFormData.value.description ?? "",
     );
     emit("success");
-    window.$message.success("歌单编辑成功");
+    window.$message.success(t("message.playlist_edit_success"));
     await updateUserCreatedPlaylist();
   },
   300,

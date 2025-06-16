@@ -95,7 +95,7 @@
                 class="ar-item"
                 @click="openJumpArtist(musicStore.playSong.platform, musicStore.playSong.singers)"
               >
-                {{ musicStore.playSong.singers || "未知艺术家" }}
+                {{ musicStore.playSong.singers || t("common.unknown_artist") }}
               </n-text>
             </div>
           </Transition>
@@ -220,6 +220,9 @@ import { toLikeSong } from "@/utils/auth";
 import { openDownloadSong, openJumpArtist, openPlaylistAdd } from "@/utils/modal";
 import player from "@/utils/player";
 import { FeatureSupportFlag } from "@/api/platform";
+import { useI18n } from "vue-i18n";
+import { computed } from "vue";
+const { t } = useI18n();
 
 const router = useRouter();
 const dataStore = useDataStore();
@@ -229,19 +232,19 @@ const settingStore = useSettingStore();
 const platformStore = usePlatformStore();
 
 // 播放模式数据
-const playModeOptions = ref([
+const playModeOptions = computed(() => [
   {
-    label: "列表循环",
+    label: t("common.play_mode_repeat"),
     key: "repeat",
     icon: renderIcon("Repeat"),
   },
   {
-    label: "单曲循环",
+    label: t("common.play_mode_repeat_once"),
     key: "repeat-once",
     icon: renderIcon("RepeatSong"),
   },
   {
-    label: "随机播放",
+    label: t("common.play_mode_shuffle"),
     key: "shuffle",
     icon: renderIcon("Shuffle"),
   },
@@ -256,7 +259,7 @@ const songMoreOptions = computed<DropdownOption[]>(() => {
   return [
     {
       key: "playlist-add",
-      label: "添加到歌单",
+      label: t("menu.add_to_playlist"),
       props: {
         onClick: () => openPlaylistAdd([song], isLocal),
       },
@@ -264,7 +267,7 @@ const songMoreOptions = computed<DropdownOption[]>(() => {
     },
     {
       key: "mv",
-      label: "观看 MV",
+      label: t("menu.watch_mv"),
       show: isHasMv,
       props: {
         onClick: () =>
@@ -277,14 +280,14 @@ const songMoreOptions = computed<DropdownOption[]>(() => {
     },
     {
       key: "download",
-      label: "下载歌曲",
+      label: t("common.download_song"),
       show: !isLocal,
       props: { onClick: () => openDownloadSong(musicStore.playSong) },
       icon: renderIcon("Download"),
     },
     {
       key: "comment",
-      label: "查看评论",
+      label: t("menu.view_comment"),
       show:
         !isLocal &&
         platformStore.isFeatureSupport(song.platform, FeatureSupportFlag.GetCommentList),

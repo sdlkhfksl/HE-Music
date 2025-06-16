@@ -10,7 +10,7 @@
     />
     <n-empty
       v-else
-      :description="`很抱歉，未能找到与 ${keyword} 相关的任何歌单`"
+      :description="t('search.no_playlist_result', { keyword })"
       style="margin-top: 60px"
       size="large"
     >
@@ -26,6 +26,8 @@
 import { searchResultHemusic } from "@/api/search";
 import PlaylistList from "@/components/List/PlaylistList.vue";
 import { PlaylistInfo } from "@/types/main.hemusic";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const props = defineProps<{
   keyword: string;

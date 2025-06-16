@@ -4,6 +4,7 @@ import { isElectron } from "@/utils/helper";
 import { isLogin } from "@/utils/auth";
 import routes from "./routes";
 import { usePlatformStore } from "@/stores";
+import { t } from "@/locale";
 
 // 基础配置
 const router: Router = createRouter({
@@ -47,13 +48,13 @@ router.beforeEach(async (to, from, next) => {
   // 需要登录
   if (to.meta.needLogin && !isLogin()) {
     if (!isElectron) window.$loadingBar.error();
-    window.$message.warning("请登录后使用");
+    window.$message.warning(t("message.login_required"));
     openUserLogin();
     return;
   }
   // 需要客户端
   else if (to.meta.needApp && !isElectron) {
-    window.$message.warning("该功能为客户端独占功能");
+    window.$message.warning(t("message.client_only_function"));
     next("/403");
     return;
   }

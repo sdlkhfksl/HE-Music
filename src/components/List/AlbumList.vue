@@ -54,7 +54,9 @@
               </n-text>
               <!-- 专辑信息 -->
               <div class="meta">
-                <n-text class="count" depth="3">{{ item?.song_count || 0 }}首</n-text>
+                <n-text class="count" depth="3">{{
+                  t("common.song_counter", { count: item?.song_count || 0 })
+                }}</n-text>
                 <n-text class="date" depth="3">{{
                   formatTimestamp(Number(item.publish_time) * 1000)
                 }}</n-text>
@@ -63,11 +65,11 @@
               <template v-if="item.singers">
                 <div v-if="Array.isArray(item.singers)" class="artists text-hidden">
                   <n-text v-for="(ar, arIndex) in item.singers" :key="arIndex" class="ar">
-                    {{ ar.name || "未知艺术家" }}
+                    {{ ar.name || t("common.unknown_artist") }}
                   </n-text>
                 </div>
                 <div v-else class="artists text-hidden">
-                  <n-text class="ar"> {{ item.singers || "未知艺术家" }} </n-text>
+                  <n-text class="ar"> {{ item.singers || t("common.unknown_artist") }} </n-text>
                 </div>
               </template>
             </div>
@@ -77,7 +79,7 @@
       <!-- 加载更多 -->
       <n-flex v-if="loadMore" class="load-more" justify="center">
         <n-button :loading="loading" size="large" strong secondary round @click="emit('loadMore')">
-          加载更多
+          {{ t("common.load_more") }}
         </n-button>
       </n-flex>
       <!-- 右键菜单 -->
@@ -98,7 +100,7 @@
       </n-grid>
     </div>
     <!-- 空列表 -->
-    <n-empty v-else description="空空如也，怎么什么都没有啊" size="large" />
+    <n-empty v-else :description="t('common.list_empty')" size="large" />
   </Transition>
 </template>
 
@@ -111,6 +113,8 @@ import player from "@/utils/player";
 import { formatTimestamp } from "@/utils/time";
 import { AlbumInfo, CoverType, UserFavouriteAlbumInfo } from "@/types/main.hemusic";
 import { formatNumber } from "@/utils/helper";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 interface Props {
   data: AlbumInfo[] | UserFavouriteAlbumInfo[];

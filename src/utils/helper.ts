@@ -10,6 +10,7 @@ import { useSettingStore } from "@/stores";
 import { marked } from "marked";
 import SvgIcon from "@/components/Global/SvgIcon.vue";
 import { SongInfo } from "@/types/main.hemusic";
+import { t } from "@/locale";
 
 type AnyObject = { [key: string]: any };
 
@@ -183,7 +184,7 @@ export const convertImageUrlToBlobUrl = async (imageUrl: string) => {
 export const copyData = async (text: any, message?: string) => {
   const { copy, copied, isSupported } = useClipboard({ legacy: true });
   if (!isSupported.value) {
-    window.$message.error("暂时无法使用复制功能");
+    window.$message.error(t("message.copy_not_support"));
     return;
   }
   // 开始复制
@@ -192,12 +193,12 @@ export const copyData = async (text: any, message?: string) => {
     text = typeof text === "string" ? text.trim() : JSON.stringify(text, null, 2);
     await copy(text);
     if (copied.value) {
-      window.$message.success(message ?? "已复制到剪贴板");
+      window.$message.success(message ?? t("message.copy_success"));
     } else {
-      window.$message.error("复制出错，请重试");
+      window.$message.error(t("message.copy_fail"));
     }
   } catch (error) {
-    window.$message.error("复制出错，请重试");
+    window.$message.error(t("message.copy_fail"));
     console.error("复制出错：", error);
   }
 };
@@ -282,11 +283,11 @@ export const changeLocalPath = async (delIndex?: number) => {
       if (!isSubfolder) {
         settingStore.localFilesPath.push(selectedDir);
       } else {
-        window.$message.error("添加的目录与现有目录有重叠，请重新选择");
+        window.$message.error(t("message.local_path_overlapping"));
       }
     }
   } catch (error) {
     console.error("Error changing local path:", error);
-    window.$message.error("更改本地歌曲文件夹出错，请重试");
+    window.$message.error(t("message.change_local_path_fail"));
   }
 };

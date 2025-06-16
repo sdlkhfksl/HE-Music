@@ -6,7 +6,9 @@
         <div class="placeholder">
           <div class="title">
             <SvgIcon name="Fire" />
-            <span>热门评论</span>
+            <span>
+              {{ t("common.hot_comment") }}
+            </span>
           </div>
         </div>
         <CommentList
@@ -19,7 +21,7 @@
       <div class="placeholder">
         <div class="title">
           <SvgIcon name="Message" />
-          <span>全部评论</span>
+          <span>{{ t("common.all_comment") }}</span>
         </div>
       </div>
       <CommentList
@@ -41,6 +43,8 @@ import { useMusicStore } from "@/stores";
 import { getComment, getSubComment } from "@/api/comment";
 import { isEmpty } from "lodash-es";
 import { CommentInfo } from "@/types/main.hemusic";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const musicStore = useMusicStore();
 

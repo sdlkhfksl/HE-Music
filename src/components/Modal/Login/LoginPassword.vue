@@ -1,12 +1,12 @@
 <template>
   <div class="login-phone">
     <n-form ref="formRef" :model="formData" :rules="formRules" class="phone-form">
-      <n-form-item label="用户名" path="username">
+      <n-form-item :label="t('common.username')" path="username">
         <n-input
           type="text"
           v-model:value="formData.username"
           :show-button="false"
-          placeholder="请输入用户名"
+          :placeholder="t('modal.username_placeholder')"
           passively-activated
           clearable
           :maxlength="18"
@@ -17,12 +17,12 @@
           </template>
         </n-input>
       </n-form-item>
-      <n-form-item label="密码" path="password">
+      <n-form-item :label="t('common.password')" path="password">
         <n-input
           v-model:value="formData.password"
           type="password"
           show-password-on="mousedown"
-          placeholder="请输入密码"
+          :placeholder="t('modal.password_placeholder')"
           :maxlength="18"
           :minlength="6"
           passively-activated
@@ -34,7 +34,7 @@
         </n-input>
       </n-form-item>
       <n-form-item :show-label="false">
-        <n-button class="login" type="primary" @click="login"> 登录 </n-button>
+        <n-button class="login" type="primary" @click="login"> {{ t("common.login") }} </n-button>
       </n-form-item>
     </n-form>
   </div>
@@ -43,10 +43,12 @@
 <script setup lang="ts">
 import type { FormInst, FormRules } from "naive-ui";
 import { accountLogin } from "@/api/login";
-import { passwordRule, usernameRule } from "@/utils/rules";
+import { useFormRule } from "@/utils/rules";
 import { debounce } from "lodash-es";
 import { LoginType } from "@/types/main";
-
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
+const { passwordRule, usernameRule } = useFormRule();
 const emit = defineEmits<{
   saveLogin: [any, LoginType];
 }>();

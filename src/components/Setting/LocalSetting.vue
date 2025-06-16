@@ -2,31 +2,43 @@
 <template>
   <div class="setting-type">
     <div class="set-list">
-      <n-h3 prefix="bar"> 本地歌曲 </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.local.local_music") }}
+      </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">显示本地歌曲封面</n-text>
-          <n-text class="tip" :depth="3">当数量过多时请勿开启，会严重影响性能</n-text>
+          <n-text class="name">
+            {{ t("setting.local.show_local_cover") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.local.show_local_cover_tip") }}
+          </n-text>
         </div>
         <n-switch class="set" v-model:value="settingStore.showLocalCover" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">显示本地默认歌曲目录</n-text>
+          <n-text class="name">
+            {{ t("setting.local.show_default_local_path") }}
+          </n-text>
         </div>
         <n-switch class="set" v-model:value="settingStore.showDefaultLocalPath" :round="false" />
       </n-card>
       <n-card class="set-item" id="local-list-choose" content-style="flex-direction: column">
         <n-flex justify="space-between">
           <div class="label">
-            <n-text class="name">本地歌曲目录</n-text>
-            <n-text class="tip" :depth="3">可在此增删本地歌曲目录，歌曲增删实时同步</n-text>
+            <n-text class="name">
+              {{ t("setting.local.local_files_path") }}
+            </n-text>
+            <n-text class="tip" :depth="3">
+              {{ t("setting.local.local_files_path_tip") }}
+            </n-text>
           </div>
           <n-button strong secondary @click="changeLocalPath()">
             <template #icon>
               <SvgIcon name="Folder" />
             </template>
-            更改
+            {{ t("common.change") }}
           </n-button>
         </n-flex>
         <n-collapse-transition :show="settingStore.localFilesPath.length > 0">
@@ -48,12 +60,16 @@
       </n-card>
     </div>
     <div class="set-list">
-      <n-h3 prefix="bar"> 下载配置 </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.local.download_config") }}
+      </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">默认下载目录</n-text>
+          <n-text class="name">
+            {{ t("setting.local.default_download_path") }}
+          </n-text>
           <n-text class="tip" :depth="3">
-            {{ settingStore.downloadPath || "若不设置则无法进行下载" }}
+            {{ settingStore.downloadPath || t("setting.local.default_download_path_empty") }}
           </n-text>
         </div>
         <n-flex>
@@ -65,28 +81,36 @@
               secondary
               @click="settingStore.downloadPath = ''"
             >
-              清除选择
+              {{ t("common.clear_select") }}
             </n-button>
           </Transition>
           <n-button strong secondary @click="choosePath">
             <template #icon>
               <SvgIcon name="Folder" />
             </template>
-            更改
+            {{ t("common.change") }}
           </n-button>
         </n-flex>
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">下载歌曲元信息</n-text>
-          <n-text class="tip" :depth="3">为当前下载歌曲附加封面及歌词等元信息</n-text>
+          <n-text class="name">
+            {{ t("setting.local.download_song_meta") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.local.download_song_meta_tip") }}
+          </n-text>
         </div>
         <n-switch class="set" v-model:value="settingStore.downloadMeta" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">同时下载封面</n-text>
-          <n-text class="tip" :depth="3">下载歌曲时同时下载封面</n-text>
+          <n-text class="name">
+            {{ t("setting.local.download_song_cover") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.local.download_song_cover_tip") }}
+          </n-text>
         </div>
         <n-switch
           v-model:value="settingStore.downloadCover"
@@ -97,8 +121,12 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">同时下载歌词</n-text>
-          <n-text class="tip" :depth="3">下载歌曲时同时下载歌词</n-text>
+          <n-text class="name">
+            {{ t("setting.local.download_song_lyric") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.local.download_song_lyric_tip") }}
+          </n-text>
         </div>
         <n-switch
           v-model:value="settingStore.downloadLyric"
@@ -109,8 +137,12 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">下载歌词翻译</n-text>
-          <n-text class="tip" :depth="3">下载歌词时同时下载翻译</n-text>
+          <n-text class="name">
+            {{ t("setting.local.download_song_lyric_trans") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.local.download_song_lyric_trans_tip") }}
+          </n-text>
         </div>
         <n-switch
           v-model:value="settingStore.downloadLyricTran"
@@ -121,8 +153,12 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">下载歌词音译</n-text>
-          <n-text class="tip" :depth="3">下载歌词时同时下载音译</n-text>
+          <n-text class="name">
+            {{ t("setting.local.download_song_lyric_roma") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.local.download_song_lyric_roma_tip") }}
+          </n-text>
         </div>
         <n-switch
           v-model:value="settingStore.downloadLyricRoma"
@@ -133,8 +169,12 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">保留元信息文件</n-text>
-          <n-text class="tip" :depth="3">是否在下载目录中保留元信息文件</n-text>
+          <n-text class="name">
+            {{ t("setting.local.save_song_meta_file") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.local.save_song_meta_file_tip") }}
+          </n-text>
         </div>
         <n-switch
           v-model:value="settingStore.saveMetaFile"
@@ -150,7 +190,9 @@
 <script setup lang="ts">
 import { useSettingStore } from "@/stores";
 import { changeLocalPath } from "@/utils/helper";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const settingStore = useSettingStore();
 
 // 选择下载路径

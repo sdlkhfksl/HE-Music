@@ -22,11 +22,13 @@ import ParseSourceUrl from "@/components/Modal/ParseSourceUrl.vue";
 import { usePlatformStore } from "@/stores";
 import { FeatureSupportFlag } from "@/api/platform";
 import Captcha from "@/components/Modal/Captcha.vue";
+import { t } from "@/locale";
 
 // 用户协议
 export const openUserAgreement = () => {
   const isAgree = window.localStorage.getItem("isAgree");
   if (isAgree) return;
+
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -47,7 +49,7 @@ export const openUserAgreement = () => {
       });
     },
     onEsc: () => {
-      window.$message.warning("请先阅读并同意用户协议");
+      window.$message.warning(t("message.agreement_required"));
     },
   });
 };
@@ -55,7 +57,7 @@ export const openUserAgreement = () => {
 let isLoginModalOpened = false;
 // 用户登录
 export const openUserLogin = (showTip: boolean = false) => {
-  if (showTip) window.$message.warning("请登录后使用");
+  if (showTip) window.$message.warning(t("message.login_required"));
   if (isLoginModalOpened) return;
   isLoginModalOpened = true;
   const modal = window.$modal.create({
@@ -93,7 +95,7 @@ export const openJumpArtist = (platform: string, data: SongInfo["singers"]) => {
     transformOrigin: "center",
     autoFocus: false,
     style: { width: "600px" },
-    title: "跳转到歌手",
+    title: t("modal.artist_jump"),
     content: () => {
       return h(JumpArtist, { artist: data, platform, onClose: () => modal.destroy() });
     },
@@ -108,7 +110,7 @@ export const openSongInfoEditor = (song: SongInfo) => {
     autoFocus: false,
     // contentStyle: { padding: 0 },
     style: { width: "600px" },
-    title: "编辑歌曲信息",
+    title: t("modal.song_info_edit"),
     content: () => {
       return h(SongInfoEditor, { song, onClose: () => modal.destroy() });
     },
@@ -117,14 +119,14 @@ export const openSongInfoEditor = (song: SongInfo) => {
 
 // 添加到歌单
 export const openPlaylistAdd = (data: SongInfo[], isLocal: boolean) => {
-  if (!data.length) return window.$message.warning("请正确选择歌曲");
+  if (!data.length) return window.$message.warning(t("message.please_select_song"));
   if (!isLogin() && !isLocal) return openUserLogin();
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
     autoFocus: false,
     style: { width: "600px" },
-    title: "添加到歌单",
+    title: t("menu.add_to_playlist"),
     content: () => {
       return h(PlaylistAdd, { data, isLocal, onClose: () => modal.destroy() });
     },
@@ -145,7 +147,7 @@ export const openBatchList = (data: SongInfo[], isLocal: boolean, playListId?: s
     style: {
       maxWidth: "70vw",
     },
-    title: "批量操作",
+    title: t("common.batch_operation"),
     content: () => h(batchList, { data, isLocal, playListId }),
   });
 };
@@ -157,7 +159,7 @@ export const openCreatePlaylist = () => {
     transformOrigin: "center",
     autoFocus: false,
     style: { width: "600px" },
-    title: "新建歌单",
+    title: t("modal.create_playlist"),
     content: () => {
       return h(CreatePlaylist, { onClose: () => modal.destroy() });
     },
@@ -175,7 +177,7 @@ export const openUpdatePlaylist = (
     transformOrigin: "center",
     autoFocus: false,
     style: { width: "600px" },
-    title: "编辑歌单",
+    title: t("modal.playlist_edit"),
     content: () => {
       return h(UpdatePlaylist, {
         id,
@@ -194,16 +196,16 @@ export const openUpdatePlaylist = (
 export const openDownloadSong = (song: SongInfo) => {
   // if (!isLogin()) return openUserLogin();
   // 是否可下载
-  if (!song) return window.$message.warning("请正确选择歌曲");
+  if (!song) return window.$message.warning(t("message.please_select_song"));
   if (song.links?.length === 0) {
-    return window.$message.warning("该歌曲不支持下载");
+    return window.$message.warning(t("message.song_not_support_download"));
   }
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
     autoFocus: false,
     style: { width: "600px" },
-    title: "下载歌曲",
+    title: t("common.download_song"),
     content: () => {
       return h(DownloadSong, { song, onClose: () => modal.destroy() });
     },
@@ -235,7 +237,7 @@ export const openUpdateApp = (data: UpdateInfoType) => {
     transformOrigin: "center",
     autoFocus: false,
     style: { width: "600px" },
-    title: "发现新版本",
+    title: t("modal.found_new_version"),
     content: () => {
       return h(UpdateApp, { data, onClose: () => modal.destroy() });
     },
@@ -250,7 +252,7 @@ export const openUpdateUserInfo = () => {
     maskClosable: false,
     autoFocus: false,
     style: { width: "400px" },
-    title: "修改信息",
+    title: t("nav.modify_info"),
     content: () => {
       return h(UpdateUserInfo, { onClose: () => modal.destroy() });
     },
@@ -265,7 +267,7 @@ export const openUpdateUserPassword = () => {
     maskClosable: false,
     autoFocus: false,
     style: { width: "400px" },
-    title: "修改密码",
+    title: t("modal.modify_password"),
     content: () => {
       return h(UpdateUserPassword, { onClose: () => modal.destroy() });
     },
@@ -279,7 +281,7 @@ export const openLyricExclude = () => {
     transformOrigin: "center",
     autoFocus: false,
     style: { width: "600px" },
-    title: "歌词排除内容",
+    title: t("setting.lyrics.lyrics_exclude_content"),
     content: () => {
       return h(ExcludeKeywords);
     },
@@ -292,7 +294,7 @@ export const openParseSourceUrl = () => {
     transformOrigin: "center",
     autoFocus: false,
     style: { width: "600px" },
-    title: "解析链接",
+    title: t("nav.parse_source_url"),
     content: () => {
       return h(ParseSourceUrl, { onClose: () => modal.destroy() });
     },
@@ -305,7 +307,7 @@ export const openCaptcha = (scene: number, meta: string) => {
     transformOrigin: "center",
     autoFocus: false,
     style: { width: "375px" },
-    title: "安全验证",
+    title: t("modal.security_verify"),
     maskClosable: false,
     content: () => {
       return h(Captcha, { scene, meta, onClose: () => modal.destroy() });

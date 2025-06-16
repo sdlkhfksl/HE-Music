@@ -25,6 +25,8 @@ import player from "@/utils/player";
 import { SongInfo } from "@/types/main.hemusic";
 import { buildSourceUrl } from "@/api/source";
 import { FeatureSupportFlag } from "@/api/platform";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const emit = defineEmits<{ removeSong: [index: SongInfo[]] }>();
 
@@ -72,7 +74,7 @@ const openDropdown = (
       dropdownOptions.value = [
         {
           key: "play",
-          label: "立即播放",
+          label: t("menu.play"),
           props: {
             onClick: () => player.addNextSong(song, true),
           },
@@ -80,7 +82,7 @@ const openDropdown = (
         },
         {
           key: "play-next",
-          label: "下一首播放",
+          label: t("menu.play_next"),
           show: !isCurrent,
           props: {
             onClick: () => player.addNextSong(song, false),
@@ -89,7 +91,7 @@ const openDropdown = (
         },
         {
           key: "playlist-add",
-          label: "添加到歌单",
+          label: t("menu.add_to_playlist"),
           props: {
             onClick: () => openPlaylistAdd([song], isLocal),
           },
@@ -97,7 +99,7 @@ const openDropdown = (
         },
         {
           key: "mv",
-          label: "观看 MV",
+          label: t("menu.watch_mv"),
           show: isHasMv,
           props: {
             onClick: () =>
@@ -111,12 +113,12 @@ const openDropdown = (
         },
         {
           key: "more",
-          label: "更多操作",
+          label: t("menu.more_operation"),
           icon: renderIcon("Menu", { size: 18 }),
           children: [
             {
               key: "code-name",
-              label: `复制歌曲名称`,
+              label: t("menu.copy_song_name"),
               props: {
                 onClick: () => copyData(song.name),
               },
@@ -124,7 +126,7 @@ const openDropdown = (
             },
             {
               key: "code-id",
-              label: `复制歌曲ID`,
+              label: t("menu.copy_song_id"),
               show: !isLocal,
               props: {
                 onClick: () => copyData(song.id),
@@ -133,14 +135,14 @@ const openDropdown = (
             },
             {
               key: "share",
-              label: `分享歌曲链接`,
+              label: t("menu.share_song_link"),
               show:
                 !isLocal &&
                 platformStore.isFeatureSupport(song.platform, FeatureSupportFlag.BuildSourceUrl),
               props: {
                 onClick: async () => {
                   const { url } = await buildSourceUrl(song.platform, song.id, "song");
-                  await copyData(url, "已复制分享链接到剪切板");
+                  await copyData(url, t("menu.share_link_copied"));
                 },
               },
               icon: renderIcon("Share", { size: 18 }),
@@ -152,7 +154,7 @@ const openDropdown = (
             },
             {
               key: "meta-edit",
-              label: "音乐标签编辑",
+              label: t("menu.music_tag_edit"),
               show: isLocal,
               props: {
                 onClick: () => {
@@ -181,7 +183,7 @@ const openDropdown = (
         },
         {
           key: "delete",
-          label: "从歌单中删除",
+          label: t("menu.delete_from_playlist"),
           show: isUserPlaylist && isLoginNormal,
           props: {
             onClick: () =>
@@ -192,8 +194,8 @@ const openDropdown = (
           icon: renderIcon("Delete"),
         },
         {
-          key: "delete",
-          label: "从本地磁盘中删除",
+          key: "delete-file",
+          label: t("menu.delete_file"),
           show: isLocal && !isCurrent,
           props: {
             onClick: () => deleteLocalSong(song, data, index),
@@ -202,7 +204,7 @@ const openDropdown = (
         },
         {
           key: "open-folder",
-          label: "打开歌曲所在目录",
+          label: t("menu.open_folder"),
           show: isLocal,
           props: {
             onClick: () => window.electron.ipcRenderer.send("open-folder", song.path),
@@ -211,7 +213,7 @@ const openDropdown = (
         },
         {
           key: "search",
-          label: "同名搜索",
+          label: t("menu.same_name_search"),
           props: {
             onClick: () => router.push({ name: "search", query: { keyword: song.name } }),
           },
@@ -219,7 +221,7 @@ const openDropdown = (
         },
         {
           key: "download",
-          label: "下载歌曲",
+          label: t("common.download_song"),
           show: !isLocal,
           props: { onClick: () => openDownloadSong(song) },
           icon: renderIcon("Download"),
@@ -240,27 +242,27 @@ const openDropdown = (
 const deleteLocalSong = (song: SongInfo, data: SongInfo[], index: number) => {
   if (!song.path) return;
   window.$dialog.warning({
-    title: "确认删除",
+    title: t("common.confirm_delete"),
     content: () =>
       h("div", { style: { marginTop: "20px" } }, [
         h(NAlert, { showIcon: false }, { default: () => song.path }),
         h("div", { style: { marginTop: "20px" } }, [
-          `确认从本地磁盘中删除 `,
+          t("menu.delete_file_confirm"),
           h("strong", null, song.name),
-          `？该操作无法撤销！`,
+          t("menu.delete_file_confirm_tip"),
         ]),
       ]),
-    positiveText: "删除",
-    negativeText: "取消",
+    positiveText: t("common.delete"),
+    negativeText: t("common.cancel"),
     onPositiveClick: async () => {
       const result = await window.electron.ipcRenderer.invoke("delete-file", song.path);
       if (result) {
         data.splice(index, 1);
         localStore.deleteLocalSong(index);
         player.removeSongIndex(index);
-        window.$message.success(`${song.name} 删除成功`);
+        window.$message.success(`${song.name} ${t("menu.delete_file_success")}`);
       } else {
-        window.$message.error(`${song.name} 删除失败，请重试`);
+        window.$message.error(`${song.name} ${t("menu.delete_file_fail_and_retry")}`);
       }
     },
   });

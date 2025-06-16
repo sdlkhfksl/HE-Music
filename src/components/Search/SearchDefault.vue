@@ -9,7 +9,8 @@
         >
           <div class="title">
             <SvgIcon name="History" />
-            <n-text class="name">搜索历史 </n-text>
+            <n-text class="name"> </n-text>
+            {{ t("search.history") }}
             <SvgIcon class="delete" name="Delete" @click.stop="deleteSearchHistory" />
           </div>
           <n-flex class="history-list">
@@ -28,7 +29,9 @@
         <div v-if="searchHotData.length > 0" class="hot-list">
           <div class="title">
             <SvgIcon name="Fire" />
-            <n-text class="name">热搜榜 </n-text>
+            <n-text class="name">
+              {{ t("search.hot_search") }}
+            </n-text>
           </div>
           <div
             v-for="(item, index) in searchHotData"
@@ -69,6 +72,8 @@ import { getCacheData } from "@/utils/cache";
 import { useDataStore, usePlatformStore, useSettingStore, useStatusStore } from "@/stores";
 import { FeatureSupportFlag } from "@/api/platform";
 import { watch } from "vue";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const emit = defineEmits<{
   toSearch: [keyword: string];
@@ -114,10 +119,10 @@ const getSearchHotData = async () => {
 // 删除搜索历史
 const deleteSearchHistory = () => {
   window.$dialog.warning({
-    title: "删除搜索历史",
-    content: "确认删除全部的搜索历史？这将无法恢复！",
-    positiveText: "确认",
-    negativeText: "取消",
+    title: t("search.delete_search_history"),
+    content: t("message.delete_search_history_confirm"),
+    positiveText: t("common.ok"),
+    negativeText: t("common.cancel"),
     onPositiveClick: () => {
       dataStore.searchHistory = [];
     },

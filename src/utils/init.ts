@@ -6,6 +6,7 @@ import { isElectron } from "./helper";
 import packageJson from "@/../package.json";
 import player from "@/utils/player";
 import log from "./log";
+import { useI18n } from "vue-i18n";
 
 // 应用初始化时需要执行的操作
 const init = async () => {
@@ -14,6 +15,9 @@ const init = async () => {
   const statusStore = useStatusStore();
   const settingStore = useSettingStore();
   const shortcutStore = useShortcutStore();
+  const { locale } = useI18n();
+
+  locale.value = settingStore.language;
 
   printVersion();
 
@@ -97,7 +101,7 @@ const keyDownEvent = debounce((event: KeyboardEvent) => {
         case "volumeDown":
           player.setVolume("down");
           break;
-        case "toogleDesktopLyric":
+        case "toggleDesktopLyric":
           player.toggleDesktopLyric();
           break;
         default:

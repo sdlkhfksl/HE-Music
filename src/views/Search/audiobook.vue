@@ -10,7 +10,7 @@
     />
     <n-empty
       v-else
-      :description="`很抱歉，未能找到与 ${keyword} 相关的任何听书`"
+      :description="t('search.no_audiobook_result', { keyword })"
       style="margin-top: 60px"
       size="large"
     >
@@ -26,6 +26,8 @@
 import { AlbumInfo } from "@/types/main.hemusic";
 import { searchResultHemusic } from "@/api/search";
 import AlbumList from "@/components/List/AlbumList.vue";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const props = defineProps<{
   keyword: string;
