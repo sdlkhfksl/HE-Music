@@ -24,7 +24,7 @@ import {
   SongInfo,
 } from "@/types/main.hemusic";
 import { deleteSongFromPlaylist, getUserPlaylists } from "@/api/userplaylist";
-import { t } from "@/locale";
+import { t } from "@/i18n";
 
 /**
  * 用户是否登录

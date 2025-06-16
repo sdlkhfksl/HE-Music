@@ -25,6 +25,7 @@ import fs from "fs/promises";
 import log from "../main/logger";
 import Store from "electron-store";
 import fg from "fast-glob";
+import { changeLanguage } from "./i18n";
 
 // 注册 ipcMain
 const initIpcMain = (
@@ -40,7 +41,7 @@ const initIpcMain = (
   initTrayIpcMain(tray, win, lyricWin);
   initThumbarIpcMain(thumbar);
   initStoreIpcMain(store);
-  initOtherIpcMain(win);
+  initOtherIpcMain(win, tray, thumbar);
 };
 
 // win
@@ -627,7 +628,7 @@ const initLyricIpcMain = (
   });
 
   // 锁定/解锁桌面歌词
-  ipcMain.on("toogleDesktopLyricLock", (_, isLock: boolean) => {
+  ipcMain.on("toggleDesktopLyricLock", (_, isLock: boolean) => {
     if (!lyricWin) return;
     // 是否穿透
     if (isLock) {
@@ -686,7 +687,7 @@ const initTrayIpcMain = (
   });
 
   // 锁定/解锁桌面歌词
-  ipcMain.on("toogleDesktopLyricLock", (_, isLock: boolean) => {
+  ipcMain.on("toggleDesktopLyricLock", (_, isLock: boolean) => {
     tray?.setDesktopLyricLock(isLock);
   });
 };
@@ -706,10 +707,18 @@ const initStoreIpcMain = (store: Store<StoreType>): void => {
 };
 
 // other
-const initOtherIpcMain = (mainWin: BrowserWindow | null): void => {
+const initOtherIpcMain = (
+  mainWin: BrowserWindow | null,
+  tray: MainTray | null,
+  thumbar: Thumbar | null,
+): void => {
   // 快捷键是否被注册
   ipcMain.handle("is-shortcut-registered", (_, shortcut: string) => isShortcutRegistered(shortcut));
-
+  ipcMain.on("change-language", async (_, lang: string) => {
+    await changeLanguage(lang);
+    tray?.updateLang();
+    thumbar?.updateLang();
+  });
   // 注册快捷键
   ipcMain.handle("register-all-shortcut", (_, allShortcuts: any): string[] | false => {
     if (!mainWin || !allShortcuts) return false;

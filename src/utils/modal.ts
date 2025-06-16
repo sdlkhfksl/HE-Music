@@ -22,7 +22,7 @@ import ParseSourceUrl from "@/components/Modal/ParseSourceUrl.vue";
 import { usePlatformStore } from "@/stores";
 import { FeatureSupportFlag } from "@/api/platform";
 import Captcha from "@/components/Modal/Captcha.vue";
-import { t } from "@/locale";
+import { t } from "@/i18n";
 
 // 用户协议
 export const openUserAgreement = () => {

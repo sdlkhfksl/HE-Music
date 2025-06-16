@@ -2,6 +2,7 @@ import { BrowserWindow, nativeImage, nativeTheme, ThumbarButton } from "electron
 import { join } from "path";
 import { isWin } from "./utils";
 import log from "./logger";
+import { t } from "./i18n";
 
 enum ThumbarKeys {
   Play = "play",
@@ -15,6 +16,7 @@ type ThumbarMap = Map<ThumbarKeys, ThumbarButton>;
 export interface Thumbar {
   clearThumbar(): void;
   updateThumbar(playing: boolean, clean?: boolean): void;
+  updateLang(): void;
 }
 
 // 工具栏图标
@@ -31,22 +33,22 @@ const thumbarIcon = (filename: string) => {
 const createThumbarButtons = (win: BrowserWindow): ThumbarMap => {
   return new Map<ThumbarKeys, ThumbarButton>()
     .set(ThumbarKeys.Prev, {
-      tooltip: "上一曲",
+      tooltip: t("common.previous"),
       icon: thumbarIcon("prev"),
       click: () => win.webContents.send("playPrev"),
     })
     .set(ThumbarKeys.Next, {
-      tooltip: "下一曲",
+      tooltip: t("common.next"),
       icon: thumbarIcon("next"),
       click: () => win.webContents.send("playNext"),
     })
     .set(ThumbarKeys.Play, {
-      tooltip: "播放",
+      tooltip: t("common.play"),
       icon: thumbarIcon("play"),
       click: () => win.webContents.send("play"),
     })
     .set(ThumbarKeys.Pause, {
-      tooltip: "暂停",
+      tooltip: t("common.pause"),
       icon: thumbarIcon("pause"),
       click: () => win.webContents.send("pause"),
     });
@@ -83,6 +85,14 @@ class createThumbar implements Thumbar {
   // 清除工具栏
   clearThumbar() {
     this._win.setThumbarButtons([]);
+  }
+
+  updateLang() {
+    this._play.tooltip = t("common.play");
+    this._pause.tooltip = t("common.pause");
+    this._prev.tooltip = t("common.previous");
+    this._next.tooltip = t("common.next");
+    this.updateThumbar();
   }
 }
 

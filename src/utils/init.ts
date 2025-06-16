@@ -45,6 +45,8 @@ const init = async () => {
     window.electron.ipcRenderer.send("change-desktop-lyric", statusStore.showDesktopLyric);
     // 检查更新
     if (settingStore.checkUpdateOnStart) window.electron.ipcRenderer.send("check-update");
+    // 语言切换
+    window.electron.ipcRenderer.send("change-language", settingStore.language);
   }
 };
 

@@ -10,7 +10,7 @@ import { useSettingStore } from "@/stores";
 import { marked } from "marked";
 import SvgIcon from "@/components/Global/SvgIcon.vue";
 import { SongInfo } from "@/types/main.hemusic";
-import { t } from "@/locale";
+import { t } from "@/i18n";
 
 type AnyObject = { [key: string]: any };
 

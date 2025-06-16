@@ -3,7 +3,7 @@ import { isDev } from "./helper";
 import { useDataStore, useSettingStore } from "@/stores";
 import { isLogin } from "./auth";
 import { openCaptcha, openUserLogin } from "@/utils/modal";
-import { t } from "@/locale";
+import { t } from "@/i18n";
 
 export const API_URL = String(isDev ? "http://127.0.0.1:8001" : import.meta.env["VITE_API_URL"]);
 // 全局地址

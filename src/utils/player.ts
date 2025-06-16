@@ -10,7 +10,7 @@ import { isDev, isElectron } from "./helper";
 import blob from "./blob";
 import { Link, SongInfo } from "@/types/main.hemusic";
 import { AxiosError } from "axios";
-import { t } from "@/locale";
+import { t } from "@/i18n";
 
 // 播放器核心
 // Howler.js

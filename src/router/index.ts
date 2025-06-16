@@ -4,7 +4,7 @@ import { isElectron } from "@/utils/helper";
 import { isLogin } from "@/utils/auth";
 import routes from "./routes";
 import { usePlatformStore } from "@/stores";
-import { t } from "@/locale";
+import { t } from "@/i18n";
 
 // 基础配置
 const router: Router = createRouter({

@@ -11,6 +11,7 @@ import Store from "electron-store";
 import initAppServer from "../server";
 import initIpcMain from "./ipcMain";
 import log from "./logger";
+import { initI18n } from "./i18n";
 // icon
 import icon from "../../public/icons/favicon.png?asset";
 
@@ -57,6 +58,8 @@ class MainProcess {
       this.store = initStore();
       // 启动主服务进程
       await initAppServer();
+      // 初始化 i18n
+      await initI18n();
       // 启动进程
       this.createLoadingWindow();
       this.createMainWindow();

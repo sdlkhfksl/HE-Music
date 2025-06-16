@@ -485,7 +485,7 @@
                 break;
               }
               case "lock-lyric": {
-                window.electron.ipcRenderer.send("toogleDesktopLyricLock", true);
+                window.electron.ipcRenderer.send("toggleDesktopLyricLock", true);
                 document.body.classList.toggle("lock-lyric", true);
                 break;
               }
@@ -525,9 +525,9 @@
           });
 
           // 歌词锁定
-          window.electron.ipcRenderer.on("toogleDesktopLyricLock", (_, lock) => {
+          window.electron.ipcRenderer.on("toggleDesktopLyricLock", (_, lock) => {
             document.body.classList.toggle("lock-lyric", lock);
-            window.electron.ipcRenderer.send("toogleDesktopLyricLock", lock);
+            window.electron.ipcRenderer.send("toggleDesktopLyricLock", lock);
           });
         }
         // 解析歌词

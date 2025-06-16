@@ -10,6 +10,7 @@ import {
 import { isWin, isLinux, isDev, appName, isMac } from "./utils";
 import { join } from "path";
 import log from "./logger";
+import { t } from "./i18n";
 
 // 播放模式
 type PlayMode = "repeat" | "repeat-once" | "shuffle";
@@ -18,7 +19,7 @@ type PlayState = "play" | "pause" | "loading";
 // 全局数据
 let playMode: PlayMode = "repeat";
 let playState: PlayState = "pause";
-let playName: string = "未播放歌曲";
+let playName: string = "";
 let likeSong: boolean = false;
 let desktopLyricShow: boolean = false;
 let desktopLyricLock: boolean = false;
@@ -34,6 +35,7 @@ export interface MainTray {
   setDesktopLyricLock(lock: boolean): void;
   destroyTray(): void;
   setSongValid(valid: boolean): void;
+  updateLang(): void;
 }
 
 // 托盘图标
@@ -64,7 +66,7 @@ const createTrayMenu = (
   const menu: MenuItemConstructorOptions[] = [
     {
       id: "name",
-      label: songValid ? playName : "未播放歌曲",
+      label: songValid ? playName : t("common.no_song_playing"),
       icon: showIcon("music"),
       click: () => {
         win.show();
@@ -75,22 +77,26 @@ const createTrayMenu = (
       type: "separator",
     },
     {
-      id: "toogleLikeSong",
-      label: likeSong ? "从我喜欢中移除" : "添加到我喜欢",
+      id: "toggleLikeSong",
+      label: likeSong ? t("common.remove_from_favorites") : t("common.add_to_favorites"),
       icon: showIcon(likeSong ? "like" : "unlike", songValid),
-      click: () => win.webContents.send("toogleLikeSong"),
+      click: () => win.webContents.send("toggleLikeSong"),
       enabled: songValid,
     },
     {
       id: "changeMode",
       label:
-        playMode === "repeat" ? "列表循环" : playMode === "repeat-once" ? "单曲循环" : "随机播放",
+        playMode === "repeat"
+          ? t("common.play_mode_repeat")
+          : playMode === "repeat-once"
+            ? t("common.play_mode_repeat_once")
+            : t("common.play_mode_shuffle"),
       icon: showIcon(playMode, songValid),
       enabled: songValid,
       submenu: [
         {
           id: "repeat",
-          label: "列表循环",
+          label: t("common.play_mode_repeat"),
           icon: showIcon("repeat"),
           checked: playMode === "repeat",
           type: "radio",
@@ -98,7 +104,7 @@ const createTrayMenu = (
         },
         {
           id: "repeat-once",
-          label: "单曲循环",
+          label: t("common.play_mode_repeat_once"),
           icon: showIcon("repeat-once"),
           checked: playMode === "repeat-once",
           type: "radio",
@@ -106,7 +112,7 @@ const createTrayMenu = (
         },
         {
           id: "shuffle",
-          label: "随机播放",
+          label: t("common.play_mode_shuffle"),
           icon: showIcon("shuffle"),
           checked: playMode === "shuffle",
           type: "radio",
@@ -119,21 +125,21 @@ const createTrayMenu = (
     },
     {
       id: "playNext",
-      label: "上一曲",
+      label: t("common.previous"),
       icon: showIcon("prev", songValid),
       click: () => win.webContents.send("playPrev"),
       enabled: songValid,
     },
     {
       id: "playOrPause",
-      label: playState === "pause" ? "播放" : "暂停",
+      label: playState === "pause" ? t("common.play") : t("common.pause"),
       icon: showIcon(playState === "pause" ? "play" : "pause", songValid),
       click: () => win.webContents.send(playState === "pause" ? "play" : "pause"),
       enabled: songValid,
     },
     {
       id: "playNext",
-      label: "下一曲",
+      label: t("common.next"),
       icon: showIcon("next", songValid),
       click: () => win.webContents.send("playNext"),
       enabled: songValid,
@@ -142,24 +148,24 @@ const createTrayMenu = (
       type: "separator",
     },
     {
-      id: "toogleDesktopLyric",
-      label: `${desktopLyricShow ? "关闭" : "开启"}桌面歌词`,
+      id: "toggleDesktopLyric",
+      label: desktopLyricShow ? t("common.hide_desktop_lyrics") : t("common.show_desktop_lyrics"),
       icon: showIcon("lyric"),
-      click: () => win.webContents.send("toogleDesktopLyric"),
+      click: () => win.webContents.send("toggleDesktopLyric"),
     },
     {
-      id: "toogleDesktopLyricLock",
-      label: `${desktopLyricLock ? "解锁" : "锁定"}桌面歌词`,
+      id: "toggleDesktopLyricLock",
+      label: desktopLyricLock ? t("common.unlock_desktop_lyrics") : t("common.lock_desktop_lyrics"),
       icon: showIcon(desktopLyricLock ? "lock" : "unlock"),
       visible: desktopLyricShow,
-      click: () => lyricWin.webContents.send("toogleDesktopLyricLock", !desktopLyricLock),
+      click: () => lyricWin.webContents.send("toggleDesktopLyricLock", !desktopLyricLock),
     },
     {
       type: "separator",
     },
     // {
     //   id: "setting",
-    //   label: "全局设置",
+    //   label: t("common.setting"),
     //   icon: showIcon("setting"),
     //   click: () => {
     //     win.show();
@@ -172,7 +178,7 @@ const createTrayMenu = (
     // },
     {
       id: "exit",
-      label: "退出",
+      label: t("common.exit"),
       icon: showIcon("power"),
       click: () => {
         win.close();
@@ -291,6 +297,9 @@ class CreateTray implements MainTray {
   // 设置歌曲是否有效
   setSongValid(valid: boolean) {
     songValid = valid;
+  }
+  updateLang() {
+    this.initTrayMenu();
   }
 }
 

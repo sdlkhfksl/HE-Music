@@ -3,7 +3,7 @@ import { openUpdateApp } from "./modal";
 import { useMusicStore, useDataStore, useStatusStore } from "@/stores";
 import player from "./player";
 import { toLikeSong } from "./auth";
-import { t } from "@/locale";
+import { t } from "@/i18n";
 // 关闭更新状态
 const closeUpdateStatus = () => {
   const statusStore = useStatusStore();
@@ -30,7 +30,7 @@ const initIpc = () => {
     // 播放模式切换
     window.electron.ipcRenderer.on("changeMode", (_, mode) => player.togglePlayMode(mode));
     // 喜欢歌曲
-    window.electron.ipcRenderer.on("toogleLikeSong", async () => {
+    window.electron.ipcRenderer.on("toggleLikeSong", async () => {
       const dataStore = useDataStore();
       const musicStore = useMusicStore();
       await toLikeSong(musicStore.playSong, !dataStore.isLikeSong(musicStore.playSong));

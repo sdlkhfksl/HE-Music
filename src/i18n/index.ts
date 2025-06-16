@@ -1,6 +1,6 @@
 import { createI18n } from "vue-i18n";
-import en from "./lang/en.json";
-import zhCN from "./lang/zh-CN.json";
+import en from "./locales/en.json";
+import zhCN from "./locales/zh-CN.json";
 
 const i18n = createI18n({
   globalInjection: false,

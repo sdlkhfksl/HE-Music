@@ -40,10 +40,13 @@ import {
 } from "naive-ui";
 import { useSettingStore, useStatusStore } from "@/stores";
 import { setColorSchemes } from "@/utils/color";
+
 // import { rgbToHex } from "@imsyy/color-utils";
 import themeColor from "@/assets/data/themeColor.json";
-import { t } from "@/locale";
+import { isElectron } from "@/utils/helper";
+import { useI18n } from "vue-i18n";
 
+const { locale, t } = useI18n();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 
@@ -234,6 +237,18 @@ const NaiveProviderContent = defineComponent({
     return h("div", { className: "main-tools" });
   },
 });
+
+watch(
+  () => settingStore.language,
+  (lang) => {
+    locale.value = lang;
+    document.documentElement?.setAttribute("lang", lang);
+    if (isElectron) {
+      // 语言切换
+      window.electron.ipcRenderer.send("change-language", lang);
+    }
+  },
+);
 
 // 监听设置更改
 watch(

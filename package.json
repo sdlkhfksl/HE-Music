@@ -61,6 +61,7 @@
     "github-markdown-css": "^5.8.1",
     "go-captcha-vue": "^2.0.6",
     "howler": "^2.2.4",
+    "i18next": "^25.2.1",
     "js-cookie": "^3.0.5",
     "jss": "^10.10.0",
     "jss-preset-default": "^10.10.0",

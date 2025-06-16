@@ -8,12 +8,7 @@
           <n-text class="name">{{ t("common.language") }}</n-text>
           <n-text class="tip" :depth="3">{{ t("setting.general.language_tip") }}</n-text>
         </div>
-        <n-select
-          v-model:value="settingStore.language"
-          class="set"
-          :options="languageOptions"
-          @update:value="languageChange"
-        />
+        <n-select v-model:value="settingStore.language" class="set" :options="languageOptions" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
@@ -375,11 +370,6 @@ const modeChange = (val: boolean) => {
 // 全局着色更改
 const themeGlobalColorChange = (val: boolean) => {
   if (val) player.getCoverColor(musicStore.songCover);
-};
-
-const languageChange = (value: string) => {
-  locale.value = value;
-  document.documentElement?.setAttribute("lang", value);
 };
 
 onMounted(() => {
