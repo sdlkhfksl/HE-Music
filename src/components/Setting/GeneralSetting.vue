@@ -29,11 +29,11 @@
               value: 'auto',
             },
             {
-              label: t('setting.general.theme_mode_value_dark'),
+              label: t('setting.general.theme_mode_value_light'),
               value: 'light',
             },
             {
-              label: t('setting.general.theme_mode_value_light'),
+              label: t('setting.general.theme_mode_value_dark'),
               value: 'dark',
             },
           ]"

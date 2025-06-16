@@ -246,7 +246,8 @@
     "spectrum_audio_channel_occupancy_confirm": "开启音乐频谱会导致自定义音频输出设备失效，将会恢复默认输出设备，是否继续开启？",
     "update_download_complete": "更新下载完成",
     "update_error": "更新出错",
-    "userinfo_modify_success": "用户信息修改成功"
+    "userinfo_modify_success": "用户信息修改成功",
+    "theme_color_change_error": "切换主题色出现错误，已使用默认配置"
   },
   "modal": {
     "album_placeholder": "请输入专辑名称",

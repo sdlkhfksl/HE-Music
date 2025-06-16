@@ -246,7 +246,8 @@
     "spectrum_audio_channel_occupancy_confirm": "Enabling music spectrum will disable custom audio output devices and restore the default output device. Continue enabling?",
     "update_download_complete": "Update download complete",
     "update_error": "Update error",
-    "userinfo_modify_success": "User information modified successfully"
+    "userinfo_modify_success": "User information modified successfully",
+    "theme_color_change_error": "Theme color error. Default restored."
   },
   "modal": {
     "album_placeholder": "Enter album name",

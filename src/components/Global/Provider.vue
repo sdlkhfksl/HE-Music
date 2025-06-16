@@ -42,6 +42,7 @@ import { useSettingStore, useStatusStore } from "@/stores";
 import { setColorSchemes } from "@/utils/color";
 // import { rgbToHex } from "@imsyy/color-utils";
 import themeColor from "@/assets/data/themeColor.json";
+import { t } from "@/locale";
 
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
@@ -206,7 +207,7 @@ const changeGlobalTheme = () => {
   } catch (error) {
     themeOverrides.value = {};
     console.error("切换主题色出现错误：", error);
-    window.$message.error("切换主题色出现错误，已使用默认配置");
+    window.$message.error(t("message.theme_color_change_error"));
   }
 };
 
