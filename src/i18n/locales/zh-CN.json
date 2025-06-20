@@ -254,7 +254,7 @@
     "alias_placeholder": "请输入别名",
     "already_latest_version": "当前已是最新版本",
     "already_login": "已登录，请勿再次操作",
-    "already_selected_song_counter": "已选择 {{ count }} 首",
+    "already_selected_song_counter": "已选择 {count} 首",
     "artist_jump": "跳转到歌手",
     "artist_placeholder": "请输入歌手名称",
     "auto_match_tag": "自动匹配标签",
@@ -622,8 +622,8 @@
     "title_za": "标题降序（ Z - A ）"
   },
   "time": {
-    "hours_ago": "{{ count }} 小时前",
+    "hours_ago": "{count} 小时前",
     "just_now": "刚刚发布",
-    "minutes_ago": "{{ count }} 分钟前"
+    "minutes_ago": "{count} 分钟前"
   }
 }

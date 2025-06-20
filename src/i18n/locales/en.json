@@ -254,7 +254,7 @@
     "alias_placeholder": "Enter alias",
     "already_latest_version": "You're on the latest version",
     "already_login": "Already logged in",
-    "already_selected_song_counter": "{{ count }} track selected | {{ count }} tracks selected",
+    "already_selected_song_counter": "{count} track selected | {count} tracks selected",
     "artist_jump": "Go to Artist",
     "artist_placeholder": "Enter artist name",
     "auto_match_tag": "Auto-match Tags",
@@ -622,8 +622,8 @@
     "title_za": "Title Z-A"
   },
   "time": {
-    "hours_ago": "{{ count }} hour ago | {{ count }} hours ago",
+    "hours_ago": "{count} hour ago | {count} hours ago",
     "just_now": "Just now",
-    "minutes_ago": "{{ count }} minute ago | {{ count }} minutes ago"
+    "minutes_ago": "{count} minute ago | {count} minutes ago"
   }
 }
