@@ -244,10 +244,10 @@
     "song_not_support_download": "This track does not support downloading",
     "song_play_fail": "This track cannot be played, skipping to next track",
     "spectrum_audio_channel_occupancy_confirm": "Enabling music spectrum will disable custom audio output devices and restore the default output device. Continue enabling?",
+    "theme_color_change_error": "Theme color error. Default restored.",
     "update_download_complete": "Update download complete",
     "update_error": "Update error",
-    "userinfo_modify_success": "User information modified successfully",
-    "theme_color_change_error": "Theme color error. Default restored."
+    "userinfo_modify_success": "User information modified successfully"
   },
   "modal": {
     "album_placeholder": "Enter album name",
@@ -263,6 +263,8 @@
     "avatar_url_placeholder": "Enter avatar URL",
     "click_download": "Click to download",
     "click_to_change_cover": "Click cover to change",
+    "close_online_service": "Disable Online Services",
+    "close_online_service_tip": "Disabling online services will turn this application into a local player. All online features including search, login, and streaming will be disabled. This change requires restart.",
     "create": "Create",
     "create_playlist": "Create Playlist",
     "delete_selected_songs": "Delete selected tracks",
@@ -284,6 +286,8 @@
     "old_password": "Old Password",
     "old_password_placeholder": "Enter old password",
     "online_playlist": "Online Playlist",
+    "open_online_service": "Enable Online Services",
+    "open_online_service_tip": "Enable online services? This change will take effect after restart.",
     "parse_fail": "Parsing failed",
     "password_placeholder": "Enter password",
     "playlist_cover_url": "Playlist Cover URL",

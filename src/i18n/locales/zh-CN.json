@@ -244,10 +244,10 @@
     "song_not_support_download": "该歌曲不支持下载",
     "song_play_fail": "该歌曲无法播放，跳至下一首",
     "spectrum_audio_channel_occupancy_confirm": "开启音乐频谱会导致自定义音频输出设备失效，将会恢复默认输出设备，是否继续开启？",
+    "theme_color_change_error": "切换主题色出现错误，已使用默认配置",
     "update_download_complete": "更新下载完成",
     "update_error": "更新出错",
-    "userinfo_modify_success": "用户信息修改成功",
-    "theme_color_change_error": "切换主题色出现错误，已使用默认配置"
+    "userinfo_modify_success": "用户信息修改成功"
   },
   "modal": {
     "album_placeholder": "请输入专辑名称",
@@ -263,6 +263,8 @@
     "avatar_url_placeholder": "请输入头像地址",
     "click_download": "点击下载",
     "click_to_change_cover": "点击封面以更换",
+    "close_online_service": "关闭在线服务",
+    "close_online_service_tip": "确定关闭软件的在线服务？将关闭包括搜索、登录、在线音乐播放等在内的全部在线服务，软件将会变为本地播放器！更改将在软件重启后生效！",
     "create": "新建",
     "create_playlist": "创建歌单",
     "delete_selected_songs": "删除已选歌曲",
@@ -284,6 +286,8 @@
     "old_password": "旧密码",
     "old_password_placeholder": "请输入旧密码",
     "online_playlist": "在线歌单",
+    "open_online_service": "开启在线服务",
+    "open_online_service_tip": "确定开启软件的在线服务？更改将在重启后生效！",
     "parse_fail": "解析失败",
     "password_placeholder": "请输入密码",
     "playlist_cover_url": "歌单图片地址",

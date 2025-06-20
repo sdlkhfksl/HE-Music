@@ -272,7 +272,7 @@ import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 
 // 国际化
-const { locale, t } = useI18n();
+const { t } = useI18n();
 const musicStore = useMusicStore();
 const settingStore = useSettingStore();
 const statusStore = useStatusStore();
@@ -337,10 +337,10 @@ const getAllSystemFonts = async () => {
 const modeChange = (val: boolean) => {
   if (val) {
     window.$dialog.warning({
-      title: "开启在线服务",
-      content: "确定开启软件的在线服务？更改将在重启后生效！",
-      positiveText: "开启",
-      negativeText: "取消",
+      title: t("modal.open_online_service"),
+      content: t("modal.open_online_service_tip"),
+      positiveText: t("common.ok"),
+      negativeText: t("common.cancel"),
       onPositiveClick: () => {
         useOnlineService.value = true;
         settingStore.useOnlineService = true;
@@ -348,11 +348,10 @@ const modeChange = (val: boolean) => {
     });
   } else {
     window.$dialog.warning({
-      title: "关闭在线服务",
-      content:
-        "确定关闭软件的在线服务？将关闭包括搜索、登录、在线音乐播放等在内的全部在线服务，软件将会变为本地播放器！更改将在软件重启后生效！",
-      positiveText: "关闭",
-      negativeText: "取消",
+      title: t("modal.close_online_service"),
+      content: t("modal.close_online_service_tip"),
+      positiveText: t("common.ok"),
+      negativeText: t("common.cancel"),
       onPositiveClick: () => {
         useOnlineService.value = false;
         settingStore.useOnlineService = false;
