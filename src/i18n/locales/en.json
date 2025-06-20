@@ -190,6 +190,7 @@
     "desktop_lyrics_save_fail": "Failed to save desktop lyrics configuration",
     "desktop_lyrics_save_success": "Desktop lyrics configuration saved",
     "found_local_music_count": "Found {count} track | Found {count} tracks",
+    "get_artist_detail_fail": "Failed to get artist detail",
     "get_comment_data_fail": "Failed to get comment data",
     "get_local_music_meta_fail": "Failed to get local track metadata",
     "get_url_fail": "Failed to get link",

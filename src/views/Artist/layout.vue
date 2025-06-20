@@ -95,7 +95,7 @@
                 <template #icon>
                   <SvgIcon :name="isLikeArtist ? 'Favorite' : 'FavoriteBorder'" />
                 </template>
-                {{ isLikeArtist ? "取消关注" : "关注歌手" }}
+                {{ isLikeArtist ? t('common.cancel_collect') : t('common.collect') }}
               </n-button>
               <!-- 更多 -->
               <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">
@@ -118,7 +118,7 @@
     </Transition>
     <!-- 标签页 -->
     <n-tabs v-model:value="artistType" class="tabs" type="segment" @update:value="tabChange">
-      <n-tab name="artist-songs"> {{ t("common.single_song") }} </n-tab>
+      <n-tab name="artist-songs"> {{ t("common.song") }} </n-tab>
       <n-tab name="artist-albums"> {{ t("common.album") }} </n-tab>
       <n-tab name="artist-videos"> {{ t("common.video") }} </n-tab>
     </n-tabs>
@@ -189,7 +189,7 @@ const listScrolling = ref<boolean>(false);
 // 更多操作
 const moreOptions = computed<DropdownOption[]>(() => [
   {
-    label: "打开源页面",
+    label: t('common.open_source_page'),
     key: "open",
     show: platformStore.isFeatureSupport(platform.value, FeatureSupportFlag.BuildSourceUrl),
     props: {
@@ -219,7 +219,7 @@ const getArtistDetail = async (id: string, platform: string) => {
     artistDetailData.value = await artistDetail(id, platform);
   } catch (error) {
     console.error("Erorr getting artist detail:", error);
-    window.$message.error("获取歌手详情失败");
+    window.$message.error(t('message.get_artist_detail_fail'));
   }
 };
 
