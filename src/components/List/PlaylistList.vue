@@ -53,7 +53,7 @@
 
               <div class="meta">
                 <n-text class="count" depth="3">{{
-                  t("common.song_counter", { count: item.song_count || 0 })
+                  t("common.song_counter", { count: Number(item.song_count) || 0 })
                 }}</n-text>
                 <n-text v-if="item.creator" class="creator" depth="3">
                   {{ item.creator || t("common.unknown") }}

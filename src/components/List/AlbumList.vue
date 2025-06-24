@@ -55,7 +55,7 @@
               <!-- 专辑信息 -->
               <div class="meta">
                 <n-text class="count" depth="3">{{
-                  t("common.song_counter", { count: item?.song_count || 0 })
+                  t("common.song_counter", { count: Number(item?.song_count) || 0 })
                 }}</n-text>
                 <n-text class="date" depth="3">{{
                   formatTimestamp(Number(item.publish_time) * 1000)

@@ -65,23 +65,24 @@
     <!--      </n-flex>-->
     <!--    </Transition>-->
     <!--     简介及标签-->
-    <!--    <Transition name="fade" mode="out-in">-->
-    <!--      <div v-if="videoData" class="desc">-->
-    <!--        &lt;!&ndash;        <n-divider />&ndash;&gt;-->
-    <!--        &lt;!&ndash;        <n-ellipsis :line-clamp="3" :tooltip="{ placement: 'bottom', width: 'trigger' }">&ndash;&gt;-->
-    <!--        &lt;!&ndash;          {{ "该视频暂无简介" }}&ndash;&gt;-->
-    <!--        &lt;!&ndash;        </n-ellipsis>&ndash;&gt;-->
-    <!--        &lt;!&ndash;        <n-flex v-if="videoData?.tags" class="tags">&ndash;&gt;-->
-    <!--        &lt;!&ndash;          <n-tag v-for="(item, index) in videoData.tags" :key="index" :bordered="false" round>&ndash;&gt;-->
-    <!--        &lt;!&ndash;            {{ item }}&ndash;&gt;-->
-    <!--        &lt;!&ndash;          </n-tag>&ndash;&gt;-->
-    <!--        &lt;!&ndash;        </n-flex>&ndash;&gt;-->
-    <!--        <n-divider />-->
-    <!--      </div>-->
-    <!--      <div v-else class="desc">-->
-    <!--        <n-skeleton :repeat="3" text round />-->
-    <!--      </div>-->
-    <!--    </Transition>-->
+    <!-- 简介及标签 -->
+    <Transition name="fade" mode="out-in">
+      <div v-if="videoData" class="desc">
+        <n-divider />
+        <n-ellipsis :line-clamp="3" :tooltip="{ placement: 'bottom', width: 'trigger' }">
+          {{ videoData?.description || t("common.no_description") }}
+        </n-ellipsis>
+        <!--          <n-flex v-if="videoData?.tags" class="tags">-->
+        <!--            <n-tag v-for="(item, index) in videoData.tags" :key="index" :bordered="false" round>-->
+        <!--              {{ item }}-->
+        <!--            </n-tag>-->
+        <!--          </n-flex>-->
+        <n-divider />
+      </div>
+      <div v-else class="desc">
+        <n-skeleton :repeat="3" text round />
+      </div>
+    </Transition>
     <n-divider />
     <!-- 评论 -->
     <div

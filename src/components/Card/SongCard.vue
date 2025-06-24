@@ -65,7 +65,7 @@
             <!--            </n-tag>-->
             <!-- MV -->
             <n-tag
-              v-if="song?.mv_id"
+              v-if="song?.mv_id && song?.mv_id != '0'"
               :bordered="false"
               class="mv"
               type="warning"

@@ -95,7 +95,7 @@
                 <template #icon>
                   <SvgIcon :name="isLikeArtist ? 'Favorite' : 'FavoriteBorder'" />
                 </template>
-                {{ isLikeArtist ? t('common.cancel_collect') : t('common.collect') }}
+                {{ isLikeArtist ? t("common.cancel_collect") : t("common.collect") }}
               </n-button>
               <!-- 更多 -->
               <n-dropdown :options="moreOptions" trigger="click" placement="bottom-start">
@@ -189,7 +189,7 @@ const listScrolling = ref<boolean>(false);
 // 更多操作
 const moreOptions = computed<DropdownOption[]>(() => [
   {
-    label: t('common.open_source_page'),
+    label: t("common.open_source_page"),
     key: "open",
     show: platformStore.isFeatureSupport(platform.value, FeatureSupportFlag.BuildSourceUrl),
     props: {
@@ -219,7 +219,7 @@ const getArtistDetail = async (id: string, platform: string) => {
     artistDetailData.value = await artistDetail(id, platform);
   } catch (error) {
     console.error("Erorr getting artist detail:", error);
-    window.$message.error(t('message.get_artist_detail_fail'));
+    window.$message.error(t("message.get_artist_detail_fail"));
   }
 };
 

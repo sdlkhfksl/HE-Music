@@ -106,6 +106,7 @@ export interface MVInfo extends CoverType {
   play_count: string;
   creator: string;
   duration: number;
+  description: string;
 }
 
 export interface CommentInfo {
