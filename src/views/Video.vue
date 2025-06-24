@@ -300,7 +300,7 @@ const loadSubMore = async (item: CommentInfo) => {
       videoId.value,
       videoPlatform.value,
       item.id,
-      "video",
+      "mv",
       item.sub_page_index,
       15,
       item.sub_last_id,
