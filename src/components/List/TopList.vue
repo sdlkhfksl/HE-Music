@@ -23,7 +23,7 @@
                 <!-- 播放量 -->
                 <div class="play-count">
                   <SvgIcon name="Play" />
-                  <span class="num">{{ formatNumber(Number(item.play_count) || 0) }}</span>
+                  <span class="num">{{ n(Number(item.play_count) || 0, "number") }}</span>
                 </div>
               </template>
               <!-- 简介 -->
@@ -82,7 +82,6 @@
 </template>
 
 <script setup lang="ts">
-import { formatNumber } from "@/utils/helper";
 import { useMusicStore, useStatusStore } from "@/stores";
 import { debounce } from "lodash-es";
 import CoverMenu from "@/components/Menu/CoverMenu.vue";
@@ -90,7 +89,7 @@ import player from "@/utils/player";
 import { CoverType, TopInfo } from "@/types/main.hemusic";
 import { topInfo } from "@/api/playlist";
 import { useI18n } from "vue-i18n";
-const { t } = useI18n();
+const { t, n } = useI18n();
 
 interface Props {
   data: TopInfo[];

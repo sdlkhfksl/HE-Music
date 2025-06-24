@@ -12,7 +12,7 @@
         <n-flex class="meta" align="center">
           <div class="item">
             <SvgIcon name="Video" :depth="3" />
-            <n-text>{{ formatNumber(Number(videoData.play_count) || 0) }}</n-text>
+            <n-text>{{ n(Number(videoData.play_count) || 0, "number") }}</n-text>
           </div>
           <!--          <div class="item">-->
           <!--            <SvgIcon name="Chat" :depth="3" />-->
@@ -123,7 +123,6 @@
 <script setup lang="ts">
 import { useDataStore, usePlatformStore, useStatusStore } from "@/stores";
 import { getMVUrlStr, videoDetail } from "@/api/video";
-import { formatNumber } from "@/utils/helper";
 import { getComment, getSubComment } from "@/api/comment";
 import player from "@/utils/player";
 // Plyr
@@ -132,7 +131,7 @@ import "plyr/dist/plyr.css";
 import { CommentInfo, MVInfo } from "@/types/main.hemusic";
 import { FeatureSupportFlag } from "@/api/platform";
 import { useI18n } from "vue-i18n";
-const { t } = useI18n();
+const { t, n } = useI18n();
 
 const router = useRouter();
 const statusStore = useStatusStore();

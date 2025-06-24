@@ -23,7 +23,7 @@
                 <!-- 播放量 -->
                 <div class="play-count">
                   <SvgIcon name="Play" />
-                  <span class="num">{{ formatNumber(Number(item.play_count) || 0) }}</span>
+                  <span class="num">{{ n(Number(item.play_count) || 0, "number") }}</span>
                 </div>
               </template>
               <!-- 简介 -->
@@ -112,9 +112,8 @@ import CoverMenu from "@/components/Menu/CoverMenu.vue";
 import player from "@/utils/player";
 import { formatTimestamp } from "@/utils/time";
 import { AlbumInfo, CoverType, UserFavouriteAlbumInfo } from "@/types/main.hemusic";
-import { formatNumber } from "@/utils/helper";
 import { useI18n } from "vue-i18n";
-const { t } = useI18n();
+const { t, n } = useI18n();
 
 interface Props {
   data: AlbumInfo[] | UserFavouriteAlbumInfo[];

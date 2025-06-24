@@ -26,7 +26,7 @@
           <!-- 播放量 -->
           <div class="play-count">
             <SvgIcon name="Play" />
-            <span class="num">{{ formatNumber(Number(playlistDetailData.play_count) || 0) }}</span>
+            <span class="num">{{ n(Number(playlistDetailData.play_count) || 0, "number") }}</span>
           </div>
         </div>
         <div class="data">
@@ -203,7 +203,7 @@
 <script setup lang="ts">
 import type { DropdownOption, MessageReactive } from "naive-ui";
 import { playlistDetail } from "@/api/playlist";
-import { coverLoaded, formatNumber, fuzzySearch, renderIcon } from "@/utils/helper";
+import { coverLoaded, fuzzySearch, renderIcon } from "@/utils/helper";
 import { renderToolbar } from "@/utils/meta";
 import { toLikePlaylist } from "@/utils/auth";
 import { debounce } from "lodash-es";
@@ -216,7 +216,7 @@ import SongList from "@/components/List/SongList.vue";
 import { buildSourceUrl } from "@/api/source";
 import { FeatureSupportFlag } from "@/api/platform";
 import { useI18n } from "vue-i18n";
-const { t } = useI18n();
+const { t, n } = useI18n();
 
 const router = useRouter();
 const dataStore = useDataStore();
