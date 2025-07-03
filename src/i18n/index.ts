@@ -8,7 +8,7 @@ const numberFormats = {
       style: "decimal",
       notation: "compact",
       compactDisplay: "short",
-      maximumFractionDigits: 1,
+      maximumFractionDigits: 2,
     },
   },
   "zh-CN": {
@@ -16,7 +16,7 @@ const numberFormats = {
       style: "decimal",
       notation: "compact",
       compactDisplay: "short",
-      maximumFractionDigits: 1,
+      maximumFractionDigits: 2,
     },
   },
 };

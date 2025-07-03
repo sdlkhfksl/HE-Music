@@ -50,7 +50,7 @@
             <div class="cover-data">
               <n-text class="name text-hidden">
                 <!-- 播放 -->
-                <SvgIcon v-if="item.is_finished" :size="14" name="Finished"/>
+                <SvgIcon v-if="item.is_finished" :size="14" name="Finished" />
                 {{ item.name }}
               </n-text>
               <!-- 专辑信息 -->
@@ -288,7 +288,7 @@ const playList = debounce(
         font-size: 16px;
         line-clamp: 2;
         -webkit-line-clamp: 2;
-        .n-icon{
+        .n-icon {
           color: var(--primary-color);
         }
       }

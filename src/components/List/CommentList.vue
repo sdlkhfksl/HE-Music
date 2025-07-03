@@ -60,7 +60,7 @@
             <!-- 点赞 -->
             <div class="item like">
               <SvgIcon name="ThumbUp" :depth="1" />
-              <n-text :depth="1">{{ item.praise_count }}</n-text>
+              <n-text :depth="1">{{ n(Number(item.praise_count) || 0, "number") }}</n-text>
             </div>
           </n-flex>
           <!-- 回复 -->
@@ -106,7 +106,7 @@ import { coverLoaded } from "@/utils/helper";
 import { formatCommentTime } from "@/utils/time";
 import { CommentInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
-const { t } = useI18n();
+const { t, n } = useI18n();
 
 defineProps<{
   sub?: boolean;
