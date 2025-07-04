@@ -75,12 +75,12 @@
           type="segment"
           @update:value="(name: string) => router.push({ name })"
         >
-          <n-tab name="local-songs"> {{ t("common.song") }} </n-tab>
+          <n-tab name="local-songs"> {{ t("common.songs") }} </n-tab>
           <n-tab :disabled="listData.length === 0" name="local-artists">
-            {{ t("common.artist") }}
+            {{ t("common.artists") }}
           </n-tab>
           <n-tab :disabled="listData.length === 0" name="local-albums">
-            {{ t("common.album") }}
+            {{ t("common.albums") }}
           </n-tab>
         </n-tabs>
       </n-flex>

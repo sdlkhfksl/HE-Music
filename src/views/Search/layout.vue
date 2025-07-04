@@ -24,7 +24,7 @@
 
       <!--      <n-tab name="search-radios"> 播客 </n-tab>-->
 
-      <n-tab-pane name="song" :tab="t('common.song')" display-directive="show:lazy">
+      <n-tab-pane name="song" :tab="t('common.songs')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchSong)"
@@ -38,7 +38,7 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
-      <n-tab-pane name="playlist" :tab="t('common.playlist')" display-directive="show:lazy">
+      <n-tab-pane name="playlist" :tab="t('common.playlists')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchPlaylist)"
@@ -52,7 +52,7 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
-      <n-tab-pane name="album" :tab="t('common.album')" display-directive="show:lazy">
+      <n-tab-pane name="album" :tab="t('common.albums')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchAlbum)"
@@ -66,7 +66,7 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
-      <n-tab-pane name="audiobook" :tab="t('common.audiobook')" display-directive="show:lazy">
+      <n-tab-pane name="audiobook" :tab="t('common.audiobooks')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchAudiobook)"
@@ -80,7 +80,7 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
-      <n-tab-pane name="artists" :tab="t('common.artist')" display-directive="show:lazy">
+      <n-tab-pane name="artists" :tab="t('common.artists')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchSinger)"
@@ -94,7 +94,7 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
-      <n-tab-pane name="videos" :tab="t('common.video')" display-directive="show:lazy">
+      <n-tab-pane name="videos" :tab="t('common.videos')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchMV)"

@@ -118,9 +118,9 @@
     </Transition>
     <!-- 标签页 -->
     <n-tabs v-model:value="artistType" class="tabs" type="segment" @update:value="tabChange">
-      <n-tab name="artist-songs"> {{ t("common.song") }} </n-tab>
-      <n-tab name="artist-albums"> {{ t("common.album") }} </n-tab>
-      <n-tab name="artist-videos"> {{ t("common.video") }} </n-tab>
+      <n-tab name="artist-songs"> {{ t("common.songs") }} </n-tab>
+      <n-tab name="artist-albums"> {{ t("common.albums") }} </n-tab>
+      <n-tab name="artist-videos"> {{ t("common.videos") }} </n-tab>
     </n-tabs>
     <!-- 路由 -->
     <RouterView v-slot="{ Component }">

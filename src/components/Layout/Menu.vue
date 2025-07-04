@@ -172,9 +172,13 @@ const renderUserPlaylist = (playlist: UserPlaylistInfo[], showCover: boolean) =>
               fallbackSrc: "/images/album.jpg?assest",
               lazy: true,
             }),
-            h(NEllipsis, null, () => playlist.name),
+            h(NEllipsis, null, () =>
+              playlist.is_default == 1 ? t("playlist.my_favorite_music") : playlist.name,
+            ),
           ])
-        : h(NEllipsis, null, () => playlist.name),
+        : h(NEllipsis, null, () =>
+            playlist.is_default == 1 ? t("playlist.my_favorite_music") : playlist.name,
+          ),
     icon: showCover ? undefined : renderIcon("PlayList"),
   }));
 };
