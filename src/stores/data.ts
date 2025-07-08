@@ -263,6 +263,6 @@ export const useDataStore = defineStore("data", {
   persist: {
     key: "data-store",
     storage: localStorage,
-    pick: ["userLoginStatus", "userData", "searchHistory", "catData", "token"],
+    pick: ["userLoginStatus", "userData", "searchHistory", "token"],
   },
 });
