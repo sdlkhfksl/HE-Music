@@ -5,10 +5,45 @@ import initUnblockAPI from "./unblock";
 import fastifyCookie from "@fastify/cookie";
 import fastifyMultipart from "@fastify/multipart";
 import fastifyStatic from "@fastify/static";
-import fastify from "fastify";
+import fastify, { FastifyReply, FastifyRequest } from "fastify";
 import log from "../main/logger";
+import { BrowserWindow } from "electron";
 
-const initAppServer = async () => {
+const loginFailTxt = `
+  <!DOCTYPE html>
+  <html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <title>Login Status</title>
+  </head>
+  <body>
+    <h1>Login fail!</h1>
+    <script>
+      alert("Login fail!");
+    </script>
+  </body>
+  </html>
+`;
+
+const loginSuccessTxt = `
+  <!DOCTYPE html>
+  <html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <title>Login Status</title>
+  </head>
+  <body>
+    <h1>登录成功！</h1>
+    <p>请手动关闭此窗口</p>
+    <script>
+      alert("登录成功！");
+      window.close();
+    </script>
+  </body>
+  </html>
+`;
+
+const initAppServer = async (getWin: () => { mainWin: BrowserWindow | null }) => {
   try {
     const server = fastify({
       // 忽略尾随斜杠
@@ -45,6 +80,22 @@ const initAppServer = async () => {
     // 注册接口
     server.register(initNcmAPI, { prefix: "/api" });
     server.register(initUnblockAPI, { prefix: "/api" });
+
+    server.get(
+      "/login/success",
+      async (
+        req: FastifyRequest<{ Querystring: { [key: string]: string } }>,
+        reply: FastifyReply,
+      ) => {
+        const { token } = req.query;
+        if (!token) {
+          reply.type("text/html").send(loginFailTxt);
+          return;
+        }
+        getWin().mainWin?.webContents.send("login-success", { token });
+        reply.type("text/html").send(loginSuccessTxt);
+      },
+    );
     // 启动端口
     const port = Number(import.meta.env["VITE_SERVER_PORT"] || 25884);
     await server.listen({ port });

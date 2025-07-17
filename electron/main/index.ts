@@ -57,7 +57,9 @@ class MainProcess {
       // 初始化 store
       this.store = initStore();
       // 启动主服务进程
-      await initAppServer();
+      await initAppServer(() => ({
+        mainWin: this.mainWindow,
+      }));
       // 初始化 i18n
       await initI18n();
       // 启动进程

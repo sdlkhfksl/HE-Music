@@ -3,16 +3,19 @@
     <img src="/icons/favicon.png?assest" alt="logo" class="logo" />
     <!-- 登录方式 -->
     <LoginPassword @saveLogin="saveLogin" />
-    <!--    &lt;!&ndash; 其他方式 &ndash;&gt;-->
-    <!--    <n-flex align="center" class="other">-->
-    <!--      <n-button :focusable="false" size="small" quaternary round @click="specialLogin('uid')">-->
-    <!--        UID 登录-->
-    <!--      </n-button>-->
-    <!--      <n-divider vertical />-->
-    <!--      <n-button :focusable="false" size="small" quaternary round @click="specialLogin('cookie')">-->
-    <!--        Cookie 登录-->
-    <!--      </n-button>-->
-    <!--    </n-flex>-->
+    <!-- 其他方式 -->
+    <n-flex align="center" class="other">
+      <n-button
+        v-for="item in providers"
+        :key="item"
+        text
+        style="font-size: 16px"
+        @click="oauthLogin(item)"
+      >
+        <SvgIcon size="20" :name="item"></SvgIcon>
+        {{ item }}
+      </n-button>
+    </n-flex>
     <!-- 关闭登录 -->
     <n-button :focusable="false" class="close" strong secondary round @click="emit('close')">
       <template #icon>
@@ -30,6 +33,11 @@ import { useDataStore, usePlatformStore, useSettingStore, useStatusStore } from 
 import LoginPassword from "@/components/Modal/Login/LoginPassword.vue";
 import player from "@/utils/player";
 import { useI18n } from "vue-i18n";
+import { authCodeURL, authProviders } from "@/api/auth";
+import SvgIcon from "@/components/Global/SvgIcon.vue";
+import { isElectron, openLink } from "@/utils/helper";
+import { debounce } from "lodash-es";
+
 const { t } = useI18n();
 
 const emit = defineEmits<{
@@ -40,6 +48,8 @@ const dataStore = useDataStore();
 const platformStore = usePlatformStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
+
+const providers = ref<string[]>([]);
 
 // 保存登录信息
 const saveLogin = async (loginData: any) => {
@@ -58,6 +68,40 @@ const saveLogin = async (loginData: any) => {
     player.initPlayer(settingStore.autoPlay, player.getSeek());
   }
 };
+
+const oauthLogin = debounce(
+  async (provider: string) => {
+    const redirect_uri = isElectron
+      ? `http://127.0.0.1:${Number(import.meta.env["VITE_SERVER_PORT"] || 25666)}/login/success`
+      : window.location.origin;
+
+    const { url } = await authCodeURL(provider, redirect_uri);
+
+    if (isElectron) {
+      openLink(url);
+    } else {
+      window.location.href = url;
+    }
+  },
+  500,
+  { leading: true, trailing: false },
+);
+
+onMounted(() => {
+  authProviders().then((res) => {
+    providers.value = res.list;
+  });
+
+  if (isElectron) {
+    window.electron.ipcRenderer.removeAllListeners("login-success");
+    window.electron.ipcRenderer.on("login-success", (_, data) => {
+      if (data.userLoginStatus || data.token === dataStore.token) {
+        return;
+      }
+      saveLogin(data);
+    });
+  }
+});
 
 onBeforeMount(() => {
   if (dataStore.userLoginStatus) {
@@ -80,7 +124,7 @@ onBeforeMount(() => {
     margin: 20px auto 30px auto;
   }
   .other {
-    margin: 20px 0;
+    margin: 10px 0;
     .n-button {
       width: 140px;
     }

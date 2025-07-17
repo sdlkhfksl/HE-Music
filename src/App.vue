@@ -87,12 +87,15 @@
 </template>
 
 <script setup lang="ts">
-import { useMusicStore, useStatusStore, useSettingStore } from "@/stores";
+import { useMusicStore, useStatusStore, useSettingStore, useDataStore } from "@/stores";
 import init from "@/utils/init";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
+const dataStore = useDataStore();
 
 // 主内容
 const contentRef = ref<HTMLElement | null>(null);
@@ -105,6 +108,15 @@ watchEffect(() => {
 });
 
 onMounted(async () => {
+  const params = new URLSearchParams(location.search);
+  const token = params.get("token");
+  if (token) {
+    dataStore.userLoginStatus = true;
+    dataStore.token = token;
+    window.$message.success(t("modal.login_success"));
+    location.replace("/");
+    return;
+  }
   await init();
 });
 </script>

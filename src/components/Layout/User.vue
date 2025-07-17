@@ -21,7 +21,7 @@
           <n-text class="name">
             {{
               dataStore.userLoginStatus
-                ? dataStore.userData.nickname || t("common.unknow_user")
+                ? dataStore.userData.nickname || t("common.unknown_user")
                 : t("nav.un_login")
             }}
           </n-text>
@@ -48,7 +48,14 @@
         <n-button :focusable="false" size="small" tertiary round @click="openUpdateUserInfo">
           {{ t("nav.modify_info") }}
         </n-button>
-        <n-button :focusable="false" size="small" tertiary round @click="openUpdateUserPassword">
+        <n-button
+          :disabled="!dataStore.userData.username"
+          :focusable="false"
+          size="small"
+          tertiary
+          round
+          @click="openUpdateUserPassword"
+        >
           {{ t("nav.modify_password") }}
         </n-button>
       </n-flex>
