@@ -1,9 +1,21 @@
-# HEPlayer
+# HE-Music
 
-> 一个简约的音乐播放器，基于 [SPlayer](https://github.com/imsyy/SPlayer) 修改
-> 该版本为特别修改版，需要搭配自定义服务器，建议使用原版
+> 一个简约的音乐播放器，基于 [SPlayer](https://github.com/imsyy/SPlayer) 修改, SPlayer是一个非常漂亮的播放器。
+>
+> 该版本为特别修改版，和SPlayer不兼容，需搭配定制的服务端运行，不知道后端服务的用户请使用 SPlayer
 
 ![main](/screenshots/SPlayer.jpg)
+
+## 📜 版权与授权声明
+
+本项目是基于 [SPlayer](https://github.com/imsyy/SPlayer) 的二次开发作品，原始代码版权归属如下：
+
+```copyright
+原始项目：SPlayer
+版权所有 © 2022-present Imsyy
+许可证：AGPL-3.0
+源码仓库：https://github.com/imsyy/SPlayer
+```
 
 ## 说明
 
@@ -20,6 +32,7 @@
 - 本项目采用 [Vue 3](https://cn.vuejs.org/) + [TypeScript](https://www.typescriptlang.org/) + [Naïve UI](https://www.naiveui.com/) + [Electron](https://www.electronjs.org/zh/docs/latest/) 开发
 - 支持网页端与客户端，由于设备有限，目前仅适配 `Win`，其他平台可自行解决兼容性后进行构建
 - 仅对移动端做了基础适配，**不保证功能全部可用**
+- **该项目为前端项目，运行时需要搭配对应的后端服务。不知道后端服务的用户，请使用SPlayer[https://github.com/imsyy/SPlayer](https://github.com/imsyy/SPlayer)**
 
   > 请注意，本程序不打算开发移动端，也不会对移动端进行完美适配，仅保证基础可用性
 
@@ -28,6 +41,26 @@
 无
 
 ## 🎉 功能
+
+- 💻 支持桌面歌词
+- 💻 支持切换为本地播放器，此模式将不会连接网络
+- 🎨 封面主题色自适应，支持全站着色
+- 🌚 Light / Dark / Auto 模式自动切换
+- 📁 本地歌曲管理及分类（建议先使用 [音乐标签](https://www.cnblogs.com/vinlxc/p/11347744.html) 进行匹配后再使用）
+- 📁 简易的本地音乐标签编辑及封面修改
+- 🎵 **支持播放部分无版权歌曲（可能会与原曲不匹配，客户端独占功能）**
+- ⬇️ 下载歌曲
+- ➕ 新建歌单及歌单编辑
+- ❤️ 收藏 / 取消收藏歌单或歌手
+- 📝 支持逐字歌词
+- 🔄 歌词滚动以及歌词翻译
+- 📹 MV 与视频播放
+- 🎶 音乐频谱显示
+- ⏭️ 音乐渐入渐出
+- 🔄 支持 PWA
+- 💬 支持查看评论
+- 📱 移动端基础适配
+- 🌐 `i18n` 支持
 
 ## 🖼️ screenshots
 
@@ -75,103 +108,14 @@
 
 </details>
 
-## 📦️ 获取
-
-### 稳定版
-
-通常情况下，可以在 [Releases](https://github.com/imsyy/SPlayer/releases) 中获取稳定版
-
-### 开发版
-
-可以通过 `GitHub Actions` 工作流获取最新的开发版，目前开发版仅提供 `Win` 版本
-
-[Dev Workflow](https://github.com/imsyy/SPlayer/actions/workflows/build.yml)
-
-## Snap Store
-
-[![Get it from the Snap Store](https://snapcraft.io/en/dark/install.svg)](https://snapcraft.io/splayer)
-
-## ⚙️ Docker 部署
-
-> 安装及配置 `Docker` 将不在此处说明，请自行解决
-
-### 本地构建
-
-> 请尽量拉取最新分支后使用本地构建方式，在线部署的仓库可能更新不及时
-
-```bash
-# 构建
-docker build -t splayer .
-
-# 运行
-docker run -d --name SPlayer -p 25884:25884 splayer
-# 或使用 Docker Compose
-docker-compose up -d
-```
-
-### 在线部署
-
-```bash
-# 从 Docker Hub 拉取
-docker pull imsyy/splayer:latest
-# 从 GitHub ghcr 拉取
-docker pull ghcr.io/imsyy/splayer:latest
-
-# 运行
-docker run -d --name SPlayer -p 25884:25884 imsyy/splayer:latest
-```
-
-以上步骤成功后，将会在本地 [localhost:25884](http://localhost:25884/) 启动，如需更换端口，请自行修改命令行中的端口号
-
-## ⚙️ Vercel 部署
-
-> 其他部署平台大致相同，在此不做说明
-
-1. 本程序依赖 [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi) 运行，请确保您已成功部署该项目，并成功取得在线访问地址
-2. 点击本仓库右上角的 `Fork`，复制本仓库到你的 `GitHub` 账号
-3. 复制 `/.env.example` 文件并重命名为 `/.env`
-4. 将 `.env` 文件中的 `VITE_API_URL` 改为第一步得到的 API 地址
-
-   ```js
-   VITE_API_URL = "https://example.com";
-   ```
-
-5. 将 `Build and Output Settings` 中的 `Output Directory` 改为 `out/renderer`
-
-   ![build](/screenshots/build.jpg)
-
-6. 点击 `Deploy`，即可成功部署
-
-## ⚙️ 服务器部署
-
-1. 重复 `⚙️ Vercel 部署` 中的 1 - 4 步骤
-2. 克隆仓库
-
-   ```bash
-   git clone https://github.com/imsyy/SPlayer.git
-   ```
-
-3. 安装依赖
-
-   ```bash
-   pnpm install
-   # 或
-   yarn install
-   # 或
-   npm install
-   ```
-
-4. 编译打包
-
-   ```bash
-   pnpm build
-   # 或
-   yarn build
-   # 或
-   npm build
-   ```
-
-5. 将站点运行目录设置为 `out/renderer` 目录
+[//]: # "## 📦️ 获取"
+[//]: #
+[//]: # "### 稳定版"
+[//]: #
+[//]: # "通常情况下，可以在 [Releases](https://github.com/serious-snow/HE-Music/releases) 中获取稳定版"
+[//]: # "## Snap Store"
+[//]: #
+[//]: # "[![Get it from the Snap Store](https://snapcraft.io/en/dark/install.svg)](https://snapcraft.io/splayer)"
 
 ## ⚙️ 本地部署
 
@@ -197,6 +141,7 @@ docker run -d --name SPlayer -p 25884:25884 imsyy/splayer:latest
 
 特此感谢为本项目提供支持与灵感的项目
 
+- [SPlayer](https://github.com/imsyy/Splayer)
 - [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)
 - [YesPlayMusic](https://github.com/qier222/YesPlayMusic)
 - [UnblockNeteaseMusic](https://github.com/UnblockNeteaseMusic/server)
@@ -204,11 +149,11 @@ docker run -d --name SPlayer -p 25884:25884 imsyy/splayer:latest
 - [Vue-mmPlayer](https://github.com/maomao1996/Vue-mmPlayer)
 - [refined-now-playing-netease](https://github.com/solstice23/refined-now-playing-netease)
 - [material-color-utilities](https://github.com/material-foundation/material-color-utilities)
-- [SPlayer](https://github.com/imsyy/Splayer)
 
 ## 📢 免责声明
 
-**本项目基于开源项目SPlayer进行二次开发，产生的一切责任都与SPlayer以及他的开发者无关!**
+**本项目基于开源项目 SPlayer 进行二次开发，产生的一切责任都与SPlayer以及他的开发者无关！**
+
 **仅供个人学习研究使用，禁止用于商业及非法用途**
 
 **歌曲、图片及歌词来源于网络，仅供学习、交流使用，不具有任何商业用途，如因使用本项目而引起的任何纠纷或责任，均由使用者自行承担。** **本项目开发者不承担任何因使用本项目而导致的任何直接或间接责任，并保留追究使用者违法行为的权利**
@@ -230,4 +175,4 @@ docker run -d --name SPlayer -p 25884:25884 imsyy/splayer:latest
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=imsyy/SPlayer&type=Date)](https://star-history.com/#imsyy/SPlayer&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=serious-snow/HE-Music&type=Date)](https://api.star-history.com/svg?repos=serious-snow/HE-Music&type=Date)
