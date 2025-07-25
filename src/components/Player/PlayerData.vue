@@ -24,9 +24,9 @@
     <!-- 歌手 -->
     <div class="artists">
       <SvgIcon :depth="3" name="Artist" size="20" />
-      <div v-if="Array.isArray(musicStore.playSong.singers)" class="ar-list">
+      <div v-if="Array.isArray(musicStore.playSong.artists)" class="ar-list">
         <span
-          v-for="ar in musicStore.playSong.singers"
+          v-for="ar in musicStore.playSong.artists"
           :key="ar.id"
           class="ar"
           @click="
@@ -45,7 +45,7 @@
         </span>
       </div>
       <div v-else class="ar-list">
-        <span class="ar">{{ musicStore.playSong.singers || "未知艺术家" }}</span>
+        <span class="ar">{{ musicStore.playSong.artists || "未知艺术家" }}</span>
       </div>
     </div>
     <!-- 专辑 -->

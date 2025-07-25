@@ -76,12 +76,12 @@ export const likeAlbum = (
   platform: string,
   name: string,
   cover: string,
-  singers: any[],
+  artists: any[],
 ) => {
   return requestHemusic({
     url: "/v1/user/favourite/album",
     method: "post",
-    data: { id, platform, name, cover, singers },
+    data: { id, platform, name, cover, artists },
   });
 };
 // 取消收藏专辑
@@ -96,7 +96,7 @@ export const unlikeAlbum = (id: string, platform: string) => {
 // 获取用户收藏歌手
 export const userFavouriteArtist = (page_size: number = 50, page_index: number = 1) => {
   return requestHemusic({
-    url: "/v1/user/favourite/singers",
+    url: "/v1/user/favourite/artists",
     params: {
       page_index,
       page_size,
@@ -107,17 +107,17 @@ export const userFavouriteArtist = (page_size: number = 50, page_index: number =
 /**
  * 收藏歌单
  */
-export const likeSinger = (id: string, platform: string, name: string, cover: string) => {
+export const likeArtist = (id: string, platform: string, name: string, cover: string) => {
   return requestHemusic({
-    url: "/v1/user/favourite/singer",
+    url: "/v1/user/favourite/artist",
     method: "post",
     data: { id, platform, name, cover },
   });
 };
 // 取消收藏歌单
-export const unlikeSinger = (id: string, platform: string) => {
+export const unlikeArtist = (id: string, platform: string) => {
   return requestHemusic({
-    url: "/v1/user/favourite/singer",
+    url: "/v1/user/favourite/artist",
     method: "delete",
     data: { id, platform },
   });

@@ -49,15 +49,15 @@ const formatArtistsList = (
   const allArtists = data.reduce(
     (acc, song) => {
       // 歌手信息
-      let singers = isArray(song.singers) ? song.singers : [song.singers];
+      let artists = isArray(song.artists) ? song.artists : [song.artists];
       // 分割歌手
       separators.forEach((separator) => {
-        singers = singers.flatMap((artist: any) =>
+        artists = artists.flatMap((artist: any) =>
           typeof artist === "string" ? artist.split(separator) : [artist],
         );
       });
       // 遍历歌手
-      singers.forEach((artist: any) => {
+      artists.forEach((artist: any) => {
         if (!artist) return;
         // 获取歌手名称
         const artistName = typeof artist === "string" ? artist.trim() : artist.name;

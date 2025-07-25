@@ -204,7 +204,7 @@ const initWinIpcMain = (
           return {
             id: getFileID(filePath),
             name: common.title || basename(filePath),
-            singers: common.artists?.join(" / ") || common.artist,
+            artists: common.artists?.join(" / ") || common.artist,
             album: common.album || "",
             alia: common.comment?.[0],
             duration: format?.duration ?? 0,
@@ -375,7 +375,7 @@ const initWinIpcMain = (
     if (!win) return false;
     let coverDownload: DownloadItem | null = null;
     try {
-      const { name, singer, album, alia, lyric, cover } = metadata;
+      const { name, artist, album, alia, lyric, cover } = metadata;
       // 规范化路径
       const songPath = resolve(path);
       if (cover && cover.startsWith("http")) {
@@ -390,9 +390,9 @@ const initWinIpcMain = (
       Id3v2Settings.forceDefaultVersion = true;
       Id3v2Settings.defaultVersion = 3;
       songFile.tag.title = name || "未知曲目";
-      songFile.tag.performers = [singer || "未知艺术家"];
+      songFile.tag.performers = [artist || "未知艺术家"];
       songFile.tag.album = album || "未知专辑";
-      songFile.tag.albumArtists = [singer || "未知艺术家"];
+      songFile.tag.albumArtists = [artist || "未知艺术家"];
       songFile.tag.lyrics = lyric || "";
       songFile.tag.description = alia || "";
       songFile.tag.comment = alia || "";
@@ -474,8 +474,8 @@ const initWinIpcMain = (
         Id3v2Settings.defaultVersion = 3;
         songFile.tag.title = songData?.name || "未知曲目";
         songFile.tag.album = songData?.album?.name || "未知专辑";
-        songFile.tag.performers = songData?.singers?.map((ar: any) => ar.name) || ["未知艺术家"];
-        songFile.tag.albumArtists = songData?.singers?.map((ar: any) => ar.name) || ["未知艺术家"];
+        songFile.tag.performers = songData?.artists?.map((ar: any) => ar.name) || ["未知艺术家"];
+        songFile.tag.albumArtists = songData?.artists?.map((ar: any) => ar.name) || ["未知艺术家"];
         if (lyric && downloadLyric) songFile.tag.lyrics = lyric;
         if (songCover && downloadCover) songFile.tag.pictures = [songCover];
         // 保存元信息

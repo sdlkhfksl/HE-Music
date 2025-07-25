@@ -20,7 +20,7 @@ export const getComment = (
   is_hot?: boolean,
 ) => {
   return requestHemusic({
-    url: "/v1/comment/list",
+    url: "/v1/comments",
     params: {
       id,
       platform,
@@ -53,7 +53,7 @@ export const getSubComment = (
   last_id?: string,
 ) => {
   return requestHemusic({
-    url: "/v1/comment//sub/list",
+    url: "/v1/comment/subs",
     params: {
       id,
       platform,

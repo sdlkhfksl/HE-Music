@@ -3,7 +3,7 @@ import {
   MVInfo,
   UserFavouriteAlbumInfo,
   UserFavouritePlaylistInfo,
-  UserFavouriteSingerInfo,
+  UserFavouriteArtistInfo,
   UserFavouriteSongInfo,
 } from "@/types/main.hemusic";
 
@@ -190,7 +190,7 @@ export interface UserDataType {
 export interface UserLikeDataType {
   songs: UserFavouriteSongInfo[];
   playlists: UserFavouritePlaylistInfo[];
-  artists: UserFavouriteSingerInfo[];
+  artists: UserFavouriteArtistInfo[];
   albums: UserFavouriteAlbumInfo[];
   mvs: MVInfo[];
 }

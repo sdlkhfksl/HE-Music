@@ -201,14 +201,14 @@ const listData = computed<SongInfo[]>(() => {
       return data.sort((a, b) => b.name.localeCompare(a.name));
     case "arAZ":
       return data.sort((a, b) => {
-        const artistA = Array.isArray(a.singers) ? a.singers[0].name : a.singers;
-        const artistB = Array.isArray(b.singers) ? b.singers[0].name : b.singers;
+        const artistA = Array.isArray(a.artists) ? a.artists[0].name : a.artists;
+        const artistB = Array.isArray(b.artists) ? b.artists[0].name : b.artists;
         return artistA?.localeCompare(artistB || "") || 0;
       });
     case "arZA":
       return data.sort((a, b) => {
-        const artistA = Array.isArray(a.singers) ? a.singers[0].name : a.singers;
-        const artistB = Array.isArray(b.singers) ? b.singers[0].name : b.singers;
+        const artistA = Array.isArray(a.artists) ? a.artists[0].name : a.artists;
+        const artistB = Array.isArray(b.artists) ? b.artists[0].name : b.artists;
         return artistB?.localeCompare(artistA || "") || 0;
       });
     case "timeDown":

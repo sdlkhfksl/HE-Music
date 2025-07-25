@@ -150,18 +150,18 @@ const routes: Array<RouteRecordRaw> = [
   },
   // toplist
   {
-    path: "/top-list",
-    name: "top-list",
-    component: () => import("@/views/TopList/TopList.vue"),
+    path: "/ranking-list",
+    name: "ranking-list",
+    component: () => import("@/views/RankingList/RankingList.vue"),
   },
   {
-    path: "/top",
-    name: "top",
+    path: "/ranking",
+    name: "ranking",
     beforeEnter: (to, _, next) => {
       if (!to.query.id || to.query.id === "0" || !to.query.platform) next({ path: "/403" });
       else next();
     },
-    component: () => import("@/views/List/top.vue"),
+    component: () => import("@/views/List/ranking.vue"),
   },
   // 我喜欢的音乐
   // {

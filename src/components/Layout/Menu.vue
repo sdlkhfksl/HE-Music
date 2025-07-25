@@ -79,8 +79,8 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
           }),
         },
         {
-          key: "top-list",
-          link: "top-list",
+          key: "ranking-list",
+          link: "ranking-list",
           label: t("common.rank"),
           icon: renderIcon("TopList", {
             style: {

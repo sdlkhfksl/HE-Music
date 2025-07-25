@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
 import type { CoverType, UserLikeDataType } from "@/types/main";
-import { playlistTagList } from "@/api/playlist";
+import { playlistCategories } from "@/api/playlist";
 import { cloneDeep, isEmpty } from "lodash-es";
 import localforage from "localforage";
-import { SongInfo, TagGroupInfo, UserInfo, UserPlaylistInfo } from "@/types/main.hemusic";
+import { SongInfo, CategoryGroupInfo, UserInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 
 interface ListState {
   playList: SongInfo[];
@@ -17,7 +17,7 @@ interface ListState {
   token: string;
   userLikeData: UserLikeDataType;
   userCreatedPlaylist: UserPlaylistInfo[]; //用户创建的歌单
-  catData: Record<string, TagGroupInfo[]>;
+  catData: Record<string, CategoryGroupInfo[]>;
 }
 
 type UserDataKeys = keyof ListState["userLikeData"];
@@ -251,7 +251,7 @@ export const useDataStore = defineStore("data", {
       if (!isEmpty(this.catData[platform])) return;
       // 获取歌单分类
       try {
-        const res = await playlistTagList(platform);
+        const res = await playlistCategories(platform);
         this.catData[platform] = res.group_list;
       } catch (error) {
         console.error("Error getting playlist cat list:", error);

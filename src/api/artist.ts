@@ -34,7 +34,7 @@ export const artistTypeList = (
  */
 export const artistDetail = (id: string, platform: string) => {
   return requestHemusic({
-    url: "/v1/singer",
+    url: "/v1/artist",
     params: { id, platform },
   });
 };
@@ -53,7 +53,7 @@ export const artistAllSongs = (
   page_size: number = 50,
 ) => {
   return requestHemusic({
-    url: "/v1/singer/song",
+    url: "/v1/artist/songs",
     params: { id, platform, page_index, page_size },
   });
 };
@@ -72,7 +72,7 @@ export const artistAblums = (
   page_size: number = 50,
 ) => {
   return requestHemusic({
-    url: "/v1/singer/album",
+    url: "/v1/artist/albums",
     params: { id, platform, page_index, page_size },
   });
 };
@@ -91,7 +91,7 @@ export const artistVideos = (
   page_size: number = 50,
 ) => {
   return requestHemusic({
-    url: "/v1/singer/mv",
+    url: "/v1/artist/mvs",
     params: { id, platform, page_index, page_size },
   });
 };

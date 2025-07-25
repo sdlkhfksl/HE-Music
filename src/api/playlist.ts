@@ -12,9 +12,9 @@ export const playlistDetail = (id: string, platform: string) => {
 };
 
 // 获取歌单分类信息
-export const playlistTagList = (platform: string) => {
+export const playlistCategories = (platform: string) => {
   return requestHemusic({
-    url: `/v1/tag/list`,
+    url: `/v1/playlist/categories`,
     params: {
       platform,
     },
@@ -22,18 +22,18 @@ export const playlistTagList = (platform: string) => {
 };
 
 // 获取歌单分类信息
-export const tagPlaylistList = (
-  id: string,
+export const categoryPlaylists = (
+  category_id: string,
   platform: string,
   page_index: number = 1,
   page_size: number = 30,
   last_id: string = "",
 ) => {
   return requestHemusic({
-    url: `/v1/tag/playlist`,
+    url: `/v1/category/playlists`,
     params: {
       platform,
-      id,
+      category_id,
       page_index,
       page_size,
       last_id,
@@ -45,8 +45,8 @@ export const tagPlaylistList = (
  * 获取排行榜数据
  * @param platform
  */
-export const getTopList = (platform: string) => {
-  return requestHemusic({ url: "/v1/top/list", params: { platform } });
+export const listRankings = (platform: string) => {
+  return requestHemusic({ url: "/v1/rankings", params: { platform } });
 };
 
 /**
@@ -57,7 +57,7 @@ export const getTopList = (platform: string) => {
  * @param page_size
  * @param last_id
  */
-export const topInfo = (
+export const getRanking = (
   id: string,
   platform: string,
   page_index: number = 1,
@@ -65,7 +65,7 @@ export const topInfo = (
   last_id: string = "",
 ) => {
   return requestHemusic({
-    url: "/v1/top",
+    url: "/v1/ranking",
     params: {
       platform,
       id,

@@ -71,7 +71,7 @@
         >
           <n-flex class="cat-list">
             <n-tag
-              v-for="(cat, catIndex) in item?.tag_list || []"
+              v-for="(cat, catIndex) in item?.category_list || []"
               :key="catIndex"
               :bordered="false"
               :class="{ choose: currentTag?.id === cat.id }"
@@ -93,25 +93,29 @@
 
 <script setup lang="ts">
 import { useDataStore } from "@/stores";
-import { PlaylistInfo, TagInfo } from "@/types/main.hemusic";
+import { PlaylistInfo, CategoryInfo } from "@/types/main.hemusic";
 import PlaylistList from "@/components/List/PlaylistList.vue";
 import { watch } from "vue";
-import { tagPlaylistList } from "@/api/playlist";
+import { categoryPlaylists } from "@/api/playlist";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 const props = defineProps<{
   platform: string;
+  category_id?: string;
 }>();
 
-const tag_id = defineModel<string>("tag_id");
+const emit = defineEmits<{
+  change: [string];
+}>();
+
 const group_name = ref<string>("");
 
 const dataStore = useDataStore();
 
 const catChangeShow = ref<boolean>(false);
 
-const currentTag = ref<TagInfo>();
+const currentTag = ref<CategoryInfo>();
 
 // 歌单数据
 const hasMore = ref<boolean>(true);
@@ -128,7 +132,7 @@ const getAllCatlistPlaylist = async () => {
   }
   // 获取数据
   loading.value = true;
-  const result = await tagPlaylistList(
+  const result = await categoryPlaylists(
     currentTag.value.id,
     props.platform,
     playlistPageIndex.value,
@@ -151,17 +155,19 @@ const loadMore = () => {
 };
 
 // 分类切换
-const changeTag = (tag: TagInfo) => {
-  tag_id.value = tag.id;
+const changeTag = (tag: CategoryInfo) => {
+  catChangeShow.value = false;
+  emit("change", tag.id);
 };
 
-watch(tag_id, (to) => {
-  [group_name.value, currentTag.value] = findTag(to || "");
-  catChangeShow.value = false;
-  resetData();
-  getAllCatlistPlaylist();
-  console.log("tag_id", to);
-});
+watch(
+  () => props.category_id,
+  async (to) => {
+    [group_name.value, currentTag.value] = findTag(to || "");
+    resetData();
+    await getAllCatlistPlaylist();
+  },
+);
 
 const resetData = () => {
   playlistData.value = [];
@@ -187,10 +193,10 @@ const resetData = () => {
 //   }
 // })
 
-const findTag = (tag_id: string): [string, TagInfo] => {
+const findTag = (tag_id: string): [string, CategoryInfo] => {
   if (tag_id) {
     for (let catDatumKey in dataStore.catData[props.platform]) {
-      const found = dataStore.catData[props.platform][catDatumKey].tag_list.find(
+      const found = dataStore.catData[props.platform][catDatumKey].category_list.find(
         (item) => item.id === tag_id,
       );
       if (found) {
@@ -201,14 +207,14 @@ const findTag = (tag_id: string): [string, TagInfo] => {
 
   return [
     dataStore.catData[props.platform][0]?.name,
-    dataStore.catData[props.platform][0]?.tag_list[0],
+    dataStore.catData[props.platform][0]?.category_list[0],
   ];
 };
 
 onMounted(async () => {
   await dataStore.getPlaylistCatList(props.platform);
 
-  [group_name.value, currentTag.value] = findTag(tag_id.value || "");
+  [group_name.value, currentTag.value] = findTag(props.category_id || "");
   // 获取歌单
   await getAllCatlistPlaylist();
 });

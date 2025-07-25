@@ -77,18 +77,18 @@
               <!--                <SvgIcon name="Time" :depth="3" />-->
               <!--                <n-text>{{ formatTimestamp(playlistDetailData.createTime) }}</n-text>-->
               <!--              </div>-->
-              <div v-if="playlistDetailData.tags?.length" class="item">
+              <div v-if="playlistDetailData.categories?.length" class="item">
                 <SvgIcon name="Tag" :depth="3" />
                 <n-flex class="tags">
                   <n-tag
-                    v-for="item in playlistDetailData.tags"
+                    v-for="item in playlistDetailData.categories"
                     :key="`${item.platform}-${item.id}`"
                     :bordered="false"
                     round
                     @click="
                       router.push({
                         name: 'playlist-square',
-                        query: { platform: item.platform, tag_id: item.id },
+                        query: { platform: item.platform, category_id: item.id },
                       })
                     "
                   >

@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { SongInfo, SongInfoSingerInfo } from "@/types/main.hemusic";
+import { SongInfo, SongInfoArtistInfo } from "@/types/main.hemusic";
 import { usePlatformStore, useSettingStore } from "@/stores";
 import { searchResultHemusic } from "@/api/search";
 import { uniq } from "lodash-es";
@@ -37,7 +37,7 @@ const settingStore = useSettingStore();
 const platformStore = usePlatformStore();
 
 const props = defineProps<{
-  artist: SongInfo["singers"];
+  artist: SongInfo["artists"];
   platform: string;
 }>();
 
@@ -47,7 +47,7 @@ const emit = defineEmits<{
 
 const router = useRouter();
 
-const artistData = ref<SongInfoSingerInfo[]>([]);
+const artistData = ref<SongInfoArtistInfo[]>([]);
 
 // 获取歌手信息
 const getArtistData = async () => {
@@ -80,7 +80,7 @@ const getArtistData = async () => {
         10,
         1,
         props.platform || platform?.id || "",
-        "singer",
+        "artist",
       );
       setArtistData(result.list, name);
     } else {
@@ -101,7 +101,7 @@ const getArtistData = async () => {
           10,
           1,
           props.platform || platform?.id || "",
-          "singers",
+          "artist",
         );
         setArtistData(result.list, name);
       });

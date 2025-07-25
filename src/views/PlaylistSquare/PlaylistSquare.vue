@@ -17,8 +17,8 @@
       >
         <PlaylistSquareResult
           :platform="platform.id"
-          v-model:tag_id="tag_id"
-          @update:tag_id="tagChange"
+          :category_id="category_id"
+          @change="tagChange"
         />
       </n-tab-pane>
     </n-tabs>
@@ -40,7 +40,7 @@ const supportPlatforms = computed<PlatformInfo[]>(
 );
 // 搜索分类
 const platform = computed<string>(() => router.currentRoute.value.query.platform as string);
-const tag_id = computed<string>(() => router.currentRoute.value.query.tag_id as string);
+const category_id = computed<string>(() => router.currentRoute.value.query.category_id as string);
 
 const platformChange = (value: string) => {
   router.replace({
@@ -51,12 +51,12 @@ const platformChange = (value: string) => {
   });
 };
 
-const tagChange = (tag_id: string) => {
+const tagChange = (category_id: string) => {
   router.replace({
     name: "playlist-square",
     query: {
       platform: platform.value,
-      tag_id: tag_id,
+      category_id: category_id,
     },
   });
 };

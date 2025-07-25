@@ -93,7 +93,7 @@ const typeNameMap = computed(() => ({
   song: t("common.song"),
   playlist: t("common.playlist"),
   album: t("common.album"),
-  singer: t("common.artist"),
+  artist: t("common.artist"),
   mv: t("common.video"),
 }));
 
@@ -162,7 +162,7 @@ const toJump = () => {
     case "album":
       router.push({ name: "album", query });
       break;
-    case "singer":
+    case "artist":
       router.push({ name: "artist", query });
       break;
     case "mv":

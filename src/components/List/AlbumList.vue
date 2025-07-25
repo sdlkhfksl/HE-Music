@@ -63,14 +63,14 @@
                 }}</n-text>
               </div>
               <!-- 歌手 -->
-              <template v-if="item.singers">
-                <div v-if="Array.isArray(item.singers)" class="artists text-hidden">
-                  <n-text v-for="(ar, arIndex) in item.singers" :key="arIndex" class="ar">
+              <template v-if="item.artists">
+                <div v-if="Array.isArray(item.artists)" class="artists text-hidden">
+                  <n-text v-for="(ar, arIndex) in item.artists" :key="arIndex" class="ar">
                     {{ ar.name || t("common.unknown_artist") }}
                   </n-text>
                 </div>
                 <div v-else class="artists text-hidden">
-                  <n-text class="ar"> {{ item.singers || t("common.unknown_artist") }} </n-text>
+                  <n-text class="ar"> {{ item.artists || t("common.unknown_artist") }}</n-text>
                 </div>
               </template>
             </div>

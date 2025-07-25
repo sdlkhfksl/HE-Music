@@ -78,7 +78,7 @@ export const openUserLogin = (showTip: boolean = false) => {
 };
 
 // 跳转到歌手
-export const openJumpArtist = (platform: string, data: SongInfo["singers"]) => {
+export const openJumpArtist = (platform: string, data: SongInfo["artists"]) => {
   const platformStore = usePlatformStore();
   if (!platformStore.isFeatureSupport(platform, FeatureSupportFlag.GetSingerInfo)) {
     return;

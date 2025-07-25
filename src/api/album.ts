@@ -13,7 +13,7 @@ export const albumDetail = (id: string, platform: string) => {
 
 export const newAlbumTabs = (platform: string) => {
   return requestHemusic({
-    url: "/v1/album/new/tab",
+    url: "/v1/album/new/tabs",
     params: { platform },
   });
 };
@@ -24,7 +24,7 @@ export const newAlbums = (
   page_size: number = 30,
 ) => {
   return requestHemusic({
-    url: "/v1/album/new",
+    url: "/v1/album/tab/news",
     params: { platform, tab_id, page_size, page_index },
   });
 };

@@ -39,7 +39,7 @@ const dropdownOptions = ref<DropdownOption[]>([]);
 const openDropdown = async (
   e: MouseEvent,
   item: CoverType,
-  type: "playlist" | "album" | "video" | "top",
+  type: "playlist" | "album" | "video" | "ranking",
 ) => {
   try {
     console.log(item, type);

@@ -159,7 +159,7 @@ class Player {
   private async getUnlockSongUrl(songData: SongInfo): Promise<string | null> {
     try {
       const songId = songData.id;
-      const artist = Array.isArray(songData.singers) ? songData.singers[0].name : songData.singers;
+      const artist = Array.isArray(songData.artists) ? songData.artists[0].name : songData.artists;
       const keyWord = songData.name + "-" + artist;
       if (!songId || !keyWord) return null;
       // 尝试解锁
@@ -317,9 +317,9 @@ class Player {
     // 获取数据
     const metaData: MediaMetadataInit = {
       title: playSongData.name,
-      artist: Array.isArray(playSongData.singers)
-        ? playSongData.singers.map((item) => item.name).join(" / ")
-        : String(playSongData.singers),
+      artist: Array.isArray(playSongData.artists)
+        ? playSongData.artists.map((item) => item.name).join(" / ")
+        : String(playSongData.artists),
       album:
         typeof playSongData.album === "object"
           ? playSongData.album.name
@@ -479,9 +479,9 @@ class Player {
     // 标题
     const title = `${playSongData.name}`;
     // 歌手
-    const artist = Array.isArray(playSongData.singers)
-      ? playSongData.singers.map((artists: { name: string }) => artists.name).join(sep)
-      : String(playSongData?.singers || t("common.unknown_artist"));
+    const artist = Array.isArray(playSongData.artists)
+      ? playSongData.artists.map((artists: { name: string }) => artists.name).join(sep)
+      : String(playSongData?.artists || t("common.unknown_artist"));
     return `${title} - ${artist}`;
   }
 

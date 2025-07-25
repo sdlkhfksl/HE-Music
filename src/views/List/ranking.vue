@@ -162,14 +162,14 @@
 
 <script setup lang="ts">
 import type { DropdownOption, MessageReactive } from "naive-ui";
-import { topInfo } from "@/api/playlist";
+import { getRanking } from "@/api/playlist";
 import { coverLoaded, fuzzySearch, renderIcon } from "@/utils/helper";
 import { renderToolbar } from "@/utils/meta";
 import { debounce } from "lodash-es";
 import { useStatusStore } from "@/stores";
 import { openBatchList } from "@/utils/modal";
 import player from "@/utils/player";
-import { SongInfo, TopInfo } from "@/types/main.hemusic";
+import { SongInfo, RankingInfo } from "@/types/main.hemusic";
 import { computed } from "vue";
 import SongList from "@/components/List/SongList.vue";
 import { useI18n } from "vue-i18n";
@@ -185,7 +185,7 @@ const songPageIndex = ref<number>(1);
 
 // 歌单数据
 const playlistData = shallowRef<SongInfo[]>([]);
-const playlistDetailData = ref<TopInfo | null>(null);
+const playlistDetailData = ref<RankingInfo | null>(null);
 
 // 模糊搜索数据
 const searchValue = ref<string>("");
@@ -258,7 +258,7 @@ const resetPlaylistData = () => {
 const handleOnlinePlaylist = async (id: string, platform: string) => {
   songLoading.value = true;
   // 获取歌单详情
-  const detail = await topInfo(id, platform, songPageIndex.value, 100);
+  const detail = await getRanking(id, platform, songPageIndex.value, 100);
   if (songPageIndex.value == 1) {
     playlistDetailData.value = detail;
   }

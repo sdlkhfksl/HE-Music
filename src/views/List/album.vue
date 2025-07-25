@@ -48,12 +48,12 @@
               <div class="item">
                 <SvgIcon name="Person" :depth="3" />
                 <div
-                  v-if="Array.isArray(albumDetailData.singers)"
+                  v-if="Array.isArray(albumDetailData.artists)"
                   class="artists text-hidden"
-                  @click="openJumpArtist(albumDetailData.platform, albumDetailData.singers)"
+                  @click="openJumpArtist(albumDetailData.platform, albumDetailData.artists)"
                 >
                   <n-text
-                    v-for="(ar, arIndex) in albumDetailData.singers"
+                    v-for="(ar, arIndex) in albumDetailData.artists"
                     :key="arIndex"
                     class="ar"
                   >
@@ -63,10 +63,10 @@
                 <div
                   v-else
                   class="artists text-hidden"
-                  @click="openJumpArtist(albumDetailData.platform, albumDetailData.singers || '')"
+                  @click="openJumpArtist(albumDetailData.platform, albumDetailData.artists || '')"
                 >
                   <n-text class="ar">
-                    {{ albumDetailData.singers || t("common.unknown_artist") }}
+                    {{ albumDetailData.artists || t("common.unknown_artist") }}
                   </n-text>
                 </div>
               </div>

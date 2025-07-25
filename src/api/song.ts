@@ -85,7 +85,7 @@ export const songDynamicCover = (id: number) => {
 
 export const newSongTabs = (platform: string) => {
   return requestHemusic({
-    url: "/v1/song/new/tab",
+    url: "/v1/song/new/tabs",
     params: { platform },
   });
 };
@@ -96,7 +96,7 @@ export const newSongs = (
   page_size: number = 30,
 ) => {
   return requestHemusic({
-    url: "/v1/song/new",
+    url: "/v1/song/tab/news",
     params: { platform, tab_id, page_size, page_index },
   });
 };

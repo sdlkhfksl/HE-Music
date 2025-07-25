@@ -55,14 +55,14 @@
               <!-- 信息 -->
               <div class="data">
                 <n-text class="name text-hidden">{{ songData.name }}</n-text>
-                <div v-if="Array.isArray(songData?.singers)" class="artists">
-                  <n-text v-for="ar in songData.singers" :key="ar.id" depth="3" class="ar">
+                <div v-if="Array.isArray(songData?.artists)" class="artists">
+                  <n-text v-for="ar in songData.artists" :key="ar.id" depth="3" class="ar">
                     {{ ar.name }}
                   </n-text>
                 </div>
                 <div v-else class="artists">
                   <n-text class="ar" depth="3">
-                    {{ songData?.singers || t("common.unknown_artist") }}
+                    {{ songData?.artists || t("common.unknown_artist") }}
                   </n-text>
                 </div>
               </div>

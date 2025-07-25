@@ -79,12 +79,12 @@
 </template>
 
 <script setup lang="ts">
-import { SingerInfo, UserFavouriteSingerInfo } from "@/types/main.hemusic";
+import { ArtistInfo, UserFavouriteArtistInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 interface Props {
-  data: SingerInfo[] | UserFavouriteSingerInfo[];
+  data: ArtistInfo[] | UserFavouriteArtistInfo[];
   cols?: string;
   loadMore?: boolean;
   loading?: boolean;

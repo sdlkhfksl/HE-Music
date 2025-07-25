@@ -23,7 +23,7 @@ export interface Link {
   url: string;
 }
 
-export interface SingerInfo {
+export interface ArtistInfo {
   id: string;
   name: string;
   cover: string;
@@ -42,7 +42,7 @@ export interface SongInfo {
   duration: number;
   mv_id: string;
   album: SongInfoAlbumInfo | string;
-  singers?: SongInfoSingerInfo[] | string;
+  artists?: SongInfoArtistInfo[] | string;
   links: Link[];
   platform: string;
   cover: string;
@@ -65,14 +65,14 @@ export interface PlaylistInfo extends CoverType {
   songs: SongInfo[];
   platform: string;
   description: string;
-  tags: TagInfo[];
+  categories: CategoryInfo[];
 }
 
 export interface AlbumInfo extends CoverType {
   name: string;
   id: string;
   cover: string;
-  singers: SongInfoSingerInfo[];
+  artists: SongInfoArtistInfo[];
   song_count: string;
   publish_time: string;
   songs: SongInfo[];
@@ -126,7 +126,7 @@ export interface CommentInfo {
   sub_page_index: number;
 }
 
-export interface TopInfo extends CoverType {
+export interface RankingInfo extends CoverType {
   name: string;
   id: string;
   cover: string;
@@ -141,19 +141,19 @@ export interface TopInfo extends CoverType {
   has_more: boolean;
 }
 
-export interface TagGroupInfo {
+export interface CategoryGroupInfo {
   name: string;
-  tag_list: TagInfo[];
+  category_list: CategoryInfo[];
 }
 
-export interface TagInfo {
+export interface CategoryInfo {
   //70后
   name: string;
   id: string;
   platform: string;
 }
 
-export interface SongInfoSingerInfo {
+export interface SongInfoArtistInfo {
   id: string;
   name: string;
 }
@@ -202,11 +202,11 @@ export interface UserFavouriteAlbumInfo extends AlbumInfo {
   name: string;
   id: string;
   cover: string;
-  singers: SongInfoSingerInfo[];
+  artists: SongInfoArtistInfo[];
   platform: string;
 }
 
-export interface UserFavouriteSingerInfo extends SingerInfo {
+export interface UserFavouriteArtistInfo extends ArtistInfo {
   name: string;
   id: string;
   cover: string;

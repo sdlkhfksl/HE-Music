@@ -1,11 +1,11 @@
 import {
   likeAlbum,
   likePlaylist,
-  likeSinger,
+  likeArtist,
   likeSong,
   unlikeAlbum,
   unlikePlaylist,
-  unlikeSinger,
+  unlikeArtist,
   unlikeSong,
   userAccount,
   userFavouriteAlbum,
@@ -20,7 +20,7 @@ import {
   AlbumInfo,
   IDPlatformInfo,
   PlaylistInfo,
-  SingerInfo,
+  ArtistInfo,
   SongInfo,
 } from "@/types/main.hemusic";
 import { deleteSongFromPlaylist, getUserPlaylists } from "@/api/userplaylist";
@@ -207,7 +207,7 @@ export const toLikePlaylist = debounce(
 
 // 收藏/取消收藏歌手
 export const toLikeArtist = debounce(
-  async (info: SingerInfo, like: boolean) => {
+  async (info: ArtistInfo, like: boolean) => {
     if (!info || !info.id || !info.platform) return;
     if (!isLogin()) {
       window.$message.warning(t("message.login_required"));
@@ -215,9 +215,9 @@ export const toLikeArtist = debounce(
     }
     try {
       if (like) {
-        await likeSinger(info.id, info.platform, info.name, info.cover);
+        await likeArtist(info.id, info.platform, info.name, info.cover);
       } else {
-        await unlikeSinger(info.id, info.platform);
+        await unlikeArtist(info.id, info.platform);
       }
       await updateUserLikeArtists();
       window.$message.success(
@@ -245,7 +245,7 @@ export const toLikeAlbum = debounce(
 
     try {
       if (like) {
-        await likeAlbum(info.id, info.platform, info.name, info.cover, info.singers);
+        await likeAlbum(info.id, info.platform, info.name, info.cover, info.artists);
       } else {
         await unlikeAlbum(info.id, info.platform);
       }

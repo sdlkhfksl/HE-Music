@@ -4,13 +4,15 @@
       <div v-if="!loading" class="official-list">
         <n-divider v-if="groupWithSong"> {{ groupWithSong.name }} </n-divider>
         <n-grid v-if="groupWithSong" cols="1 600:2 1000:3" x-gap="20" y-gap="20">
-          <n-gi v-for="(item, index) in groupWithSong.top_list" :key="index">
+          <n-gi v-for="(item, index) in groupWithSong.ranking_list" :key="index">
             <SongListCard
               :cover="item.cover"
               :title="item.name"
               :height="160"
               size="normal"
-              @click="router.push({ name: 'top', query: { id: item.id, platform: item.platform } })"
+              @click="
+                router.push({ name: 'ranking', query: { id: item.id, platform: item.platform } })
+              "
             >
               <template #info>
                 <div
@@ -19,11 +21,11 @@
                   class="song-item text-hidden"
                 >
                   <n-text class="name">{{ songIndex + 1 }}. {{ song.name }}</n-text>
-                  <n-text v-if="Array.isArray(song.singers)" class="desc" depth="3">{{
-                    song.singers?.[0]?.name
+                  <n-text v-if="Array.isArray(song.artists)" class="desc" depth="3">{{
+                    song.artists?.[0]?.name
                   }}</n-text>
                   <n-text v-else class="desc" depth="3">{{
-                    song.singers || t("common.unknown_artist")
+                    song.artists || t("common.unknown_artist")
                   }}</n-text>
                 </div>
               </template>
@@ -33,7 +35,7 @@
 
         <div v-for="(item, idx) in topListData || []" :key="idx">
           <n-divider style="margin-bottom: 0"> {{ item.name }}</n-divider>
-          <TopList :data="item.top_list" />
+          <RankingList :data="item.ranking_list" />
         </div>
       </div>
       <div v-else class="official-list">
@@ -53,9 +55,8 @@
 </template>
 
 <script setup lang="ts">
-import TopList from "@/components/List/TopList.vue";
-import { TopInfo } from "@/types/main.hemusic";
-import { getTopList } from "@/api/playlist";
+import { RankingInfo } from "@/types/main.hemusic";
+import { listRankings } from "@/api/playlist";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
@@ -68,23 +69,23 @@ const props = defineProps<{
 const loading = ref<boolean>(true);
 const groupWithSong = ref<{
   name: string;
-  top_list: TopInfo[];
+  ranking_list: RankingInfo[];
 }>();
 
 // 排行榜数据
 const topListData = ref<
   {
     name: string;
-    top_list: TopInfo[];
+    ranking_list: RankingInfo[];
   }[]
 >();
 
 // 获取排行榜数据
 const getTopPlaylistData = async () => {
   loading.value = true;
-  const { group_list = [] } = await getTopList(props.platform);
+  const { group_list = [] } = await listRankings(props.platform);
 
-  if (group_list?.[0].top_list?.[0].songs?.length > 0) {
+  if (group_list?.[0].ranking_list?.[0].songs?.length > 0) {
     groupWithSong.value = group_list[0];
     group_list.shift();
     topListData.value = group_list;

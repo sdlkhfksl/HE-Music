@@ -156,7 +156,7 @@ import { artistDetail } from "@/api/artist";
 import { useDataStore, usePlatformStore, useSettingStore } from "@/stores";
 import { toLikeArtist } from "@/utils/auth";
 import ArtistSongs from "./songs.vue";
-import { SingerInfo } from "@/types/main.hemusic";
+import { ArtistInfo } from "@/types/main.hemusic";
 import { buildSourceUrl } from "@/api/source";
 import { FeatureSupportFlag } from "@/api/platform";
 import { DropdownOption } from "naive-ui";
@@ -180,7 +180,7 @@ const platform = computed<string>(() => router.currentRoute.value.query.platform
 const artistType = ref<string>((router.currentRoute.value?.name as string) || "artist-songs");
 
 // 歌手数据
-const artistDetailData = ref<SingerInfo | null>(null);
+const artistDetailData = ref<ArtistInfo | null>(null);
 
 // 列表是否滚动
 const listScrolling = ref<boolean>(false);
@@ -194,7 +194,7 @@ const moreOptions = computed<DropdownOption[]>(() => [
     show: platformStore.isFeatureSupport(platform.value, FeatureSupportFlag.BuildSourceUrl),
     props: {
       onClick: async () => {
-        const { url } = await buildSourceUrl(platform.value, artistId.value, "singer");
+        const { url } = await buildSourceUrl(platform.value, artistId.value, "artist");
         window.open(url);
       },
     },

@@ -6,7 +6,7 @@
           <div
             class="cover-item"
             @click="goDetail(item)"
-            @contextmenu="coverMenuRef?.openDropdown($event, item, 'top')"
+            @contextmenu="coverMenuRef?.openDropdown($event, item, 'ranking')"
           >
             <!-- 封面 -->
             <div class="cover">
@@ -86,13 +86,13 @@ import { useMusicStore, useStatusStore } from "@/stores";
 import { debounce } from "lodash-es";
 import CoverMenu from "@/components/Menu/CoverMenu.vue";
 import player from "@/utils/player";
-import { CoverType, TopInfo } from "@/types/main.hemusic";
-import { topInfo } from "@/api/playlist";
+import { CoverType, RankingInfo } from "@/types/main.hemusic";
+import { getRanking } from "@/api/playlist";
 import { useI18n } from "vue-i18n";
 const { t, n } = useI18n();
 
 interface Props {
-  data: TopInfo[];
+  data: RankingInfo[];
   cols?: string;
   loadMore?: boolean;
   loading?: boolean;
@@ -118,13 +118,13 @@ const coverMenuRef = ref<InstanceType<typeof CoverMenu> | null>(null);
 
 // 是否处于当前播放列表
 // 是否处于当前播放列表
-const isPlaying = (item: TopInfo) =>
-  musicStore.isPlayingPlaylist(item.id, item.platform, "top") && statusStore.playStatus;
+const isPlaying = (item: RankingInfo) =>
+  musicStore.isPlayingPlaylist(item.id, item.platform, "ranking") && statusStore.playStatus;
 
 // 查看详情
-const goDetail = (item: TopInfo) => {
+const goDetail = (item: RankingInfo) => {
   router.push({
-    name: "top",
+    name: "ranking",
     query: { id: item.id, platform: item.platform },
   });
 };
@@ -134,15 +134,16 @@ const playList = debounce(
   async (item: CoverType) => {
     try {
       // 是否为当前列表
-      if (musicStore.isPlayingPlaylist(item.id, item.platform, "top")) return player.playOrPause();
+      if (musicStore.isPlayingPlaylist(item.id, item.platform, "ranking"))
+        return player.playOrPause();
       // 开始加载
       item.loading = true;
       // 获取播放列表
-      const list = await topInfo(item.id, item.platform, 1, 1000);
+      const list = await getRanking(item.id, item.platform, 1, 1000);
       player.updatePlayList(list.songs, undefined, {
         id: item.id,
         platform: item.platform,
-        type: "top",
+        type: "ranking",
       });
     } catch (error) {
       console.log("Error to play: ", error);

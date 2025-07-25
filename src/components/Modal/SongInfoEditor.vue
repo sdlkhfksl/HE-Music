@@ -24,9 +24,9 @@
                 clearable
               />
             </n-form-item>
-            <n-form-item :label="t('common.artist')" path="singer">
+            <n-form-item :label="t('common.artist')" path="artist">
               <n-input
-                v-model:value="infoFormData.singer"
+                v-model:value="infoFormData.artist"
                 :placeholder="t('modal.artist_placeholder')"
                 clearable
               />
@@ -168,7 +168,7 @@ const emit = defineEmits<{
 interface InfoFormType {
   name: string;
   fileName: string;
-  singer: string;
+  artist: string;
   album: string;
   alia?: string;
   lyric?: string;
@@ -197,7 +197,7 @@ const localEventBus = useEventBus("local");
 
 // 表单数据
 const infoFormRef = ref<FormInst | null>(null);
-const infoFormData = ref<InfoFormType>({ name: "", fileName: "", singer: "", album: "" });
+const infoFormData = ref<InfoFormType>({ name: "", fileName: "", artist: "", album: "" });
 const infoFormRules: FormRules = { name: textRule };
 
 // 封面数据
@@ -220,7 +220,7 @@ const getSongInfo = async () => {
   infoFormData.value = {
     fileName,
     name: common.title || "",
-    singer: common.artists?.join(" / ") || common.artist || "",
+    artist: common.artists?.join(" / ") || common.artist || "",
     album: common.album || "",
     alia: (common.comment?.[0] as string) || "",
     lyric: (common.lyrics?.[0] as unknown as string) || "",
@@ -244,7 +244,7 @@ const onlineMatch = debounce(
       if (!props.song || !infoFormData.value.md5) return;
       const { result } = await matchSong(
         infoFormData.value.name || "",
-        infoFormData.value.singer || "",
+        infoFormData.value.artist || "",
         infoFormData.value.album || "",
         infoFormData.value.duration || 0,
         infoFormData.value.md5,
@@ -260,7 +260,7 @@ const onlineMatch = debounce(
         infoFormData.value = {
           ...infoFormData.value,
           name: songData.name,
-          singer: isArray(songData.artists)
+          artist: isArray(songData.artists)
             ? songData.artists.map((ar: { name: string }) => ar.name).join(" / ")
             : songData.artists,
           album: isObject(songData.album) ? songData.album.name : songData.album,
@@ -304,7 +304,7 @@ const updatePlaySong = (metadata: InfoFormType) => {
   // 更新数据
   const updatedSong = {
     name: metadata.name,
-    singers: metadata.singer,
+    artists: metadata.artist,
     album: metadata.album,
     alia: metadata.alia,
     cover: coverData.value || "",

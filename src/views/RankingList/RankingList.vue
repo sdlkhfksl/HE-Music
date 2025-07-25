@@ -15,19 +15,19 @@
         :disabled="platform.status !== 1"
         display-directive="show:lazy"
       >
-        <TopListResult :platform="platform.id" />
+        <RankingListResult :platform="platform.id" />
       </n-tab-pane>
     </n-tabs>
   </div>
 </template>
 
 <script setup lang="ts">
-import TopListResult from "@/views/TopList/TopListResult.vue";
 import { usePlatformStore } from "@/stores";
 import { onBeforeRouteUpdate } from "vue-router";
 import { FeatureSupportFlag } from "@/api/platform";
 import { computed, onActivated, watch } from "vue";
 import { PlatformInfo } from "@/types/main.hemusic";
+import RankingListResult from "@/views/RankingList/RankingListResult.vue";
 
 const router = useRouter();
 const platformStore = usePlatformStore();
@@ -40,7 +40,7 @@ const platform = computed<string>(() => router.currentRoute.value.query.platform
 
 const platformChange = (value: string) => {
   router.replace({
-    name: "top-list",
+    name: "ranking-list",
     query: {
       platform: value,
     },

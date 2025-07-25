@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { searchResultHemusic } from "@/api/search";
-import { SingerInfo } from "@/types/main.hemusic";
+import { ArtistInfo } from "@/types/main.hemusic";
 import ArtistList from "@/components/List/ArtistList.vue";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
@@ -39,13 +39,13 @@ const hasMore = ref<boolean>(true);
 const loading = ref<boolean>(true);
 const searchPage = ref<number>(1);
 const searchCount = ref<number>(1);
-const searchResultData = ref<SingerInfo[]>([]);
+const searchResultData = ref<ArtistInfo[]>([]);
 
 // 获取搜索结果
 const getSearchResult = async () => {
   // 获取数据
   loading.value = true;
-  searchResultHemusic(props.keyword, 30, searchPage.value, props.platform, "singer")
+  searchResultHemusic(props.keyword, 30, searchPage.value, props.platform, "artist")
     .then((result) => {
       // 是否还有
       hasMore.value = result?.has_more;

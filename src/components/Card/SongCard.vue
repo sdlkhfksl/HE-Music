@@ -81,12 +81,12 @@
             </n-tag>
           </div>
           <!-- 歌手 -->
-          <div v-if="Array.isArray(song.singers)" class="artists text-hidden">
+          <div v-if="Array.isArray(song.artists)" class="artists text-hidden">
             <n-text
-              v-for="ar in song.singers"
+              v-for="ar in song.artists"
               :key="ar.id"
               class="ar"
-              @click="openJumpArtist(song.platform, song.singers)"
+              @click="openJumpArtist(song.platform, song.artists)"
             >
               {{ ar.name }}
             </n-text>
@@ -97,9 +97,9 @@
           <div
             v-else
             class="artists text-hidden"
-            @click="openJumpArtist(song.platform, song.singers)"
+            @click="openJumpArtist(song.platform, song.artists)"
           >
-            <n-text class="ar"> {{ song.singers || t("unknown_artist") }} </n-text>
+            <n-text class="ar"> {{ song.artists || t("common.unknown_artist") }} </n-text>
           </div>
           <!--别名-->
           <n-text v-if="song.subtitle" class="alia text-hidden" depth="3">{{

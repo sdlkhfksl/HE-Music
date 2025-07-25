@@ -80,12 +80,12 @@
             />
             <!-- 歌手 -->
             <div v-else class="artists">
-              <template v-if="Array.isArray(musicStore.playSong.singers)">
+              <template v-if="Array.isArray(musicStore.playSong.artists)">
                 <n-text
-                  v-for="(item, index) in musicStore.playSong.singers"
+                  v-for="(item, index) in musicStore.playSong.artists"
                   :key="index"
                   class="ar-item"
-                  @click="openJumpArtist(musicStore.playSong.platform, musicStore.playSong.singers)"
+                  @click="openJumpArtist(musicStore.playSong.platform, musicStore.playSong.artists)"
                 >
                   {{ item.name }}
                 </n-text>
@@ -93,9 +93,9 @@
               <n-text
                 v-else
                 class="ar-item"
-                @click="openJumpArtist(musicStore.playSong.platform, musicStore.playSong.singers)"
+                @click="openJumpArtist(musicStore.playSong.platform, musicStore.playSong.artists)"
               >
-                {{ musicStore.playSong.singers || t("common.unknown_artist") }}
+                {{ musicStore.playSong.artists || t("common.unknown_artist") }}
               </n-text>
             </div>
           </Transition>

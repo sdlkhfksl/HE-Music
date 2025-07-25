@@ -65,10 +65,6 @@ serverHemusic.interceptors.response.use(
     switch (response?.status) {
       case 400:
         console.error("客户端错误：", response.status, response.statusText);
-        if (response && (response.data as { reason?: string }).reason === "CAPTCHA_REQUIRED") {
-          const { metadata } = response.data as { metadata: { scene: string; meta: string } };
-          openCaptcha(Number(metadata.scene), metadata.meta);
-        }
         // 执行客户端错误的处理逻辑
         break;
       case 401:
@@ -78,6 +74,10 @@ serverHemusic.interceptors.response.use(
         break;
       case 403:
         console.error("禁止访问：", response.status, response.statusText);
+        if (response && (response.data as { reason?: string }).reason === "CAPTCHA_REQUIRED") {
+          const { metadata } = response.data as { metadata: { scene: string; meta: string } };
+          openCaptcha(Number(metadata.scene), metadata.meta);
+        }
         // 执行禁止访问的处理逻辑
         break;
       case 404:

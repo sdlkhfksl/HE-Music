@@ -122,10 +122,10 @@ const tableData = computed<DataType[]>(() =>
     id: song?.id,
     platform: song?.platform,
     name: song?.name,
-    artists: isArray(song?.singers)
+    artists: isArray(song?.artists)
       ? // 拼接歌手
-        song?.singers.map((ar: { name: string }) => ar.name).join(" / ")
-      : song?.singers || t("common.unknown_artist"),
+        song?.artists.map((ar: { name: string }) => ar.name).join(" / ")
+      : song?.artists || t("common.unknown_artist"),
     album: isObject(song?.album) ? song?.album.name : song?.album || "-",
     // 原始数据
     origin: song,
