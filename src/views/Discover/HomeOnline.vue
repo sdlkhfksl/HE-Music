@@ -75,35 +75,35 @@ interface RecItemType {
 }
 
 interface RecDataType {
-  new_song_list: RecItemType;
-  new_album_list: RecItemType;
-  featured_mv_list: RecItemType;
-  featured_playlist_list: RecItemType;
+  new_song: RecItemType;
+  new_album: RecItemType;
+  featured_mv: RecItemType;
+  featured_playlist: RecItemType;
 }
 
 const loading = ref(true);
 
 // 推荐数据
 const pageData = ref<RecDataType>({
-  new_song_list: {
+  new_song: {
     name: computed(() => t("discover.new_song")),
     list: [] as SongInfo[],
     type: "song",
     path: "new-song",
   },
-  new_album_list: {
+  new_album: {
     name: computed(() => t("discover.new_album")),
     list: [] as AlbumInfo[],
     type: "album",
     path: "new-album",
   },
-  featured_mv_list: {
+  featured_mv: {
     name: computed(() => t("discover.featured_videos")),
     list: [] as MVInfo[],
     type: "video",
     cols: "2 600:2 800:3 900:4 1200:5 1400:6",
   },
-  featured_playlist_list: {
+  featured_playlist: {
     name: computed(() => t("discover.featured_playlist")),
     type: "playlist",
     list: [] as PlaylistInfo[],
@@ -114,10 +114,10 @@ const pageData = ref<RecDataType>({
 const getAllDiscoverData = async () => {
   try {
     const res = await discoverPage(props.platform);
-    pageData.value.new_song_list.list = res.new_song_list;
-    pageData.value.new_album_list.list = res.new_album_list;
-    pageData.value.featured_mv_list.list = res.featured_mv_list;
-    pageData.value.featured_playlist_list.list = res.featured_playlist_list;
+    pageData.value.new_song.list = res.new_songs;
+    pageData.value.new_album.list = res.new_albums;
+    pageData.value.featured_mv.list = res.featured_mvs;
+    pageData.value.featured_playlist.list = res.featured_playlists;
   } catch (error) {
     console.error("Error getting discover page:", error);
   }

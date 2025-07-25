@@ -71,7 +71,7 @@
         >
           <n-flex class="cat-list">
             <n-tag
-              v-for="(cat, catIndex) in item?.category_list || []"
+              v-for="(cat, catIndex) in item?.categories || []"
               :key="catIndex"
               :bordered="false"
               :class="{ choose: currentTag?.id === cat.id }"
@@ -196,7 +196,7 @@ const resetData = () => {
 const findTag = (tag_id: string): [string, CategoryInfo] => {
   if (tag_id) {
     for (let catDatumKey in dataStore.catData[props.platform]) {
-      const found = dataStore.catData[props.platform][catDatumKey].category_list.find(
+      const found = dataStore.catData[props.platform][catDatumKey].categories.find(
         (item) => item.id === tag_id,
       );
       if (found) {
@@ -207,7 +207,7 @@ const findTag = (tag_id: string): [string, CategoryInfo] => {
 
   return [
     dataStore.catData[props.platform][0]?.name,
-    dataStore.catData[props.platform][0]?.category_list[0],
+    dataStore.catData[props.platform][0]?.categories[0],
   ];
 };
 

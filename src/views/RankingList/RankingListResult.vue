@@ -4,7 +4,7 @@
       <div v-if="!loading" class="official-list">
         <n-divider v-if="groupWithSong"> {{ groupWithSong.name }} </n-divider>
         <n-grid v-if="groupWithSong" cols="1 600:2 1000:3" x-gap="20" y-gap="20">
-          <n-gi v-for="(item, index) in groupWithSong.ranking_list" :key="index">
+          <n-gi v-for="(item, index) in groupWithSong.rankings" :key="index">
             <SongListCard
               :cover="item.cover"
               :title="item.name"
@@ -35,7 +35,7 @@
 
         <div v-for="(item, idx) in topListData || []" :key="idx">
           <n-divider style="margin-bottom: 0"> {{ item.name }}</n-divider>
-          <RankingList :data="item.ranking_list" />
+          <RankingList :data="item.rankings" />
         </div>
       </div>
       <div v-else class="official-list">
@@ -69,28 +69,28 @@ const props = defineProps<{
 const loading = ref<boolean>(true);
 const groupWithSong = ref<{
   name: string;
-  ranking_list: RankingInfo[];
+  rankings: RankingInfo[];
 }>();
 
 // 排行榜数据
 const topListData = ref<
   {
     name: string;
-    ranking_list: RankingInfo[];
+    rankings: RankingInfo[];
   }[]
 >();
 
 // 获取排行榜数据
 const getTopPlaylistData = async () => {
   loading.value = true;
-  const { group_list = [] } = await listRankings(props.platform);
+  const { groups = [] } = await listRankings(props.platform);
 
-  if (group_list?.[0].ranking_list?.[0].songs?.length > 0) {
-    groupWithSong.value = group_list[0];
-    group_list.shift();
-    topListData.value = group_list;
+  if (groups?.[0].rankings?.[0].songs?.length > 0) {
+    groupWithSong.value = groups[0];
+    groups.shift();
+    topListData.value = groups;
   } else {
-    topListData.value = group_list;
+    topListData.value = groups;
   }
 
   loading.value = false;

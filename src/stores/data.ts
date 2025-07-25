@@ -252,7 +252,7 @@ export const useDataStore = defineStore("data", {
       // 获取歌单分类
       try {
         const res = await playlistCategories(platform);
-        this.catData[platform] = res.group_list;
+        this.catData[platform] = res.groups;
       } catch (error) {
         console.error("Error getting playlist cat list:", error);
         throw error;

@@ -143,7 +143,7 @@ export interface RankingInfo extends CoverType {
 
 export interface CategoryGroupInfo {
   name: string;
-  category_list: CategoryInfo[];
+  categories: CategoryInfo[];
 }
 
 export interface CategoryInfo {
