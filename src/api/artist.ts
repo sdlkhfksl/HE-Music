@@ -1,29 +1,33 @@
-import request, { requestHemusic } from "@/utils/request";
+import { requestHemusic } from "@/utils/request";
 
 /**
  * 歌手分类列表
- * @param {number} type - 歌手类型（-1:全部 1:男歌手 2:女歌手 3:乐队）
- * @param {number} area - 歌手区域（-1:全部 7:华语 96:欧美 8:日本 16:韩国 0:其他）
- * @param {number|string} initial - 首字母索引查找参数
- * @param {number} [offset=0] - 偏移数量，默认 0
- * @param {number} [limit=50] - 返回数量，默认 50
  */
-export const artistTypeList = (
-  type: number = -1,
-  area: number = -1,
-  initial: number | string = -1,
-  offset: number = 0,
-  limit: number = 50,
+export const tabArtists = (
+  platform: string = "",
+  page_index: number = 0,
+  page_size: number = 50,
+  filters: Record<string, string> = {},
 ) => {
-  return request({
-    url: "/artist/list",
+  return requestHemusic({
+    url: "/v1/artist/tab/artists",
     params: {
-      type,
-      area,
-      initial,
-      offset,
-      limit,
+      platform,
+      page_index,
+      page_size,
+      filters,
     },
+  });
+};
+
+/**
+ * 获取歌手详情
+ * @param platform
+ */
+export const artistTabs = (platform: string) => {
+  return requestHemusic({
+    url: "/v1/artist/tabs",
+    params: { platform },
   });
 };
 
@@ -65,7 +69,7 @@ export const artistAllSongs = (
  * @param page_index
  * @param page_size
  */
-export const artistAblums = (
+export const artistAlbums = (
   id: string,
   platform: string,
   page_index: number = 1,

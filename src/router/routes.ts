@@ -75,6 +75,12 @@ const routes: Array<RouteRecordRaw> = [
       else next();
     },
   },
+  {
+    path: "/artists",
+    name: "artists",
+    component: () => import("@/views/Artists/Artists.vue"),
+  },
+
   // 歌手
   {
     path: "/artist",

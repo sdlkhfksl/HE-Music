@@ -3,7 +3,14 @@ import type { CoverType, UserLikeDataType } from "@/types/main";
 import { playlistCategories } from "@/api/playlist";
 import { cloneDeep, isEmpty } from "lodash-es";
 import localforage from "localforage";
-import { SongInfo, CategoryGroupInfo, UserInfo, UserPlaylistInfo } from "@/types/main.hemusic";
+import {
+  SongInfo,
+  CategoryGroupInfo,
+  UserInfo,
+  UserPlaylistInfo,
+  ArtistTabInfo,
+} from "@/types/main.hemusic";
+import { artistTabs } from "@/api/artist";
 
 interface ListState {
   playList: SongInfo[];
@@ -17,7 +24,8 @@ interface ListState {
   token: string;
   userLikeData: UserLikeDataType;
   userCreatedPlaylist: UserPlaylistInfo[]; //用户创建的歌单
-  catData: Record<string, CategoryGroupInfo[]>;
+  playlistCategories: Record<string, CategoryGroupInfo[]>;
+  artistTabs: Record<string, ArtistTabInfo[]>;
 }
 
 type UserDataKeys = keyof ListState["userLikeData"];
@@ -68,7 +76,8 @@ export const useDataStore = defineStore("data", {
       mvs: [],
     },
     // 分类数据
-    catData: {},
+    playlistCategories: {},
+    artistTabs: {},
   }),
   getters: {
     // 是否为喜欢歌曲
@@ -247,14 +256,26 @@ export const useDataStore = defineStore("data", {
       }
     },
     // 获取歌单分类
-    async getPlaylistCatList(platform: string) {
-      if (!isEmpty(this.catData[platform])) return;
+    async getPlaylistCategories(platform: string) {
+      if (!isEmpty(this.playlistCategories[platform])) return;
       // 获取歌单分类
       try {
         const res = await playlistCategories(platform);
-        this.catData[platform] = res.groups;
+        this.playlistCategories[platform] = res.groups;
       } catch (error) {
         console.error("Error getting playlist cat list:", error);
+        throw error;
+      }
+    },
+    // 获取歌手分类
+    async getArtistTabs(platform: string) {
+      if (!isEmpty(this.artistTabs[platform])) return;
+      // 获取歌单分类
+      try {
+        const res = await artistTabs(platform);
+        this.artistTabs[platform] = res.tabs;
+      } catch (error) {
+        console.error("Error getting artist tab list:", error);
         throw error;
       }
     },

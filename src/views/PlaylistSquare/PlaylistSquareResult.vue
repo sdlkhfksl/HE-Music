@@ -64,7 +64,7 @@
       </template>
       <n-tabs type="segment" animated>
         <n-tab-pane
-          v-for="(item, index) in dataStore.catData[platform] || []"
+          v-for="(item, index) in dataStore.playlistCategories[platform] || []"
           :key="index"
           :name="item.name"
           :tab="item.name"
@@ -195,24 +195,24 @@ const resetData = () => {
 
 const findTag = (tag_id: string): [string, CategoryInfo] => {
   if (tag_id) {
-    for (let catDatumKey in dataStore.catData[props.platform]) {
-      const found = dataStore.catData[props.platform][catDatumKey].categories.find(
+    for (let catDatumKey in dataStore.playlistCategories[props.platform]) {
+      const found = dataStore.playlistCategories[props.platform][catDatumKey].categories.find(
         (item) => item.id === tag_id,
       );
       if (found) {
-        return [dataStore.catData[props.platform][catDatumKey].name, found];
+        return [dataStore.playlistCategories[props.platform][catDatumKey].name, found];
       }
     }
   }
 
   return [
-    dataStore.catData[props.platform][0]?.name,
-    dataStore.catData[props.platform][0]?.categories[0],
+    dataStore.playlistCategories[props.platform][0]?.name,
+    dataStore.playlistCategories[props.platform][0]?.categories[0],
   ];
 };
 
 onMounted(async () => {
-  await dataStore.getPlaylistCatList(props.platform);
+  await dataStore.getPlaylistCategories(props.platform);
 
   [group_name.value, currentTag.value] = findTag(props.category_id || "");
   // 获取歌单

@@ -250,3 +250,14 @@ export interface SearchDefaultInfo {
   key: string;
   description: string;
 }
+
+export interface ArtistTabInfo {
+  id: string;
+  platform: string;
+  options: Option[];
+}
+
+export interface Option {
+  value: string;
+  label: string;
+}

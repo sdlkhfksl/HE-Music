@@ -89,6 +89,16 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
           }),
         },
         {
+          key: "artists",
+          link: "artists",
+          label: t("common.artists"),
+          icon: renderIcon("Artist", {
+            style: {
+              transform: "translateY(-1px)",
+            },
+          }),
+        },
+        {
           key: "divider",
           type: "divider",
         },

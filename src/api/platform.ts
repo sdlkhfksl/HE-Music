@@ -54,6 +54,9 @@ export const FeatureSupportFlag = {
   ParseSourceUrl: 1n << 35n, // 解析来源链接
 
   SearchAudiobook: 1n << 36n, // 搜索有声书
+
+  ListArtistTabs: 1n << 37n, // 获取歌手TAB列表
+  ListTabArtists: 1n << 38n, // 获取TAB歌手列表
 };
 
 // 获取发现页面

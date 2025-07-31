@@ -34,7 +34,7 @@
               <n-text class="name text-hidden">{{ item.name }}</n-text>
               <!-- 数量 -->
 
-              <div class="item">
+              <div v-if="!hiddenItem" class="item">
                 <div v-if="item.song_count" class="num">
                   <SvgIcon name="Music" :depth="3" />
                   <n-text class="num" :depth="3">{{ item.song_count }}</n-text>
@@ -89,6 +89,7 @@ interface Props {
   loadMore?: boolean;
   loading?: boolean;
   loadingText?: string;
+  hiddenItem?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {

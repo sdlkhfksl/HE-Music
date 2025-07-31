@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { artistAblums } from "@/api/artist";
+import { artistAlbums } from "@/api/artist";
 import { AlbumInfo } from "@/types/main.hemusic";
 import AlbumList from "@/components/List/AlbumList.vue";
 
@@ -32,7 +32,7 @@ const getArtistAllAlbums = async () => {
     if (!props.id || !props.platform) return;
     loading.value = true;
     // 获取数据
-    const result = await artistAblums(props.id, props.platform, albumPageIndex.value, 50);
+    const result = await artistAlbums(props.id, props.platform, albumPageIndex.value, 50);
     // 是否还有
     hasMore.value = result?.has_more;
     albumData.value = albumData.value.concat(result.list);
