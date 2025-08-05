@@ -81,6 +81,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/views/Artists/Artists.vue"),
   },
 
+  {
+    path: "/radios",
+    name: "radios",
+    component: () => import("@/views/Radios/Radios.vue"),
+  },
+
   // 歌手
   {
     path: "/artist",

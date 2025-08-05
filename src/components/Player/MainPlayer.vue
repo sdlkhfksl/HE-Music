@@ -105,7 +105,11 @@
     <!-- 控制 -->
     <div class="play-control">
       <!-- 上一曲 -->
-      <div class="play-icon" v-debounce="() => player.nextOrPrev('prev')">
+      <div
+        v-if="!statusStore.radioMode"
+        class="play-icon"
+        v-debounce="() => player.nextOrPrev('prev')"
+      >
         <SvgIcon :size="26" name="SkipPrev" />
       </div>
       <!-- 播放暂停 -->
@@ -137,7 +141,12 @@
     </div>
     <!-- 功能 -->
     <Transition name="fade" mode="out-in">
-      <n-flex :key="'normal'" :size="[8, 0]" class="play-menu" justify="end">
+      <n-flex
+        :key="statusStore.radioMode ? 'fm' : 'normal'"
+        :size="[8, 0]"
+        class="play-menu"
+        justify="end"
+      >
         <!-- 播放时间 -->
         <div class="time">
           <n-text depth="2">{{ secondsToTime(statusStore.currentTime) }}</n-text>
@@ -159,6 +168,7 @@
         </n-dropdown>
         <!-- 播放模式 -->
         <n-dropdown
+          v-if="!statusStore.radioMode"
           :options="playModeOptions"
           :show-arrow="true"
           @select="(mode) => player.togglePlayMode(mode)"
@@ -189,6 +199,7 @@
         </n-popover>
         <!-- 播放列表 -->
         <n-badge
+          v-if="!statusStore.radioMode"
           :value="dataStore.playList?.length ?? 0"
           :show="settingStore.showPlaylistCount"
           :max="999"

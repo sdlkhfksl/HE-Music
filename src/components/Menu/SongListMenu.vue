@@ -83,7 +83,7 @@ const openDropdown = (
         {
           key: "play-next",
           label: t("menu.play_next"),
-          show: !isCurrent,
+          show: !isCurrent && !statusStore.radioMode,
           props: {
             onClick: () => player.addNextSong(song, false),
           },

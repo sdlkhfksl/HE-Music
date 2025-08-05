@@ -17,6 +17,14 @@ interface MusicState {
     lrcAMData: LyricLine[];
     yrcAMData: LyricLine[];
   };
+  // 电台
+  radio: {
+    id: string;
+    platform: string;
+    list: SongInfo[];
+    playIndex: number;
+    pageIndex: number;
+  };
 }
 
 // 默认音乐数据
@@ -49,6 +57,13 @@ export const useMusicStore = defineStore("music", {
       yrcData: [], // 逐字歌词
       lrcAMData: [], // 普通歌词-AM
       yrcAMData: [], // 逐字歌词-AM
+    },
+    radio: {
+      id: "", // 电台id
+      platform: "", // 电台平台
+      list: [], // 电台歌曲
+      playIndex: 0, // 电台播放索引
+      pageIndex: 1, // 电台页码
     },
   }),
   getters: {
@@ -84,6 +99,11 @@ export const useMusicStore = defineStore("music", {
       (size: number = 300): string => {
         return state.playSong.path ? state.playSong.cover : getSizeCover(state.playSong, size);
       },
+
+    // 电台歌曲
+    radioSong(state): SongInfo {
+      return state.radio.list?.[state.radio.playIndex] || defaultMusicData;
+    },
   },
   actions: {},
   // 持久化

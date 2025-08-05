@@ -11,6 +11,7 @@ import blob from "./blob";
 import { Link, SongInfo } from "@/types/main.hemusic";
 import { AxiosError } from "axios";
 import { t } from "@/i18n";
+import { listRadioSongs } from "@/api/radio";
 
 // 播放器核心
 // Howler.js
@@ -66,7 +67,13 @@ class Player {
    */
   private getPlaySongData(): SongInfo | null {
     const dataStore = useDataStore();
+    const musicStore = useMusicStore();
     const statusStore = useStatusStore();
+
+    // 若为私人FM
+    if (statusStore.radioMode) {
+      return musicStore.radioSong;
+    }
     // 播放列表
     const playlist = dataStore.playList;
     if (!playlist.length) return null;
@@ -402,6 +409,7 @@ class Player {
    */
   private async errorNext(errCode?: number) {
     const dataStore = useDataStore();
+    const statusStore = useStatusStore();
     // 次数加一
     this.testNumber++;
     if (this.testNumber > 5) {
@@ -417,7 +425,7 @@ class Player {
       return;
     }
     // 播放下一曲
-    if (dataStore.playList.length > 1) {
+    if (dataStore.playList.length > 1 || statusStore.radioMode) {
       await this.nextOrPrev("next");
     } else {
       window.$message.error(t("message.no_playable_song"));
@@ -641,6 +649,12 @@ class Player {
       // 获取数据
       const { playList } = dataStore;
       const { playSongMode } = statusStore;
+
+      // 若为私人FM
+      if (statusStore.radioMode) {
+        await this.nextRadio(false, true);
+        return;
+      }
       // 列表长度
       const playListLength = playList.length;
       // 播放列表是否为空
@@ -868,6 +882,8 @@ class Player {
     if (scrobble) this.scrobbleSong();
     // 更新列表
     await dataStore.setPlayList(cloneDeep(data));
+
+    if (statusStore.radioMode) statusStore.radioMode = false;
     // 是否直接播放
     if (song && typeof song === "object" && "id" in song) {
       // 是否为当前播放歌曲
@@ -907,6 +923,9 @@ class Player {
     const dataStore = useDataStore();
     const musicStore = useMusicStore();
     const statusStore = useStatusStore();
+
+    // 关闭特殊模式
+    if (statusStore.radioMode) statusStore.radioMode = false;
     // 是否为当前播放歌曲
     if (musicStore.playSong.id === song.id && musicStore.playSong.platform === song.platform) {
       this.play();
@@ -996,6 +1015,7 @@ class Player {
     statusStore.$patch({
       playListShow: false,
       showFullPlayer: false,
+      radioMode: false,
       playIndex: -1,
     });
     musicStore.$reset();
@@ -1150,6 +1170,55 @@ class Player {
     }
     // 默认返回第一个
     return songInfo.links[0];
+  }
+
+  /**
+   * 初始化私人FM
+   * @param init 是否初始化
+   * @param playNext 是否播放下一首
+   */
+  async nextRadio(init: boolean = true, playNext: boolean = false) {
+    const musicStore = useMusicStore();
+    const statusStore = useStatusStore();
+    try {
+      // 获取并重置
+      const getPersonalFmData = async () => {
+        const result = await listRadioSongs(
+          musicStore.radio.id,
+          musicStore.radio.platform,
+          musicStore.radio.pageIndex || 1,
+        );
+        console.log(`🌐 radio :`, result.songs);
+        musicStore.radio.playIndex = 0;
+        musicStore.radio.list = result.songs;
+        musicStore.radio.pageIndex = result.page_index || musicStore.radio.pageIndex;
+      };
+      // 若为空
+      if (init || musicStore.radio.list.length === 0) {
+        musicStore.radio.pageIndex = 1;
+        statusStore.radioMode = true;
+        await getPersonalFmData();
+        // 清理并播放
+        this.resetStatus();
+        await this.initPlayer();
+        return;
+      }
+      // 若需播放下一首
+      if (playNext) {
+        // 更改索引
+        if (musicStore.radio.playIndex < musicStore.radio.list.length - 1) {
+          musicStore.radio.playIndex++;
+        } else {
+          musicStore.radio.pageIndex++;
+          await getPersonalFmData();
+        }
+        // 清理并播放
+        this.resetStatus();
+        await this.initPlayer();
+      }
+    } catch (error) {
+      console.error("Failed to initialize radio:", error);
+    }
   }
 }
 

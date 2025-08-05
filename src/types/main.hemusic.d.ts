@@ -261,3 +261,12 @@ export interface Option {
   value: string;
   label: string;
 }
+
+export interface RadioInfo {
+  name: string;
+  id: string;
+  cover: string;
+  platform: string;
+
+  loading: boolean;
+}

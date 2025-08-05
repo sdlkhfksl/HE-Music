@@ -57,6 +57,9 @@ export const FeatureSupportFlag = {
 
   ListArtistTabs: 1n << 37n, // 获取歌手TAB列表
   ListTabArtists: 1n << 38n, // 获取TAB歌手列表
+
+  ListRadios: 1n << 39n, // 获取电台列表
+  ListRadioSongs: 1n << 40n, // 获取电台歌曲列表
 };
 
 // 获取发现页面

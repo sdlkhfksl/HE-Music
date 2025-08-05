@@ -27,7 +27,11 @@
         <div class="center">
           <div class="btn">
             <!-- 上一曲 -->
-            <div class="btn-icon" v-debounce="() => player.nextOrPrev('prev')">
+            <div
+              v-if="!statusStore.radioMode"
+              class="btn-icon"
+              v-debounce="() => player.nextOrPrev('prev')"
+            >
               <SvgIcon :size="26" name="SkipPrev" />
             </div>
             <!-- 播放暂停 -->
@@ -108,7 +112,11 @@
             </div>
           </n-popover>
           <!-- 播放列表 -->
-          <div class="menu-icon" @click.stop="statusStore.playListShow = !statusStore.playListShow">
+          <div
+            v-if="!statusStore.radioMode"
+            class="menu-icon"
+            @click.stop="statusStore.playListShow = !statusStore.playListShow"
+          >
             <SvgIcon name="PlayList" />
           </div>
         </n-flex>

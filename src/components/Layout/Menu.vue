@@ -99,6 +99,16 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
           }),
         },
         {
+          key: "radios",
+          link: "radios",
+          label: t("common.radios"),
+          icon: renderIcon("Radio", {
+            style: {
+              transform: "translateY(-1px)",
+            },
+          }),
+        },
+        {
           key: "divider",
           type: "divider",
         },

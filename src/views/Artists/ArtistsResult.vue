@@ -90,7 +90,7 @@ const loadMore = () => {
 onMounted(async () => {
   await dataStore.getArtistTabs(props.platform);
   dataStore.artistTabs[props.platform]?.forEach((tab) => {
-    filters.value[tab.id] = tab.options[0].value;
+    filters.value[tab.id] = tab.options[0]?.value;
   });
 
   await getArtistListData();
