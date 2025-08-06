@@ -153,9 +153,9 @@ class Player {
     // 是否有播放地址
     if (!songData || !songData?.url) return null;
     // 返回歌曲地址
-    // 客户端直接返回，网页端转 https
-    const url = isElectron ? songData.url : songData.url.replace(/^http:/, "https:");
-    return url;
+    // 都返回 原始地址
+    // const url = isElectron ? songData.url : songData.url.replace(/^http:/, "https:");
+    return songData.url;
   }
 
   /**
