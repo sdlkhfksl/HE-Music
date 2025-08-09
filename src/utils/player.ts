@@ -521,7 +521,7 @@ class Player {
         await this.parseLocalMusicInfo(path);
       }
       // 在线歌曲
-      else if (id && platform && dataStore.playList.length) {
+      else if (id && platform) {
         const link = this.selectPlayQuality(playSongData, quality);
         if (!link) throw new Error("Get song link error");
         statusStore.playQuality = link.name;
