@@ -13,6 +13,8 @@ export interface PlatformInfo {
   feature_support_flag: bigint;
   // 状态
   status: number;
+  // 图片尺寸
+  image_sizes: number[];
 }
 
 export interface Link {

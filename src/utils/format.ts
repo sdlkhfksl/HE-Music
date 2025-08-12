@@ -3,7 +3,7 @@ import { msToTime } from "./time";
 import { flatMap, isArray, uniqBy } from "lodash-es";
 import { SongInfo } from "@/types/main.hemusic";
 import { getCoverUrlStr } from "@/api/song";
-import { useDataStore } from "@/stores";
+import { useDataStore, usePlatformStore } from "@/stores";
 
 type CoverDataType = {
   cover: string;
@@ -247,26 +247,19 @@ export const getSizeCover = (song: SongInfo, size = 300) => {
     return "/images/song.jpg?assest";
   }
 
-  // 如果传的小数 说明要最大的
-  if (size < 0) {
-    size = 1000;
+  const platformStore = usePlatformStore();
+
+  const platformInfo = platformStore.getPlatformInfo(song.platform);
+  const image_sizes = platformInfo?.image_sizes || [];
+  if (image_sizes.length > 0) {
+    // 如果传的小数 说明要最大的
+    if (size < 0) {
+      size = image_sizes[image_sizes.length - 1];
+    } else {
+      size = image_sizes.find((item) => item >= size) || image_sizes[image_sizes.length - 1];
+    }
   }
   const { cover = "", platform, id } = song;
-  switch (platform) {
-    case "tidal":
-      size = [80, 160, 320, 640, 1280].find((item) => item >= size) || 1280;
-      break;
-    case "kugou":
-      size = [120, 240, 480, 720, 1080].find((item) => item >= size) || 1080;
-      break;
-    case "qq":
-      size = [120, 150, 180, 300, 500, 800, 1200, 1500].find((item) => item >= size) || 1500;
-      break;
-    case "joox":
-      size = [100, 300, 500, 1000].find((item) => item >= size) || 1000;
-      break;
-  }
-
   if (cover) {
     return cover.replaceAll("{x}", size.toString()).replaceAll("{y}", size.toString());
   }
