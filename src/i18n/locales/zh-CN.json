@@ -594,7 +594,7 @@
       "song_quality_value_128mp3_tip": "标准音质 128kbps",
       "song_quality_value_192mp3_tip": "较高音质 192kbps",
       "song_quality_value_320mp3_tip": "超高音质 320kbps",
-      "song_quality_value_auto_tip": "自动选择音质 上一曲音质>hires>flac>320mp3>128mp3",
+      "song_quality_value_auto_tip": "自动：{quality}（最后选择）>hires>flac>320mp3>128mp3",
       "song_quality_value_dolby_tip": "杜比全景声音乐，沉浸式聆听体验",
       "song_quality_value_flac_tip": "高保真无损音质，最高 48kHz/16bit",
       "song_quality_value_galaxy_tip": "臻品全景声",

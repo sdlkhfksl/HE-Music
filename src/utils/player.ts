@@ -1124,6 +1124,7 @@ class Player {
   // 切换音质
   async changeQuality(quality: string) {
     const statusStore = useStatusStore();
+    statusStore.selectedQuality = quality;
     if (statusStore.playQuality === quality) return;
     statusStore.playQuality = quality;
     await this.initPlayer(true, statusStore.currentTime, quality);
@@ -1134,6 +1135,7 @@ class Player {
     const settingStore = useSettingStore();
     const currentQuality = statusStore.playQuality;
     const songLevel = settingStore.songLevel;
+    const selectedQuality = statusStore.selectedQuality;
 
     if (songInfo.links?.length == 0) {
       return null;
@@ -1145,28 +1147,14 @@ class Player {
       return link;
     }
 
-    // 自动音质
-    if (songLevel === "auto") {
-      // 按照这个顺序找音质
-      const qualityList = [currentQuality, "hires", "flac", "320mp3", "128mp3"];
-      for (const quality of qualityList) {
-        link = songInfo.links.find((item) => item.name === quality);
-        if (link) {
-          return link;
-        }
+    const qualityList = (
+      songLevel === "auto" ? [selectedQuality, "hires", "flac", "320mp3", "128mp3"] : []
+    ).concat([songLevel, currentQuality, selectedQuality]);
+    for (const quality of qualityList) {
+      link = songInfo.links.find((item) => item.name === quality);
+      if (link) {
+        return link;
       }
-    }
-
-    // 找到设置的音质
-    link = songInfo.links.find((item) => item.name === songLevel);
-    if (link) {
-      return link;
-    }
-
-    // 找到当前播放的音质
-    link = songInfo.links.find((item) => item.name === currentQuality);
-    if (link) {
-      return link;
     }
     // 默认返回第一个
     return songInfo.links[0];

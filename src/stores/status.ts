@@ -36,6 +36,7 @@ interface StatusState {
   showPlayerComment: boolean;
   updateCheck: boolean;
   playQuality: string;
+  selectedQuality: string;
   radioMode: boolean;
 }
 
@@ -96,6 +97,8 @@ export const useStatusStore = defineStore("status", {
     updateCheck: false,
     // 播放音质
     playQuality: "320mp3",
+    // 用户选择的音质
+    selectedQuality: "320mp3",
     // 电台模式
     radioMode: false,
   }),
@@ -148,6 +151,7 @@ export const useStatusStore = defineStore("status", {
       "listSort",
       "showDesktopLyric",
       "playQuality",
+      "selectedQuality",
       "radioMode",
     ],
   },

@@ -222,7 +222,7 @@
 
 <script setup lang="ts">
 import type { SelectOption } from "naive-ui";
-import { useSettingStore } from "@/stores";
+import { useSettingStore, useStatusStore } from "@/stores";
 import { isElectron, renderOption } from "@/utils/helper";
 import { uniqBy } from "lodash";
 import player from "@/utils/player";
@@ -230,6 +230,7 @@ import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 const { t } = useI18n();
 const settingStore = useSettingStore();
+const statusStore = useStatusStore();
 
 // 输出设备数据
 const outputDevices = ref<SelectOption[]>([]);
@@ -241,7 +242,7 @@ const showSpectrums = ref<boolean>(settingStore.showSpectrums);
 const songLevelData = computed(() => ({
   auto: {
     label: t("common.auto"),
-    tip: t("setting.play.song_quality_value_auto_tip"),
+    tip: t("setting.play.song_quality_value_auto_tip", { quality: statusStore.selectedQuality }),
     value: "auto",
   },
   "128mp3": {
