@@ -60,6 +60,7 @@
     "get-port": "^7.1.0",
     "github-markdown-css": "^5.8.1",
     "go-captcha-vue": "^2.0.6",
+    "hls.js": "^1.6.10",
     "howler": "^2.2.4",
     "i18next": "^25.2.1",
     "js-cookie": "^3.0.5",

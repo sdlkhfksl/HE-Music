@@ -131,15 +131,14 @@ import "plyr/dist/plyr.css";
 import { CommentInfo, MVInfo } from "@/types/main.hemusic";
 import { FeatureSupportFlag } from "@/api/platform";
 import { useI18n } from "vue-i18n";
+import Hls from "hls.js";
+
 const { t, n } = useI18n();
 
 const router = useRouter();
 const statusStore = useStatusStore();
 const dataStore = useDataStore();
 const platformStore = usePlatformStore();
-
-// 是否激活
-const isActivated = ref<boolean>(false);
 
 // 视频参数
 const videoId = computed<string>(() => router.currentRoute.value.query.id as string);
@@ -159,6 +158,7 @@ const commentHasMore = ref<boolean>(true);
 const commentText = computed(() => ({ hot: t("common.hottest"), new: t("common.newest") }));
 const commentLastId = ref<string>("");
 const commentTotalCount = ref<number>(0);
+const hlsRef = ref<Hls | null>(null);
 
 // 播放器配置
 const playerOptions: Plyr.Options = {
@@ -191,8 +191,8 @@ const playerOptions: Plyr.Options = {
     normal: t("common.normal"),
     quality: t("common.quality"),
     pip: t("common.pip"),
-    enterFullscreen: t("common.enter_full_screen"),
-    exitFullscreen: t("common.exit_full_screen"),
+    enterFullscreen: t("common.enter_fullscreen"),
+    exitFullscreen: t("common.exit_fullscreen"),
     mute: t("common.mute"),
     unmute: t("common.unmute"),
   },
@@ -202,8 +202,7 @@ const playerOptions: Plyr.Options = {
 };
 
 // 初始化播放器
-const initPlayer = () => {
-  videoData.value = null;
+const initPlayer = (playerOptions: Plyr.Options) => {
   videoPlayer.value?.destroy();
   if (videoRef.value) videoPlayer.value = new Plyr(videoRef.value, playerOptions);
   // 播放器事件
@@ -214,28 +213,68 @@ const initPlayer = () => {
 
 // 获取视频数据
 const getVideoData = async (id: string, platform: string) => {
-  console.log("getVideoData", id, platform);
   try {
-    if (!id || !platform || !videoPlayer.value) return;
+    if (!id || !platform || !videoRef.value) return;
     // 获取视频详情
     const result = await videoDetail(id, platform);
     videoData.value = result;
+    console.log(result);
+    const isHLS = Hls.isSupported() && videoData.value?.links?.[0].format == "hls";
     const sources =
       videoData.value?.links?.map((item) => {
         return {
           src:
             item.url || getMVUrlStr(platform, id, item.quality, item.format, true, dataStore.token),
-          type: "video/mp4",
+          type: isHLS ? "application/x-mpegURL" : "video/mp4",
           size: item.quality,
         };
       }) || [];
     // 更改播放地址
-    videoPlayer.value.source = {
-      type: "video",
-      title: videoData.value?.name,
-      sources,
-      poster: videoData.value?.cover,
-    };
+
+    if (isHLS) {
+      const hls = new Hls();
+      hls.loadSource(sources[0].src);
+      hls.attachMedia(videoRef.value);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        // Transform available levels into an array of integers (height values).
+        const availableQualities = hls.levels.map((l) => l.height);
+        const options: Plyr.Options = {
+          ...playerOptions,
+          quality: {
+            default: availableQualities[0],
+            options: availableQualities,
+            forced: true,
+            onChange: (e: number) => {
+              const idx = hls.levels.findIndex((level) => level.height == e);
+              if (idx > -1 && hls.currentLevel != idx) {
+                hls.currentLevel = idx;
+              }
+            },
+          },
+        };
+        initPlayer(options);
+        hlsRef.value = hls;
+      });
+    } else {
+      const options: Plyr.Options = {
+        ...playerOptions,
+        quality: {
+          default: sources[0].size,
+          options: sources.map((item) => item.size),
+        },
+      };
+
+      initPlayer(options);
+
+      if (videoPlayer.value) {
+        videoPlayer.value.source = {
+          type: "video",
+          title: videoData.value?.name,
+          sources,
+          poster: videoData.value?.cover,
+        };
+      }
+    }
     if (platformStore.isFeatureSupport(platform, FeatureSupportFlag.GetCommentList)) {
       // 获取评论
       getCommentData(id, platform);
@@ -329,32 +368,16 @@ const changeCommentType = (type: "hot" | "new") => {
   getCommentData(videoId.value, videoPlatform.value, true);
 };
 
-onActivated(() => {
-  if (!isActivated.value) {
-    isActivated.value = true;
-  } else {
-    closeMusic();
-    if (videoId.value !== videoData.value?.id) {
-      // initPlayer();
-      getVideoData(videoId.value, videoPlatform.value);
-    }
-  }
-});
-
-onDeactivated(() => {
+onUnmounted(() => {
   closeMusic(false);
+  videoPlayer.value?.destroy();
+  hlsRef.value?.destroy();
 });
 
 onMounted(() => {
   closeMusic();
-  // 初始化播放器
-  initPlayer();
   // 获取视频数据
   getVideoData(videoId.value, videoPlatform.value);
-});
-
-onUnmounted(() => {
-  closeMusic(false);
 });
 </script>
 

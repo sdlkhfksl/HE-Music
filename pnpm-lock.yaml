@@ -93,6 +93,9 @@ importers:
       go-captcha-vue:
         specifier: ^2.0.6
         version: 2.0.6(vue@3.5.13(typescript@5.6.2))
+      hls.js:
+        specifier: ^1.6.10
+        version: 1.6.10
       howler:
         specifier: ^2.2.4
         version: 2.2.4
@@ -2570,6 +2573,9 @@ packages:
   highlight.js@11.11.1:
     resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
     engines: {node: '>=12.0.0'}
+
+  hls.js@1.6.10:
+    resolution: {integrity: sha512-16XHorwFNh+hYazYxDNXBLEm5aRoU+oxMX6qVnkbGH3hJil4xLav3/M6NH92VkD1qSOGKXeSm+5unuawPXK6OQ==}
 
   hosted-git-info@4.1.0:
     resolution: {integrity: sha512-kyCuEOWjJqZuDbRHzL8V93NzQhwIB71oFWSyzVo+KPZI+pnQPPxucdkrOZvkLRnrf5URsQM+IJ09Dw29cRALIA==}
@@ -6993,6 +6999,8 @@ snapshots:
   he@1.2.0: {}
 
   highlight.js@11.11.1: {}
+
+  hls.js@1.6.10: {}
 
   hosted-git-info@4.1.0:
     dependencies:
