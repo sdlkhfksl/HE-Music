@@ -5,8 +5,8 @@
         v-if="searchCount > 0"
         :data="searchResultData"
         :loading="loading"
-        :loadMore="hasMore"
-        @loadMore="loadMore"
+        :load-more="hasMore"
+        @load-more="loadMore"
       />
       <n-empty
         v-else

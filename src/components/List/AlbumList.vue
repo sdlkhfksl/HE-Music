@@ -28,7 +28,9 @@
               </template>
               <!-- 简介 -->
               <div v-if="item.description" class="description">
-                <n-text class="text-hidden"> {{ item.description }}</n-text>
+                <n-text class="text-hidden">
+                  {{ item.description }}
+                </n-text>
               </div>
               <!-- 播放按钮 -->
               <div class="play-btn" @click.stop>
@@ -55,12 +57,12 @@
               </n-text>
               <!-- 专辑信息 -->
               <div class="meta">
-                <n-text class="count" depth="3">{{
-                  t("common.song_counter", { count: Number(item?.song_count) || 0 })
-                }}</n-text>
-                <n-text class="date" depth="3">{{
-                  formatTimestamp(Number(item.publish_time) * 1000)
-                }}</n-text>
+                <n-text class="count" depth="3">
+                  {{ t("common.song_counter", { count: Number(item?.song_count) || 0 }) }}
+                </n-text>
+                <n-text class="date" depth="3">
+                  {{ formatTimestamp(Number(item.publish_time) * 1000) }}
+                </n-text>
               </div>
               <!-- 歌手 -->
               <template v-if="item.artists">
@@ -70,7 +72,9 @@
                   </n-text>
                 </div>
                 <div v-else class="artists text-hidden">
-                  <n-text class="ar"> {{ item.artists || t("common.unknown_artist") }}</n-text>
+                  <n-text class="ar">
+                    {{ item.artists || t("common.unknown_artist") }}
+                  </n-text>
                 </div>
               </template>
             </div>
@@ -84,7 +88,7 @@
         </n-button>
       </n-flex>
       <!-- 右键菜单 -->
-      <CoverMenu ref="coverMenuRef" @toPlay="playList" />
+      <CoverMenu ref="coverMenuRef" @to-play="playList" />
     </div>
     <div v-else-if="loading" class="cover-list loading album">
       <n-grid :cols="cols" x-gap="20" y-gap="20">

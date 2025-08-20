@@ -21,8 +21,8 @@
       <n-skeleton v-if="loading" animated text height="50px" :repeat="2" />
       <n-empty v-else-if="!parseResult.success" :description="t('modal.parse_fail')" size="large" />
       <SongList
-        height="auto"
         v-else-if="parseResult.type === 'song'"
+        height="auto"
         :data="parseResult.songs"
         :loading="true"
         :show-footer="false"

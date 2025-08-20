@@ -28,9 +28,9 @@
     <ArtistList
       :data="artistsData"
       :loading="loading"
-      :loadMore="hasMore"
-      @loadMore="loadMore"
-      hiddenItem
+      :load-more="hasMore"
+      hidden-item
+      @load-more="loadMore"
     />
   </div>
 </template>

@@ -10,13 +10,12 @@ import {
   session,
   shell,
 } from "electron";
-import { File, Id3v2Settings, Picture } from "node-taglib-sharp";
-import { parseFile } from "music-metadata";
+import { File, Picture } from "node-taglib-sharp";
 import { getFonts } from "font-list";
 import { MainTray } from "./tray";
 import { Thumbar } from "./thumbar";
 import { StoreType } from "./store";
-import { appName, getFileID, getFileMD5, isDev } from "./utils";
+import { appName, getFileID, getFileMD5, isDev, parseFile } from "./utils";
 import { isShortcutRegistered, registerShortcut, unregisterShortcuts } from "./shortcut";
 import { basename, isAbsolute, join, relative, resolve } from "path";
 import { download } from "electron-dl";
@@ -184,12 +183,12 @@ const initWinIpcMain = (
 
         try {
           // 处理元信息
-          const { common, format } = await parseFile(filePath);
+          const file = parseFile(filePath);
           // 获取文件大小
           const { size } = await fs.stat(filePath);
           // 判断音质等级
           let quality: string = "";
-          const { lossless, bitsPerSample = 0, sampleRate = 0, bitrate = 0 } = format;
+          const { lossless, bitsPerSample = 0, sampleRate = 0, bitrate = 0 } = file;
           // 判断是否为 HI-Res
           // 母带质量判断：采样率大于 384 kHz 或者位深度大于 32 位浮动
           if (sampleRate > 384000 || bitsPerSample >= 32) {
@@ -198,16 +197,16 @@ const initWinIpcMain = (
             quality = "HIRES"; // High-Resolution
           } else if (lossless) {
             quality = "SQ";
-          } else if (bitrate >= 192000) {
+          } else if (bitrate >= 192) {
             quality = "HQ"; // High Quality
           }
           return {
             id: getFileID(filePath),
-            name: common.title || basename(filePath),
-            artists: common.artists?.join(" / ") || common.artist,
-            album: common.album || "",
-            alia: common.comment?.[0],
-            duration: format?.duration ?? 0,
+            name: file.title || basename(filePath),
+            artists: file.artists?.join(" / ") || "",
+            album: file.album || "",
+            alia: file.alia,
+            duration: file.duration ?? 0,
             size: size,
             path: filePath,
             quality,
@@ -229,16 +228,27 @@ const initWinIpcMain = (
   ipcMain.handle("get-music-metadata", async (_, path: string) => {
     try {
       const filePath = resolve(path).replace(/\\/g, "/");
-      const { common, format } = await parseFile(filePath);
+      const file = parseFile(filePath);
       return {
         // 文件名称
-        fileName: basename(filePath),
+        filename: basename(filePath),
+        name: file.title || "",
+        artists: file.artists || [],
+        album: file.album || "",
+        alia: file.alia || "",
+        duration: file.duration,
+        channels: file.channels,
+        codec: file.codec,
+        bitsPerSample: file.bitsPerSample,
+        sampleRate: file.sampleRate,
+        bitrate: file.bitrate,
+        lyrics: file.lyrics,
+        pictures: file.pictures.map((picture) => ({
+          data: Buffer.from(picture.data.toByteVector().toByteArray()).buffer,
+          format: picture.mimeType,
+        })),
         // 文件大小
         size: (await fs.stat(filePath)).size,
-        // 元信息
-        common,
-        // 音质信息
-        format,
         // md5
         md5: await getFileMD5(filePath),
       };
@@ -252,9 +262,8 @@ const initWinIpcMain = (
   ipcMain.handle("get-music-lyric", async (_, path: string): Promise<string> => {
     try {
       const filePath = resolve(path).replace(/\\/g, "/");
-      const { common } = await parseFile(filePath);
-      const lyric = common?.lyrics;
-      if (lyric && lyric.length > 0) return (lyric[0] as unknown as string) || "";
+      const { lyrics } = parseFile(filePath);
+      if (lyrics) return lyrics;
       // 如果歌词数据不存在，尝试读取同名的 lrc 文件
       else {
         const lrcFilePath = filePath.replace(/\.[^.]+$/, ".lrc");
@@ -275,19 +284,19 @@ const initWinIpcMain = (
   // 获取音乐封面
   ipcMain.handle(
     "get-music-cover",
-    async (_, path: string): Promise<{ data: Buffer; format: string } | null> => {
+    async (_, path: string): Promise<{ data: ArrayBuffer; format: string } | null> => {
       try {
-        const { common } = await parseFile(path);
+        const { pictures } = parseFile(path);
         // 获取封面数据
-        const picture = common.picture?.[0];
+        const picture = pictures?.[0];
         if (picture) {
-          return { data: Buffer.from(picture.data), format: picture.format };
+          return { data: Buffer.from(picture.data.toByteArray()).buffer, format: picture.mimeType };
         } else {
           const coverFilePath = path.replace(/\.[^.]+$/, ".jpg");
           try {
             await fs.access(coverFilePath);
             const coverData = await fs.readFile(coverFilePath);
-            return { data: coverData, format: "image/jpeg" };
+            return { data: new Uint8Array(coverData).buffer, format: "image/jpeg" };
           } catch {
             return null;
           }
@@ -375,25 +384,32 @@ const initWinIpcMain = (
     if (!win) return false;
     let coverDownload: DownloadItem | null = null;
     try {
-      const { name, artist, album, alia, lyric, cover } = metadata;
+      const { name, artists, album, alia, lyrics, cover } = metadata;
       // 规范化路径
       const songPath = resolve(path);
       if (cover && cover.startsWith("http")) {
         coverDownload = await download(win, cover);
       }
-      const coverPath = coverDownload ? coverDownload.getSavePath() : cover ? resolve(cover) : null;
+
+      const coverPath = coverDownload
+        ? coverDownload.getSavePath()
+        : cover?.startsWith("file://")
+          ? resolve(cover.replace(/^file:\/\//, ""))
+          : cover
+            ? resolve(cover)
+            : null;
       // 读取歌曲文件
       const songFile = File.createFromPath(songPath);
       // 读取封面文件
       const songCover = coverPath ? Picture.fromPath(coverPath) : null;
       // 保存元数据
-      Id3v2Settings.forceDefaultVersion = true;
-      Id3v2Settings.defaultVersion = 3;
+      // Id3v2Settings.forceDefaultVersion = true;
+      // Id3v2Settings.defaultVersion = 3;
       songFile.tag.title = name || "未知曲目";
-      songFile.tag.performers = [artist || "未知艺术家"];
+      songFile.tag.performers = artists;
       songFile.tag.album = album || "未知专辑";
-      songFile.tag.albumArtists = [artist || "未知艺术家"];
-      songFile.tag.lyrics = lyric || "";
+      songFile.tag.albumArtists = artists;
+      songFile.tag.lyrics = lyrics || "";
       songFile.tag.description = alia || "";
       songFile.tag.comment = alia || "";
       if (songCover) songFile.tag.pictures = [songCover];
@@ -470,8 +486,8 @@ const initWinIpcMain = (
         // 生成图片信息
         const songCover = Picture.fromPath(coverDownload.getSavePath());
         // 保存修改后的元数据
-        Id3v2Settings.forceDefaultVersion = true;
-        Id3v2Settings.defaultVersion = 3;
+        // Id3v2Settings.forceDefaultVersion = true;
+        // Id3v2Settings.defaultVersion = 3;
         songFile.tag.title = songData?.name || "未知曲目";
         songFile.tag.album = songData?.album?.name || "未知专辑";
         songFile.tag.performers = songData?.artists?.map((ar: any) => ar.name) || ["未知艺术家"];

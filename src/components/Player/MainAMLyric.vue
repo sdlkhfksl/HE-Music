@@ -6,13 +6,13 @@
     >
       <LyricPlayer
         ref="lyricPlayerRef"
-        :lyricLines="amLyricsData"
-        :currentTime="playSeek"
+        :lyric-lines="amLyricsData"
+        :current-time="playSeek"
         :playing="statusStore.playStatus"
-        :enableSpring="settingStore.useAMSpring"
-        :enableScale="settingStore.useAMSpring"
-        :alignPosition="settingStore.lyricsScrollPosition === 'center' ? 0.5 : 0.2"
-        :enableBlur="settingStore.lyricsBlur"
+        :enable-spring="settingStore.useAMSpring"
+        :enable-scale="settingStore.useAMSpring"
+        :align-position="settingStore.lyricsScrollPosition === 'center' ? 0.5 : 0.2"
+        :enable-blur="settingStore.lyricsBlur"
         :style="{
           '--amll-lyric-view-color': mainColor,
           '--amll-lyric-player-font-size': settingStore.lyricFontSize + 'px',

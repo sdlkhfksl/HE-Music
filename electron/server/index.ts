@@ -5,7 +5,7 @@ import initUnblockAPI from "./unblock";
 import fastifyCookie from "@fastify/cookie";
 import fastifyMultipart from "@fastify/multipart";
 import fastifyStatic from "@fastify/static";
-import fastify, { FastifyReply, FastifyRequest } from "fastify";
+import Fastify from "fastify";
 import log from "../main/logger";
 import { BrowserWindow } from "electron";
 
@@ -45,10 +45,10 @@ const loginSuccessTxt = `
 
 const initAppServer = async (getWin: () => { mainWin: BrowserWindow | null }) => {
   try {
-    const server = fastify({
-      // 忽略尾随斜杠
-      ignoreTrailingSlash: true,
+    const server = Fastify({
+      ignoreDuplicateSlashes: true, // 忽略尾随斜杠
     });
+
     // 注册插件
     server.register(fastifyCookie);
     server.register(fastifyMultipart);
@@ -81,23 +81,17 @@ const initAppServer = async (getWin: () => { mainWin: BrowserWindow | null }) =>
     server.register(initNcmAPI, { prefix: "/api" });
     server.register(initUnblockAPI, { prefix: "/api" });
 
-    server.get(
-      "/login/success",
-      async (
-        req: FastifyRequest<{ Querystring: { [key: string]: string } }>,
-        reply: FastifyReply,
-      ) => {
-        const { token } = req.query;
-        if (!token) {
-          reply.type("text/html").send(loginFailTxt);
-          return;
-        }
-        getWin().mainWin?.webContents.send("login-success", { token });
-        reply.type("text/html").send(loginSuccessTxt);
-      },
-    );
+    server.get("/login/success", async (req, reply) => {
+      const { token } = req.query as { token?: string };
+      if (!token) {
+        reply.type("text/html").send(loginFailTxt);
+        return;
+      }
+      getWin().mainWin?.webContents.send("login-success", { token });
+      reply.type("text/html").send(loginSuccessTxt);
+    });
     // 启动端口
-    const port = Number(import.meta.env["VITE_SERVER_PORT"] || 25884);
+    const port = Number(import.meta.env["VITE_SERVER_PORT"] || 25666);
     await server.listen({ port });
     log.info(`🌐 Starting AppServer on port ${port}`);
     return server;

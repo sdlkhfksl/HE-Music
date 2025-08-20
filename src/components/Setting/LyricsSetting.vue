@@ -1,7 +1,9 @@
 <template>
   <div class="setting-type">
     <div class="set-list">
-      <n-h3 prefix="bar"> {{ t("setting.lyrics.lyrics_setting") }} </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.lyrics.lyrics_setting") }}
+      </n-h3>
       <n-card
         id="lyrics-show"
         :content-style="{
@@ -22,14 +24,18 @@
       >
         <div v-for="item in 2" :key="item" :class="['lrc-item', { on: item === 2 }]">
           <n-text>我是一句歌词</n-text>
-          <n-text v-if="settingStore.showTran">I'm the lyric</n-text>
-          <n-text v-if="settingStore.showRoma">wo shi yi ju ge ci</n-text>
+          <n-text v-if="settingStore.showTran"> I'm the lyric </n-text>
+          <n-text v-if="settingStore.showRoma"> wo shi yi ju ge ci </n-text>
         </div>
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.lyrics.lyrics_font_size") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.lyrics.lyrics_font_size_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.lyrics.lyrics_font_size") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.lyrics.lyrics_font_size_tip") }}
+          </n-text>
         </div>
         <n-flex>
           <Transition name="fade" mode="out-in">
@@ -62,8 +68,7 @@
           </n-text>
           <n-text class="tip" :depth="3">
             {{ t("setting.lyrics.lyrics_tran_font_size_tip") }}
-            }}</n-text
-          >
+          </n-text>
         </div>
         <n-flex>
           <Transition name="fade" mode="out-in">
@@ -99,8 +104,7 @@
           </n-text>
           <n-text class="tip" :depth="3">
             {{ t("setting.lyrics.lyrics_roma_font_size_tip") }}
-            }}</n-text
-          >
+          </n-text>
         </div>
         <n-flex>
           <Transition name="fade" mode="out-in">
@@ -131,7 +135,9 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.lyrics.lyrics_font_bold") }} </n-text>
+          <n-text class="name">
+            {{ t("setting.lyrics.lyrics_font_bold") }}
+          </n-text>
           <n-text class="tip" :depth="3">
             {{ t("setting.lyrics.lyrics_font_bold_tip") }}
           </n-text>
@@ -283,8 +289,9 @@
           secondary
           :disabled="!settingStore.lyricExclude"
           @click="openLyricExclude"
-          >{{ t("common.configuration") }}</n-button
         >
+          {{ t("common.configuration") }}
+        </n-button>
       </n-card>
     </div>
     <div class="set-list">

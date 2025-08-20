@@ -7,7 +7,7 @@
       <n-card class="set-item">
         <n-flex align="center" class="about">
           <SvgIcon name="HEMusic" size="26" />
-          <n-text class="logo-name">HE-Music</n-text>
+          <n-text class="logo-name"> HE-Music </n-text>
           <n-tag :bordered="false" size="small" type="primary">
             {{ packageJson.version }}
           </n-tag>
@@ -38,9 +38,11 @@
             <n-tag v-if="newVersion?.prerelease" class="test" size="small" type="warning">
               {{ t("setting.about.beta_version") }}
             </n-tag>
-            <n-text :depth="3" class="time">{{ newVersion?.time }}</n-text>
+            <n-text :depth="3" class="time">
+              {{ newVersion?.time }}
+            </n-text>
           </n-flex>
-          <div class="markdown-body" v-html="newVersion?.changelog" @click="jumpLink" />
+          <div class="markdown-body" @click="jumpLink" v-html="newVersion?.changelog" />
         </n-card>
       </n-collapse-transition>
     </div>
@@ -61,9 +63,11 @@
                 <n-tag :bordered="false" size="small" type="primary">
                   {{ item?.version || "v0.0.0" }}
                 </n-tag>
-                <n-text :depth="3" class="time">{{ item?.time }}</n-text>
+                <n-text :depth="3" class="time">
+                  {{ item?.time }}
+                </n-text>
               </n-flex>
-              <div class="markdown-body" v-html="item?.changelog" @click="jumpLink" />
+              <div class="markdown-body" @click="jumpLink" v-html="item?.changelog" />
             </n-card>
           </n-collapse-item>
         </n-collapse>
@@ -82,7 +86,9 @@
           @click="openLink(item.url)"
         >
           <SvgIcon :name="item.icon" :size="26" />
-          <n-text class="name"> {{ item.name }} </n-text>
+          <n-text class="name">
+            {{ item.name }}
+          </n-text>
         </n-card>
       </n-flex>
     </div>

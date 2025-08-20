@@ -6,13 +6,13 @@ class BlobURLManager {
   }
 
   /**
-   * 从给定的 Buffer 数据生成 Blob URL
+   * 从给定的 ArrayBuffer 数据生成 Blob URL
    * @param data - 要转换为 Blob 的二进制数据
    * @param format - 数据的 MIME 类型（'image/jpeg'）
    * @param key - 用于标识 Blob URL 的唯一键（文件路径）
    * @returns Blob URL
    */
-  createBlobURL(data: Buffer, format: string, key: string): string {
+  createBlobURL(data: ArrayBuffer, format: string, key: string): string {
     try {
       if (this.blobURLs.has(key)) {
         // console.log("🌱 Blob URL already exists:", key);

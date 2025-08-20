@@ -14,7 +14,9 @@
           @click="jumpArtist(item.id, platform)"
         >
           <n-avatar :src="'/images/artist.jpg?assest'" class="cover" round />
-          <n-text class="name">{{ item.name }}</n-text>
+          <n-text class="name">
+            {{ item.name }}
+          </n-text>
         </n-card>
       </div>
       <div v-else class="ar-list">

@@ -29,7 +29,7 @@
       </div>
     </Transition>
     <!-- 视频播放器 -->
-    <div class="player" v-visible>
+    <div v-visible class="player">
       <Transition name="fade" mode="out-in">
         <video :key="`${videoPlatform}-${videoId}`" ref="videoRef" />
       </Transition>
@@ -92,9 +92,9 @@
       <n-flex class="title" justify="space-between">
         <n-h3 prefix="bar">
           {{ t("common.comment") }}
-          <n-text v-if="commentTotalCount > 0" class="num" depth="3">{{
-            commentTotalCount
-          }}</n-text>
+          <n-text v-if="commentTotalCount > 0" class="num" depth="3">
+            {{ commentTotalCount }}
+          </n-text>
         </n-h3>
         <n-flex class="tag">
           <n-tag
@@ -112,9 +112,9 @@
       <CommentList
         :data="commentData"
         :loading="commentLoading"
-        :loadMore="commentHasMore"
-        @loadMore="loadMoreComment"
-        @loadSubMore="loadSubMore"
+        :load-more="commentHasMore"
+        @load-more="loadMoreComment"
+        @load-sub-more="loadSubMore"
       />
     </div>
   </div>

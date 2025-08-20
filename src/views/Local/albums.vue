@@ -3,22 +3,24 @@
     <n-scrollbar class="album-list">
       <n-card
         v-for="(item, key, index) in albumData"
-        :key="index"
         :id="key"
+        :key="index"
         :class="['album-item', { choose: chooseAlbum === key }]"
         @click="chooseAlbum = key"
       >
         <Transition name="fade" mode="out-in">
           <n-image
             :key="item?.[0]?.cover"
+            v-visible.once="(show: boolean) => loadAlbumCover(show, key)"
             :src="item?.[0]?.cover || '/images/album.jpg?assest'"
             preview-disabled
             class="cover"
-            v-visible.once="(show: boolean) => loadAlbumCover(show, key)"
           />
         </Transition>
         <div class="data">
-          <n-text class="name">{{ key }}</n-text>
+          <n-text class="name">
+            {{ key }}
+          </n-text>
           <n-text class="num" depth="3">
             <SvgIcon name="Music" :depth="3" />
             {{ t("common.song_counter", { count: item.length }) }}

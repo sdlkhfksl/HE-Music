@@ -107,13 +107,14 @@
       <!-- 上一曲 -->
       <div
         v-if="!statusStore.radioMode"
-        class="play-icon"
         v-debounce="() => player.nextOrPrev('prev')"
+        class="play-icon"
       >
         <SvgIcon :size="26" name="SkipPrev" />
       </div>
       <!-- 播放暂停 -->
       <n-button
+        v-debounce="() => player.playOrPause()"
         :loading="statusStore.playLoading"
         :focusable="false"
         :keyboard="false"
@@ -122,7 +123,6 @@
         strong
         secondary
         circle
-        v-debounce="() => player.playOrPause()"
       >
         <template #icon>
           <Transition name="fade" mode="out-in">
@@ -135,7 +135,7 @@
         </template>
       </n-button>
       <!-- 下一曲 -->
-      <div class="play-icon" v-debounce="() => player.nextOrPrev('next')">
+      <div v-debounce="() => player.nextOrPrev('next')" class="play-icon">
         <SvgIcon :size="26" name="SkipNext" />
       </div>
     </div>
@@ -149,8 +149,12 @@
       >
         <!-- 播放时间 -->
         <div class="time">
-          <n-text depth="2">{{ secondsToTime(statusStore.currentTime) }}</n-text>
-          <n-text depth="2">{{ secondsToTime(statusStore.duration) }}</n-text>
+          <n-text depth="2">
+            {{ secondsToTime(statusStore.currentTime) }}
+          </n-text>
+          <n-text depth="2">
+            {{ secondsToTime(statusStore.duration) }}
+          </n-text>
         </div>
         <!-- 桌面歌词 -->
         <div v-if="isElectron" class="menu-icon" @click.stop="player.toggleDesktopLyric">
@@ -160,6 +164,7 @@
         <n-dropdown
           :options="qualityOptions"
           :show-arrow="true"
+          :disabled="musicStore.isLocalSong"
           @select="(quality) => player.changeQuality(quality)"
         >
           <div class="menu-icon quality-selector">
@@ -194,7 +199,7 @@
               vertical
               @update:value="(val) => player.setVolume(val)"
             />
-            <n-text class="slider-num">{{ statusStore.playVolumePercent }}%</n-text>
+            <n-text class="slider-num"> {{ statusStore.playVolumePercent }}% </n-text>
           </div>
         </n-popover>
         <!-- 播放列表 -->
@@ -345,7 +350,15 @@ const instantLyrics = computed(() => {
 
 // 音质选项
 const qualityOptions = computed(() => {
-  return musicStore.playSong?.links.map((item): DropdownOption => {
+  if (musicStore.isLocalSong) {
+    return [
+      {
+        label: musicStore.playSong?.quality,
+        key: musicStore.playSong?.quality,
+      },
+    ];
+  }
+  return musicStore.playSong?.links?.map((item): DropdownOption => {
     return {
       label: item.name,
       key: item.name,

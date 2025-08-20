@@ -5,7 +5,7 @@
         <SvgIcon name="Help" />
       </template>
       可在官方的
-      <n-a href="https://music.163.com/" target="_blank">网页端</n-a>
+      <n-a href="https://music.163.com/" target="_blank"> 网页端 </n-a>
       和客户端的控制台中获取，只需要 Cookie 中的 <code>MUSIC_U</code> 字段即可，例如：
       <code>MUSIC_U=00C7...;</code><br />请注意：必须以 <code>;</code> 结束
     </n-alert>
@@ -15,7 +15,7 @@
       type="textarea"
       placeholder="请输入 Cookie"
     />
-    <n-button type="primary" @click="login">登录</n-button>
+    <n-button type="primary" @click="login"> 登录 </n-button>
   </div>
 </template>
 

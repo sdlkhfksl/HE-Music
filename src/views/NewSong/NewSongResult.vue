@@ -4,10 +4,10 @@
     <SongList
       :data="resultData"
       :loading="loading"
-      loadMore
-      disabledSort
-      @reachBottom="reachBottom"
+      load-more
+      disabled-sort
       :height="songListHeight"
+      @reach-bottom="reachBottom"
     />
   </div>
 </template>

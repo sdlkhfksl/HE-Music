@@ -8,9 +8,9 @@
       @update:checked-row-keys="tableCheck"
     />
     <n-flex class="batch-footer" justify="space-between" align="center">
-      <n-text :depth="3" class="count">{{
-        t("modal.already_selected_song_counter", { count: checkCount })
-      }}</n-text>
+      <n-text :depth="3" class="count">
+        {{ t("modal.already_selected_song_counter", { count: checkCount }) }}
+      </n-text>
       <n-flex class="menu">
         <!-- 批量删除 -->
         <n-button

@@ -2,7 +2,9 @@
   <div class="toplists">
     <Transition name="fade" mode="out-in">
       <div v-if="!loading" class="official-list">
-        <n-divider v-if="groupWithSong"> {{ groupWithSong.name }} </n-divider>
+        <n-divider v-if="groupWithSong">
+          {{ groupWithSong.name }}
+        </n-divider>
         <n-grid v-if="groupWithSong" cols="1 600:2 1000:3" x-gap="20" y-gap="20">
           <n-gi v-for="(item, index) in groupWithSong.rankings" :key="index">
             <SongListCard
@@ -20,13 +22,13 @@
                   :key="songIndex"
                   class="song-item text-hidden"
                 >
-                  <n-text class="name">{{ songIndex + 1 }}. {{ song.name }}</n-text>
-                  <n-text v-if="Array.isArray(song.artists)" class="desc" depth="3">{{
-                    song.artists?.[0]?.name
-                  }}</n-text>
-                  <n-text v-else class="desc" depth="3">{{
-                    song.artists || t("common.unknown_artist")
-                  }}</n-text>
+                  <n-text class="name"> {{ songIndex + 1 }}. {{ song.name }} </n-text>
+                  <n-text v-if="Array.isArray(song.artists)" class="desc" depth="3">
+                    {{ song.artists?.[0]?.name }}
+                  </n-text>
+                  <n-text v-else class="desc" depth="3">
+                    {{ song.artists || t("common.unknown_artist") }}
+                  </n-text>
                 </div>
               </template>
             </SongListCard>
@@ -34,7 +36,9 @@
         </n-grid>
 
         <div v-for="(item, idx) in topListData || []" :key="idx">
-          <n-divider style="margin-bottom: 0"> {{ item.name }}</n-divider>
+          <n-divider style="margin-bottom: 0">
+            {{ item.name }}
+          </n-divider>
           <RankingList :data="item.rankings" />
         </div>
       </div>

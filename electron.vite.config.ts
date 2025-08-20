@@ -15,8 +15,8 @@ export default defineConfig(({ command, mode }) => {
   };
   console.log(command);
   // 获取端口
-  const webPort: number = Number(getEnv("VITE_WEB_PORT") || 14558);
-  const servePort: number = Number(getEnv("VITE_SERVER_PORT") || 25884);
+  const webPort: number = Number(getEnv("VITE_WEB_PORT") || 14666);
+  const servePort: number = Number(getEnv("VITE_SERVER_PORT") || 25666);
   // 返回配置
   return {
     // 主进程

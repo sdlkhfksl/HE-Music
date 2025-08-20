@@ -36,9 +36,9 @@
               </template>
               <n-thing :title="index === 0 ? t('playlist.my_favorite_music') : item.name">
                 <template #description>
-                  <n-text depth="3" class="size">{{
-                    t("common.song_count_noun", { count: item.song_count })
-                  }}</n-text>
+                  <n-text depth="3" class="size">
+                    {{ t("common.song_count_noun", { count: item.song_count }) }}
+                  </n-text>
                 </template>
               </n-thing>
             </n-list-item>

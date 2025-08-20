@@ -8,7 +8,7 @@
             :src="playlistDetailData.cover"
             :previewed-img-props="{ style: { borderRadius: '8px' } }"
             :preview-src="playlistDetailData.cover"
-            :renderToolbar="renderToolbar"
+            :render-toolbar="renderToolbar"
             show-toolbar-tooltip
             class="cover-img"
             @load="coverLoaded"
@@ -141,10 +141,10 @@
         :data="playlistDataShow"
         :loading="songLoading"
         :height="songListHeight"
-        loadMore
-        disabledSort
+        load-more
+        disabled-sort
         @scroll="listScroll"
-        @reachBottom="reachBottom"
+        @reach-bottom="reachBottom"
       />
       <n-empty
         v-else

@@ -1,7 +1,7 @@
 <template>
   <div class="search-type" style="height: auto">
     <!--    <Transition name="fade" mode="out-in">-->
-    <AlbumList :data="resultData" :loading="loading" :loadMore="hasMore" @loadMore="loadMore" />
+    <AlbumList :data="resultData" :loading="loading" :load-more="hasMore" @load-more="loadMore" />
   </div>
 </template>
 

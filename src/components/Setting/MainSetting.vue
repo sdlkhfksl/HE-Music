@@ -18,8 +18,10 @@
           <SvgIcon name="Github" :size="20" />
           {{ packageJson.author }}
         </n-text>
-        <n-text class="name">HE-Music</n-text>
-        <n-text class="version" depth="3">{{ packageJson.version }}</n-text>
+        <n-text class="name"> HE-Music </n-text>
+        <n-text class="version" depth="3">
+          {{ packageJson.version }}
+        </n-text>
       </div>
     </div>
     <n-scrollbar
@@ -43,7 +45,9 @@
         <!-- 关于 -->
         <AboutSetting v-else-if="activeKey === 'about'" />
         <!-- 空白 -->
-        <n-text v-else class="error">{{ t("setting.none_key") }}</n-text>
+        <n-text v-else class="error">
+          {{ t("setting.none_key") }}
+        </n-text>
       </Transition>
     </n-scrollbar>
   </div>

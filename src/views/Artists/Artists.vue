@@ -1,10 +1,10 @@
 <template>
   <div class="artists">
     <n-tabs
+      v-model:value="platform"
       class="tabs"
       type="bar"
       animated
-      v-model:value="platform"
       @update:value="platformChange"
     >
       <n-tab-pane

@@ -33,7 +33,9 @@
       </div>
       <n-skeleton v-else class="qr" />
     </div>
-    <n-text class="tip" depth="3">{{ qrTipText }}</n-text>
+    <n-text class="tip" depth="3">
+      {{ qrTipText }}
+    </n-text>
   </div>
 </template>
 

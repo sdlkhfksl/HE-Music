@@ -15,7 +15,7 @@
         <n-scrollbar class="scrollbar">
           <n-form ref="infoFormRef" :model="infoFormData" :rules="infoFormRules" class="phone-form">
             <n-form-item :label="t('common.filename')" path="fileName">
-              <n-input v-model:value="infoFormData.fileName" disabled />
+              <n-input v-model:value="infoFormData.filename" disabled />
             </n-form-item>
             <n-form-item :label="t('common.song_name')" path="name">
               <n-input
@@ -25,10 +25,9 @@
               />
             </n-form-item>
             <n-form-item :label="t('common.artist')" path="artist">
-              <n-input
-                v-model:value="infoFormData.artist"
+              <n-dynamic-tags
+                v-model:value="infoFormData.artists"
                 :placeholder="t('modal.artist_placeholder')"
-                clearable
               />
             </n-form-item>
             <n-form-item :label="t('common.album')" path="album">
@@ -47,7 +46,7 @@
             </n-form-item>
             <n-form-item :label="t('common.lyrics')" path="lyric">
               <n-input
-                v-model:value="infoFormData.lyric"
+                v-model:value="infoFormData.lyrics"
                 :autosize="{ minRows: 3, maxRows: 6 }"
                 :placeholder="t('modal.lyrics_placeholder')"
                 type="textarea"
@@ -65,7 +64,7 @@
                   disabled
                 >
                   <template #suffix>
-                    <n-text depth="3">kbps</n-text>
+                    <n-text depth="3"> kbps </n-text>
                   </template>
                 </n-input-number>
               </n-form-item-gi>
@@ -77,7 +76,7 @@
                   disabled
                 >
                   <template #suffix>
-                    <n-text depth="3">s</n-text>
+                    <n-text depth="3"> s </n-text>
                   </template>
                 </n-input-number>
               </n-form-item-gi>
@@ -89,7 +88,7 @@
                   disabled
                 >
                   <template #suffix>
-                    <n-text depth="3">Hz</n-text>
+                    <n-text depth="3"> Hz </n-text>
                   </template>
                 </n-input-number>
               </n-form-item-gi>
@@ -127,24 +126,25 @@
           @click="changeCover"
         />
         <n-flex class="menu" justify="center">
-          <n-text depth="3">{{ t("modal.click_to_change_cover") }}</n-text>
+          <n-text depth="3">
+            {{ t("modal.click_to_change_cover") }}
+          </n-text>
         </n-flex>
       </n-tab-pane>
     </n-tabs>
     <n-flex class="menu" justify="center">
-      <n-button class="btn" strong secondary @click="emit('close')">{{
-        t("common.cancel")
-      }}</n-button>
-      <n-button class="btn" type="primary" @click="saveSongInfo(song)">{{
-        "common.save"
-      }}</n-button>
+      <n-button class="btn" strong secondary @click="emit('close')">
+        {{ t("common.cancel") }}
+      </n-button>
+      <n-button class="btn" type="primary" @click="saveSongInfo(song)">
+        {{ t("common.save") }}
+      </n-button>
     </n-flex>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { FormInst, FormRules } from "naive-ui";
-import type { ICommonTagsResult, IFormat } from "music-metadata";
 import { useDataStore, useMusicStore, useSettingStore } from "@/stores";
 import { useFormRule } from "@/utils/rules";
 import { copyData } from "@/utils/helper";
@@ -154,6 +154,7 @@ import blob from "@/utils/blob";
 import { formatSongsList } from "@/utils/format";
 import { SongInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
+import { romaSeparator, transSeparator } from "@/utils/lyric";
 const { t } = useI18n();
 const { textRule } = useFormRule();
 const props = defineProps<{
@@ -167,11 +168,11 @@ const emit = defineEmits<{
 // 表单类型
 interface InfoFormType {
   name: string;
-  fileName: string;
-  artist: string;
+  filename: string;
+  artists: string[];
   album: string;
   alia?: string;
-  lyric?: string;
+  lyrics?: string;
   size?: number;
   cover?: string | null;
   // 时长
@@ -197,7 +198,7 @@ const localEventBus = useEventBus("local");
 
 // 表单数据
 const infoFormRef = ref<FormInst | null>(null);
-const infoFormData = ref<InfoFormType>({ name: "", fileName: "", artist: "", album: "" });
+const infoFormData = ref<InfoFormType>({ name: "", filename: "", artists: [], album: "" });
 const infoFormRules: FormRules = { name: textRule };
 
 // 封面数据
@@ -207,34 +208,43 @@ const coverData = ref<string>("/images/song.jpg?assest");
 const getSongInfo = async () => {
   if (!props.song || !props.song.path) return;
   const path = props.song.path;
-  const infoData: {
-    fileName: string;
-    size: number;
-    common: ICommonTagsResult;
-    format: IFormat;
-    md5: string;
+  const {
+    filename,
+    name,
+    artists,
+    album,
+    alia,
+    lyrics,
+    codec,
+    duration,
+    bitrate,
+    sampleRate,
+    size,
+    pictures,
+    md5,
   } = await window.electron.ipcRenderer.invoke("get-music-metadata", path); // 解构数据
-  const { fileName, size, common, format, md5 } = infoData;
 
   // 更新数据
   infoFormData.value = {
-    fileName,
-    name: common.title || "",
-    artist: common.artists?.join(" / ") || common.artist || "",
-    album: common.album || "",
-    alia: (common.comment?.[0] as string) || "",
-    lyric: (common.lyrics?.[0] as unknown as string) || "",
-    type: format.codec,
-    duration: format.duration ? Number(format.duration.toFixed(2)) : 0,
+    filename,
+    name: name || "",
+    artists: artists || [],
+    album: album || "",
+    alia: alia || "",
+    lyrics: lyrics || "",
+    type: codec,
+    duration: duration || 0,
     size: size,
-    br: format.bitrate ? Math.floor(format.bitrate / 1000 || 0) : 0,
-    frequency: format.sampleRate,
+    br: bitrate || 0,
+    frequency: sampleRate,
     md5,
   };
+
   // 获取封面
-  const coverBuff = common.picture?.[0]?.data || "";
-  const coverType = common.picture?.[0]?.format || "";
-  if (coverBuff) coverData.value = blob.createBlobURL(coverBuff as Buffer, coverType, path);
+  const coverBuff = pictures?.[0]?.data || "";
+  const coverType = pictures?.[0]?.format || "";
+
+  if (coverBuff) coverData.value = blob.createBlobURL(coverBuff as ArrayBuffer, coverType, path);
 };
 
 // 在线匹配
@@ -244,7 +254,7 @@ const onlineMatch = debounce(
       if (!props.song || !infoFormData.value.md5) return;
       const { result } = await matchSong(
         infoFormData.value.name || "",
-        infoFormData.value.artist || "",
+        infoFormData.value.artists.join(" / ") || "",
         infoFormData.value.album || "",
         infoFormData.value.duration || 0,
         infoFormData.value.md5,
@@ -260,20 +270,24 @@ const onlineMatch = debounce(
         infoFormData.value = {
           ...infoFormData.value,
           name: songData.name,
-          artist: isArray(songData.artists)
-            ? songData.artists.map((ar: { name: string }) => ar.name).join(" / ")
-            : songData.artists,
+          artists: isArray(songData.artists)
+            ? songData.artists.map((ar: { name: string }) => ar.name)
+            : [songData.artists],
           album: isObject(songData.album) ? songData.album.name : songData.album,
           alia: songData.alia,
         };
         // 获取歌词
         const result = await neteaseSongLyric(songData.id);
-        console.log(result);
-        infoFormData.value.lyric = [
+        infoFormData.value.lyrics = [
           result.lrc.lyric,
-          settingStore.downloadLyric && settingStore.downloadLyricTran ? result.tlyric?.lyric : "",
-          settingStore.downloadLyric && settingStore.downloadLyricRoma ? result.romalrc?.lyric : "",
+          settingStore.downloadLyric && settingStore.downloadLyricTran && result.tlyric?.lyric
+            ? [transSeparator, result.tlyric?.lyric].join("\n")
+            : "",
+          settingStore.downloadLyric && settingStore.downloadLyricRoma && result.romalrc?.lyric
+            ? [romaSeparator, result.romalrc?.lyric].join("\n")
+            : "",
         ]
+
           .filter((item) => !!item)
           .join("\n\n");
 
@@ -296,7 +310,7 @@ const onlineMatch = debounce(
 const changeCover = async () => {
   const newPath = await window.electron.ipcRenderer.invoke("choose-image");
   if (!newPath) return;
-  coverData.value = newPath;
+  coverData.value = `file://${newPath}`;
 };
 
 // 实时修改列表
@@ -304,7 +318,7 @@ const updatePlaySong = (metadata: InfoFormType) => {
   // 更新数据
   const updatedSong = {
     name: metadata.name,
-    artists: metadata.artist,
+    artists: metadata.artists.join(" / "),
     album: metadata.album,
     alia: metadata.alia,
     cover: coverData.value || "",
@@ -325,20 +339,31 @@ const updatePlaySong = (metadata: InfoFormType) => {
 // 保存修改
 const saveSongInfo = debounce(async (song: SongInfo) => {
   try {
+    if (!song.path) return;
     if (!infoFormRef.value) return;
     // 校验表单
     await infoFormRef.value?.validate();
     // 保存修改
     const metadata = {
       ...infoFormData.value,
+      artists: infoFormData.value.artists.slice(),
       cover:
         coverData.value.startsWith("blob:") || coverData.value === "/images/song.jpg?assest"
           ? null
           : coverData.value,
     };
-    console.log(song.path, metadata);
     await window.electron.ipcRenderer.invoke("set-music-metadata", song.path, metadata);
     window.$message.success(t("message.song_info_modify_success"));
+
+    // 更新cover
+    if (metadata.cover) {
+      blob.revokeBlobURL(song.path);
+      const coverData = await window.electron.ipcRenderer.invoke("get-music-cover", song.path);
+      if (!coverData) return;
+      const { data, format } = coverData;
+      const blobURL = blob.createBlobURL(data, format, song.path);
+      if (blobURL) metadata.cover = blobURL;
+    }
     // 修改音乐信息
     updatePlaySong(metadata);
     emit("close");

@@ -1,7 +1,9 @@
 <template>
   <div class="download-song">
     <n-collapse-transition :show="!song">
-      <n-text class="loading"> {{ t("modal.loading_song_info") }} </n-text>
+      <n-text class="loading">
+        {{ t("modal.loading_song_info") }}
+      </n-text>
     </n-collapse-transition>
     <n-collapse-transition :show="!!song">
       <n-alert type="warning" :title="t('modal.please_know')" closable>
@@ -15,11 +17,13 @@
             <n-flex>
               <n-radio v-for="(item, index) in song.links" :key="index" :value="item.name">
                 <n-flex>
-                  <n-text class="name">{{ item.name }}</n-text>
+                  <n-text class="name">
+                    {{ item.name }}
+                  </n-text>
                   <!-- 文件预估大小 -->
-                  <n-text v-if="Number(item.size) > 0" depth="3">{{
-                    formatFileSize(Number(item.size) || 0)
-                  }}</n-text>
+                  <n-text v-if="Number(item.size) > 0" depth="3">
+                    {{ formatFileSize(Number(item.size) || 0) }}
+                  </n-text>
                 </n-flex>
               </n-radio>
             </n-flex>
@@ -48,7 +52,9 @@
       </n-collapse>
     </n-collapse-transition>
     <n-flex class="menu" justify="end">
-      <n-button strong secondary @click="emit('close')"> {{ t("common.cancel") }} </n-button>
+      <n-button strong secondary @click="emit('close')">
+        {{ t("common.cancel") }}
+      </n-button>
       <n-button :loading="loading" type="primary" @click="download">
         {{ t("common.download_song") }}
       </n-button>
@@ -65,7 +71,7 @@ import { openSetting } from "@/utils/modal";
 import { saveAs } from "file-saver";
 import player from "@/utils/player";
 import { SongInfo } from "@/types/main.hemusic";
-import { removeWordLyric } from "@/utils/lyric";
+import { romaSeparator, transSeparator, removeWordLyric } from "@/utils/lyric";
 import { getSizeCover } from "@/utils/format";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
@@ -163,8 +169,12 @@ const electronDownload = async (url: string, songName: string, fileType: string)
     const lyricResult = await songLyric(props.song.id, props.song.platform);
     lyric = [
       removeWordLyric(lyricResult?.lyric) || "",
-      downloadLyricTran ? removeWordLyric(lyricResult?.trans) : "",
-      downloadLyricRoma ? removeWordLyric(lyricResult?.roma) : "",
+      downloadLyricTran && lyricResult?.trans
+        ? [transSeparator, removeWordLyric(lyricResult?.trans)].join("\n")
+        : "",
+      downloadLyricRoma && lyricResult?.roma
+        ? [romaSeparator, removeWordLyric(lyricResult?.roma)].join("\n")
+        : "",
     ]
       .filter((item) => !!item)
       .join("\n\n");

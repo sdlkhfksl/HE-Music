@@ -33,25 +33,27 @@
         <div class="data">
           <!-- 评论 -->
           <div class="content">
-            <n-text class="name">{{ item.user.name || t("common.unknown_user") }}：</n-text>
-            <n-text class="name" v-if="item.be_replied && !item.be_replied.content"
-              >{{ t("common.reply") }} @
-              {{ item.be_replied.user.name || t("common.unknown_user") }}：</n-text
-            >
-            <n-text class="text" v-dompurify-html="getContent(item.content)" />
+            <n-text class="name"> {{ item.user.name || t("common.unknown_user") }}： </n-text>
+            <n-text v-if="item.be_replied && !item.be_replied.content" class="name">
+              {{ t("common.reply") }} @
+              {{ item.be_replied.user.name || t("common.unknown_user") }}：
+            </n-text>
+            <n-text v-dompurify-html="getContent(item.content)" class="text" />
           </div>
           <!-- 回复 -->
-          <div class="reply" v-if="item.be_replied && item.be_replied.content">
+          <div v-if="item.be_replied && item.be_replied.content" class="reply">
             <n-text class="name" :depth="3">
               @ {{ item.be_replied.user.name || t("common.unknown_user") }}：
             </n-text>
-            <n-text class="text" v-dompurify-html="getContent(item.be_replied.content)" />
+            <n-text v-dompurify-html="getContent(item.be_replied.content)" class="text" />
           </div>
           <!-- 信息 -->
           <n-flex class="meta" align-items="center">
             <div class="item">
               <SvgIcon name="Time" :depth="3" />
-              <n-text :depth="3">{{ formatCommentTime(Number(item.timestamp) * 1000) }}</n-text>
+              <n-text :depth="3">
+                {{ formatCommentTime(Number(item.timestamp) * 1000) }}
+              </n-text>
             </div>
             <!--            <div v-if="item.ip" :title="item.ip.ip" class="item">-->
             <!--              <SvgIcon name="IP" :depth="3" />-->
@@ -60,22 +62,24 @@
             <!-- 点赞 -->
             <div class="item like">
               <SvgIcon name="ThumbUp" :depth="1" />
-              <n-text :depth="1">{{ n(Number(item.praise_count) || 0, "number") }}</n-text>
+              <n-text :depth="1">
+                {{ n(Number(item.praise_count) || 0, "number") }}
+              </n-text>
             </div>
           </n-flex>
           <!-- 回复 -->
           <div
-            class="sub-comment"
             v-if="item.sub_comments.length > 0 || Number(item.reply_count) > 0"
+            class="sub-comment"
           >
             <CommentList
               :data="item.sub_comments"
-              :loadMore="item.sub_has_more"
+              :load-more="item.sub_has_more"
               :loading="item.sub_loading"
-              @loadMore="emit('loadSubMore', item)"
               sub
-              :subCount="item.sub_page_index === 1"
+              :sub-count="item.sub_page_index === 1"
               :total="Number(item.reply_count)"
+              @load-more="emit('loadSubMore', item)"
             />
           </div>
         </div>

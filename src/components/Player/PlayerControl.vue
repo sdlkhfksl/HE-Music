@@ -29,8 +29,8 @@
             <!-- 上一曲 -->
             <div
               v-if="!statusStore.radioMode"
-              class="btn-icon"
               v-debounce="() => player.nextOrPrev('prev')"
+              class="btn-icon"
             >
               <SvgIcon :size="26" name="SkipPrev" />
             </div>
@@ -57,7 +57,7 @@
               </template>
             </n-button>
             <!-- 下一曲 -->
-            <div class="btn-icon" v-debounce="() => player.nextOrPrev('next')">
+            <div v-debounce="() => player.nextOrPrev('next')" class="btn-icon">
               <SvgIcon :size="26" name="SkipNext" />
             </div>
           </div>
@@ -108,7 +108,7 @@
                 vertical
                 @update:value="(val) => player.setVolume(val)"
               />
-              <n-text class="slider-num">{{ statusStore.playVolumePercent }}%</n-text>
+              <n-text class="slider-num"> {{ statusStore.playVolumePercent }}% </n-text>
             </div>
           </n-popover>
           <!-- 播放列表 -->

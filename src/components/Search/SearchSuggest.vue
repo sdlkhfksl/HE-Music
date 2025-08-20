@@ -22,9 +22,9 @@
           @click="emit('toSearch', statusStore.searchInputValue, 'keyword')"
         >
           <SvgIcon name="Search" :depth="3" />
-          <n-text class="text text-hidden">{{
-            `${t("search.direct_search")} ${statusStore.searchInputValue}`
-          }}</n-text>
+          <n-text class="text text-hidden">
+            {{ `${t("search.direct_search")} ${statusStore.searchInputValue}` }}
+          </n-text>
         </div>
         <!-- 搜索建议 -->
         <Transition name="fade" mode="out-in" @after-leave="calcSearchSuggestHeights">
@@ -36,8 +36,8 @@
                   class="name"
                   :text="suggestItem"
                   :patterns="[statusStore.searchInputValue.trim()]"
-                  highlightClass="highlight"
-                ></n-highlight>
+                  highlight-class="highlight"
+                />
               </div>
             </div>
           </div>

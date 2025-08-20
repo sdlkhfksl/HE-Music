@@ -2,7 +2,7 @@
   <div class="login">
     <img src="/icons/favicon.png?assest" alt="logo" class="logo" />
     <!-- 登录方式 -->
-    <LoginPassword @saveLogin="saveLogin" />
+    <LoginPassword @save-login="saveLogin" />
     <!-- 其他方式 -->
     <n-flex align="center" class="other">
       <n-button
@@ -12,7 +12,7 @@
         style="font-size: 16px"
         @click="oauthLogin(item)"
       >
-        <SvgIcon size="20" :name="item"></SvgIcon>
+        <SvgIcon size="20" :name="item" />
         {{ item }}
       </n-button>
     </n-flex>

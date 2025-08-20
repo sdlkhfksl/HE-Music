@@ -66,7 +66,9 @@
       bordered
       @after-leave="rememberNotAsk = false"
     >
-      <n-text class="tip">{{ t("message.close_software_confirm") }}</n-text>
+      <n-text class="tip">
+        {{ t("message.close_software_confirm") }}
+      </n-text>
       <n-checkbox v-model:checked="rememberNotAsk" class="checkbox">
         {{ t("message.remember_and_do_not_ask_again") }}
       </n-checkbox>

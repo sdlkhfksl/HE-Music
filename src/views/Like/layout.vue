@@ -23,9 +23,15 @@
       type="segment"
       @update:value="(name: string) => router.push({ name })"
     >
-      <n-tab name="like-playlists"> {{ t("common.playlist") }} </n-tab>
-      <n-tab name="like-albums"> {{ t("common.album") }} </n-tab>
-      <n-tab name="like-artists"> {{ t("common.artist") }} </n-tab>
+      <n-tab name="like-playlists">
+        {{ t("common.playlist") }}
+      </n-tab>
+      <n-tab name="like-albums">
+        {{ t("common.album") }}
+      </n-tab>
+      <n-tab name="like-artists">
+        {{ t("common.artist") }}
+      </n-tab>
       <!--      <n-tab name="like-videos"> 视频 </n-tab>-->
     </n-tabs>
     <!-- 路由 -->
@@ -34,7 +40,7 @@
         <KeepAlive v-if="settingStore.useKeepAlive">
           <component :is="Component" class="router-view" />
         </KeepAlive>
-        <component v-else :is="Component" class="router-view" />
+        <component :is="Component" v-else class="router-view" />
       </Transition>
     </RouterView>
   </div>

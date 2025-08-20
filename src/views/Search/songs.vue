@@ -5,10 +5,10 @@
       v-if="searchCount > 0"
       :data="searchResultData"
       :loading="loading"
-      loadMore
-      disabledSort
-      @reachBottom="reachBottom"
+      load-more
+      disabled-sort
       :height="songListHeight"
+      @reach-bottom="reachBottom"
     />
     <n-empty
       v-else

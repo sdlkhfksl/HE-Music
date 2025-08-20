@@ -3,29 +3,37 @@
 <template>
   <div class="setting-type">
     <div class="set-list">
-      <n-h3 prefix="bar"> {{ t("setting.shortcut.global_shortcut") }} </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.shortcut.global_shortcut") }}
+      </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.shortcut.open_global_shortcut") }}</n-text>
-          <n-text class="tip" :depth="3">{{
-            t("setting.shortcut.open_global_shortcut_tip")
-          }}</n-text>
+          <n-text class="name">
+            {{ t("setting.shortcut.open_global_shortcut") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.shortcut.open_global_shortcut_tip") }}
+          </n-text>
         </div>
         <n-switch
-          class="set"
           v-model:value="shortcutStore.globalOpen"
+          class="set"
           :round="false"
           @update:value="updateGlobalOpen"
         />
       </n-card>
     </div>
     <div class="set-list">
-      <n-h3 prefix="bar"> {{ t("setting.shortcut.change_shortcut") }} </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.shortcut.change_shortcut") }}
+      </n-h3>
       <n-card id="shortcut-list" class="set-item">
         <n-list v-for="(item, key, index) in shortcutList" :key="index" class="shortcut" hoverable>
           <n-list-item>
             <template #prefix>
-              <n-text class="name">{{ t("common." + snakeCase(key)) }}</n-text>
+              <n-text class="name">
+                {{ t("common." + snakeCase(key)) }}
+              </n-text>
             </template>
             <n-thing>
               <n-flex>

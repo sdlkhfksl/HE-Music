@@ -1,6 +1,8 @@
 <template>
   <div class="exclude">
-    <n-alert :show-icon="false">{{ t("setting.lyrics.lyrics_exclude_warning") }}</n-alert>
+    <n-alert :show-icon="false">
+      {{ t("setting.lyrics.lyrics_exclude_warning") }}
+    </n-alert>
     <n-dynamic-tags v-model:value="settingStore.lyricExcludeKeywords" />
   </div>
 </template>

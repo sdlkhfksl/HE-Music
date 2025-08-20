@@ -5,10 +5,10 @@
         v-if="searchCount > 0"
         :data="searchResultData"
         :loading="loading"
-        :loadMore="hasMore"
+        :load-more="hasMore"
         cols="2 600:2 800:3 900:4 1200:5 1400:6"
         type="video"
-        @loadMore="loadMore"
+        @load-more="loadMore"
       />
       <n-empty
         v-else

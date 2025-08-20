@@ -3,10 +3,10 @@
     <VideoList
       :data="videoData"
       :loading="loading"
-      :loadMore="hasMore"
+      :load-more="hasMore"
       type="video"
       cols="2 600:2 800:3 900:4 1200:5 1400:6"
-      @loadMore="loadMore"
+      @load-more="loadMore"
     />
   </div>
 </template>

@@ -5,7 +5,9 @@
     :description="t('route.server_internal_error_tip')"
   >
     <template #footer>
-      <n-button type="primary" @click="router.go(0)"> {{ t("status.reload") }} </n-button>
+      <n-button type="primary" @click="router.go(0)">
+        {{ t("status.reload") }}
+      </n-button>
     </template>
   </n-result>
 </template>

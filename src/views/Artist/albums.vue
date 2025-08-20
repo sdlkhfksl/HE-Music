@@ -3,9 +3,9 @@
     <AlbumList
       :data="albumData"
       :loading="loading"
-      :loadMore="hasMore"
+      :load-more="hasMore"
       type="album"
-      @loadMore="loadMore"
+      @load-more="loadMore"
     />
   </div>
 </template>

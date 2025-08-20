@@ -31,21 +31,29 @@
             </div>
             <!-- 信息 -->
             <div class="cover-data">
-              <n-text class="name text-hidden">{{ item.name }}</n-text>
+              <n-text class="name text-hidden">
+                {{ item.name }}
+              </n-text>
               <!-- 数量 -->
 
               <div v-if="!hiddenItem" class="item">
                 <div v-if="item.song_count" class="num">
                   <SvgIcon name="Music" :depth="3" />
-                  <n-text class="num" :depth="3">{{ item.song_count }}</n-text>
+                  <n-text class="num" :depth="3">
+                    {{ item.song_count }}
+                  </n-text>
                 </div>
                 <div v-if="item.album_count" class="num">
                   <SvgIcon name="Album" :depth="3" />
-                  <n-text class="num" :depth="3">{{ item.album_count }}</n-text>
+                  <n-text class="num" :depth="3">
+                    {{ item.album_count }}
+                  </n-text>
                 </div>
                 <div v-if="item.mv_count" class="num">
                   <SvgIcon name="Video" :depth="3" />
-                  <n-text class="num" :depth="3">{{ item.mv_count }}</n-text>
+                  <n-text class="num" :depth="3">
+                    {{ item.mv_count }}
+                  </n-text>
                 </div>
               </div>
             </div>

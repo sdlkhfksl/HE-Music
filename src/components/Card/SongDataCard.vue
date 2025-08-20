@@ -9,7 +9,9 @@
     </n-image>
     <Transition name="fade" mode="out-in">
       <div v-if="data" class="data">
-        <n-text class="name">{{ data.name }}</n-text>
+        <n-text class="name">
+          {{ data.name }}
+        </n-text>
         <div v-if="Array.isArray(data.artists)" class="artists text-hidden">
           <SvgIcon name="Artist" :depth="3" />
           <n-text v-for="ar in data.artists" :key="ar.id" class="ar">
@@ -18,7 +20,9 @@
         </div>
         <div v-else class="artists text-hidden">
           <SvgIcon name="Artist" :depth="3" />
-          <n-text class="ar"> {{ data.artists || t("common.unknown_artist") }}</n-text>
+          <n-text class="ar">
+            {{ data.artists || t("common.unknown_artist") }}
+          </n-text>
         </div>
         <div class="album text-hidden">
           <SvgIcon name="Album" :depth="3" />

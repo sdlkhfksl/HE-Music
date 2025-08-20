@@ -37,8 +37,8 @@
         <!-- 导航栏 -->
         <Nav id="main-header" />
         <n-layout
-          ref="contentRef"
           id="main-content"
+          ref="contentRef"
           :native-scrollbar="false"
           :style="{
             '--layout-height': contentHeight,
@@ -58,7 +58,7 @@
               <KeepAlive v-if="settingStore.useKeepAlive" :max="20" :exclude="['layout', 'Video']">
                 <component :is="Component" class="router-view" />
               </KeepAlive>
-              <component v-else :is="Component" class="router-view" />
+              <component :is="Component" v-else class="router-view" />
             </Transition>
           </RouterView>
           <!-- 回顶 -->
@@ -90,6 +90,7 @@
 import { useMusicStore, useStatusStore, useSettingStore, useDataStore } from "@/stores";
 import init from "@/utils/init";
 import { useI18n } from "vue-i18n";
+import blob from "@/utils/blob";
 const { t } = useI18n();
 
 const musicStore = useMusicStore();
@@ -118,6 +119,9 @@ onMounted(async () => {
     return;
   }
   await init();
+});
+onUnmounted(() => {
+  blob.revokeAllBlobURLs();
 });
 </script>
 

@@ -3,12 +3,14 @@
     <n-scrollbar class="artist-list">
       <n-card
         v-for="(item, key, index) in artistData"
-        :key="index"
         :id="key"
+        :key="index"
         :class="['artist-item', { choose: chooseArtist === key }]"
         @click="chooseArtist = key"
       >
-        <n-text class="name">{{ key }}</n-text>
+        <n-text class="name">
+          {{ key }}
+        </n-text>
         <n-text class="num" depth="3">
           <SvgIcon name="Music" :depth="3" />
           {{ t("common.song_counter", { count: item.length }) }}

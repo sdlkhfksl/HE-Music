@@ -9,7 +9,7 @@
         >
           <div class="title">
             <SvgIcon name="History" />
-            <n-text class="name"> </n-text>
+            <n-text class="name" />
             {{ t("search.history") }}
             <SvgIcon class="delete" name="Delete" @click.stop="deleteSearchHistory" />
           </div>
@@ -39,10 +39,14 @@
             class="hot-item"
             @click="emit('toSearch', item)"
           >
-            <n-text class="num" depth="3">{{ index + 1 }}</n-text>
+            <n-text class="num" depth="3">
+              {{ index + 1 }}
+            </n-text>
             <div class="data">
               <div class="name">
-                <n-text class="text">{{ item }}</n-text>
+                <n-text class="text">
+                  {{ item }}
+                </n-text>
                 <!--                <n-tag-->
                 <!--                  v-if="item.iconUrl"-->
                 <!--                  :type="item.iconType == 1 ? 'error' : 'warning'"-->

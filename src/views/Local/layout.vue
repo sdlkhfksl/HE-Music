@@ -1,7 +1,9 @@
 <template>
   <div class="local">
     <div class="title">
-      <n-text class="keyword">{{ t("common.local_music") }}</n-text>
+      <n-text class="keyword">
+        {{ t("common.local_music") }}
+      </n-text>
       <n-flex class="status">
         <n-text class="item">
           <SvgIcon name="Music" :depth="3" />
@@ -18,6 +20,7 @@
     <n-flex class="menu" justify="space-between">
       <n-flex class="left" align="flex-end">
         <n-button
+          v-debounce="() => player.updatePlayList(listData)"
           :focusable="false"
           :disabled="loading && !localStore.localSongs?.length"
           :loading="loading"
@@ -25,7 +28,6 @@
           strong
           secondary
           round
-          v-debounce="() => player.updatePlayList(listData)"
         >
           <template #icon>
             <SvgIcon name="Play" />
@@ -60,7 +62,7 @@
           v-model:value="searchValue"
           :input-props="{ autocomplete: 'off' }"
           class="search"
-          :placeholder="t('common.fuzzy_search')"
+          :placeholder="t('search.fuzzy_search')"
           clearable
           round
           @input="listSearch"
@@ -75,7 +77,9 @@
           type="segment"
           @update:value="(name: string) => router.push({ name })"
         >
-          <n-tab name="local-songs"> {{ t("common.songs") }} </n-tab>
+          <n-tab name="local-songs">
+            {{ t("common.songs") }}
+          </n-tab>
           <n-tab :disabled="listData.length === 0" name="local-artists">
             {{ t("common.artists") }}
           </n-tab>
@@ -91,7 +95,7 @@
         <KeepAlive v-if="settingStore.useKeepAlive">
           <component :is="Component" :data="listData" :loading="loading" class="router-view" />
         </KeepAlive>
-        <component v-else :is="Component" :data="listData" :loading="loading" class="router-view" />
+        <component :is="Component" v-else :data="listData" :loading="loading" class="router-view" />
       </Transition>
     </RouterView>
     <!-- 目录管理 -->

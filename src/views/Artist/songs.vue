@@ -3,8 +3,8 @@
     <SongList
       :data="songData"
       :loading="loading"
-      loadMore
-      @reachBottom="reachBottom"
+      load-more
+      @reach-bottom="reachBottom"
       @scroll="emit('scroll', $event)"
     />
   </div>

@@ -5,7 +5,7 @@
       :data="data"
       :loading="loading"
       :hidden-cover="!settingStore.showLocalCover"
-      :hiddenSize="false"
+      :hidden-size="false"
     />
   </div>
 </template>

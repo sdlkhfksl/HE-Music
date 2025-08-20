@@ -39,7 +39,9 @@
           @click="router.push({ name: item.name })"
         >
           <n-number-animation :from="0" :to="item.value" />
-          <n-text :depth="3">{{ item.label }}</n-text>
+          <n-text :depth="3">
+            {{ item.label }}
+          </n-text>
         </div>
       </div>
       <n-divider />

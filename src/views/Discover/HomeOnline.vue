@@ -40,7 +40,7 @@
         :data="item.list"
         height="auto"
         :loading="true"
-        :showFooter="false"
+        :show-footer="false"
       />
     </div>
   </div>

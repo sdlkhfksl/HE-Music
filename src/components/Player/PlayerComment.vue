@@ -15,7 +15,7 @@
           :data="commentHotData"
           :loading="commentHotData?.length === 0"
           transparent
-          @loadSubMore="loadSubMore"
+          @load-sub-more="loadSubMore"
         />
       </template>
       <div class="placeholder">
@@ -28,10 +28,10 @@
         :data="commentData"
         :loading="commentLoading"
         type="song"
-        :loadMore="commentHasMore"
+        :load-more="commentHasMore"
         transparent
-        @loadMore="loadMoreComment"
-        @loadSubMore="loadSubMore"
+        @load-more="loadMoreComment"
+        @load-sub-more="loadSubMore"
       />
       <div class="placeholder" />
     </n-scrollbar>

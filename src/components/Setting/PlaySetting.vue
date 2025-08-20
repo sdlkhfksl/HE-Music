@@ -2,16 +2,20 @@
 <template>
   <div class="setting-type">
     <div class="set-list">
-      <n-h3 prefix="bar"> {{ t("setting.play.play_setting") }} </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.play.play_setting") }}
+      </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.play.auto_play") }}</n-text>
-          <n-text v-if="isElectron" class="tip" :depth="3">{{
-            t("setting.play.auto_play_tip")
-          }}</n-text>
-          <n-text v-else class="tip" :depth="3">{{
-            t("setting.play.auto_play_not_support_tip")
-          }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.auto_play") }}
+          </n-text>
+          <n-text v-if="isElectron" class="tip" :depth="3">
+            {{ t("setting.play.auto_play_tip") }}
+          </n-text>
+          <n-text v-else class="tip" :depth="3">
+            {{ t("setting.play.auto_play_not_support_tip") }}
+          </n-text>
         </div>
         <n-switch
           v-model:value="settingStore.autoPlay"
@@ -22,24 +26,32 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.play.memory_last_seek") }}</n-text>
-          <n-text class="tip" :depth="3"> {{ t("setting.play.memory_last_seek_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.memory_last_seek") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.play.memory_last_seek_tip") }}
+          </n-text>
         </div>
         <n-switch v-model:value="settingStore.memoryLastSeek" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name"> {{ t("setting.play.song_volume_fade") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.song_volume_fade") }}
+          </n-text>
         </div>
         <n-switch v-model:value="settingStore.songVolumeFade" class="set" :round="false" />
       </n-card>
       <n-collapse-transition :show="settingStore.songVolumeFade">
         <n-card class="set-item">
           <div class="label">
-            <n-text class="name"> {{ t("setting.play.song_volume_fade_time") }}</n-text>
+            <n-text class="name">
+              {{ t("setting.play.song_volume_fade_time") }}
+            </n-text>
             <n-text class="tip" :depth="3">
-              {{ t("setting.play.song_volume_fade_time_tip") }}</n-text
-            >
+              {{ t("setting.play.song_volume_fade_time_tip") }}
+            </n-text>
           </div>
           <n-input-number
             v-model:value="settingStore.songVolumeFadeTime"
@@ -55,8 +67,12 @@
       </n-collapse-transition>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name"> {{ t("setting.play.online_song_quality") }}</n-text>
-          <n-text class="tip" :depth="3"> {{ songLevelData[settingStore.songLevel]?.tip }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.online_song_quality") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ songLevelData[settingStore.songLevel]?.tip }}
+          </n-text>
         </div>
         <n-select
           v-model:value="settingStore.songLevel"
@@ -74,8 +90,12 @@
       <!--      </n-card>-->
       <n-card v-if="isElectron" class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.play.unlock_music") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.play.unlock_music_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.unlock_music") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.play.unlock_music_tip") }}
+          </n-text>
         </div>
         <n-switch v-model:value="settingStore.useSongUnlock" class="set" :round="false" />
       </n-card>
@@ -88,8 +108,12 @@
       <!--      </n-card>-->
       <n-card v-if="isElectron" class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.play.output_device") }}</n-text>
-          <n-text class="tip" :depth="3"> {{ t("setting.play.output_device_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.output_device") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.play.output_device_tip") }}
+          </n-text>
         </div>
         <n-select
           v-model:value="settingStore.playDevice"
@@ -101,11 +125,17 @@
       </n-card>
     </div>
     <div class="set-list">
-      <n-h3 prefix="bar"> {{ t("common.player") }} </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("common.player") }}
+      </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name"> {{ t("setting.play.player_type") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.play.player_type_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.player_type") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.play.player_type_tip") }}
+          </n-text>
         </div>
         <n-select
           v-model:value="settingStore.playerType"
@@ -124,8 +154,12 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name"> {{ t("setting.play.player_background_type") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.play.player_background_type_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.player_background_type") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.play.player_background_type_tip") }}
+          </n-text>
         </div>
         <n-select
           v-model:value="settingStore.playerBackgroundType"
@@ -155,35 +189,53 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.play.full_player_cache") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.play.full_player_cache_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.full_player_cache") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.play.full_player_cache_tip") }}
+          </n-text>
         </div>
         <n-switch v-model:value="settingStore.fullPlayerCache" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.play.count_down_show") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.play.count_down_show_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.count_down_show") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.play.count_down_show_tip") }}
+          </n-text>
         </div>
         <n-switch v-model:value="settingStore.countDownShow" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.play.bar_lyric_show") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.play.bar_lyric_show_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.bar_lyric_show") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.play.bar_lyric_show_tip") }}
+          </n-text>
         </div>
         <n-switch v-model:value="settingStore.barLyricShow" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.play.show_playlist_count") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.show_playlist_count") }}
+          </n-text>
         </div>
         <n-switch v-model:value="settingStore.showPlaylistCount" class="set" :round="false" />
       </n-card>
       <n-card v-if="isElectron" class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.play.show_spectrum") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.play.show_spectrum_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.show_spectrum") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.play.show_spectrum_tip") }}
+          </n-text>
         </div>
         <n-switch
           class="set"
@@ -194,20 +246,28 @@
       </n-card>
     </div>
     <div class="set-list">
-      <n-h3 prefix="bar"> {{ t("setting.play.system_integration") }} </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.play.system_integration") }}
+      </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.play.smtc") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.play.smtc_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.smtc") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.play.smtc_tip") }}
+          </n-text>
         </div>
         <n-switch v-model:value="settingStore.smtcOpen" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.play.smtc_output_high_quality_cover") }}</n-text>
-          <n-text class="tip" :depth="3">{{
-            t("setting.play.smtc_output_high_quality_cover_tip")
-          }}</n-text>
+          <n-text class="name">
+            {{ t("setting.play.smtc_output_high_quality_cover") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.play.smtc_output_high_quality_cover_tip") }}
+          </n-text>
         </div>
         <n-switch
           v-model:value="settingStore.smtcOutputHighQualityCover"

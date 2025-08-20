@@ -1,11 +1,11 @@
 <!-- 播放列表 -->
 <template>
   <n-drawer
+    id="main-playlist"
     v-model:show="statusStore.playListShow"
     :class="{ 'full-player': statusStore.showFullPlayer }"
     :style="{ '--main-color': statusStore.mainColor }"
     :auto-focus="false"
-    id="main-playlist"
     style="width: 400px"
   >
     <n-drawer-content :native-scrollbar="false" closable>
@@ -33,13 +33,13 @@
           <template #default="{ item: songData, index }">
             <div
               :key="index"
-              :class="['song-item', { on: statusStore.playIndex === index }]"
               v-debounce="
                 () => {
                   player.togglePlayIndex(index);
                   statusStore.playListShow = false;
                 }
               "
+              :class="['song-item', { on: statusStore.playIndex === index }]"
             >
               <!-- 序号 -->
               <div class="index">
@@ -54,7 +54,9 @@
               </div>
               <!-- 信息 -->
               <div class="data">
-                <n-text class="name text-hidden">{{ songData.name }}</n-text>
+                <n-text class="name text-hidden">
+                  {{ songData.name }}
+                </n-text>
                 <div v-if="Array.isArray(songData?.artists)" class="artists">
                   <n-text v-for="ar in songData.artists" :key="ar.id" depth="3" class="ar">
                     {{ ar.name }}

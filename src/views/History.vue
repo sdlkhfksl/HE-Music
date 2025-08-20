@@ -4,19 +4,19 @@
       <n-text class="keyword">
         {{ t("nav.play_history") }}
       </n-text>
-      <n-text class="size" depth="3">{{
-        t("common.total_song_count", { count: dataStore.historyList?.length || 0 })
-      }}</n-text>
+      <n-text class="size" depth="3">
+        {{ t("common.total_song_count", { count: dataStore.historyList?.length || 0 }) }}
+      </n-text>
     </div>
     <n-flex class="menu">
       <n-button
+        v-debounce="() => player.updatePlayList(dataStore.historyList)"
         :focusable="false"
         :disabled="!dataStore.historyList?.length"
         type="primary"
         strong
         secondary
         round
-        v-debounce="() => player.updatePlayList(dataStore.historyList)"
       >
         <template #icon>
           <SvgIcon name="Play" />
@@ -43,8 +43,8 @@
         v-if="dataStore.historyList.length > 0"
         :data="dataStore.historyList"
         :loading="true"
-        hiddenCover
-        hiddenSize
+        hidden-cover
+        hidden-size
       />
       <n-empty v-else :description="t('history.no_record')" style="margin-top: 60px" size="large">
         <template #icon>

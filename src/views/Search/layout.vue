@@ -1,18 +1,20 @@
 <template>
   <div :key="searchKeyword" class="search">
     <div class="title">
-      <n-text class="keyword">{{ searchKeyword }}</n-text>
+      <n-text class="keyword">
+        {{ searchKeyword }}
+      </n-text>
       <n-text depth="3">
         {{ t("search.search_result") }}
       </n-text>
     </div>
     <!-- 标签页 -->
     <n-tabs
+      v-model:value="searchType"
       class="tabs"
       type="segment"
       animated
       default-value="song"
-      v-model:value="searchType"
       @update:value="tabChange"
     >
       <!--      <n-tab name="search-songs"> 单曲 </n-tab>-->

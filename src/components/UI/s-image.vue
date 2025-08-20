@@ -10,8 +10,8 @@
       <img
         v-if="src"
         ref="imgRef"
-        :src="imgSrc"
         :key="imgSrc"
+        :src="imgSrc"
         :alt="alt || 'image'"
         :class="['cover', { loaded: isLoaded }]"
         @load="imageLoaded"

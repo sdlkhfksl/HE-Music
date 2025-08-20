@@ -1,6 +1,6 @@
 <template>
   <div class="new-song">
-    <n-tabs class="tabs" type="bar" animated v-model:value="tab_id" @update:value="tagChange">
+    <n-tabs v-model:value="tab_id" class="tabs" type="bar" animated @update:value="tagChange">
       <n-tab-pane
         v-for="tab in tabs"
         :key="`new-song-${tab.platform}-${tab.id}`"

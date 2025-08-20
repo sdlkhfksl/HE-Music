@@ -9,8 +9,7 @@
     trigger="manual"
     @select="dropdownShow = false"
     @clickoutside="dropdownShow = false"
-  >
-  </n-dropdown>
+  />
 </template>
 
 <script setup lang="ts">

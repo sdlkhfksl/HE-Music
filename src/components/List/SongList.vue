@@ -17,18 +17,18 @@
           ref="listRef"
           :key="listData?.[0]?.id"
           :list="listData"
-          :minSize="94"
+          :min-size="94"
           :buffer="2"
           :offset="offset"
           :style="{ height: height === 'auto' ? 'auto' : `${height || songListHeight}px` }"
-          itemKey="id"
+          item-key="id"
           @scroll="onScroll"
-          @toBottom="onToBottom"
+          @to-bottom="onToBottom"
         >
           <!-- 悬浮顶栏 -->
           <template v-if="showHeader" #stickyHeader>
             <div class="list-header song-card">
-              <n-text class="num">#</n-text>
+              <n-text class="num"> # </n-text>
               <n-dropdown
                 v-if="!disabledSort"
                 :options="sortMenuOptions"
@@ -43,11 +43,19 @@
                   </n-text>
                 </div>
               </n-dropdown>
-              <n-text v-else class="title">{{ t("common.title") }}</n-text>
-              <n-text v-if="!hiddenAlbum" class="album">{{ t("common.album") }}</n-text>
-              <n-text class="actions"></n-text>
-              <n-text class="meta">{{ t("common.duration") }}</n-text>
-              <n-text v-if="!hiddenSize" class="meta">{{ t("common.size") }}</n-text>
+              <n-text v-else class="title">
+                {{ t("common.title") }}
+              </n-text>
+              <n-text v-if="!hiddenAlbum" class="album">
+                {{ t("common.album") }}
+              </n-text>
+              <n-text class="actions" />
+              <n-text class="meta">
+                {{ t("common.duration") }}
+              </n-text>
+              <n-text v-if="!hiddenSize" class="meta">
+                {{ t("common.size") }}
+              </n-text>
             </div>
           </template>
           <!-- 主内容 -->
@@ -55,13 +63,13 @@
             <SongCard
               :song="itemData"
               :index="index"
-              :hiddenCover="hiddenCover"
-              :hiddenAlbum="hiddenAlbum"
+              :hidden-cover="hiddenCover"
+              :hidden-album="hiddenAlbum"
+              :hidden-size="hiddenSize"
               @dblclick.stop="player.updatePlayList(listData, itemData, playlist)"
               @contextmenu.stop="
                 songListMenuRef?.openDropdown($event, listData, itemData, index, playlist)
               "
-              :hiddenSize="hiddenSize"
             />
           </template>
           <!-- 加载更多 -->
@@ -77,7 +85,7 @@
         </VirtList>
       </Transition>
       <!-- 右键菜单 -->
-      <SongListMenu ref="songListMenuRef" @removeSong="removeSong" />
+      <SongListMenu ref="songListMenuRef" @remove-song="removeSong" />
       <!-- 列表操作 -->
       <Teleport to="body">
         <Transition name="fade" mode="out-in">

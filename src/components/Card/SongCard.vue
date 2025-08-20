@@ -22,7 +22,7 @@
         <!-- 封面 -->
         <s-image
           v-if="!hiddenCover"
-          :key="song.cover"
+          :key="song.cover || song.path || song.id"
           :src="song.path ? song.cover : getSizeCover(song, 300)"
           class="cover"
           @update:show="localCover"
@@ -99,21 +99,23 @@
             class="artists text-hidden"
             @click="openJumpArtist(song.platform, song.artists)"
           >
-            <n-text class="ar"> {{ song.artists || t("common.unknown_artist") }} </n-text>
+            <n-text class="ar">
+              {{ song.artists || t("common.unknown_artist") }}
+            </n-text>
           </div>
           <!--别名-->
-          <n-text v-if="song.subtitle" class="alia text-hidden" depth="3">{{
-            song.subtitle
-          }}</n-text>
+          <n-text v-if="song.subtitle" class="alia text-hidden" depth="3">
+            {{ song.subtitle }}
+          </n-text>
           <!--更多版本-->
           <n-collapse
-            class="sublist-btn"
             v-if="song.sublist?.length > 0"
+            class="sublist-btn"
             arrow-placement="right"
             @item-header-click="toggleSublist"
             @dblclick.stop=""
           >
-            <n-collapse-item :title="t('search.more_version')" name="1"> </n-collapse-item>
+            <n-collapse-item :title="t('search.more_version')" name="1" />
           </n-collapse>
           <!--          <n-text v-if="song.sublist?.length > 0" @click.stop="toggleSublist">更多版本 {{showSublist? '收起' : '展开' }} </n-text>-->
         </div>
@@ -157,7 +159,9 @@
       <!--        {{ formatNumber(song.playCount || 0) }}-->
       <!--      </n-text>-->
       <!-- 时长 -->
-      <n-text class="meta" depth="3">{{ secondsToTime(song.duration) }}</n-text>
+      <n-text class="meta" depth="3">
+        {{ secondsToTime(song.duration) }}
+      </n-text>
       <!-- 大小 -->
       <n-text v-if="!hiddenSize" class="meta size" depth="3">
         {{ formatFileSize(song.size || 0) }}
@@ -170,8 +174,8 @@
         :data="song.sublist"
         height="auto"
         :loading="false"
-        :showFooter="false"
-        :showHeader="false"
+        :show-footer="false"
+        :show-header="false"
       />
     </n-collapse-transition>
   </div>

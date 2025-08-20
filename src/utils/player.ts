@@ -27,7 +27,7 @@ class Player {
   // 频谱数据
   private audioContext: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
-  private dataArray: Uint8Array | null = null;
+  private dataArray: Uint8Array<ArrayBuffer> | null = null;
   private source: MediaElementAudioSourceNode | null = null;
   // 其他数据
   private testNumber: number = 0;
@@ -516,6 +516,7 @@ class Player {
       statusStore.playLoading = true;
       // 本地歌曲
       if (path) {
+        statusStore.playQuality = playSongData.quality || "local";
         await this.createPlayer("file://" + path, autoPlay, seek);
         // 获取歌曲元信息
         await this.parseLocalMusicInfo(path);

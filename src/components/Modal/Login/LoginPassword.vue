@@ -3,8 +3,8 @@
     <n-form ref="formRef" :model="formData" :rules="formRules" class="phone-form">
       <n-form-item :label="t('common.username')" path="username">
         <n-input
-          type="text"
           v-model:value="formData.username"
+          type="text"
           :show-button="false"
           :placeholder="t('modal.username_placeholder')"
           passively-activated
@@ -34,7 +34,9 @@
         </n-input>
       </n-form-item>
       <n-form-item :show-label="false">
-        <n-button class="login" type="primary" @click="login"> {{ t("common.login") }} </n-button>
+        <n-button class="login" type="primary" @click="login">
+          {{ t("common.login") }}
+        </n-button>
       </n-form-item>
     </n-form>
   </div>

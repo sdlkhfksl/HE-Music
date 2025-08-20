@@ -7,7 +7,7 @@
             :src="artistDetailData.cover"
             :previewed-img-props="{ style: { borderRadius: '8px' } }"
             :preview-src="artistDetailData.cover"
-            :renderToolbar="renderToolbar"
+            :render-toolbar="renderToolbar"
             show-toolbar-tooltip
             class="cover-img"
             @load="coverLoaded"
@@ -23,9 +23,9 @@
         </div>
         <div class="data">
           <div class="name text-hidden">
-            <n-text class="name-text">{{
-              artistDetailData.name || t("common.unknown_artist")
-            }}</n-text>
+            <n-text class="name-text">
+              {{ artistDetailData.name || t("common.unknown_artist") }}
+            </n-text>
             <n-text v-if="artistDetailData?.alias" class="name-alias" depth="3">
               {{ artistDetailData.alias || t("common.unknown_artist") }}
             </n-text>
@@ -118,28 +118,34 @@
     </Transition>
     <!-- 标签页 -->
     <n-tabs v-model:value="artistType" class="tabs" type="segment" @update:value="tabChange">
-      <n-tab name="artist-songs"> {{ t("common.songs") }} </n-tab>
-      <n-tab name="artist-albums"> {{ t("common.albums") }} </n-tab>
-      <n-tab name="artist-videos"> {{ t("common.videos") }} </n-tab>
+      <n-tab name="artist-songs">
+        {{ t("common.songs") }}
+      </n-tab>
+      <n-tab name="artist-albums">
+        {{ t("common.albums") }}
+      </n-tab>
+      <n-tab name="artist-videos">
+        {{ t("common.videos") }}
+      </n-tab>
     </n-tabs>
     <!-- 路由 -->
     <RouterView v-slot="{ Component }">
       <Transition :name="`router-${settingStore.routeAnimation}`" mode="out-in">
         <KeepAlive v-if="settingStore.useKeepAlive">
           <component
-            ref="componentRef"
             :is="Component"
             :id="artistId"
+            ref="componentRef"
             :platform="platform"
             class="router-view"
             @scroll="listScroll"
           />
         </KeepAlive>
         <component
-          v-else
-          ref="componentRef"
           :is="Component"
+          v-else
           :id="artistId"
+          ref="componentRef"
           :platform="platform"
           class="router-view"
           @scroll="listScroll"

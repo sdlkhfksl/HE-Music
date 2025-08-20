@@ -11,10 +11,14 @@
     </n-flex>
     <n-scrollbar style="max-height: 500px">
       <div v-if="data?.releaseNotes" class="markdown-body" v-html="data.releaseNotes" />
-      <div v-else class="markdown-body">{{ t("modal.no_update_log") }}</div>
+      <div v-else class="markdown-body">
+        {{ t("modal.no_update_log") }}
+      </div>
     </n-scrollbar>
     <n-flex class="menu" justify="end">
-      <n-button strong secondary @click="emit('close')"> {{ t("common.cancel") }} </n-button>
+      <n-button strong secondary @click="emit('close')">
+        {{ t("common.cancel") }}
+      </n-button>
       <n-button type="warning" strong secondary @click="goDownload">
         {{ t("modal.click_download") }}
       </n-button>

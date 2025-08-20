@@ -37,8 +37,8 @@
       v-if="playlistCount > 0"
       :data="playlistData"
       :loading="loading"
-      :loadMore="hasMore"
-      @loadMore="loadMore"
+      :load-more="hasMore"
+      @load-more="loadMore"
     />
     <!-- 分类选择 -->
     <n-modal

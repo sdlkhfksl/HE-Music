@@ -1,11 +1,11 @@
 <!-- 用户协议 -->
 <template>
   <div class="user-agreement">
-    <n-h1 class="title">用户协议</n-h1>
+    <n-h1 class="title"> 用户协议 </n-h1>
     <n-scrollbar class="scrollbar">
       <n-flex class="date" justify="center">
-        <n-tag round>生效日期：2024 年 7 月 16 日</n-tag>
-        <n-tag type="warning" round>更新日期：2024 年 9 月 28 日</n-tag>
+        <n-tag round> 生效日期：2024 年 7 月 16 日 </n-tag>
+        <n-tag type="warning" round> 更新日期：2024 年 9 月 28 日 </n-tag>
       </n-flex>
       <n-p>
         欢迎使用 HE-Music（以下简称“本软件”）。本软件是一个本地音乐播放软件，可能会调用第三方 API
@@ -20,9 +20,9 @@
       </n-ol>
       <n-h3 prefix="bar"> 开源许可 </n-h3>
       <n-ol>
-        <n-li
-          >本项目基于开源项目SPlayer进行二次开发，产生的一切责任都与SPlayer以及他的开发者无关。</n-li
-        >
+        <n-li>
+          本项目基于开源项目SPlayer进行二次开发，产生的一切责任都与SPlayer以及他的开发者无关。
+        </n-li>
         <n-li>仅供个人学习研究使用，禁止用于商业及非法用途。</n-li>
         <n-li>本软件是基于 AGPL-3.0 许可发布的开源软件。</n-li>
         <n-li>用户在使用、修改和分发 HE-Music 时，必须遵守 AGPL-3.0 许可的条款和条件。</n-li>
@@ -112,8 +112,8 @@
       </n-card>
     </n-scrollbar>
     <n-flex justify="center">
-      <n-button v-if="isElectron" type="error" @click="closeApp">不同意</n-button>
-      <n-button type="success" @click="emit('close')" :disabled="!isReadOver">
+      <n-button v-if="isElectron" type="error" @click="closeApp"> 不同意 </n-button>
+      <n-button type="success" :disabled="!isReadOver" @click="emit('close')">
         {{ isReadOver ? "同意并使用" : "请先完整阅读" }}
       </n-button>
     </n-flex>

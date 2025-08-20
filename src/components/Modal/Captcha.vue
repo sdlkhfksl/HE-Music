@@ -39,9 +39,10 @@
 <script setup lang="ts">
 import { Click, Rotate, Slide, SlideRegion } from "go-captcha-vue";
 import { getCaptcha, verifyCaptcha } from "@/api/captcha";
-import { ClickDot } from "go-captcha-vue/dist/components/click/meta/data";
 import { debounce } from "lodash-es";
 import { useI18n } from "vue-i18n";
+import { ClickDot } from "go-captcha-vue/dist/components/click/meta/data";
+
 const { t } = useI18n();
 interface CaptchaDataType {
   thumbX: number;

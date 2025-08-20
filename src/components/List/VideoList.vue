@@ -43,10 +43,14 @@
             </div>
             <!-- 信息 -->
             <div class="cover-data">
-              <n-text class="name text-hidden">{{ item.name }}</n-text>
+              <n-text class="name text-hidden">
+                {{ item.name }}
+              </n-text>
               <template v-if="item.creator">
                 <div class="artists text-hidden">
-                  <n-text class="ar"> {{ item.creator || "未知艺术家" }} </n-text>
+                  <n-text class="ar">
+                    {{ item.creator || "未知艺术家" }}
+                  </n-text>
                 </div>
               </template>
             </div>
@@ -60,7 +64,7 @@
         </n-button>
       </n-flex>
       <!-- 右键菜单 -->
-      <CoverMenu ref="coverMenuRef" @toPlay="playList" />
+      <CoverMenu ref="coverMenuRef" @to-play="playList" />
     </div>
     <div v-else-if="loading" class="cover-list loading video">
       <n-grid :cols="cols" x-gap="20" y-gap="20">

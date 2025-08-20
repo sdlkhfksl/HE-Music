@@ -2,18 +2,28 @@
 <template>
   <div class="setting-type">
     <div class="set-list">
-      <n-h3 prefix="bar"> {{ t("setting.general.theme_setting") }} </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.general.theme_setting") }}
+      </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("common.language") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.general.language_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("common.language") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.language_tip") }}
+          </n-text>
         </div>
         <n-select v-model:value="settingStore.language" class="set" :options="languageOptions" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.general.theme_mode") }}</n-text>
-          <n-text class="tip" :depth="3"> {{ t("setting.general.theme_mode_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.theme_mode") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.theme_mode_tip") }}
+          </n-text>
         </div>
         <n-select
           v-model:value="settingStore.themeMode"
@@ -36,8 +46,12 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name"> {{ t("setting.general.theme_color") }}</n-text>
-          <n-text class="tip" :depth="3"> {{ t("setting.general.theme_color_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.theme_color") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.theme_color_tip") }}
+          </n-text>
         </div>
         <n-select
           v-model:value="settingStore.themeColorType"
@@ -51,10 +65,12 @@
       >
         <n-card class="set-item">
           <div class="label">
-            <n-text class="name"> {{ t("setting.general.theme_color_custom") }}</n-text>
-            <n-text class="tip" :depth="3">{{
-              t("setting.general.theme_color_custom_tip")
-            }}</n-text>
+            <n-text class="name">
+              {{ t("setting.general.theme_color_custom") }}
+            </n-text>
+            <n-text class="tip" :depth="3">
+              {{ t("setting.general.theme_color_custom_tip") }}
+            </n-text>
           </div>
           <n-color-picker
             v-model:value="settingStore.themeCustomColor"
@@ -66,8 +82,12 @@
       </n-collapse-transition>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.general.theme_global_color") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.general.theme_global_color_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.theme_global_color") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.theme_global_color_tip") }}
+          </n-text>
         </div>
         <n-switch
           v-model:value="settingStore.themeGlobalColor"
@@ -78,8 +98,12 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.general.theme_follow_cover") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.general.theme_follow_cover_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.theme_follow_cover") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.theme_follow_cover_tip") }}
+          </n-text>
         </div>
         <n-switch
           v-model:value="settingStore.themeFollowCover"
@@ -90,31 +114,47 @@
       </n-card>
     </div>
     <div class="set-list">
-      <n-h3 prefix="bar"> {{ t("setting.general.misc_setting") }} </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.general.misc_setting") }}
+      </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.general.show_search_history") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.show_search_history") }}
+          </n-text>
         </div>
-        <n-switch class="set" v-model:value="settingStore.showSearchHistory" :round="false" />
+        <n-switch v-model:value="settingStore.showSearchHistory" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.general.menu_show_cover") }}</n-text>
-          <n-text class="tip" :depth="3">{{ t("setting.general.menu_show_cover_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.menu_show_cover") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.menu_show_cover_tip") }}
+          </n-text>
         </div>
-        <n-switch class="set" v-model:value="settingStore.menuShowCover" :round="false" />
+        <n-switch v-model:value="settingStore.menuShowCover" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name"> {{ t("setting.general.use_keep_alive") }}</n-text>
-          <n-text class="tip" :depth="3"> {{ t("setting.general.use_keep_alive_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.use_keep_alive") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.use_keep_alive_tip") }}
+          </n-text>
         </div>
-        <n-switch class="set" v-model:value="settingStore.useKeepAlive" :round="false" />
+        <n-switch v-model:value="settingStore.useKeepAlive" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name"> {{ t("setting.general.route_animation") }}</n-text>
-          <n-text class="tip" :depth="3"> {{ t("setting.general.route_animation_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.route_animation") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.route_animation_tip") }}
+          </n-text>
         </div>
         <n-select
           v-model:value="settingStore.routeAnimation"
@@ -145,18 +185,28 @@
       </n-card>
     </div>
     <div v-if="isElectron" class="set-list">
-      <n-h3 prefix="bar"> {{ t("setting.general.system_setting") }} </n-h3>
+      <n-h3 prefix="bar">
+        {{ t("setting.general.system_setting") }}
+      </n-h3>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.general.use_online_service") }}</n-text>
-          <n-text class="tip" :depth="3"> {{ t("setting.general.use_online_service_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.use_online_service") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.use_online_service_tip") }}
+          </n-text>
         </div>
         <n-switch class="set" :value="useOnlineService" :round="false" @update:value="modeChange" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.general.custom_font") }}</n-text>
-          <n-text class="tip" :depth="3"> {{ t("setting.general.custom_font_tip") }} </n-text>
+          <n-text class="name">
+            {{ t("setting.general.custom_font") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.custom_font_tip") }}
+          </n-text>
         </div>
         <n-flex>
           <Transition name="fade" mode="out-in">
@@ -175,8 +225,12 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name"> {{ t("setting.general.lyric_font") }}</n-text>
-          <n-text class="tip" :depth="3"> {{ t("setting.general.lyric_font_tip") }} </n-text>
+          <n-text class="name">
+            {{ t("setting.general.lyric_font") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.lyric_font_tip") }}
+          </n-text>
         </div>
         <n-flex>
           <Transition name="fade" mode="out-in">
@@ -202,8 +256,12 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.general.close_software") }}</n-text>
-          <n-text class="tip" :depth="3"> {{ t("setting.general.close_software_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.close_software") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.close_software_tip") }}
+          </n-text>
         </div>
         <n-select
           v-model:value="settingStore.closeAppMethod"
@@ -223,13 +281,17 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.general.show_close_app_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.show_close_app_tip") }}
+          </n-text>
         </div>
         <n-switch v-model:value="settingStore.showCloseAppTip" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name"> {{ t("setting.general.show_taskbar_progress") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.show_taskbar_progress") }}
+          </n-text>
           <n-text class="tip" :depth="3">
             {{ t("setting.general.show_taskbar_progress_tip") }}
           </n-text>
@@ -243,17 +305,23 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name"> {{ t("setting.general.prevent_sleep") }}</n-text>
-          <n-text class="tip" :depth="3"> {{ t("setting.general.prevent_sleep_tip") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.prevent_sleep") }}
+          </n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.prevent_sleep_tip") }}
+          </n-text>
         </div>
         <n-switch v-model:value="settingStore.preventSleep" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name"> {{ t("setting.general.check_update_on_start") }}</n-text>
+          <n-text class="name">
+            {{ t("setting.general.check_update_on_start") }}
+          </n-text>
           <n-text class="tip" :depth="3">
-            {{ t("setting.general.check_update_on_start_tip") }}</n-text
-          >
+            {{ t("setting.general.check_update_on_start_tip") }}
+          </n-text>
         </div>
         <n-switch v-model:value="settingStore.checkUpdateOnStart" class="set" :round="false" />
       </n-card>

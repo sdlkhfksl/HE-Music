@@ -2,10 +2,10 @@
   <div class="home">
     <n-tabs
       v-if="settingStore.useOnlineService"
+      v-model:value="platform"
       class="tabs"
       type="bar"
       animated
-      v-model:value="platform"
       @update:value="platformChange"
     >
       <n-tab-pane

@@ -2,6 +2,10 @@ import { LyricLine, LyricWord } from "@applemusic-like-lyrics/lyric";
 import { LyricType } from "@/types/main";
 import { useMusicStore, useSettingStore } from "@/stores";
 import { msToS } from "./time";
+
+export const transSeparator = "[lang:trans]";
+export const romaSeparator = "[lang:roma]";
+
 // 歌词排除内容
 const getExcludeKeywords = () => {
   const settingStore = useSettingStore();
@@ -136,43 +140,62 @@ export const alignLyrics = (
   return lyricsData;
 };
 
+const splitLocalLyrics = (text: string) => {
+  // 获取标签位置（兼容不存在的情况）
+  const transIndex = text.indexOf(transSeparator);
+  const romaIndex = text.indexOf(romaSeparator);
+
+  // 提取原文（标签之前的内容）
+  const lyric = text
+    .slice(
+      0,
+      Math.min(transIndex >= 0 ? transIndex : Infinity, romaIndex >= 0 ? romaIndex : Infinity),
+    )
+    .trim();
+
+  // 动态提取翻译和罗马音（顺序无关）
+  let trans = "",
+    roma = "";
+  if (transIndex >= 0) {
+    const transEnd = text.indexOf(romaSeparator, transIndex + transSeparator.length);
+    trans = text
+      .slice(
+        transIndex + transSeparator.length,
+        transEnd >= 0 && transEnd > transIndex ? transEnd : undefined, // 确保结束位置在翻译标签之后
+      )
+      .trim();
+  }
+  if (romaIndex >= 0) {
+    const romaEnd = text.indexOf(transSeparator, romaIndex + romaSeparator.length);
+    roma = text
+      .slice(
+        romaIndex + romaSeparator.length,
+        romaEnd >= 0 && romaEnd > romaIndex ? romaEnd : undefined, // 确保结束位置在罗马音标签之后
+      )
+      .trim();
+  }
+
+  return { lyric, trans, roma };
+};
+
 // 处理本地歌词
 export const parseLocalLyric = (lyric: string) => {
   if (!lyric) {
     resetSongLyric();
     return;
   }
-  const musicStore = useMusicStore();
+
+  const splitLyric = splitLocalLyrics(lyric);
+
   // 解析
-  const lrc: LyricLine[] = parseLineLyric({ lyric }).line;
+  const lrc: LyricLine[] = parseLineLyric(splitLyric).line;
   const lrcData: LyricType[] = parseLrcData(lrc);
-  // 处理结果
-  const lrcDataParsed: LyricType[] = [];
-  // 翻译提取
-  for (let i = 0; i < lrcData.length; i++) {
-    // 当前歌词
-    const lrcItem = lrcData[i];
-    // 是否具有翻译
-    const existingObj = lrcDataParsed.find((v) => v.time === lrcItem.time);
-    if (existingObj) {
-      if (!existingObj.tran) existingObj.tran = lrcItem.content;
-      else if (!existingObj.roma) existingObj.roma = lrcItem.content;
-    } else {
-      lrcDataParsed.push(lrcItem);
-    }
-  }
+
+  const musicStore = useMusicStore();
   // 更新歌词
   musicStore.songLyric = {
-    lrcData: lrcDataParsed,
-    lrcAMData: lrcDataParsed.map((line, index, lines) => ({
-      words: [{ startTime: line.time, endTime: 0, word: line.content }],
-      startTime: line.time * 1000,
-      endTime: lines[index + 1]?.time * 1000,
-      translatedLyric: line.tran ?? "",
-      romanLyric: line.roma ?? "",
-      isBG: false,
-      isDuet: false,
-    })),
+    lrcData: lrcData,
+    lrcAMData: lrc,
     yrcData: [],
     yrcAMData: [],
   };
@@ -272,9 +295,12 @@ export const parseLineLyric = ({ lyric = "", roma = "", trans = "" }) => {
         },
       ],
       translatedLyric:
-        transLyrics.find(({ rawTime: tLyricRawTime }) => tLyricRawTime === rawTime)?.content || "",
+        transLyrics.find(
+          ({ rawTime: tRawTime, time: tTime }) => tRawTime === rawTime || tTime === time,
+        )?.content || "",
       romanLyric:
-        spells.find(({ rawTime: sLyricRawTime }) => sLyricRawTime === rawTime)?.content || "",
+        spells.find(({ rawTime: tRawTime, time: tTime }) => tRawTime === rawTime || tTime === time)
+          ?.content || "",
       startTime: time,
       endTime: 0,
       isBG: false,
@@ -287,9 +313,10 @@ export const parseLineLyric = ({ lyric = "", roma = "", trans = "" }) => {
     }
     parsedLyrics.push(lrc);
   }
-
-  parsedLyrics[parsedLyrics.length - 1].endTime = Infinity;
-  parsedLyrics[parsedLyrics.length - 1].words[0].endTime = Infinity;
+  if (parsedLyrics[parsedLyrics.length - 1]) {
+    parsedLyrics[parsedLyrics.length - 1].endTime = Infinity;
+    parsedLyrics[parsedLyrics.length - 1].words[0].endTime = Infinity;
+  }
 
   return { line: parsedLyrics, metadata: {} };
 };
@@ -334,7 +361,8 @@ const parse = (lrc: string) => {
       if (!timestamp.groups) continue;
       const { min, sec, ms } = timestamp.groups as { min: string; sec: string; ms: string };
       const rawTime = timestamp[0];
-      const time = (Number(min) * 60 + Number(sec)) * 1000 + Number(ms ?? 0);
+      const mss = ms?.length == 3 ? ms : ms + "0"; // .02 => .020
+      const time = (Number(min) * 60 + Number(sec)) * 1000 + Number(mss ?? 0);
 
       const parsedLyric = { rawTime, time, content: trimContent(content) };
       parsedLyrics.splice(binarySearch(parsedLyric), 0, parsedLyric);

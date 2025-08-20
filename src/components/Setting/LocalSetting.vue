@@ -14,7 +14,7 @@
             {{ t("setting.local.show_local_cover_tip") }}
           </n-text>
         </div>
-        <n-switch class="set" v-model:value="settingStore.showLocalCover" :round="false" />
+        <n-switch v-model:value="settingStore.showLocalCover" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
@@ -22,9 +22,9 @@
             {{ t("setting.local.show_default_local_path") }}
           </n-text>
         </div>
-        <n-switch class="set" v-model:value="settingStore.showDefaultLocalPath" :round="false" />
+        <n-switch v-model:value="settingStore.showDefaultLocalPath" class="set" :round="false" />
       </n-card>
-      <n-card class="set-item" id="local-list-choose" content-style="flex-direction: column">
+      <n-card id="local-list-choose" class="set-item" content-style="flex-direction: column">
         <n-flex justify="space-between">
           <div class="label">
             <n-text class="name">
@@ -48,7 +48,9 @@
             class="set-item"
           >
             <div class="label">
-              <n-text class="name">{{ item }}</n-text>
+              <n-text class="name">
+                {{ item }}
+              </n-text>
             </div>
             <n-button strong secondary @click="changeLocalPath(index)">
               <template #icon>
@@ -101,7 +103,7 @@
             {{ t("setting.local.download_song_meta_tip") }}
           </n-text>
         </div>
-        <n-switch class="set" v-model:value="settingStore.downloadMeta" :round="false" />
+        <n-switch v-model:value="settingStore.downloadMeta" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">

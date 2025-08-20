@@ -39,8 +39,8 @@
             </div>
             <div
               v-for="(item, index) in musicStore.songLyric.yrcData"
-              :key="index"
               :id="`lrc-${index}`"
+              :key="index"
               :class="['lrc-line', 'is-yrc', { on: statusStore.lyricIndex === index }]"
               :style="{
                 filter: settingStore.lyricsBlur
@@ -102,8 +102,8 @@
             </div>
             <div
               v-for="(item, index) in musicStore.songLyric.lrcData"
-              :key="index"
               :id="`lrc-${index}`"
+              :key="index"
               :class="['lrc-line', 'is-lrc', { on: statusStore.lyricIndex === index }]"
               :style="{
                 filter: settingStore.lyricsBlur

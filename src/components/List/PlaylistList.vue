@@ -28,7 +28,9 @@
               </template>
               <!-- 简介 -->
               <div v-if="item.description" class="description">
-                <n-text class="text-hidden"> {{ item.description }}</n-text>
+                <n-text class="text-hidden">
+                  {{ item.description }}
+                </n-text>
               </div>
               <!-- 播放按钮 -->
               <div class="play-btn" @click.stop>
@@ -48,13 +50,15 @@
             </div>
             <!-- 信息 -->
             <div class="cover-data">
-              <n-text class="name text-hidden">{{ item.name }}</n-text>
+              <n-text class="name text-hidden">
+                {{ item.name }}
+              </n-text>
               <!-- 创建者 -->
 
               <div class="meta">
-                <n-text class="count" depth="3">{{
-                  t("common.song_counter", { count: Number(item.song_count) || 0 })
-                }}</n-text>
+                <n-text class="count" depth="3">
+                  {{ t("common.song_counter", { count: Number(item.song_count) || 0 }) }}
+                </n-text>
                 <n-text v-if="item.creator" class="creator" depth="3">
                   {{ item.creator || t("common.unknown") }}
                 </n-text>
@@ -70,7 +74,7 @@
         </n-button>
       </n-flex>
       <!-- 右键菜单 -->
-      <CoverMenu ref="coverMenuRef" @toPlay="playList" />
+      <CoverMenu ref="coverMenuRef" @to-play="playList" />
     </div>
     <div v-else-if="loading" class="cover-list loading playlist">
       <n-grid :cols="cols" x-gap="20" y-gap="20">
