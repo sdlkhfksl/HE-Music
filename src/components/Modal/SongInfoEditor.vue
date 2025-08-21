@@ -58,7 +58,7 @@
               </n-form-item-gi>
               <n-form-item-gi :span="12" :label="t('common.bitrate')" path="br">
                 <n-input-number
-                  v-model:value="infoFormData.br"
+                  v-model:value="infoFormData.bitrate"
                   :show-button="false"
                   style="width: 100%"
                   disabled
@@ -68,7 +68,7 @@
                   </template>
                 </n-input-number>
               </n-form-item-gi>
-              <n-form-item-gi :span="12" label="时长" path="duration">
+              <n-form-item-gi :span="12" :label="t('common.duration')" path="duration">
                 <n-input-number
                   v-model:value="infoFormData.duration"
                   :show-button="false"
@@ -80,9 +80,9 @@
                   </template>
                 </n-input-number>
               </n-form-item-gi>
-              <n-form-item-gi :span="12" :label="t('common.frequency')" path="br">
+              <n-form-item-gi :span="12" :label="t('common.sample_rate')" path="br">
                 <n-input-number
-                  v-model:value="infoFormData.frequency"
+                  v-model:value="infoFormData.sampleRate"
                   :show-button="false"
                   style="width: 100%"
                   disabled
@@ -101,6 +101,18 @@
                     </template>
                   </n-button>
                 </n-input-group>
+              </n-form-item-gi>
+              <n-form-item-gi :span="12" :label="t('common.bits_per_sample')" path="br">
+                <n-input-number
+                  v-model:value="infoFormData.bitsPerSample"
+                  :show-button="false"
+                  style="width: 100%"
+                  disabled
+                >
+                  <template #suffix>
+                    <n-text depth="3"> bit </n-text>
+                  </template>
+                </n-input-number>
               </n-form-item-gi>
               <n-form-item-gi :span="12" label="MD5" path="md5">
                 <n-input-group>
@@ -180,9 +192,11 @@ interface InfoFormType {
   // 类型
   type?: string;
   // 码率
-  br?: number;
+  bitrate?: number;
   // 频率
-  frequency?: number;
+  sampleRate?: number;
+  // 位深度
+  bitsPerSample?: number;
   // 位置
   path?: string;
   // md5
@@ -219,11 +233,11 @@ const getSongInfo = async () => {
     duration,
     bitrate,
     sampleRate,
+    bitsPerSample,
     size,
     pictures,
     md5,
   } = await window.electron.ipcRenderer.invoke("get-music-metadata", path); // 解构数据
-
   // 更新数据
   infoFormData.value = {
     filename,
@@ -235,8 +249,9 @@ const getSongInfo = async () => {
     type: codec,
     duration: duration || 0,
     size: size,
-    br: bitrate || 0,
-    frequency: sampleRate,
+    bitrate: bitrate || 0,
+    sampleRate: sampleRate,
+    bitsPerSample: bitsPerSample,
     md5,
   };
 

@@ -91,7 +91,7 @@ const initAppServer = async (getWin: () => { mainWin: BrowserWindow | null }) =>
       reply.type("text/html").send(loginSuccessTxt);
     });
     // 启动端口
-    const port = Number(import.meta.env["VITE_SERVER_PORT"] || 25666);
+    const port = Number(process.env["VITE_SERVER_PORT"] || 25666);
     await server.listen({ port });
     log.info(`🌐 Starting AppServer on port ${port}`);
     return server;

@@ -108,6 +108,7 @@ export const openSongInfoEditor = (song: SongInfo) => {
     preset: "card",
     transformOrigin: "center",
     autoFocus: false,
+    trapFocus: false,
     // contentStyle: { padding: 0 },
     style: { width: "600px" },
     title: t("modal.song_info_edit"),

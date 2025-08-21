@@ -135,7 +135,7 @@ class MainProcess {
     if (isDev && process.env["ELECTRON_RENDERER_URL"]) {
       this.mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
     } else {
-      const port = Number(import.meta.env["VITE_SERVER_PORT"] || 25666);
+      const port = Number(process.env["VITE_SERVER_PORT"] || 25666);
       this.mainWindow.loadURL(`http://127.0.0.1:${port}`);
     }
 

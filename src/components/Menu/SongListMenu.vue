@@ -67,7 +67,7 @@ const openDropdown = (
     const isCurrent = statusStore.playIndex === index;
     // 是否为用户歌单
     const isUserPlaylist = !!(playlist?.id && playlist?.type === "user-playlist");
-    console.log("menu", playlist.id, playlist.type, isUserPlaylist);
+
     // 生成菜单
     nextTick().then(() => {
       dropdownOptions.value = [

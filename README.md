@@ -17,6 +17,9 @@
 源码仓库：https://github.com/imsyy/SPlayer
 ```
 
+## ⚠️ 注意
+- **该项目为前端项目，运行时需要搭配对应的后端服务。**
+- **不知道后端服务的用户，请使用SPlayer[https://github.com/imsyy/SPlayer](https://github.com/imsyy/SPlayer)**
 ## 说明
 
 > [!IMPORTANT]
@@ -32,7 +35,7 @@
 - 本项目采用 [Vue 3](https://cn.vuejs.org/) + [TypeScript](https://www.typescriptlang.org/) + [Naïve UI](https://www.naiveui.com/) + [Electron](https://www.electronjs.org/zh/docs/latest/) 开发
 - 支持网页端与客户端，由于设备有限，目前仅适配 `Win`，其他平台可自行解决兼容性后进行构建
 - 仅对移动端做了基础适配，**不保证功能全部可用**
-- **该项目为前端项目，运行时需要搭配对应的后端服务。不知道后端服务的用户，请使用SPlayer[https://github.com/imsyy/SPlayer](https://github.com/imsyy/SPlayer)**
+- 该项目为前端项目，运行时需要搭配对应的后端服务。不知道后端服务的用户，请使用SPlayer[https://github.com/imsyy/SPlayer](https://github.com/imsyy/SPlayer)
 
   > 请注意，本程序不打算开发移动端，也不会对移动端进行完美适配，仅保证基础可用性
 
