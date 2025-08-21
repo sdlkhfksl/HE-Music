@@ -68,7 +68,7 @@ export const useMusicStore = defineStore("music", {
   }),
   getters: {
     isLocalSong(state): boolean {
-      return state.playSong?.path !== "";
+      return !!state.playSong?.path;
     },
     // 是否具有歌词
     isHasLrc(state): boolean {
