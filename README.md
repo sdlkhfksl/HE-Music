@@ -18,8 +18,10 @@
 ```
 
 ## ⚠️ 注意
+
 - **该项目为前端项目，运行时需要搭配对应的后端服务。**
 - **不知道后端服务的用户，请使用SPlayer[https://github.com/imsyy/SPlayer](https://github.com/imsyy/SPlayer)**
+
 ## 说明
 
 > [!IMPORTANT]

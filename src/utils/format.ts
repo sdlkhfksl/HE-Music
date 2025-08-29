@@ -259,6 +259,8 @@ export const getSizeCover = (song: SongInfo, size = 300) => {
       size = image_sizes.find((item) => item >= size) || image_sizes[image_sizes.length - 1];
     }
   }
+  if (size === 0) size = 300;
+  if (size < 0) size = 1000;
   const { cover = "", platform, id } = song;
   if (cover) {
     return cover.replaceAll("{x}", size.toString()).replaceAll("{y}", size.toString());

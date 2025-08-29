@@ -3,7 +3,7 @@ import { is } from "@electron-toolkit/utils";
 import fs from "fs/promises";
 import crypto from "crypto";
 import { resolve } from "path";
-import { File, MediaTypes } from "node-taglib-sharp";
+import { File, MediaTypes, Mpeg4IsoAudioSampleEntry } from "node-taglib-sharp";
 
 // 系统判断
 export const isDev = is.dev;
@@ -50,7 +50,8 @@ export const parseFile = (path: string) => {
       channels: properties.audioChannels,
       codec: codecs?.[0]?.description,
       lossless: codecs?.[0]?.mediaTypes === MediaTypes.LosslessAudio,
-      bitsPerSample: properties.bitsPerSample || 16,
+      bitsPerSample:
+        properties.bitsPerSample || (codecs[0] as Mpeg4IsoAudioSampleEntry)?.audioSampleSize || 16,
       sampleRate: properties.audioSampleRate,
       bitrate: properties.audioBitrate,
       lyrics: tag.lyrics || "",
