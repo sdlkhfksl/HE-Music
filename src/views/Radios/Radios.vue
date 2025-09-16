@@ -35,7 +35,14 @@ const supportPlatforms = computed<PlatformInfo[]>(
   () => platformStore.featureSupportList(FeatureSupportFlag.ListRadios) || [],
 );
 // 搜索分类
-const platform = computed<string>(() => router.currentRoute.value.query.platform as string);
+const platform = computed<string>(() => {
+  // 只有当前路由是 ranking-list 时才返回 platform，否则返回空字符串
+  const currentRoute = router.currentRoute.value;
+  if (currentRoute.name !== "radios") {
+    return "";
+  }
+  return currentRoute.query.platform as string;
+});
 
 const platformChange = (value: string) => {
   router.replace({

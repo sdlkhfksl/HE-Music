@@ -1,5 +1,5 @@
 <template>
-  <div class="top-list">
+  <div class="ranking-list">
     <n-tabs
       v-model:value="platform"
       class="tabs"
@@ -9,7 +9,7 @@
     >
       <n-tab-pane
         v-for="platform in supportPlatforms"
-        :key="`discover-playlists-${platform.id}`"
+        :key="`ranking-list-${platform.id}`"
         :name="platform.id"
         :tab="platform.shortname"
         :disabled="platform.status !== 1"
@@ -36,7 +36,14 @@ const supportPlatforms = computed<PlatformInfo[]>(
 );
 
 // 搜索分类
-const platform = computed<string>(() => router.currentRoute.value.query.platform as string);
+const platform = computed<string>(() => {
+  // 只有当前路由是 ranking-list 时才返回 platform，否则返回空字符串
+  const currentRoute = router.currentRoute.value;
+  if (currentRoute.name !== "ranking-list") {
+    return "";
+  }
+  return currentRoute.query.platform as string;
+});
 
 const platformChange = (value: string) => {
   router.replace({
@@ -81,7 +88,7 @@ const watcher = watch(
 </script>
 
 <style lang="scss" scoped>
-.top-list {
+.ranking-list {
   display: flex;
   flex-direction: column;
 }
