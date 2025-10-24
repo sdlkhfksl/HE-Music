@@ -338,6 +338,7 @@ const songMoreOptions = computed<DropdownOption[]>(() => {
           statusStore.$patch({
             showFullPlayer: true,
             showPlayerComment: true,
+            pureLyricMode: isMobile.value ? true : statusStore.pureLyricMode,
           });
         },
       },

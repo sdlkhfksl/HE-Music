@@ -6,7 +6,7 @@
     :class="{ 'full-player': statusStore.showFullPlayer }"
     :style="{
       '--main-color': statusStore.mainColor,
-      'max-width': isMobile ? '100%' : '400px'
+      'max-width': isMobile ? '100%' : '400px',
     }"
     :auto-focus="false"
     style="width: 400px"
