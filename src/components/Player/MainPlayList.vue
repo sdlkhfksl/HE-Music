@@ -4,7 +4,10 @@
     id="main-playlist"
     v-model:show="statusStore.playListShow"
     :class="{ 'full-player': statusStore.showFullPlayer }"
-    :style="{ '--main-color': statusStore.mainColor }"
+    :style="{
+      '--main-color': statusStore.mainColor,
+      'max-width': isMobile ? '100%' : '400px'
+    }"
     :auto-focus="false"
     style="width: 400px"
   >
@@ -124,6 +127,7 @@ import { useStatusStore, useDataStore } from "@/stores";
 import type { VirtualListInst } from "naive-ui";
 import player from "@/utils/player";
 import { useI18n } from "vue-i18n";
+import { isMobile } from "@/utils/helper";
 const { t } = useI18n();
 
 const dataStore = useDataStore();

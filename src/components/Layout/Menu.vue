@@ -426,4 +426,8 @@ watch(
     border-radius: 8px;
   }
 }
+.mb-menu {
+  width: 26px;
+  height: 26px;
+}
 </style>

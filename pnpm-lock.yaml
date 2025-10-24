@@ -23,10 +23,10 @@ importers:
         version: 0.1.5(@pixi/app@7.4.3(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3)))(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3))(@pixi/filter-blur@7.4.3(@pixi/core@7.4.3))(@pixi/filter-bulge-pinch@5.1.1(@pixi/core@7.4.3))(@pixi/filter-color-matrix@7.4.3(@pixi/core@7.4.3))(@pixi/sprite@7.4.3(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3)))(jss-preset-default@10.10.0)(jss@10.10.0)(vue@3.5.18(typescript@5.9.2))
       '@electron-toolkit/preload':
         specifier: ^3.0.2
-        version: 3.0.2(electron@37.3.1)
+        version: 3.0.2(electron@37.7.1)
       '@electron-toolkit/utils':
         specifier: ^4.0.0
-        version: 4.0.0(electron@37.3.1)
+        version: 4.0.0(electron@37.7.1)
       '@imsyy/color-utils':
         specifier: ^1.0.2
         version: 1.0.2
@@ -188,8 +188,8 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
       electron:
-        specifier: ^37.3.1
-        version: 37.3.1
+        specifier: ^37.6.0
+        version: 37.7.1
       electron-builder:
         specifier: ^26.0.12
         version: 26.0.12(electron-builder-squirrel-windows@26.0.12)
@@ -2062,8 +2062,8 @@ packages:
     resolution: {integrity: sha512-bO3y10YikuUwUuDUQRM4KfwNkKhnpVO7IPdbsrejwN9/AABJzzTQ4GeHwyzNSrVO+tEH3/Np255a3sVZpZDjvg==}
     engines: {node: '>=8.0.0'}
 
-  electron@37.3.1:
-    resolution: {integrity: sha512-7DhktRLqhe6OJh/Bo75bTI0puUYEmIwSzMinocgO63mx3MVjtIn2tYMzLmAleNIlud2htkjpsMG2zT4PiTCloA==}
+  electron@37.7.1:
+    resolution: {integrity: sha512-2EmIqWv4T8BtgFQosB3/0Fezs09X3l0wXhIzes/cNt/GI+UDljbQr3NiF2J9WnqP0aFSbUEfztGUQMiX+qDvsw==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -4386,17 +4386,17 @@ snapshots:
       ajv: 6.12.6
       ajv-keywords: 3.5.2(ajv@6.12.6)
 
-  '@electron-toolkit/preload@3.0.2(electron@37.3.1)':
+  '@electron-toolkit/preload@3.0.2(electron@37.7.1)':
     dependencies:
-      electron: 37.3.1
+      electron: 37.7.1
 
   '@electron-toolkit/tsconfig@1.0.1(@types/node@24.3.0)':
     dependencies:
       '@types/node': 24.3.0
 
-  '@electron-toolkit/utils@4.0.0(electron@37.3.1)':
+  '@electron-toolkit/utils@4.0.0(electron@37.7.1)':
     dependencies:
-      electron: 37.3.1
+      electron: 37.7.1
 
   '@electron/asar@3.2.18':
     dependencies:
@@ -6180,7 +6180,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@37.3.1:
+  electron@37.7.1:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 22.17.2
