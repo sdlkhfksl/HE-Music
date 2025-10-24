@@ -108,7 +108,7 @@
       <div
         v-if="!statusStore.radioMode"
         v-debounce="() => player.nextOrPrev('prev')"
-        class="play-icon"
+        class="play-icon play-control-prev"
       >
         <SvgIcon :size="26" name="SkipPrev" />
       </div>
@@ -135,7 +135,7 @@
         </template>
       </n-button>
       <!-- 下一曲 -->
-      <div v-debounce="() => player.nextOrPrev('next')" class="play-icon">
+      <div v-debounce="() => player.nextOrPrev('next')" class="play-icon play-control-next">
         <SvgIcon :size="26" name="SkipNext" />
       </div>
     </div>
@@ -178,14 +178,18 @@
           :show-arrow="true"
           @select="(mode) => player.togglePlayMode(mode)"
         >
-          <div class="menu-icon" @click.stop="player.togglePlayMode(false)">
+          <div class="menu-icon play_mode" @click.stop="player.togglePlayMode(false)">
             <SvgIcon :name="statusStore.playModeIcon" />
           </div>
         </n-dropdown>
         <!-- 音量调节 -->
         <n-popover :show-arrow="false" :style="{ padding: 0 }">
           <template #trigger>
-            <div class="menu-icon" @click.stop="player.toggleMute" @wheel="player.setVolume">
+            <div
+              class="menu-icon volume-mute"
+              @click.stop="player.toggleMute"
+              @wheel="player.setVolume"
+            >
               <SvgIcon :name="statusStore.playVolumeIcon" />
             </div>
           </template>
@@ -202,14 +206,36 @@
             <n-text class="slider-num"> {{ statusStore.playVolumePercent }}% </n-text>
           </div>
         </n-popover>
+        <!-- 播放暂停 -->
+        <n-button
+          v-debounce="() => player.playOrPause()"
+          :loading="statusStore.playLoading"
+          :focusable="false"
+          :keyboard="false"
+          class="play-pause"
+          type="primary"
+          strong
+          secondary
+          circle
+        >
+          <template #icon>
+            <Transition name="fade" mode="out-in">
+              <SvgIcon
+                :key="statusStore.playStatus ? 'Pause' : 'Play'"
+                :name="statusStore.playStatus ? 'Pause' : 'Play'"
+                :size="28"
+              />
+            </Transition>
+          </template>
+        </n-button>
         <!-- 播放列表 -->
         <n-badge
           v-if="!statusStore.radioMode"
           :value="dataStore.playList?.length ?? 0"
-          :show="settingStore.showPlaylistCount"
+          :show="!isMobile && settingStore.showPlaylistCount"
           :max="999"
           :style="{
-            marginRight: settingStore.showPlaylistCount ? '12px' : null,
+            marginRight: !isMobile && settingStore.showPlaylistCount ? '12px' : null,
           }"
         >
           <div class="menu-icon" @click.stop="statusStore.playListShow = !statusStore.playListShow">
@@ -231,7 +257,7 @@ import {
   useStatusStore,
 } from "@/stores";
 import { calculateCurrentTime, secondsToTime } from "@/utils/time";
-import { isElectron, renderIcon, coverLoaded } from "@/utils/helper";
+import { isElectron, renderIcon, coverLoaded, isMobile } from "@/utils/helper";
 import { toLikeSong } from "@/utils/auth";
 import { openDownloadSong, openJumpArtist, openPlaylistAdd } from "@/utils/modal";
 import player from "@/utils/player";
@@ -391,8 +417,12 @@ const qualityOptions = computed(() => {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   align-items: center;
-  transition: bottom 0.3s;
   z-index: 10;
+  transition: bottom 0.3s;
+  @media (max-width: 768px) {
+    grid-template-columns: auto 30px;
+    padding: 0 5px;
+  }
   &.show {
     bottom: 0;
   }
@@ -570,8 +600,13 @@ const qualityOptions = computed(() => {
         transform: scale(1);
       }
     }
+
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
   .play-menu {
+    flex-wrap: nowrap !important;
     .time {
       display: flex;
       align-items: center;
@@ -621,12 +656,25 @@ const qualityOptions = computed(() => {
       &:active {
         transform: scale(1);
       }
+
+      @media (max-width: 768px) {
+        padding: 2px;
+      }
     }
     :deep(.n-badge-sup) {
       background-color: rgba(var(--primary), 0.28);
       backdrop-filter: blur(20px);
       .n-base-slot-machine {
         color: var(--primary-hex);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .time,
+      .quality-selector,
+      .play_mode,
+      .volume-mute {
+        display: none;
       }
     }
   }

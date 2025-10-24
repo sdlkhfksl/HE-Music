@@ -125,10 +125,16 @@ watchDebounced(
     height 0.3s ease,
     opacity 0.3s ease,
     transform 0.3s ease;
+  @media (max-width: 768px) {
+    left: -25%;
+  }
   :deep(.scrollbar) {
     max-height: calc(100vh - 160px);
     .n-scrollbar-content {
       padding: 10px;
+    }
+    @media (max-width: 768px) {
+      max-height: calc(100vh - 80px);
     }
   }
   .direct {

@@ -31,11 +31,7 @@
     </Transition>
     <!-- 独立歌词 -->
     <Transition name="fade" mode="out-in">
-      <div
-        v-if="isShowComment && !statusStore.pureLyricMode"
-        :key="instantLyrics.content"
-        class="lrc-instant"
-      >
+      <div v-if="isShowComment" :key="instantLyrics.content" class="lrc-instant">
         <span class="lrc">{{ instantLyrics.content }}</span>
         <span v-if="instantLyrics.tran" class="lrc-tran">{{ instantLyrics.tran }}</span>
       </div>
@@ -64,7 +60,7 @@
         </div>
         <Transition name="fade" mode="out-in">
           <!-- 评论 -->
-          <PlayerComment v-if="isShowComment && !statusStore.pureLyricMode" />
+          <PlayerComment v-if="isShowComment" />
           <!-- 歌词 -->
           <div v-else-if="musicStore.isHasLrc" class="content-right">
             <!-- 数据 -->
@@ -84,7 +80,12 @@
       </div>
     </Transition>
     <!-- 控制中心 -->
-    <PlayerControl @mouseenter.stop="stopHide" @mouseleave.stop="playerMove" />
+    <PlayerControlMobile
+      v-if="isMobile"
+      @mouseenter.stop="stopHide"
+      @mouseleave.stop="playerMove"
+    />
+    <PlayerControl v-else @mouseenter.stop="stopHide" @mouseleave.stop="playerMove" />
     <!-- 音乐频谱 -->
     <PlayerSpectrum
       v-if="isElectron && settingStore.showSpectrums"
@@ -97,10 +98,11 @@
 
 <script setup lang="ts">
 import { useMusicStore, usePlatformStore, useSettingStore, useStatusStore } from "@/stores";
-import { isElectron } from "@/utils/helper";
+import { isElectron, isMobile } from "@/utils/helper";
 import { throttle } from "lodash-es";
 import player from "@/utils/player";
 import { FeatureSupportFlag } from "@/api/platform";
+import PlayerControlMobile from "@/components/Player/PlayerControlMobile.vue";
 
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
@@ -125,11 +127,7 @@ const playerContentKey = computed(() => {
 
 // 数据是否居中
 const playerDataCenter = computed<boolean>(
-  () =>
-    !musicStore.isHasLrc ||
-    statusStore.pureLyricMode ||
-    settingStore.playerType === "record" ||
-    isShowComment.value,
+  () => !musicStore.isHasLrc || statusStore.pureLyricMode || settingStore.playerType === "record",
 );
 
 // 当前实时歌词
@@ -280,12 +278,7 @@ onBeforeUnmount(() => {
         margin-bottom: 26px;
       }
     }
-    &.pure {
-      .content-right {
-        align-items: center;
-        max-width: 100%;
-      }
-    }
+
     &.show-comment {
       .content-left {
         min-width: 40vw;
@@ -307,6 +300,29 @@ onBeforeUnmount(() => {
             }
           }
         }
+      }
+    }
+
+    @media (max-width: 768px) {
+      .content-right {
+        display: none;
+      }
+      .player-comment {
+        display: none;
+      }
+    }
+
+    &.pure {
+      .content-right,
+      .player-comment {
+        align-items: center;
+        max-width: 100%;
+        @media (max-width: 768px) {
+          display: flex;
+        }
+      }
+      :deep(.n-scrollbar-content) {
+        padding: 0 5px;
       }
     }
   }

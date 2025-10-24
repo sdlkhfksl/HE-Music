@@ -371,6 +371,9 @@ const toggleSublist = (data: any) => {
         opacity: 0.6 !important;
       }
     }
+    @media (max-width: 768px) {
+      display: none;
+    }
   }
   .title {
     flex: 1;
@@ -487,6 +490,9 @@ const toggleSublist = (data: any) => {
       .album-text {
         color: var(--primary-hex);
       }
+    }
+    @media (max-width: 768px) {
+      display: none;
     }
   }
   .actions {

@@ -128,6 +128,15 @@ onMounted(getAllDiscoverData);
 </script>
 
 <style lang="scss" scoped>
+.home-online {
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
 .main-rec {
   .date {
     display: flex;
@@ -156,7 +165,7 @@ onMounted(getAllDiscoverData);
 }
 .title {
   margin-top: 10px;
-  padding: 0 4px;
+  padding: 0 16px;
   .n-h {
     margin: 0;
     display: flex;
@@ -176,5 +185,14 @@ onMounted(getAllDiscoverData);
       }
     }
   }
+}
+
+.rec-public {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0 16px;
+  margin: 0;
+  box-sizing: border-box;
 }
 </style>

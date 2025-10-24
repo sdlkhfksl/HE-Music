@@ -1,0 +1,41 @@
+// 移动端响应式样式
+@media (max-width: 768px) {
+  // 基础布局调整
+  body {
+    overflow: auto;
+  }
+
+  // 主布局调整
+  #main {
+    flex-direction: column !important;
+
+    #main-sider {
+      display: none !important;
+    }
+
+    #main-content {
+      //top: 0 !important;
+      bottom: 60px !important;
+      padding: 0 !important;
+
+      .n-scrollbar-content {
+        padding: 0 !important;
+      }
+
+      .rec-public {
+        padding: 0 !important;
+      }
+    }
+  }
+
+  // 通用组件调整
+  .n-modal {
+    width: 95vw !important;
+    max-width: 95vw !important;
+  }
+
+  // 文本隐藏优化
+  .text-hidden {
+    -webkit-line-clamp: 2;
+  }
+}

@@ -160,10 +160,16 @@ const watcher = watch(
   &.fadeDown-enter-to {
     transition-delay: 0.25s;
   }
+  @media (max-width: 768px) {
+    left: -25%;
+  }
   :deep(.scrollbar) {
     max-height: calc(100vh - 160px);
     .n-scrollbar-content {
       padding: 10px;
+    }
+    @media (max-width: 768px) {
+      max-height: calc(100vh - 80px);
     }
   }
   .title {

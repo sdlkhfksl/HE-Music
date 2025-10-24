@@ -14,7 +14,7 @@
             round
           />
           <n-avatar v-else round>
-            <SvgIcon name="Person" :depth="3" size="26" />
+            <SvgIcon name="Person" :depth="3" size="24" />
           </n-avatar>
         </div>
         <div class="user-data">
@@ -163,10 +163,10 @@ onBeforeMount(() => {
     min-width: 38px;
     border-radius: 50%;
     border: 2px solid rgba(var(--primary), 0.28);
-    .n-avatar {
-      width: 100%;
-      height: 100%;
-    }
+    //.n-avatar {
+    //  width: 100%;
+    //  height: 100%;
+    //}
   }
   .user-data {
     display: flex;
@@ -191,6 +191,16 @@ onBeforeMount(() => {
   }
   &:active {
     background-color: rgba(var(--primary), 0.12);
+  }
+
+  @media (max-width: 768px) {
+    .avatar {
+      width: 24px;
+      height: 24px;
+    }
+    .user-data {
+      display: none;
+    }
   }
 }
 .user-menu {

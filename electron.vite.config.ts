@@ -83,6 +83,7 @@ export default defineConfig(({ command, mode }) => {
       },
       server: {
         port: webPort,
+        host: "0.0.0.0",
         // 代理
         proxy: {
           "/api": {

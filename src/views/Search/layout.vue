@@ -174,18 +174,32 @@ onBeforeRouteUpdate((to) => {
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
+  overflow: hidden;
   .title {
     margin-top: 12px;
     margin-bottom: 12px;
     font-size: 22px;
+    padding: 0 16px;
     .keyword {
       font-size: 36px;
       font-weight: bold;
       margin-right: 8px;
       line-height: normal;
+      word-break: break-all;
     }
     .n-text {
       display: inline-block;
+    }
+  }
+  .tabs {
+    width: 100%;
+    overflow: hidden;
+    :deep(.n-tabs-nav) {
+      padding: 0 16px;
+    }
+    :deep(.n-tabs-pane-wrapper) {
+      overflow: hidden;
     }
   }
   .router-view {

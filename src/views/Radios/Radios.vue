@@ -8,7 +8,7 @@
       @update:value="platformChange"
     >
       <n-tab-pane
-        v-for="platform in supportPlatforms"
+        v-for="platform in supportPlatforms.concat(supportPlatforms)"
         :key="`radios-${platform.id}`"
         :name="platform.id"
         :tab="platform.shortname"
@@ -90,5 +90,17 @@ const watcher = watch(
 .radios {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  .tabs {
+    width: 100%;
+    overflow: hidden;
+    :deep(.n-tabs-nav) {
+      padding: 0 16px;
+    }
+    :deep(.n-tabs-pane-wrapper) {
+      overflow: hidden;
+    }
+  }
 }
 </style>

@@ -202,12 +202,18 @@ onMounted(async () => {
       background-color 0.3s var(--n-bezier),
       width 0.3s var(--n-bezier);
     z-index: 101;
+    &.focus {
+      width: 300px;
+    }
+    @media (max-width: 768px) {
+      width: 190px;
+      &.focus {
+        width: 190px;
+      }
+    }
     :deep(input) {
       height: 100%;
       width: 100%;
-    }
-    &.focus {
-      width: 300px;
     }
   }
   .search-mask {

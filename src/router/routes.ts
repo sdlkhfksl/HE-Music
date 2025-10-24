@@ -251,6 +251,11 @@ const routes: Array<RouteRecordRaw> = [
     meta: { offline: true },
     component: () => import("@/views/History.vue"),
   },
+  {
+    path: "/setting",
+    name: "setting",
+    component: () => import("@/views/Setting/Setting.vue"),
+  },
   // 状态
   {
     path: "/403",

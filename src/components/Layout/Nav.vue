@@ -19,16 +19,23 @@
       <SearchInp />
       <!-- 可拖拽 -->
       <div class="nav-drag" />
-      <!-- 用户 -->
+      <!--      &lt;!&ndash; 用户 &ndash;&gt;-->
       <User v-if="settingStore.useOnlineService" />
       <!-- 设置菜单 -->
-      <n-dropdown :options="setOptions" trigger="click" show-arrow @select="setSelect">
+      <n-dropdown
+        v-if="!isMobile"
+        :options="setOptions"
+        trigger="click"
+        show-arrow
+        @select="setSelect"
+      >
         <n-button :focusable="false" :title="t('common.setting')" tertiary circle>
           <template #icon>
             <SvgIcon name="Settings" />
           </template>
         </n-button>
       </n-dropdown>
+      <Menu v-if="isMobile" mobile :setOptions="setOptions" @setSelect="setSelect" />
     </n-flex>
     <!-- 客户端控制 -->
     <n-flex v-if="isElectron" align="center" class="client-control">
@@ -95,9 +102,12 @@
 <script setup lang="ts">
 import type { DropdownOption } from "naive-ui";
 import { useSettingStore } from "@/stores";
-import { isElectron, isDev, renderIcon } from "@/utils/helper";
+import { isElectron, isDev, renderIcon, isMobile } from "@/utils/helper";
 import { openParseSourceUrl, openSetting } from "@/utils/modal";
 import { useI18n } from "vue-i18n";
+import { ref } from "vue";
+import Menu from "@/components/Layout/Menu.vue";
+
 const { t } = useI18n();
 
 const router = useRouter();
@@ -198,6 +208,10 @@ const setSelect = (key: string) => {
       settingStore.setThemeMode();
       break;
     case "setting":
+      if (isMobile.value) {
+        router.push("/setting");
+        return;
+      }
       openSetting();
       break;
     case "dev-tools":
@@ -261,6 +275,30 @@ onMounted(() => {
   margin-top: 12px;
   :deep(.n-checkbox__label) {
     line-height: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav {
+    height: 60px !important;
+    padding: 0 5px !important;
+
+    .n-button {
+      width: 26px !important;
+      height: 26px !important;
+    }
+
+    .nav-main {
+      margin-left: 5px !important;
+
+      .mb-menu {
+        margin-right: 1px;
+      }
+    }
+
+    .client-control {
+      display: none !important;
+    }
   }
 }
 </style>

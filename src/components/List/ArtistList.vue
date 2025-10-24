@@ -101,7 +101,7 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  cols: "4 600:4 800:5 900:6 1200:7 1400:8",
+  cols: "3 600:4 800:5 900:6 1200:7 1400:8",
 });
 
 const emit = defineEmits<{

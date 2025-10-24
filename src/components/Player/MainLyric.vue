@@ -138,7 +138,7 @@
       </div>
       <div class="divider" />
       <!-- 更多设置 -->
-      <div class="menu-icon" @click="openSetting('lyrics')">
+      <div class="menu-icon" @click="openLyricSetting">
         <SvgIcon name="Settings" />
       </div>
     </n-flex>
@@ -151,10 +151,12 @@ import { NScrollbar } from "naive-ui";
 import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
 import { openSetting } from "@/utils/modal";
 import player from "@/utils/player";
+import { isMobile } from "@/utils/helper";
 
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
+const router = useRouter();
 
 const lrcMouseStatus = ref<boolean>(false);
 const lyricScroll = ref<InstanceType<typeof NScrollbar> | null>(null);
@@ -172,6 +174,20 @@ const currentTimeOffsetValue = computed(() => {
   const currentTimeOffset = statusStore.currentTimeOffset;
   return currentTimeOffset > 0 ? `+${currentTimeOffset}` : currentTimeOffset;
 });
+
+const openLyricSetting = () => {
+  if (isMobile.value) {
+    statusStore.showFullPlayer = false;
+    router.push({
+      path: "/setting",
+      query: {
+        type: "lyrics",
+      },
+    });
+    return;
+  }
+  openSetting("lyrics");
+};
 
 // 鼠标移出歌词区域
 const lrcAllLeave = () => {
@@ -575,6 +591,9 @@ onBeforeUnmount(() => {
   &.pure {
     :deep(.n-scrollbar-content) {
       padding: 0 80px;
+      @media (max-width: 768px) {
+        padding: 0;
+      }
     }
     .lyric-content {
       .placeholder {

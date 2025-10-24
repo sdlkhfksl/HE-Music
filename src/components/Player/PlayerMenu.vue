@@ -1,12 +1,12 @@
 <template>
   <div class="player-menu">
     <Transition name="fade" mode="out-in">
-      <div v-show="statusStore.playerMetaShow" class="menu-content">
+      <div v-show="isMobile || statusStore.playerMetaShow" class="menu-content">
         <n-flex class="left">
           <div
             v-if="musicStore.isHasLrc"
             :class="['menu-icon', { open: statusStore.pureLyricMode }]"
-            @click="statusStore.pureLyricMode = !statusStore.pureLyricMode"
+            @click="setPureLyricMode"
           >
             <SvgIcon name="TextPlay" />
           </div>
@@ -27,12 +27,17 @@
 
 <script setup lang="ts">
 import { useMusicStore, useStatusStore } from "@/stores";
-
+import { isMobile } from "@/utils/helper";
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 
 // Fullscreen
 const { isFullscreen, toggle: toggleFullscreen } = useFullscreen();
+
+const setPureLyricMode = () => {
+  statusStore.pureLyricMode = !statusStore.pureLyricMode;
+  statusStore.showPlayerComment = false;
+};
 </script>
 
 <style lang="scss" scoped>
@@ -84,6 +89,9 @@ const { isFullscreen, toggle: toggleFullscreen } = useFullscreen();
       &:active {
         transform: scale(1);
       }
+    }
+    @media (max-width: 768px) {
+      padding: 0 5px;
     }
   }
   .left {

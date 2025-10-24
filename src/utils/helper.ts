@@ -26,6 +26,7 @@ export const isWin = userAgent.includes("Windows");
 export const isMac = userAgent.includes("Macintosh");
 export const isLinux = userAgent.includes("Linux");
 export const isElectron = userAgent.includes("Electron");
+export const isMobile = useMediaQuery("(max-width: 768px)");
 
 // 链接跳转
 export const openLink = (url: string, target: "_self" | "_blank" = "_blank") => {

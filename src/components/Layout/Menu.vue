@@ -1,6 +1,7 @@
 <!-- 主菜单 -->
 <template>
   <n-menu
+    v-if="!mobile"
     ref="menuRef"
     v-model:value="menuActiveKey"
     :class="{ cover: settingStore.menuShowCover }"
@@ -14,6 +15,13 @@
     :render-label="renderMenuLabel"
     @update:value="menuUpdate"
   />
+  <n-dropdown v-else trigger="click" :options="menuOptions" @select="dropdownSelect">
+    <n-button :focusable="false" tertiary class="mb-menu" circle>
+      <template #icon>
+        <SvgIcon name="Menu" />
+      </template>
+    </n-button>
+  </n-dropdown>
 </template>
 
 <script setup lang="ts">
@@ -29,7 +37,7 @@ import {
 
 import { useDataStore, useSettingStore, useStatusStore } from "@/stores";
 import { RouterLink, useRouter } from "vue-router";
-import { isElectron, renderIcon } from "@/utils/helper";
+import { isElectron, isMobile, renderIcon } from "@/utils/helper";
 import { openCreatePlaylist } from "@/utils/modal";
 import { PlaylistInfo, UserFavouritePlaylistInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
@@ -40,6 +48,15 @@ const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 
 const { t } = useI18n();
+
+const props = defineProps<{
+  mobile?: boolean;
+  setOptions?: MenuOption[];
+}>();
+const emit = defineEmits<{
+  // 加载更多
+  setSelect: [string];
+}>();
 // 菜单数据
 const menuRef = ref<MenuInst | null>(null);
 const menuActiveKey = ref<string | number>((router.currentRoute.value.name as string) || "home");
@@ -107,6 +124,17 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
               transform: "translateY(-1px)",
             },
           }),
+        },
+        {
+          key: "setting-layout",
+          show: isMobile.value,
+          label: t("common.setting"),
+          icon: renderIcon("Radio", {
+            style: {
+              transform: "translateY(-1px)",
+            },
+          }),
+          children: props.setOptions,
         },
         {
           key: "divider",
@@ -246,6 +274,29 @@ const renderMenuLabel = (option: MenuOption) => {
     return h(RouterLink, { to: { name: option.link as string } }, () => option.label as string);
   }
   return typeof option.label === "function" ? option.label() : (option.label as string);
+};
+
+const dropdownSelect = (key: string, item: MenuOption) => {
+  if (props.setOptions && props.setOptions.findIndex((item2) => item2 === item) > -1) {
+    emit("setSelect", key);
+    return;
+  }
+
+  if (item.platform) {
+    router.push({
+      name: (item.type as string) || "",
+      query: { id: item.id as string, platform: item.platform as string },
+    });
+  } else if ((item.type as string) === "user-playlist") {
+    router.push({
+      name: (item.type as string) || "",
+      query: { id: item.id as string },
+    });
+  } else {
+    router.push({
+      name: (item.link as string) || "",
+    });
+  }
 };
 
 // 菜单项更改

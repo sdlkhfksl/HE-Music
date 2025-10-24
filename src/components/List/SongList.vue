@@ -307,11 +307,12 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 .song-list {
   height: 100%;
+  width: 100%;
   border-radius: 12px 0 0 12px;
   overflow: hidden;
   .song-card {
     padding-bottom: 12px;
-    // padding-right: 4px;
+    overflow-x: hidden; /* 防止水平滚动 */
   }
   // 悬浮顶栏
   .list-header {
@@ -337,6 +338,9 @@ onBeforeUnmount(() => {
       min-width: 40px;
       font-weight: bold;
       margin-right: 12px;
+      @media (max-width: 768px) {
+        display: none;
+      }
     }
     .title {
       position: relative;
@@ -377,6 +381,9 @@ onBeforeUnmount(() => {
     .album {
       flex: 1;
       padding-right: 20px;
+      @media (max-width: 768px) {
+        display: none;
+      }
     }
     .actions {
       display: flex;
@@ -398,6 +405,8 @@ onBeforeUnmount(() => {
   }
   // 滚动条
   .virt-list__client {
+    width: 100%;
+    overflow-x: hidden !important; /* 禁用水平滚动 */
     transition:
       height 0.3s,
       width 0.3s,

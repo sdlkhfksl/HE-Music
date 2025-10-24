@@ -97,5 +97,15 @@ const watcher = watch(
   width: 100%;
   max-width: 1500px;
   margin: 0 auto;
+  .tabs {
+    width: 100%;
+    overflow: hidden;
+    :deep(.n-tabs-nav) {
+      padding: 0 16px;
+    }
+    :deep(.n-tabs-pane-wrapper) {
+      overflow: hidden;
+    }
+  }
 }
 </style>

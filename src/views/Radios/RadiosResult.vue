@@ -1,6 +1,6 @@
 <template>
   <div class="radio">
-    <n-tabs v-if="!loading" v-model:value="tabValue" class="tabs" type="segment" animated>
+    <n-tabs v-if="!loading" v-model:value="tabValue" class="tabs" type="card" animated>
       <n-tab-pane
         v-for="tab in radioListData"
         :key="`radio-group-${props.platform}-${tab.name}`"
@@ -64,7 +64,6 @@ onMounted(() => {
 .radio {
   display: flex;
   flex-direction: column;
-
   .skeleton-container {
     width: 100%;
     //padding: 20px;

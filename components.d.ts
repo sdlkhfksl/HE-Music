@@ -115,6 +115,7 @@ declare module 'vue' {
     PlayerBackground: typeof import('./src/components/Player/PlayerBackground.vue')['default']
     PlayerComment: typeof import('./src/components/Player/PlayerComment.vue')['default']
     PlayerControl: typeof import('./src/components/Player/PlayerControl.vue')['default']
+    PlayerControlMobile: typeof import('./src/components/Player/PlayerControlMobile.vue')['default']
     PlayerCover: typeof import('./src/components/Player/PlayerCover.vue')['default']
     PlayerData: typeof import('./src/components/Player/PlayerData.vue')['default']
     PlayerMenu: typeof import('./src/components/Player/PlayerMenu.vue')['default']

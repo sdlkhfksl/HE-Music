@@ -89,5 +89,15 @@ const watcher = watch(
 .artists {
   display: flex;
   flex-direction: column;
+  .tabs {
+    width: 100%;
+    overflow: hidden;
+    :deep(.n-tabs-nav) {
+      padding: 0 16px;
+    }
+    :deep(.n-tabs-pane-wrapper) {
+      overflow: hidden;
+    }
+  }
 }
 </style>
