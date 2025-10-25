@@ -6,6 +6,10 @@
 
 ![main](/screenshots/SPlayer.jpg)
 
+
+## 第三方登录说明
+由于某些原因，暂停`LinuxDo`渠道登录，恢复时间另行通知。
+
 ## 📜 版权与授权声明
 
 本项目是基于 [SPlayer](https://github.com/imsyy/SPlayer) 的二次开发作品，原始代码版权归属如下：
