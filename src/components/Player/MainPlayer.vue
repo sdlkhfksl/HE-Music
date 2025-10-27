@@ -669,6 +669,9 @@ const qualityOptions = computed(() => {
         color: var(--primary-hex);
       }
     }
+    .play-pause {
+      display: none;
+    }
 
     @media (max-width: 768px) {
       .time,
@@ -676,6 +679,10 @@ const qualityOptions = computed(() => {
       .play_mode,
       .volume-mute {
         display: none;
+      }
+
+      .play-pause {
+        display: flex;
       }
     }
   }
