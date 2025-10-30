@@ -386,8 +386,12 @@ const qualityOptions = computed(() => {
     ];
   }
   return musicStore.playSong?.links?.map((item): DropdownOption => {
+    const desc = platformStore.getPlatformQualityDescription(
+      musicStore.playSong?.platform,
+      item.name,
+    );
     return {
-      label: item.name,
+      label: desc ? `${item.name}(${desc})` : `${item.name}`,
       key: item.name,
     };
   });

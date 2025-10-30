@@ -145,7 +145,7 @@
 </template>
 
 <script setup lang="ts">
-import { useDataStore, useMusicStore, useStatusStore } from "@/stores";
+import { useDataStore, useMusicStore, usePlatformStore, useStatusStore } from "@/stores";
 import { calculateCurrentTime, secondsToTime } from "@/utils/time";
 import { toLikeSong } from "@/utils/auth";
 import player from "@/utils/player";
@@ -155,6 +155,7 @@ import { openDownloadSong, openPlaylistAdd } from "@/utils/modal";
 const dataStore = useDataStore();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
+const platformStore = usePlatformStore();
 
 // 进度条拖拽结束
 const sliderDragend = () => {
@@ -180,8 +181,12 @@ const qualityOptions = computed(() => {
     ];
   }
   return musicStore.playSong?.links?.map((item): DropdownOption => {
+    const desc = platformStore.getPlatformQualityDescription(
+      musicStore.playSong?.platform,
+      item.name,
+    );
     return {
-      label: item.name,
+      label: desc ? `${item.name}(${desc})` : `${item.name}`,
       key: item.name,
     };
   });

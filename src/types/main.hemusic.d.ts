@@ -15,6 +15,15 @@ export interface PlatformInfo {
   status: number;
   // 图片尺寸
   image_sizes: number[];
+  // 平台音质
+  qualities: PlatformQuality[];
+  // 音质映射说明
+  quality_map: Map<string, string>;
+}
+
+export interface PlatformQuality {
+  name: string;
+  description: string;
 }
 
 export interface Link {

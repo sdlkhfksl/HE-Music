@@ -18,7 +18,7 @@
               <n-radio v-for="(item, index) in song.links" :key="index" :value="item.name">
                 <n-flex>
                   <n-text class="name">
-                    {{ item.name }}
+                    {{ getQualityDescription(item.name) }}
                   </n-text>
                   <!-- 文件预估大小 -->
                   <n-text v-if="Number(item.size) > 0" depth="3">
@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 import { songLyric, songUrl } from "@/api/song";
-import { useSettingStore } from "@/stores";
+import { usePlatformStore, useSettingStore } from "@/stores";
 import { cloneDeep } from "lodash-es";
 import { formatFileSize, isElectron } from "@/utils/helper";
 import { openSetting } from "@/utils/modal";
@@ -80,6 +80,7 @@ const props = defineProps<{ song: SongInfo }>();
 const emit = defineEmits<{ close: [] }>();
 
 const settingStore = useSettingStore();
+const platformStore = usePlatformStore();
 
 // 歌曲数据
 // const songData = ref<SongInfo>(props.song);
@@ -106,6 +107,11 @@ const getSongDetail = async (): Promise<any> => {
 const changeDownloadPath = async () => {
   const path = await window.electron.ipcRenderer.invoke("choose-path");
   if (path) downloadPath.value = path;
+};
+
+const getQualityDescription = (name: string) => {
+  const desc = platformStore.getPlatformQualityDescription(props.song?.platform, name);
+  return desc ? `${name}(${desc})` : `${name}`;
 };
 
 // 下载歌曲

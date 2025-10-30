@@ -31,6 +31,10 @@ export const usePlatformStore = defineStore("platform", {
     getPlatformShortName() {
       return (platform: string): string => this.getPlatformInfo(platform)?.shortname || platform;
     },
+    getPlatformQualityDescription() {
+      return (platform: string, name: string): string =>
+        this.getPlatformInfo(platform)?.quality_map?.[name] || undefined;
+    },
   },
 
   actions: {
@@ -41,6 +45,9 @@ export const usePlatformStore = defineStore("platform", {
         return {
           ...item,
           feature_support_flag: BigInt(item.feature_support_flag),
+          quality_map: Object.fromEntries(
+            item.qualities.map((item) => [item.name, item.description]),
+          ),
         };
       });
     },
