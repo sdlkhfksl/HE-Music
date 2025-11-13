@@ -130,7 +130,7 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
           key: "setting-layout",
           show: isMobile.value,
           label: t("common.setting"),
-          icon: renderIcon("Radio", {
+          icon: renderIcon("Settings", {
             style: {
               transform: "translateY(-1px)",
             },
