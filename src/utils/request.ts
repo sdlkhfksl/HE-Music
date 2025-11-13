@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import { isDev, isElectron } from "./helper";
+import { isDev, isElectron } from "./env";
 import { useDataStore, useSettingStore } from "@/stores";
 import { isLogin } from "./auth";
 import { openCaptcha, openUserLogin } from "@/utils/modal";

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { ColorScheme, PlayModeType, RGB, SortType } from "@/types/main";
+import { SongInfo } from "@/types/main.hemusic";
 
 interface StatusState {
   menuCollapsed: boolean;
@@ -25,9 +26,13 @@ interface StatusState {
   pureLyricMode: boolean;
   playIndex: number;
   lyricIndex: number;
+  /** 歌词加载状态 */
+  lyricLoading: boolean;
   currentTime: number;
   duration: number;
   progress: number;
+  /** 每首歌曲的进度偏移（按歌曲 id-platform 记忆） */
+  currentTimeOffsetMap: Record<string, number>;
   currentTimeOffset: number;
   playUblock: boolean;
   mainContentHeight: number;
@@ -38,6 +43,23 @@ interface StatusState {
   playQuality: string;
   selectedQuality: string;
   radioMode: boolean;
+  /** 均衡器是否开启 */
+  eqEnabled: boolean;
+  /** 均衡器 10 段增益（dB） */
+  eqBands: number[];
+  /** 均衡器当前预设 key */
+  eqPreset: string;
+  /** 自动关闭 */
+  autoClose: {
+    /** 自动关闭 */
+    enable: boolean;
+    /** 自动关闭时间（分钟） */
+    time: number;
+    /** 剩余时长（秒） */
+    remainTime: number;
+    /** 等待歌曲结束 */
+    waitSongEnd: boolean;
+  };
 }
 
 export const useStatusStore = defineStore("status", {
@@ -51,7 +73,7 @@ export const useStatusStore = defineStore("status", {
     showPlayBar: true,
     // 播放状态
     playStatus: false,
-    playLoading: false,
+    playLoading: true,
     playUblock: false,
     // 播放列表状态
     playListShow: false,
@@ -65,6 +87,7 @@ export const useStatusStore = defineStore("status", {
     currentTime: 0,
     duration: 0,
     progress: 0,
+    currentTimeOffsetMap: {},
     // 进度偏移
     currentTimeOffset: 0,
     // 封面主题
@@ -77,6 +100,7 @@ export const useStatusStore = defineStore("status", {
     playIndex: -1,
     // 歌词播放索引
     lyricIndex: -1,
+    lyricLoading: false,
     // 默认倍速
     playRate: 1,
     // 默认音量
@@ -101,7 +125,77 @@ export const useStatusStore = defineStore("status", {
     selectedQuality: "320mp3",
     // 电台模式
     radioMode: false,
+
+    eqEnabled: false,
+    eqBands: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    eqPreset: "acoustic",
+    autoClose: {
+      enable: false,
+      time: 30,
+      remainTime: 0,
+      waitSongEnd: true,
+    },
   }),
+  actions: {
+    /** 获取指定歌曲的偏移（默认 0） */
+    getSongOffset(song?: SongInfo): number {
+      if (!song) return 0;
+      return this.currentTimeOffsetMap?.[`${song.platform}-${song.id}`] ?? 0;
+    },
+    /** 设置指定歌曲的偏移 */
+    setSongOffset(song?: SongInfo, offset: number = 0) {
+      if (!song) return;
+      if (!this.currentTimeOffsetMap) this.currentTimeOffsetMap = {};
+      const fixed = Number(offset.toFixed(2));
+      if (fixed === 0) {
+        // 为 0 时移除记录，避免占用空间
+        delete this.currentTimeOffsetMap[`${song.platform}-${song.id}`];
+      } else {
+        this.currentTimeOffsetMap[`${song.platform}-${song.id}`] = fixed;
+      }
+    },
+    /** 调整指定歌曲的偏移（增量） */
+    incSongOffset(song?: SongInfo, delta: number = 0.5) {
+      if (!song) return;
+      const current = this.getSongOffset(song);
+      const next = Number((current + delta).toFixed(2));
+      if (next === 0) {
+        delete this.currentTimeOffsetMap[`${song.platform}-${song.id}`];
+      } else {
+        this.setSongOffset(song, next);
+      }
+    },
+    /** 重置指定歌曲的偏移为 0 */
+    resetSongOffset(song?: SongInfo) {
+      if (!song) return;
+      // 直接删除该歌曲记录
+      if (this.currentTimeOffsetMap && `${song.platform}-${song.id}` in this.currentTimeOffsetMap) {
+        delete this.currentTimeOffsetMap[`${song.platform}-${song.id}`];
+      }
+    },
+    /**
+     * 设置 EQ 开关
+     * @param enabled 是否开启
+     */
+    setEqEnabled(enabled: boolean) {
+      this.eqEnabled = enabled;
+    },
+    /**
+     * 设置 EQ 10 段增益（dB）
+     * @param bands 长度 10 的 dB 数组
+     */
+    setEqBands(bands: number[]) {
+      if (Array.isArray(bands) && bands.length === 10) {
+        this.eqBands = [...bands];
+      }
+    },
+    /**
+     * 设置 EQ 预设名
+     */
+    setEqPreset(preset: string) {
+      this.eqPreset = preset;
+    },
+  },
   getters: {
     // 播放音量图标
     playVolumeIcon(state) {
@@ -130,7 +224,6 @@ export const useStatusStore = defineStore("status", {
       return `${mainColor.r}, ${mainColor.g}, ${mainColor.b}`;
     },
   },
-  actions: {},
   // 持久化
   persist: {
     key: "status-store",
@@ -140,6 +233,7 @@ export const useStatusStore = defineStore("status", {
       "currentTime",
       "duration",
       "progress",
+      "currentTimeOffsetMap",
       "pureLyricMode",
       "playIndex",
       "playRate",
@@ -153,6 +247,10 @@ export const useStatusStore = defineStore("status", {
       "playQuality",
       "selectedQuality",
       "radioMode",
+      "autoClose",
+      "eqEnabled",
+      "eqBands",
+      "eqPreset",
     ],
   },
 });

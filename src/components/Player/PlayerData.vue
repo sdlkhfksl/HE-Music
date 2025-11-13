@@ -3,22 +3,20 @@
     <!-- 名称 -->
     <div class="name">
       <span class="name-text text-hidden">{{ musicStore.playSong.name || "未知曲目" }}</span>
-      <n-popover v-if="statusStore.playUblock" :show-arrow="false" placement="right-start" raw>
-        <template #trigger>
-          <SvgIcon :depth="3" name="CloudLockOpen" size="22" />
-        </template>
-        <div
-          :style="{
-            '--theme': theme,
-          }"
-          class="player-tip"
-        >
-          <span>{{ t("play.unlock_music_tip") }}</span>
-        </div>
-      </n-popover>
+      <!-- 额外信息 -->
+      <div v-if="statusStore.playUblock" class="extra-info">
+        <n-popover :show-arrow="false" placement="right" raw>
+          <template #trigger>
+            <SvgIcon :depth="3" name="CloudLockOpen" size="22" />
+          </template>
+          <div :style="{ '--theme': theme }" class="player-tip">
+            {{ t("play.unlock_music_tip") }}
+          </div>
+        </n-popover>
+      </div>
     </div>
     <!-- 别名 -->
-    <span v-if="musicStore.playSong.alias" class="alia">
+    <span v-if="musicStore.playSong.alias" class="alia text-hidden">
       {{ musicStore.playSong.alias }}
     </span>
     <!-- 歌手 -->
@@ -121,6 +119,7 @@ const jumpPage = debounce(
     color: rgb(var(--main-color));
   }
   .name {
+    position: relative;
     display: flex;
     align-items: center;
     margin-left: 4px;
@@ -140,6 +139,8 @@ const jumpPage = debounce(
     margin: 6px 0 6px 2px;
     opacity: 0.6;
     font-size: 18px;
+    line-clamp: 1;
+    -webkit-line-clamp: 1;
   }
   .artists {
     margin-top: 2px;
@@ -189,8 +190,8 @@ const jumpPage = debounce(
     .name-text {
       opacity: 0.7;
       transition: opacity 0.3s;
-      line-clamp: 2;
-      -webkit-line-clamp: 2;
+      line-clamp: 1;
+      -webkit-line-clamp: 1;
       cursor: pointer;
       &:hover {
         opacity: 1;
@@ -204,6 +205,13 @@ const jumpPage = debounce(
       .name-text {
         font-size: 30px;
       }
+      .extra-info {
+        position: absolute;
+        right: -34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   }
   &.center {
@@ -215,7 +223,7 @@ const jumpPage = debounce(
   }
 }
 .player-tip {
-  width: 240px;
+  max-width: 240px;
   padding: 12px 20px;
   border-radius: 12px;
   color: rgb(var(--theme));

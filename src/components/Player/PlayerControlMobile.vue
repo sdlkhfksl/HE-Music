@@ -1,7 +1,10 @@
 <template>
   <div class="player-control-main">
     <Transition name="fade" mode="out-in">
-      <div v-if="!statusStore.pureLyricMode" class="player-control-header">
+      <div
+        v-if="!statusStore.pureLyricMode && !statusStore.showPlayerComment"
+        class="player-control-header"
+      >
         <!-- 添加到歌单 -->
         <div
           class="menu-icon"
@@ -40,17 +43,7 @@
       <!-- 进度条 -->
       <div class="slider">
         <span>{{ secondsToTime(statusStore.currentTime) }}</span>
-        <n-slider
-          v-model:value="statusStore.progress"
-          :step="0.01"
-          :min="0"
-          :max="100"
-          :tooltip="false"
-          :keyboard="false"
-          class="player-slider"
-          @dragstart="player.pause(false)"
-          @dragend="sliderDragend"
-        />
+        <PlayerSlider :show-tooltip="false" />
         <span>{{ secondsToTime(statusStore.duration) }}</span>
       </div>
     </div>
@@ -146,28 +139,18 @@
 
 <script setup lang="ts">
 import { useDataStore, useMusicStore, usePlatformStore, useStatusStore } from "@/stores";
-import { calculateCurrentTime, secondsToTime } from "@/utils/time";
 import { toLikeSong } from "@/utils/auth";
 import player from "@/utils/player";
 import type { DropdownOption } from "naive-ui";
 import { openDownloadSong, openPlaylistAdd } from "@/utils/modal";
+import { secondsToTime } from "@/utils/time";
 
 const dataStore = useDataStore();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const platformStore = usePlatformStore();
-
-// 进度条拖拽结束
-const sliderDragend = () => {
-  const seek = calculateCurrentTime(statusStore.progress, statusStore.duration);
-  statusStore.playStatus = true;
-  // 调整进度
-  player.setSeek(seek);
-  player.play();
-};
 const showComment = () => {
   statusStore.showPlayerComment = true;
-  statusStore.pureLyricMode = true;
 };
 
 // 音质选项

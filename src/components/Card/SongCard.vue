@@ -183,7 +183,7 @@
 
 <script setup lang="ts">
 import { useDataStore, useMusicStore, usePlatformStore, useStatusStore } from "@/stores";
-import { formatFileSize, isElectron } from "@/utils/helper";
+import { formatFileSize } from "@/utils/helper";
 import { openJumpArtist } from "@/utils/modal";
 import { toLikeSong } from "@/utils/auth";
 import { isObject } from "lodash-es";
@@ -197,6 +197,7 @@ import { IsValidId, songEqual } from "@/utils/song";
 import { FeatureSupportFlag } from "@/api/platform";
 import SongList from "@/components/List/SongList.vue";
 import { useI18n } from "vue-i18n";
+import { isElectron } from "@/utils/env";
 const { t } = useI18n();
 
 const props = defineProps<{

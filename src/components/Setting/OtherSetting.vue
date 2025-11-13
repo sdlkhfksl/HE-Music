@@ -157,7 +157,7 @@
 
 <script setup lang="ts">
 import { useSettingStore, useDataStore } from "@/stores";
-import { isElectron } from "@/utils/helper";
+import { isElectron } from "@/utils/env";
 import { debounce } from "lodash-es";
 import { useI18n } from "vue-i18n";
 

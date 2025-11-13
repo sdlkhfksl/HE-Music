@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { useMusicStore, useStatusStore } from "@/stores";
-import { isMobile } from "@/utils/helper";
+import { isMobile } from "@/utils/env";
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 
@@ -43,7 +43,7 @@ const setPureLyricMode = () => {
 <style lang="scss" scoped>
 .player-menu {
   width: 100%;
-  height: 80px;
+  min-height: 80px;
   overflow: hidden;
   z-index: 100;
   cursor: pointer;

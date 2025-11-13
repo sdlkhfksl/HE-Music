@@ -138,10 +138,18 @@ export type LyricContentType = {
 };
 
 export type LyricType = {
+  /** 歌词开始时间 */
   time: number;
+  /** 歌词结束时间 */
   endTime: number;
-  tran: string;
-  roma: string;
+  /** 翻译歌词 */
+  tran?: string;
+  /** 音译歌词 */
+  roma?: string;
+  /** 是否为背景歌词 */
+  isBG?: boolean;
+  /** 是否为对唱歌词 */
+  isDuet?: boolean;
   content: string;
   contents: LyricContentType[];
 };

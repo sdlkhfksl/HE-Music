@@ -66,15 +66,16 @@
 import { songLyric, songUrl } from "@/api/song";
 import { usePlatformStore, useSettingStore } from "@/stores";
 import { cloneDeep } from "lodash-es";
-import { formatFileSize, isElectron } from "@/utils/helper";
+import { formatFileSize } from "@/utils/helper";
 import { openSetting } from "@/utils/modal";
 import { saveAs } from "file-saver";
-import player from "@/utils/player";
 import { SongInfo } from "@/types/main.hemusic";
 import { romaSeparator, transSeparator, removeWordLyric } from "@/utils/lyric";
 import { getSizeCover } from "@/utils/format";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
+import { isElectron } from "@/utils/env";
+import { getPlayerInfo } from "@/utils/player/song";
 
 const props = defineProps<{ song: SongInfo }>();
 const emit = defineEmits<{ close: [] }>();
@@ -140,7 +141,7 @@ const download = async () => {
       return;
     }
     // 下载相关数据
-    const songName = player.getPlayerInfo(props.song) || "未知歌曲";
+    const songName = getPlayerInfo(props.song) || "未知歌曲";
 
     const format = result.format?.toLowerCase() || link.format.toLowerCase();
     // 区分设备下载

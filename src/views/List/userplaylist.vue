@@ -149,6 +149,7 @@
         }"
         @scroll="listScroll"
         @remove-song="removeSong"
+        :doubleClickAction="searchData?.length ? 'add' : 'all'"
       />
       <n-empty
         v-else

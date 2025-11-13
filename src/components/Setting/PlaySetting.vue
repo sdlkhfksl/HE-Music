@@ -175,13 +175,7 @@
             },
             {
               label: t('setting.play.player_background_type_value_color'),
-              disabled: true,
               value: 'color',
-            },
-            {
-              label: t('setting.play.player_background_type_value_none'),
-              disabled: true,
-              value: 'none',
             },
           ]"
           class="set"
@@ -283,7 +277,8 @@
 <script setup lang="ts">
 import type { SelectOption } from "naive-ui";
 import { useSettingStore, useStatusStore } from "@/stores";
-import { isElectron, renderOption } from "@/utils/helper";
+import { renderOption } from "@/utils/helper";
+import { isElectron } from "@/utils/env";
 import { uniqBy } from "lodash";
 import player from "@/utils/player";
 import { useI18n } from "vue-i18n";

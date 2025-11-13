@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
-import { keywords } from "@/assets/data/exclude";
+import { keywords, regexes } from "@/assets/data/exclude";
 
 interface SettingState {
+  /** 明暗模式 */
   themeMode: "light" | "dark" | "auto";
   themeColorType:
     | "default"
@@ -19,7 +20,9 @@ interface SettingState {
   themeGlobalColor: boolean;
   themeFollowCover: boolean;
   globalFont: "default" | string;
-  LyricFont: "follow" | string;
+  lyricFont: "follow" | string;
+  /** 日语歌词字体 */
+  japaneseLyricFont: "follow" | string;
   showCloseAppTip: boolean;
   closeAppMethod: "exit" | "hide";
   showTaskbarProgress: boolean;
@@ -32,6 +35,7 @@ interface SettingState {
   lyricFontBold: boolean;
   showYrc: boolean;
   showYrcAnimation: boolean;
+  showYrcLongEffect: boolean;
   showTran: boolean;
   showRoma: boolean;
   lyricsPosition: "flex-start" | "center" | "flex-end";
@@ -77,9 +81,13 @@ interface SettingState {
   realIP: string;
   fullPlayerCache: boolean;
   useKeepAlive: boolean;
-  lyricExclude: boolean;
-  lyricExcludeKeywords: string[];
+  enableLyricsExclude: boolean;
+  enableTTMLExclude: boolean;
+  enableLocalLyricsExclude: boolean;
+  lyricsExcludeKeywords: string[];
+  lyricsExcludeRegexes: string[];
   showDefaultLocalPath: boolean;
+  enableTTMLLyrics: boolean;
   language: string;
 }
 
@@ -92,7 +100,8 @@ export const useSettingStore = defineStore("setting", {
     themeFollowCover: false, // 主题跟随歌曲封面
     themeGlobalColor: false, // 全局着色
     globalFont: "default", // 全局字体
-    LyricFont: "follow", // 歌词区域字体
+    lyricFont: "follow", // 歌词区域字体
+    japaneseLyricFont: "follow",
     hideVipTag: false, // 隐藏 VIP 标签
     showSearchHistory: true, // 显示搜索历史
     menuShowCover: true, // 菜单显示封面
@@ -133,14 +142,19 @@ export const useSettingStore = defineStore("setting", {
     useAMSpring: false, // 是否使用 AM 歌词弹簧效果
     showYrc: true, // 显示逐字歌词
     showYrcAnimation: true, // 显示逐字歌词动画
+    showYrcLongEffect: true,
     showTran: true, // 显示歌词翻译
     showRoma: true, // 显示歌词音译
     lyricsPosition: "flex-start", // 歌词位置
     lyricsBlur: false, // 歌词模糊
     lyricsScrollPosition: "start", // 歌词滚动位置
     lrcMousePause: false, // 鼠标悬停暂停
-    lyricExclude: true, // 歌词排除
-    lyricExcludeKeywords: keywords, // 歌词排除关键字
+    enableLyricsExclude: true, // 歌词排除
+    enableTTMLExclude: false, // 歌词排除 TTML
+    enableLocalLyricsExclude: false,
+    lyricsExcludeKeywords: keywords, // 歌词排除关键字
+    lyricsExcludeRegexes: regexes, // 歌词排除正则表达式
+    enableTTMLLyrics: true, // 启用 TTML 歌词
     // 本地
     localFilesPath: [],
     showDefaultLocalPath: true, // 显示默认本地路径
@@ -161,7 +175,15 @@ export const useSettingStore = defineStore("setting", {
     useRealIP: false, // 是否使用真实 IP
     realIP: "116.25.146.177", // 真实IP地址
   }),
-  getters: {},
+  getters: {
+    /**
+     * 获取淡入淡出时间
+     * @returns 淡入淡出时间
+     */
+    getFadeTime(state): number {
+      return state.songVolumeFade ? state.songVolumeFadeTime : 0;
+    },
+  },
   actions: {
     // 更换明暗模式
     setThemeMode(mode?: "auto" | "light" | "dark") {

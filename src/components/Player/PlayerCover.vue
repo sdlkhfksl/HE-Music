@@ -10,6 +10,7 @@
     <s-image
       :key="musicStore.getSongCover(-1)"
       :src="musicStore.getSongCover(-1)"
+      :observe-visibility="false"
       class="cover-img"
     />
   </div>

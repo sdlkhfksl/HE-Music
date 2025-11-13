@@ -30,8 +30,8 @@
       </n-tab-pane>
       <n-tab-pane
         v-if="isElectron"
-        name="other"
-        :tab="t('setting.other.other_setting')"
+        name="shortcut"
+        :tab="t('setting.shortcut.shortcut_setting')"
         display-directive="show:lazy"
       >
         <!-- 快捷键 -->
@@ -39,8 +39,8 @@
       </n-tab-pane>
       <n-tab-pane
         v-if="isElectron"
-        name="other"
-        :tab="t('setting.other.other_setting')"
+        name="local"
+        :tab="t('setting.local.local_setting')"
         display-directive="show:lazy"
       >
         <!-- 本地 -->
@@ -66,7 +66,7 @@
 import type { SettingType } from "@/types/main";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
-import { isElectron } from "@/utils/helper";
+import { isElectron } from "@/utils/env";
 
 const { t } = useI18n();
 const router = useRouter();

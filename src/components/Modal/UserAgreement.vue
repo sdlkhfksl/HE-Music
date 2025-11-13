@@ -121,7 +121,7 @@
 </template>
 
 <script setup lang="ts">
-import { isElectron } from "@/utils/helper";
+import { isElectron } from "@/utils/env";
 
 const emit = defineEmits<{
   close: [];
@@ -134,7 +134,7 @@ const isReadOver = useElementVisibility(readOverRef);
 
 // 关闭软件
 const closeApp = () => {
-  window.electron.ipcRenderer.send("win-close");
+  window.electron.ipcRenderer.send("quit-app");
 };
 </script>
 

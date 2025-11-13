@@ -184,6 +184,7 @@
           platform: playlistDetailData?.platform,
           type: 'playlist',
         }"
+        :doubleClickAction="searchData?.length ? 'add' : 'all'"
         @scroll="listScroll"
       />
       <n-empty

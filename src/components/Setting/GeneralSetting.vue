@@ -220,7 +220,12 @@
               {{ t("common.reset_default") }}
             </n-button>
           </Transition>
-          <n-select v-model:value="settingStore.globalFont" :options="allFontsData" class="set" />
+          <n-select
+            v-model:value="settingStore.globalFont"
+            :options="allFontsWithDefault"
+            class="set"
+            filterable
+          />
         </n-flex>
       </n-card>
       <n-card class="set-item">
@@ -235,22 +240,53 @@
         <n-flex>
           <Transition name="fade" mode="out-in">
             <n-button
-              v-if="settingStore.LyricFont !== 'follow'"
+              v-if="settingStore.lyricFont !== 'follow'"
               type="primary"
               strong
               secondary
-              @click="settingStore.LyricFont = 'follow'"
+              @click="settingStore.lyricFont = 'follow'"
             >
               {{ t("common.reset_default") }}
             </n-button>
           </Transition>
           <n-select
-            v-model:value="settingStore.LyricFont"
+            v-model:value="settingStore.lyricFont"
             :options="[
               { label: t('setting.general.lyric_font_follow_global'), value: 'follow' },
-              ...allFontsData.filter((v) => v.value !== 'default'),
+              ...allFontsData,
             ]"
             class="set"
+            filterable
+          />
+        </n-flex>
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">
+            {{ t("setting.general.lyric_font_jp") }}
+          </n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.general.lyric_font_jp_tip") }} </n-text>
+        </div>
+        <n-flex>
+          <Transition name="fade" mode="out-in">
+            <n-button
+              v-if="settingStore.japaneseLyricFont !== 'follow'"
+              type="primary"
+              strong
+              secondary
+              @click="settingStore.japaneseLyricFont = 'follow'"
+            >
+              {{ t("common.reset_default") }}
+            </n-button>
+          </Transition>
+          <n-select
+            v-model:value="settingStore.japaneseLyricFont"
+            :options="[
+              { label: t('setting.general.lyric_font_follow_global'), value: 'follow' },
+              ...allFontsData,
+            ]"
+            class="set"
+            filterable
           />
         </n-flex>
       </n-card>
@@ -331,22 +367,37 @@
 
 <script setup lang="ts">
 import type { SelectOption } from "naive-ui";
-import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
-import { isElectron } from "@/utils/helper";
+import { useDataStore, useMusicStore, useSettingStore, useStatusStore } from "@/stores";
+import { isDev, isElectron } from "@/utils/env";
 import { isEmpty } from "lodash-es";
 import themeColor from "@/assets/data/themeColor.json";
-import player from "@/utils/player";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
+import { getCoverColor } from "@/utils/player/song";
 
 // 国际化
 const { t } = useI18n();
 const musicStore = useMusicStore();
 const settingStore = useSettingStore();
 const statusStore = useStatusStore();
+const dataStore = useDataStore();
 
 // 全部字体
 const allFontsData = ref<SelectOption[]>([]);
+
+const allFontsWithDefault = computed(() => {
+  return [
+    {
+      label: t("common.system_default"),
+      value: "default",
+      style: {
+        fontFamily:
+          "v-sans, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+      },
+    },
+    ...allFontsData.value,
+  ];
+});
 
 // 是否开启在线服务
 const useOnlineService = ref(settingStore.useOnlineService);
@@ -379,6 +430,7 @@ const closeTaskbarProgress = (val: boolean) => {
 // 获取全部系统字体
 const getAllSystemFonts = async () => {
   const allFonts = await window.electron.ipcRenderer.invoke("get-all-fonts");
+  allFontsData.value = [];
   allFonts.map((v: string) => {
     // 去除前后的引号
     v = v.replace(/^['"]+|['"]+$/g, "");
@@ -389,15 +441,6 @@ const getAllSystemFonts = async () => {
         fontFamily: v,
       },
     });
-  });
-  // 添加默认选项
-  allFontsData.value.unshift({
-    label: t("common.system_default"),
-    value: "default",
-    style: {
-      fontFamily:
-        "v-sans, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
-    },
   });
 };
 
@@ -412,6 +455,14 @@ const modeChange = (val: boolean) => {
       onPositiveClick: () => {
         useOnlineService.value = true;
         settingStore.useOnlineService = true;
+        // 清理播放数据
+        dataStore.$reset();
+        musicStore.$reset();
+        // 清空本地数据
+        localStorage.removeItem("data-store");
+        localStorage.removeItem("music-store");
+        // 热重载
+        window.location.reload();
       },
     });
   } else {
@@ -423,8 +474,14 @@ const modeChange = (val: boolean) => {
       onPositiveClick: () => {
         useOnlineService.value = false;
         settingStore.useOnlineService = false;
+        // 清理播放数据
+        dataStore.$reset();
+        musicStore.$reset();
+        // 清空本地数据
+        localStorage.removeItem("data-store");
+        localStorage.removeItem("music-store");
         // 重启
-        window.electron.ipcRenderer.send("win-reload");
+        if (!isDev) window.electron.ipcRenderer.send("win-reload");
       },
       onNegativeClick: () => {
         useOnlineService.value = true;
@@ -436,7 +493,7 @@ const modeChange = (val: boolean) => {
 
 // 全局着色更改
 const themeGlobalColorChange = (val: boolean) => {
-  if (val) player.getCoverColor(musicStore.songCover);
+  if (val) getCoverColor(musicStore.songCover);
 };
 
 onMounted(() => {

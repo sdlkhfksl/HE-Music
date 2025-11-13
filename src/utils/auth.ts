@@ -15,7 +15,7 @@ import {
 } from "@/api/user";
 import { useDataStore } from "@/stores";
 import { debounce, isFunction } from "lodash-es";
-import { isElectron } from "./helper";
+import { isElectron } from "./env";
 import {
   AlbumInfo,
   IDPlatformInfo,

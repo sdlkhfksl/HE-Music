@@ -51,7 +51,7 @@
           </Transition>
           <n-input-number
             v-model:value="settingStore.lyricFontSize"
-            :min="30"
+            :min="12"
             :max="60"
             class="set"
             :placeholder="t('setting.lyrics.lyrics_font_size_placeholder')"
@@ -84,7 +84,7 @@
           </Transition>
           <n-input-number
             v-model:value="settingStore.lyricTranFontSize"
-            :min="12"
+            :min="5"
             :max="40"
             :disabled="settingStore.useAMLyrics"
             class="set"
@@ -275,27 +275,47 @@
             {{ t("setting.lyrics.lyrics_exclude_tip") }}
           </n-text>
         </div>
-        <n-switch v-model:value="settingStore.lyricExclude" class="set" :round="false" />
+        <n-switch v-model:value="settingStore.enableLyricsExclude" class="set" :round="false" />
       </n-card>
-      <n-card class="set-item">
-        <div class="label">
-          <n-text class="name">
-            {{ t("setting.lyrics.lyrics_exclude_content") }}
-          </n-text>
-        </div>
-        <n-button
-          type="primary"
-          strong
-          secondary
-          :disabled="!settingStore.lyricExclude"
-          @click="openLyricExclude"
-        >
-          {{ t("common.configuration") }}
-        </n-button>
-      </n-card>
+      <n-collapse-transition :show="settingStore.enableLyricsExclude">
+        <n-card class="set-item">
+          <div class="label">
+            <n-text class="name">{{ t("setting.lyrics.lyrics_exclude_ttml") }}</n-text>
+            <n-text class="tip" :depth="3">
+              {{ t("setting.lyrics.lyrics_exclude_ttml_tip") }}
+            </n-text>
+          </div>
+          <n-switch v-model:value="settingStore.enableTTMLExclude" class="set" :round="false" />
+        </n-card>
+        <n-card class="set-item">
+          <div class="label">
+            <n-text class="name">{{ t("setting.lyrics.lyrics_exclude_local") }}</n-text>
+            <n-text class="tip" :depth="3">
+              {{ t("setting.lyrics.lyrics_exclude_local_tip") }}
+            </n-text>
+          </div>
+          <n-switch
+            v-model:value="settingStore.enableLocalLyricsExclude"
+            class="set"
+            :round="false"
+          />
+        </n-card>
+        <n-card class="set-item">
+          <div class="label">
+            <n-text class="name"> {{ t("setting.lyrics.lyrics_exclude_content") }}</n-text>
+            <n-text class="tip" :depth="3">
+              {{ t("setting.lyrics.lyrics_exclude_content_tip") }}
+            </n-text>
+          </div>
+          <n-button type="primary" strong secondary @click="openLyricExclude">
+            {{ t("common.configuration") }}</n-button
+          >
+        </n-card>
+      </n-collapse-transition>
     </div>
     <div class="set-list">
       <n-h3 prefix="bar"> Apple Music-like Lyrics </n-h3>
+      <n-tag type="warning" size="small" round>Beta</n-tag>
       <n-card class="set-item">
         <div class="label">
           <n-text class="name">
@@ -318,11 +338,21 @@
         </div>
         <n-switch v-model:value="settingStore.useAMSpring" class="set" :round="false" />
       </n-card>
+      <!--      <n-card class="set-item">-->
+      <!--        <div class="label">-->
+      <!--          <n-text class="name">{{ t("setting.lyrics.enable_online_ttml_lyrics") }}</n-text>-->
+      <!--          <n-text class="tip" :depth="3">-->
+      <!--            {{ t("setting.lyrics.enable_online_ttml_lyrics_tip") }}-->
+      <!--          </n-text>-->
+      <!--        </div>-->
+      <!--        <n-switch v-model:value="settingStore.enableTTMLLyrics" class="set" :round="false" />-->
+      <!--      </n-card>-->
     </div>
     <div v-if="isElectron" class="set-list">
       <n-h3 prefix="bar">
         {{ t("common.desktop_lyrics") }}
       </n-h3>
+      <n-tag type="warning" size="small" round>Beta</n-tag>
       <n-card class="set-item">
         <div class="label">
           <n-text class="name">
@@ -338,17 +368,147 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">
-            {{ t("setting.lyrics.desktop_lyrics_font_size") }}
-          </n-text>
+          <n-text class="name">{{ t("setting.lyrics.desktop_lyrics_lock") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.lyrics.desktop_lyrics_lock_tip") }}</n-text>
+        </div>
+        <n-switch
+          v-model:value="desktopLyricConfig.isLock"
+          :round="false"
+          class="set"
+          @update:value="saveDesktopLyricConfig"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{ t("setting.lyrics.desktop_lyrics_double_line") }}</n-text>
+          <n-text class="tip" :depth="3">{{
+            t("setting.lyrics.desktop_lyrics_double_line_tip")
+          }}</n-text>
+        </div>
+        <n-switch
+          v-model:value="desktopLyricConfig.isDoubleLine"
+          :round="false"
+          class="set"
+          @update:value="saveDesktopLyricConfig"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{ t("setting.lyrics.desktop_lyrics_limit_bounds") }}</n-text>
           <n-text class="tip" :depth="3">
-            {{ t("setting.lyrics.desktop_lyrics_font_size_tip") }}
+            {{ t("setting.lyrics.desktop_lyrics_limit_bounds_tip") }}</n-text
+          >
+        </div>
+        <n-switch
+          v-model:value="desktopLyricConfig.limitBounds"
+          :round="false"
+          class="set"
+          @update:value="saveDesktopLyricConfig"
+        />
+      </n-card>
+      <!-- position -->
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{ t("setting.lyrics.desktop_lyrics_align") }}</n-text>
+
+          <n-text class="tip" :depth="3">{{ t("setting.lyrics.desktop_lyrics_align_tip") }}</n-text>
+        </div>
+        <n-select
+          v-model:value="desktopLyricConfig.position"
+          :options="[
+            { label: t('setting.lyrics.desktop_lyrics_align_value_left'), value: 'left' },
+            { label: t('setting.lyrics.desktop_lyrics_align_value_center'), value: 'center' },
+            { label: t('setting.lyrics.desktop_lyrics_align_value_right'), value: 'right' },
+            { label: t('setting.lyrics.desktop_lyrics_align_value_both'), value: 'both' },
+          ]"
+          class="set"
+          @update:value="saveDesktopLyricConfig"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{ t("setting.lyrics.desktop_lyrics_font_family") }}</n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.lyrics.desktop_lyrics_font_family_tip") }}
           </n-text>
+        </div>
+        <n-flex>
+          <Transition name="fade" mode="out-in">
+            <n-button
+              v-if="desktopLyricConfig.fontFamily !== 'system-ui'"
+              type="primary"
+              strong
+              secondary
+              @click="
+                () => {
+                  desktopLyricConfig.fontFamily = 'system-ui';
+                  saveDesktopLyricConfig();
+                }
+              "
+            >
+              {{ t("common.reset_default") }}
+            </n-button>
+          </Transition>
+          <n-select
+            v-model:value="desktopLyricConfig.fontFamily"
+            :options="allFontsWithDefault"
+            class="set"
+            filterable
+            @update:value="saveDesktopLyricConfig"
+          />
+        </n-flex>
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{ t("setting.lyrics.show_desktop_font_lyrics") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.lyrics.show_desktop_font_lyrics") }}</n-text>
+        </div>
+        <n-switch
+          v-model:value="desktopLyricConfig.showYrc"
+          :round="false"
+          class="set"
+          @update:value="saveDesktopLyricConfig"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{ t("setting.lyrics.show_desktop_lyrics_trans") }}</n-text>
+          <n-text class="tip" :depth="3">{{
+            t("setting.lyrics.show_desktop_lyrics_trans_tip")
+          }}</n-text>
+        </div>
+        <n-switch
+          v-model:value="desktopLyricConfig.showTran"
+          :round="false"
+          class="set"
+          @update:value="saveDesktopLyricConfig"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{ t("setting.lyrics.desktop_lyrics_font_bold") }}</n-text>
+          <n-text class="tip" :depth="3">{{
+            t("setting.lyrics.desktop_lyrics_font_bold_tip")
+          }}</n-text>
+        </div>
+        <n-switch
+          v-model:value="desktopLyricConfig.fontIsBold"
+          :round="false"
+          class="set"
+          @update:value="saveDesktopLyricConfig"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name"> {{ t("setting.lyrics.desktop_lyrics_font_size") }}</n-text>
+          <n-text class="tip" :depth="3">{{
+            t("setting.lyrics.desktop_lyrics_font_size_tip")
+          }}</n-text>
         </div>
         <n-select
           v-model:value="desktopLyricConfig.fontSize"
           :options="
-            Array.from({ length: 41 }, (_, i) => {
+            Array.from({ length: 96 - 20 + 1 }, (_, i) => {
               return {
                 label: `${20 + i} px`,
                 value: 20 + i,
@@ -361,15 +521,28 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">
-            {{ t("setting.lyrics.desktop_lyrics_main_color") }}
-          </n-text>
-          <n-text class="tip" :depth="3">
-            {{ t("setting.lyrics.desktop_lyrics_main_color_tip") }}
-          </n-text>
+          <n-text class="name">{{ t("setting.lyrics.desktop_lyrics_font_color_played") }}</n-text>
+          <n-text class="tip" :depth="3">{{
+            t("setting.lyrics.desktop_lyrics_font_color_played_tip")
+          }}</n-text>
         </div>
         <n-color-picker
-          v-model:value="desktopLyricConfig.mainColor"
+          v-model:value="desktopLyricConfig.playedColor"
+          :show-alpha="false"
+          :modes="['hex']"
+          class="set"
+          @complete="saveDesktopLyricConfig"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{ t("setting.lyrics.desktop_lyrics_font_color_unplayed") }}</n-text>
+          <n-text class="tip" :depth="3">{{
+            t("setting.lyrics.desktop_lyrics_font_color_unplayed_tip")
+          }}</n-text>
+        </div>
+        <n-color-picker
+          v-model:value="desktopLyricConfig.unplayedColor"
           :show-alpha="false"
           :modes="['hex']"
           class="set"
@@ -412,31 +585,32 @@
 <script setup lang="ts">
 import { useSettingStore, useStatusStore } from "@/stores";
 import { cloneDeep, isEqual } from "lodash-es";
-import { isElectron } from "@/utils/helper";
-import player from "@/utils/player";
+import { isElectron } from "@/utils/env";
 import { openLyricExclude } from "@/utils/modal";
 import { useI18n } from "vue-i18n";
+import { LyricConfig } from "@/types/desktop-lyric";
+import defaultDesktopLyricConfig from "@/assets/data/lyricConfig";
+import player from "@/utils/player";
+import type { SelectOption } from "naive-ui";
+import { computed } from "vue";
 
 const { t } = useI18n();
 
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 
+// 全部字体
+const allFontsData = ref<SelectOption[]>([]);
 // 桌面歌词配置
-const defaultDesktopLyricConfig = {
-  fontSize: 30,
-  mainColor: "#fff",
-  shadowColor: "rgba(0, 0, 0, 0.5)",
-};
-const desktopLyricConfig = reactive({ ...defaultDesktopLyricConfig });
+const desktopLyricConfig = reactive<LyricConfig>({ ...defaultDesktopLyricConfig });
 
 // 获取桌面歌词配置
 const getDesktopLyricConfig = async () => {
   if (!isElectron) return;
-  const config = await window.electron.ipcRenderer.invoke("get-desktop-lyric-option");
+  const config = await window.electron.ipcRenderer.invoke("request-desktop-lyric-option");
   if (config) Object.assign(desktopLyricConfig, config);
   // 监听更新
-  window.electron.ipcRenderer.on("desktop-lyric-option-change", (_, config) => {
+  window.electron.ipcRenderer.on("update-desktop-lyric-option", (_, config) => {
     if (config && !isEqual(desktopLyricConfig, config)) {
       Object.assign(desktopLyricConfig, config);
     }
@@ -449,7 +623,7 @@ const saveDesktopLyricConfig = () => {
     if (!isElectron) return;
     console.log(cloneDeep(desktopLyricConfig));
     window.electron.ipcRenderer.send(
-      "set-desktop-lyric-option",
+      "update-desktop-lyric-option",
       cloneDeep(desktopLyricConfig),
       true,
     );
@@ -465,9 +639,21 @@ const saveDesktopLyricConfig = () => {
 const restoreDesktopLyricConfig = () => {
   try {
     if (!isElectron) return;
-    window.electron.ipcRenderer.send("set-desktop-lyric-option", defaultDesktopLyricConfig, true);
-    window.$message.success(t("message.desktop_lyrics_reset_success"));
-    console.log(defaultDesktopLyricConfig, desktopLyricConfig);
+    window.$dialog.warning({
+      title: t("common.warning"),
+      content: t("message.desktop_lyrics_reset_confirm"),
+      positiveText: t("common.ok"),
+      negativeText: t("common.cancel"),
+      onPositiveClick: () => {
+        window.electron.ipcRenderer.send(
+          "update-desktop-lyric-option",
+          defaultDesktopLyricConfig,
+          true,
+        );
+        window.$message.success(t("message.desktop_lyrics_reset_success"));
+        console.log(defaultDesktopLyricConfig, desktopLyricConfig);
+      },
+    });
   } catch (error) {
     console.error("Failed to save options:", error);
     window.$message.error(t("message.desktop_lyrics_reset_fail"));
@@ -475,8 +661,40 @@ const restoreDesktopLyricConfig = () => {
   }
 };
 
+const allFontsWithDefault = computed(() => {
+  return [
+    {
+      label: t("common.system_default"),
+      value: "system-ui",
+      style: {
+        fontFamily: "system-ui",
+      },
+    },
+    ...allFontsData.value,
+  ];
+});
+
+// 获取全部系统字体
+const getAllSystemFonts = async () => {
+  const allFonts = await window.electron.ipcRenderer.invoke("get-all-fonts");
+  allFonts.map((v: string) => {
+    // 去除前后的引号
+    v = v.replace(/^['"]+|['"]+$/g, "");
+    allFontsData.value.push({
+      label: v,
+      value: v,
+      style: {
+        fontFamily: v,
+      },
+    });
+  });
+};
+
 onMounted(() => {
-  getDesktopLyricConfig();
+  if (isElectron) {
+    getDesktopLyricConfig();
+    getAllSystemFonts();
+  }
 });
 </script>
 

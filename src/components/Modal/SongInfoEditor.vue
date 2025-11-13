@@ -240,19 +240,19 @@ const getSongInfo = async () => {
   } = await window.electron.ipcRenderer.invoke("get-music-metadata", path); // 解构数据
   // 更新数据
   infoFormData.value = {
-    filename,
-    name: name || "",
+    filename: String(filename),
+    name: String(name ?? ""),
     artists: artists || [],
-    album: album || "",
-    alia: alia || "",
-    lyrics: lyrics || "",
-    type: codec,
+    album: String(album ?? ""),
+    alia: String(alia ?? ""),
+    lyrics: String(lyrics ?? ""),
+    type: String(codec),
     duration: duration || 0,
     size: size,
     bitrate: bitrate || 0,
     sampleRate: sampleRate,
     bitsPerSample: bitsPerSample,
-    md5,
+    md5: String(md5),
   };
 
   // 获取封面
@@ -365,7 +365,9 @@ const saveSongInfo = debounce(async (song: SongInfo) => {
       cover:
         coverData.value.startsWith("blob:") || coverData.value === "/images/song.jpg?assest"
           ? null
-          : coverData.value,
+          : coverData.value.startsWith("file://")
+            ? coverData.value.replace(/^file:\/\//, "")
+            : coverData.value,
     };
     await window.electron.ipcRenderer.invoke("set-music-metadata", song.path, metadata);
     window.$message.success(t("message.song_info_modify_success"));

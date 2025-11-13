@@ -8,17 +8,7 @@
     ]"
   >
     <!-- 进度条 -->
-    <n-slider
-      v-model:value="statusStore.progress"
-      :step="0.01"
-      :min="0"
-      :max="100"
-      :tooltip="false"
-      :keyboard="false"
-      class="player-slider"
-      @dragstart="player.pause(false)"
-      @dragend="sliderDragend"
-    />
+    <PlayerSlider />
     <!-- 信息 -->
     <div class="play-data">
       <!-- 封面 -->
@@ -42,7 +32,7 @@
             </template>
           </n-image>
           <!-- 打开播放器 -->
-          <SvgIcon name="Zoom" :size="30" />
+          <SvgIcon name="Expand" :size="30" />
         </div>
       </Transition>
       <!-- 信息 -->
@@ -56,6 +46,16 @@
               :speed="0.2"
               class="name"
             />
+            <!-- 倍速 -->
+            <n-tag
+              v-if="statusStore.playRate !== 1"
+              type="primary"
+              size="small"
+              round
+              @click="openChangeRate"
+            >
+              {{ statusStore.playRate }}x
+            </n-tag>
             <!-- 喜欢 -->
             <SvgIcon
               :name="dataStore.isLikeSong(musicStore.playSong) ? 'Favorite' : 'FavoriteBorder'"
@@ -147,101 +147,36 @@
         class="play-menu"
         justify="end"
       >
-        <!-- 播放时间 -->
-        <div class="time">
-          <n-text depth="2">
-            {{ secondsToTime(statusStore.currentTime) }}
-          </n-text>
-          <n-text depth="2">
-            {{ secondsToTime(statusStore.duration) }}
-          </n-text>
-        </div>
-        <!-- 桌面歌词 -->
-        <div v-if="isElectron" class="menu-icon" @click.stop="player.toggleDesktopLyric">
-          <SvgIcon name="DesktopLyric" :depth="statusStore.showDesktopLyric ? 1 : 3" />
-        </div>
-        <!-- 音质切换 -->
-        <n-dropdown
-          :options="qualityOptions"
-          :show-arrow="true"
-          :disabled="musicStore.isLocalSong"
-          @select="(quality) => player.changeQuality(quality)"
-        >
-          <div class="menu-icon quality-selector">
-            <span class="current-quality">{{ statusStore.playQuality }}</span>
-          </div>
-        </n-dropdown>
-        <!-- 播放模式 -->
-        <n-dropdown
-          v-if="!statusStore.radioMode"
-          :options="playModeOptions"
-          :show-arrow="true"
-          @select="(mode) => player.togglePlayMode(mode)"
-        >
-          <div class="menu-icon play_mode" @click.stop="player.togglePlayMode(false)">
-            <SvgIcon :name="statusStore.playModeIcon" />
-          </div>
-        </n-dropdown>
-        <!-- 音量调节 -->
-        <n-popover :show-arrow="false" :style="{ padding: 0 }">
-          <template #trigger>
-            <div
-              class="menu-icon volume-mute"
-              @click.stop="player.toggleMute"
-              @wheel="player.setVolume"
-            >
-              <SvgIcon :name="statusStore.playVolumeIcon" />
+        <!-- 时间相关 -->
+        <Transition name="fade" mode="out-in">
+          <n-flex
+            :key="statusStore.autoClose.enable ? 'autoClose' : 'time'"
+            :size="4"
+            justify="center"
+            class="time-container"
+            vertical
+          >
+            <div class="time">
+              <n-text depth="2">{{ secondsToTime(statusStore.currentTime) }}</n-text>
+              <n-text depth="2">{{ secondsToTime(statusStore.duration) }}</n-text>
             </div>
-          </template>
-          <div class="volume-change" @wheel="player.setVolume">
-            <n-slider
-              v-model:value="statusStore.playVolume"
-              :tooltip="false"
-              :min="0"
-              :max="1"
-              :step="0.01"
-              vertical
-              @update:value="(val) => player.setVolume(val)"
-            />
-            <n-text class="slider-num"> {{ statusStore.playVolumePercent }}% </n-text>
-          </div>
-        </n-popover>
-        <!-- 播放暂停 -->
-        <n-button
-          v-debounce="() => player.playOrPause()"
-          :loading="statusStore.playLoading"
-          :focusable="false"
-          :keyboard="false"
-          class="play-pause"
-          type="primary"
-          strong
-          secondary
-          circle
-        >
-          <template #icon>
-            <Transition name="fade" mode="out-in">
-              <SvgIcon
-                :key="statusStore.playStatus ? 'Pause' : 'Play'"
-                :name="statusStore.playStatus ? 'Pause' : 'Play'"
-                :size="28"
-              />
-            </Transition>
-          </template>
-        </n-button>
-        <!-- 播放列表 -->
-        <n-badge
-          v-if="!statusStore.radioMode"
-          :value="dataStore.playList?.length ?? 0"
-          :show="!isMobile && settingStore.showPlaylistCount"
-          :max="999"
-          :style="{
-            marginRight: !isMobile && settingStore.showPlaylistCount ? '12px' : null,
-          }"
-        >
-          <div class="menu-icon" @click.stop="statusStore.playListShow = !statusStore.playListShow">
-            <SvgIcon name="PlayList" />
-          </div>
-        </n-badge>
+            <!-- 定时关闭 -->
+            <n-tag
+              v-if="statusStore.autoClose.enable"
+              size="small"
+              type="primary"
+              round
+              @click="openAutoClose"
+            >
+              {{ convertSecondsToTime(statusStore.autoClose.remainTime) }}
+              <template #icon>
+                <SvgIcon name="TimeAuto" />
+              </template>
+            </n-tag>
+          </n-flex>
+        </Transition>
+        <!-- 功能区 -->
+        <PlayerRightMenu />
       </n-flex>
     </Transition>
   </div>
@@ -256,14 +191,22 @@ import {
   useSettingStore,
   useStatusStore,
 } from "@/stores";
-import { calculateCurrentTime, secondsToTime } from "@/utils/time";
-import { isElectron, renderIcon, coverLoaded, isMobile } from "@/utils/helper";
+import { secondsToTime, convertSecondsToTime } from "@/utils/time";
+import { renderIcon, coverLoaded } from "@/utils/helper";
 import { toLikeSong } from "@/utils/auth";
-import { openDownloadSong, openJumpArtist, openPlaylistAdd } from "@/utils/modal";
+import {
+  openAutoClose,
+  openChangeRate,
+  openDownloadSong,
+  openJumpArtist,
+  openPlaylistAdd,
+} from "@/utils/modal";
 import player from "@/utils/player";
 import { FeatureSupportFlag } from "@/api/platform";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
+import { isMobile } from "@/utils/env";
+
 const { t } = useI18n();
 
 const router = useRouter();
@@ -272,25 +215,6 @@ const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 const platformStore = usePlatformStore();
-
-// 播放模式数据
-const playModeOptions = computed(() => [
-  {
-    label: t("common.play_mode_repeat"),
-    key: "repeat",
-    icon: renderIcon("Repeat"),
-  },
-  {
-    label: t("common.play_mode_repeat_once"),
-    key: "repeat-once",
-    icon: renderIcon("RepeatSong"),
-  },
-  {
-    label: t("common.play_mode_shuffle"),
-    key: "shuffle",
-    icon: renderIcon("Shuffle"),
-  },
-]);
 
 // 歌曲更多操作
 const songMoreOptions = computed<DropdownOption[]>(() => {
@@ -338,7 +262,7 @@ const songMoreOptions = computed<DropdownOption[]>(() => {
           statusStore.$patch({
             showFullPlayer: true,
             showPlayerComment: true,
-            pureLyricMode: isMobile.value ? true : statusStore.pureLyricMode,
+            pureLyricMode: isMobile.value ? false : statusStore.pureLyricMode,
           });
         },
       },
@@ -346,15 +270,6 @@ const songMoreOptions = computed<DropdownOption[]>(() => {
     },
   ];
 });
-
-// 进度条拖拽结束
-const sliderDragend = () => {
-  const seek = calculateCurrentTime(statusStore.progress, statusStore.duration);
-  statusStore.playStatus = true;
-  // 调整进度
-  player.setSeek(seek);
-  player.play();
-};
 
 // 是否展示歌词
 const isShowLyrics = computed(() => {
@@ -374,39 +289,6 @@ const instantLyrics = computed(() => {
     ? `${content?.content}（ ${content?.tran} ）`
     : content?.content;
 });
-
-// 音质选项
-const qualityOptions = computed(() => {
-  if (musicStore.isLocalSong) {
-    return [
-      {
-        label: musicStore.playSong?.quality,
-        key: musicStore.playSong?.quality,
-      },
-    ];
-  }
-  return musicStore.playSong?.links?.map((item): DropdownOption => {
-    const desc = platformStore.getPlatformQualityDescription(
-      musicStore.playSong?.platform,
-      item.name,
-    );
-    return {
-      label: desc ? `${item.name}(${desc})` : `${item.name}`,
-      key: item.name,
-    };
-  });
-  // .flatMap((item: DropdownOption, idx: number): DropdownOption[] =>
-  //   idx === musicStore.playSong?.links.length - 1
-  //     ? [item]
-  //     : [
-  //         item,
-  //         {
-  //           key: `line-${idx}`,
-  //           type: "divider",
-  //         },
-  //       ],
-  // );
-});
 </script>
 
 <style lang="scss" scoped>
@@ -425,7 +307,7 @@ const qualityOptions = computed(() => {
   z-index: 10;
   transition: bottom 0.3s;
   @media (max-width: 768px) {
-    grid-template-columns: auto 30px;
+    grid-template-columns: auto 60px;
     padding: 0 5px;
   }
   &.show {
@@ -507,6 +389,13 @@ const qualityOptions = computed(() => {
           width: max-content;
           max-width: calc(100% - 100px);
           transition: color 0.3s;
+
+          @media (max-width: 768px) {
+            font-size: 12px;
+          }
+        }
+        .n-tag {
+          margin-left: 4px;
         }
         .like {
           color: var(--primary-hex);
@@ -521,7 +410,7 @@ const qualityOptions = computed(() => {
           }
         }
         .more {
-          margin-left: 8px;
+          margin-left: 4px;
           cursor: pointer;
         }
       }
@@ -590,6 +479,7 @@ const qualityOptions = computed(() => {
       width: 38px;
       height: 38px;
       border-radius: 50%;
+      will-change: transform;
       transition:
         background-color 0.3s,
         transform 0.3s;
@@ -612,6 +502,16 @@ const qualityOptions = computed(() => {
   }
   .play-menu {
     flex-wrap: nowrap !important;
+    .time-container {
+      margin-right: 8px;
+      .n-tag {
+        justify-content: center;
+        font-size: 12px;
+      }
+      @media (max-width: 768px) {
+        display: none !important;
+      }
+    }
     .time {
       display: flex;
       align-items: center;
@@ -628,80 +528,6 @@ const qualityOptions = computed(() => {
         }
       }
     }
-    .quality-selector {
-      display: flex;
-      align-items: center;
-      //gap: 4px;
-    }
-
-    .current-quality {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--primary-hex);
-    }
-
-    .menu-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
-      border-radius: 8px;
-      transition:
-        background-color 0.3s,
-        transform 0.3s;
-      cursor: pointer;
-      .n-icon {
-        font-size: 22px;
-        color: var(--primary-hex);
-      }
-      &:hover {
-        transform: scale(1.1);
-        background-color: rgba(var(--primary), 0.28);
-      }
-      &:active {
-        transform: scale(1);
-      }
-
-      @media (max-width: 768px) {
-        padding: 2px;
-      }
-    }
-    :deep(.n-badge-sup) {
-      background-color: rgba(var(--primary), 0.28);
-      backdrop-filter: blur(20px);
-      .n-base-slot-machine {
-        color: var(--primary-hex);
-      }
-    }
-    .play-pause {
-      display: none;
-    }
-
-    @media (max-width: 768px) {
-      .time,
-      .quality-selector,
-      .play_mode,
-      .volume-mute {
-        display: none;
-      }
-
-      .play-pause {
-        display: flex;
-      }
-    }
-  }
-}
-// 音量调节
-.volume-change {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 64px;
-  height: 200px;
-  padding: 12px 16px;
-  .slider-num {
-    margin-top: 4px;
-    font-size: 12px;
   }
 }
 </style>

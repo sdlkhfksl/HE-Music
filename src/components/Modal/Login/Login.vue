@@ -35,8 +35,9 @@ import player from "@/utils/player";
 import { useI18n } from "vue-i18n";
 import { authCodeURL, authProviders } from "@/api/auth";
 import SvgIcon from "@/components/Global/SvgIcon.vue";
-import { isElectron, openLink } from "@/utils/helper";
+import { openLink } from "@/utils/helper";
 import { debounce } from "lodash-es";
+import { isElectron } from "@/utils/env";
 
 const { t } = useI18n();
 

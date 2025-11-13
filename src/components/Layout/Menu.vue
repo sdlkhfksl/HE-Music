@@ -37,7 +37,8 @@ import {
 
 import { useDataStore, useSettingStore, useStatusStore } from "@/stores";
 import { RouterLink, useRouter } from "vue-router";
-import { isElectron, isMobile, renderIcon } from "@/utils/helper";
+import { renderIcon } from "@/utils/helper";
+import { isElectron, isMobile } from "@/utils/env";
 import { openCreatePlaylist } from "@/utils/modal";
 import { PlaylistInfo, UserFavouritePlaylistInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";

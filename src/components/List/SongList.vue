@@ -15,7 +15,7 @@
       <Transition name="fade" mode="out-in">
         <VirtList
           ref="listRef"
-          :key="listData?.[0]?.id"
+          :key="listKey"
           :list="listData"
           :min-size="94"
           :buffer="2"
@@ -66,7 +66,11 @@
               :hidden-cover="hiddenCover"
               :hidden-album="hiddenAlbum"
               :hidden-size="hiddenSize"
-              @dblclick.stop="player.updatePlayList(listData, itemData, playlist)"
+              @dblclick.stop="
+                doubleClickAction === 'add'
+                  ? player.addNextSong(itemData, true)
+                  : player.updatePlayList(listData, itemData, playlist)
+              "
               @contextmenu.stop="
                 songListMenuRef?.openDropdown($event, listData, itemData, index, playlist)
               "
@@ -120,7 +124,7 @@ import type { DropdownOption } from "naive-ui";
 import type { SortType } from "@/types/main";
 import { useMusicStore, useStatusStore } from "@/stores";
 import { VirtList } from "vue-virt-list";
-import { cloneDeep, entries, isEmpty, snakeCase } from "lodash-es";
+import { entries, isEmpty, snakeCase } from "lodash-es";
 import { sortOptions } from "@/utils/meta";
 import { renderIcon } from "@/utils/helper";
 import SongListMenu from "@/components/Menu/SongListMenu.vue";
@@ -160,6 +164,8 @@ const props = withDefaults(
     showFooter?: boolean;
     showHeader?: boolean;
     hiddenSize?: boolean;
+    // 双击播放操作
+    doubleClickAction?: "all" | "add";
   }>(),
   {
     type: "song",
@@ -199,8 +205,9 @@ const songListMenuRef = ref<InstanceType<typeof SongListMenu> | null>(null);
 
 // 列表数据
 const listData = computed<SongInfo[]>(() => {
-  const data = cloneDeep(props.data);
-  if (props.disabledSort) return data;
+  if (props.disabledSort) return props.data;
+  // 创建副本用于排序（避免修改原数组）
+  const data = [...props.data];
   // 排序
   switch (statusStore.listSort) {
     case "titleAZ":
@@ -230,6 +237,12 @@ const listData = computed<SongInfo[]>(() => {
     default:
       return data;
   }
+});
+
+// 虚拟列表 key
+const listKey = computed(() => {
+  // 其他列表长度（检测增删操作）
+  return listData.value?.length || 0;
 });
 
 // 列表是否具有播放歌曲
@@ -393,7 +406,6 @@ onBeforeUnmount(() => {
     }
     .meta {
       width: 50px;
-      font-size: 13px;
       text-align: center;
       &.size {
         width: 60px;

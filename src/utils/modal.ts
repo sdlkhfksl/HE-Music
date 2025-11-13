@@ -8,7 +8,7 @@ import JumpArtist from "@/components/Modal/JumpArtist.vue";
 import UserAgreement from "@/components/Modal/UserAgreement.vue";
 import SongInfoEditor from "@/components/Modal/SongInfoEditor.vue";
 import PlaylistAdd from "@/components/Modal/PlaylistAdd.vue";
-import batchList from "@/components/Modal/batchList.vue";
+import BatchList from "@/components/Modal/BatchList.vue";
 import CreatePlaylist from "@/components/Modal/CreatePlaylist.vue";
 import UpdatePlaylist from "@/components/Modal/UpdatePlaylist.vue";
 import DownloadSong from "@/components/Modal/DownloadSong.vue";
@@ -17,7 +17,10 @@ import UpdateApp from "@/components/Modal/UpdateApp.vue";
 import { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 import UpdateUserPassword from "@/components/Modal/UpdateUserPassword.vue";
 import UpdateUserInfo from "@/components/Modal/UpdateUserInfo.vue";
-import ExcludeKeywords from "@/components/Modal/ExcludeKeywords.vue";
+import ExcludeLyrics from "@/components/Modal/ExcludeLyrics.vue";
+import ChangeRate from "@/components/Modal/ChangeRate.vue";
+import AutoClose from "@/components/Modal/AutoClose.vue";
+import Equalizer from "@/components/Modal/Equalizer.vue";
 import ParseSourceUrl from "@/components/Modal/ParseSourceUrl.vue";
 import { usePlatformStore } from "@/stores";
 import { FeatureSupportFlag } from "@/api/platform";
@@ -149,7 +152,7 @@ export const openBatchList = (data: SongInfo[], isLocal: boolean, playListId?: s
       maxWidth: "70vw",
     },
     title: t("common.batch_operation"),
-    content: () => h(batchList, { data, isLocal, playListId }),
+    content: () => h(BatchList, { data, isLocal, playListId }),
   });
 };
 
@@ -284,7 +287,7 @@ export const openLyricExclude = () => {
     style: { width: "600px" },
     title: t("setting.lyrics.lyrics_exclude_content"),
     content: () => {
-      return h(ExcludeKeywords);
+      return h(ExcludeLyrics);
     },
   });
 };
@@ -312,6 +315,48 @@ export const openCaptcha = (scene: number, meta: string) => {
     maskClosable: false,
     content: () => {
       return h(Captcha, { scene, meta, onClose: () => modal.destroy() });
+    },
+  });
+};
+
+/** 打开播放速度弹窗 */
+export const openChangeRate = () => {
+  window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    style: { width: "600px" },
+    title: t("common.play_rate"),
+    content: () => {
+      return h(ChangeRate);
+    },
+  });
+};
+
+/** 打开自动关闭弹窗 */
+export const openAutoClose = () => {
+  window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    style: { width: "600px" },
+    title: t("common.auto_close"),
+    content: () => {
+      return h(AutoClose);
+    },
+  });
+};
+
+/** 打开均衡器弹窗 */
+export const openEqualizer = () => {
+  window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    style: { width: "620px" },
+    title: t("common.equalizer"),
+    content: () => {
+      return h(Equalizer);
     },
   });
 };

@@ -11,22 +11,12 @@ import { marked } from "marked";
 import SvgIcon from "@/components/Global/SvgIcon.vue";
 import { SongInfo } from "@/types/main.hemusic";
 import { t } from "@/i18n";
+import { isElectron } from "@/utils/env";
 
 type AnyObject = { [key: string]: any };
 
 // 必要数据
 let imageBlobURL: string = "";
-
-// 环境判断
-export const isDev = import.meta.env.MODE === "development" || import.meta.env.DEV;
-
-// 系统判断
-const userAgent = window.navigator.userAgent;
-export const isWin = userAgent.includes("Windows");
-export const isMac = userAgent.includes("Macintosh");
-export const isLinux = userAgent.includes("Linux");
-export const isElectron = userAgent.includes("Electron");
-export const isMobile = useMediaQuery("(max-width: 768px)");
 
 // 链接跳转
 export const openLink = (url: string, target: "_self" | "_blank" = "_blank") => {
@@ -290,5 +280,52 @@ export const changeLocalPath = async (delIndex?: number) => {
   } catch (error) {
     console.error("Error changing local path:", error);
     window.$message.error(t("message.change_local_path_fail"));
+  }
+};
+
+/**
+ * 洗牌数组（Fisher-Yates）
+ */
+export const shuffleArray = <T>(arr: T[]): T[] => {
+  const copy = arr.slice();
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+};
+
+/**
+ * 在浏览器空闲时执行任务
+ * @param task 要执行的任务
+ */
+export const runIdle = (task: () => void) => {
+  try {
+    const ric = window?.requestIdleCallback as ((cb: () => void) => number) | undefined;
+    if (typeof ric === "function") {
+      ric(() => {
+        try {
+          task();
+        } catch {
+          /* empty */
+        }
+      });
+    } else {
+      setTimeout(() => {
+        try {
+          task();
+        } catch {
+          /* empty */
+        }
+      }, 0);
+    }
+  } catch {
+    setTimeout(() => {
+      try {
+        task();
+      } catch {
+        /* empty */
+      }
+    }, 0);
   }
 };

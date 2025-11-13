@@ -127,7 +127,7 @@ import { useStatusStore, useDataStore } from "@/stores";
 import type { VirtualListInst } from "naive-ui";
 import player from "@/utils/player";
 import { useI18n } from "vue-i18n";
-import { isMobile } from "@/utils/helper";
+import { isMobile } from "@/utils/env";
 const { t } = useI18n();
 
 const dataStore = useDataStore();

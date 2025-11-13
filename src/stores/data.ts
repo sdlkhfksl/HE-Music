@@ -14,6 +14,7 @@ import { artistTabs } from "@/api/artist";
 
 interface ListState {
   playList: SongInfo[];
+  originalPlayList: SongInfo[];
   historyList: SongInfo[];
   searchHistory: string[];
   localPlayList: CoverType[];
@@ -48,6 +49,7 @@ export const useDataStore = defineStore("data", {
   state: (): ListState => ({
     // 播放列表
     playList: [],
+    originalPlayList: [],
     // 播放历史
     historyList: [],
     // 搜索历史
@@ -142,6 +144,30 @@ export const useDataStore = defineStore("data", {
         console.error("Error updating playlist:", error);
         throw error;
       }
+    },
+
+    // 保存原始播放列表
+    async setOriginalPlayList(data: SongInfo[]): Promise<void> {
+      const snapshot = cloneDeep(data);
+      this.originalPlayList = snapshot;
+      await musicDB.setItem("originalPlayList", snapshot);
+    },
+    // 获取原始播放列表
+    async getOriginalPlayList(): Promise<SongInfo[] | null> {
+      if (Array.isArray(this.originalPlayList) && this.originalPlayList.length > 0) {
+        return this.originalPlayList;
+      }
+      const data = (await musicDB.getItem("originalPlayList")) as SongInfo[] | null;
+      if (Array.isArray(data) && data.length > 0) {
+        this.originalPlayList = data;
+        return data;
+      }
+      return null;
+    },
+    // 清除原始播放列表
+    async clearOriginalPlayList(): Promise<void> {
+      this.originalPlayList = [];
+      await musicDB.setItem("originalPlayList", []);
     },
     // 新增下一首播放歌曲
     async setNextPlaySong(song: SongInfo, index: number): Promise<number> {

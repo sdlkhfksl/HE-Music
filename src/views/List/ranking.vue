@@ -145,6 +145,7 @@
         disabled-sort
         @scroll="listScroll"
         @reach-bottom="reachBottom"
+        :doubleClickAction="searchData?.length ? 'add' : 'all'"
       />
       <n-empty
         v-else

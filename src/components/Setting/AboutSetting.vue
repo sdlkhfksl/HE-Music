@@ -97,11 +97,12 @@
 
 <script setup lang="ts">
 import type { UpdateLogType } from "@/types/main";
-import { getUpdateLog, isElectron, openLink } from "@/utils/helper";
+import { getUpdateLog, openLink } from "@/utils/helper";
 import { debounce } from "lodash-es";
 import { useStatusStore } from "@/stores";
 import packageJson from "@/../package.json";
 import { useI18n } from "vue-i18n";
+import { isElectron } from "@/utils/env";
 
 const { t } = useI18n();
 const statusStore = useStatusStore();

@@ -1,4 +1,5 @@
 import request, { API_URL, requestHemusic } from "@/utils/request";
+import { isElectron } from "@/utils/env";
 
 // 获取歌曲 URL
 export const songUrl = (
@@ -19,7 +20,11 @@ export const songUrl = (
 };
 
 // 获取解锁歌曲 URL
-export const unlockSongUrl = (id: string, keyword: string, server: "netease" | "kuwo") => {
+export const unlockSongUrl = (
+  id: string,
+  keyword: string,
+  server: "netease" | "kuwo" | "bodian",
+) => {
   const params = server === "netease" ? { id: Number(id) } : { keyword };
   return request({
     baseURL: "/api/unblock",
@@ -29,7 +34,7 @@ export const unlockSongUrl = (id: string, keyword: string, server: "netease" | "
 };
 
 // 获取歌曲歌词
-export const songLyric = (id, platform: string) => {
+export const songLyric = (id: string, platform: string) => {
   return requestHemusic({
     url: "/v1/song/lyric",
     params: {
@@ -121,3 +126,26 @@ export const getCoverUrlStr = (
     redirect: redirect.toString(),
     token,
   }).toString()}`;
+
+/**
+ * 获取歌曲 TTML 歌词
+ * @param id 音乐 id
+ * @returns TTML 格式歌词
+ */
+export const songLyricTTML = async (id: number) => {
+  if (isElectron) {
+    return request({ url: "/lyric/ttml", params: { id, noCookie: true } });
+  } else {
+    const url = `https://amll-ttml-db.stevexmh.net/ncm/${id}`;
+    try {
+      const response = await fetch(url);
+      if (response === null || response.status !== 200) {
+        return null;
+      }
+      const data = await response.text();
+      return data;
+    } catch {
+      return null;
+    }
+  }
+};

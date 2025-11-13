@@ -5,7 +5,9 @@
       '--lrc-tran-size': settingStore.lyricTranFontSize + 'px',
       '--lrc-roma-size': settingStore.lyricRomaFontSize + 'px',
       '--lrc-bold': settingStore.lyricFontBold ? 'bold' : 'normal',
-      'font-family': settingStore.LyricFont !== 'follow' ? settingStore.LyricFont : '',
+      '--ja-font-family':
+        settingStore.japaneseLyricFont !== 'follow' ? settingStore.japaneseLyricFont : '',
+      'font-family': settingStore.lyricFont !== 'follow' ? settingStore.lyricFont : '',
       cursor: statusStore.playerMetaShow ? 'auto' : 'none',
     }"
     :class="[
@@ -24,13 +26,13 @@
         @after-enter="lyricsScroll(statusStore.lyricIndex)"
         @after-leave="lyricsScroll(statusStore.lyricIndex)"
       >
-        <n-scrollbar ref="lyricScroll" class="lyric-scroll">
+        <div v-if="statusStore.lyricLoading" class="lyric-loading">歌词正在加载中...</div>
+        <n-scrollbar v-else ref="lyricScroll" class="lyric-scroll" tabindex="-1">
           <!-- 逐字歌词 -->
           <template v-if="settingStore.showYrc && musicStore.isHasYrc">
             <div id="lrc-placeholder" class="placeholder">
               <!-- 倒计时 -->
               <CountDown
-                v-if="settingStore.countDownShow"
                 :start="0"
                 :duration="musicStore.songLyric.yrcData[0].time || 0"
                 :seek="playSeek"
@@ -39,12 +41,27 @@
             </div>
             <div
               v-for="(item, index) in musicStore.songLyric.yrcData"
-              :id="`lrc-${index}`"
               :key="index"
-              :class="['lrc-line', 'is-yrc', { on: statusStore.lyricIndex === index }]"
+              :id="`lrc-${index}`"
+              :class="[
+                'lrc-line',
+                'is-yrc',
+                {
+                  // on: statusStore.lyricIndex === index,
+                  // 当播放时间大于等于当前歌词的开始时间
+                  on:
+                    (playSeek >= item.time && playSeek < item.endTime) ||
+                    statusStore.lyricIndex === index,
+                  'is-bg': item.isBG,
+                  'is-duet': item.isDuet,
+                },
+              ]"
               :style="{
                 filter: settingStore.lyricsBlur
-                  ? `blur(${Math.min(Math.abs(statusStore.lyricIndex - index) * 1.8, 10)}px)`
+                  ? (playSeek >= item.time && playSeek < item.endTime) ||
+                    statusStore.lyricIndex === index
+                    ? 'blur(0)'
+                    : `blur(${Math.min(Math.abs(statusStore.lyricIndex - index) * 1.8, 10)}px)`
                   : 'blur(0)',
               }"
               @click="jumpSeek(item.time)"
@@ -56,24 +73,38 @@
                   :key="textIndex"
                   :class="{
                     'content-text': true,
-                    'content-long': text.duration >= 1.5 && playSeek <= text.endTime,
+                    'content-long':
+                      settingStore.showYrcLongEffect &&
+                      text.duration >= 1.5 &&
+                      playSeek <= text.endTime,
                     'end-with-space': text.endsWithSpace,
                   }"
                 >
-                  <span class="word">{{ text.content }}</span>
-                  <span class="filler" :style="getYrcStyle(text, index)">
+                  <span class="word" :lang="getLyricLanguage(text.content)">
+                    {{ text.content }}
+                  </span>
+                  <span
+                    class="filler"
+                    :style="getYrcStyle(text, index)"
+                    :lang="getLyricLanguage(text.content)"
+                  >
                     {{ text.content }}
                   </span>
                 </div>
               </div>
               <!-- 翻译 -->
-              <span v-if="item.tran && settingStore.showTran" class="tran">{{ item.tran }}</span>
+              <span v-if="item.tran && settingStore.showTran" class="tran" lang="en">
+                {{ item.tran }}
+              </span>
               <!-- 音译 -->
-              <span v-if="item.roma && settingStore.showRoma" class="roma">{{ item.roma }}</span>
-              <!-- 倒计时 -->
+              <span v-if="item.roma && settingStore.showRoma" class="roma" lang="en">
+                {{ item.roma }}
+              </span>
+              <!-- 间奏倒计时 -->
               <div
                 v-if="
                   settingStore.countDownShow &&
+                  item.time > 0 &&
                   musicStore.songLyric.yrcData[index + 1]?.time - item.endTime >= 10
                 "
                 class="count-down-content"
@@ -93,7 +124,6 @@
             <div id="lrc-placeholder" class="placeholder">
               <!-- 倒计时 -->
               <CountDown
-                v-if="settingStore.countDownShow"
                 :start="0"
                 :duration="musicStore.songLyric.lrcData[0].time || 0"
                 :seek="playSeek"
@@ -102,8 +132,8 @@
             </div>
             <div
               v-for="(item, index) in musicStore.songLyric.lrcData"
-              :id="`lrc-${index}`"
               :key="index"
+              :id="`lrc-${index}`"
               :class="['lrc-line', 'is-lrc', { on: statusStore.lyricIndex === index }]"
               :style="{
                 filter: settingStore.lyricsBlur
@@ -113,35 +143,23 @@
               @click="jumpSeek(item.time)"
             >
               <!-- 歌词 -->
-              <span class="content">{{ item.content }}</span>
+              <span class="content" :lang="getLyricLanguage(item.content)">{{ item.content }}</span>
               <!-- 翻译 -->
-              <span v-if="item.tran && settingStore.showTran" class="tran">{{ item.tran }}</span>
+              <span v-if="item.tran && settingStore.showTran" class="tran" lang="en">
+                {{ item.tran }}
+              </span>
               <!-- 音译 -->
-              <span v-if="item.roma && settingStore.showRoma" class="roma">{{ item.roma }}</span>
+              <span v-if="item.roma && settingStore.showRoma" class="roma" lang="en">
+                {{ item.roma }}
+              </span>
             </div>
             <div class="placeholder" />
           </template>
         </n-scrollbar>
       </div>
     </Transition>
-    <!-- 歌词菜单 -->
-    <n-flex class="menu" justify="center" vertical>
-      <!-- 进度微调 -->
-      <div class="menu-icon" @click="statusStore.currentTimeOffset -= 0.5">
-        <SvgIcon name="Replay5" />
-      </div>
-      <span class="time" @click="statusStore.currentTimeOffset = 0">
-        {{ currentTimeOffsetValue }}
-      </span>
-      <div class="menu-icon" @click="statusStore.currentTimeOffset += 0.5">
-        <SvgIcon name="Forward5" />
-      </div>
-      <div class="divider" />
-      <!-- 更多设置 -->
-      <div class="menu-icon" @click="openLyricSetting">
-        <SvgIcon name="Settings" />
-      </div>
-    </n-flex>
+    <!-- 歌词菜单组件 -->
+    <LyricMenu />
   </div>
 </template>
 
@@ -149,14 +167,14 @@
 import type { LyricContentType } from "@/types/main";
 import { NScrollbar } from "naive-ui";
 import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
-import { openSetting } from "@/utils/modal";
 import player from "@/utils/player";
-import { isMobile } from "@/utils/helper";
+import { getLyricLanguage } from "@/utils/lyric";
+import LyricMenu from "./LyricMenu.vue";
+import { isElectron } from "@/utils/env";
 
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
-const router = useRouter();
 
 const lrcMouseStatus = ref<boolean>(false);
 const lyricScroll = ref<InstanceType<typeof NScrollbar> | null>(null);
@@ -164,30 +182,10 @@ const lyricScroll = ref<InstanceType<typeof NScrollbar> | null>(null);
 // 实时播放进度
 const playSeek = ref<number>(player.getSeek());
 
-// 实时更新播放进度
+// 实时更新播放进度（按歌曲 id 应用偏移）
 const { pause: pauseSeek, resume: resumeSeek } = useRafFn(() => {
-  playSeek.value = player.getSeek() + statusStore.currentTimeOffset;
+  playSeek.value = player.getSeek() + statusStore.getSongOffset(musicStore.playSong);
 });
-
-// 歌词偏移值
-const currentTimeOffsetValue = computed(() => {
-  const currentTimeOffset = statusStore.currentTimeOffset;
-  return currentTimeOffset > 0 ? `+${currentTimeOffset}` : currentTimeOffset;
-});
-
-const openLyricSetting = () => {
-  if (isMobile.value) {
-    statusStore.showFullPlayer = false;
-    router.push({
-      path: "/setting",
-      query: {
-        type: "lyrics",
-      },
-    });
-    return;
-  }
-  openSetting("lyrics");
-};
 
 // 鼠标移出歌词区域
 const lrcAllLeave = () => {
@@ -212,52 +210,64 @@ const lyricsScroll = (index: number) => {
   }
 };
 
-// 逐字歌词样式计算
+/**
+ * 不活跃的普通歌词动画样式
+ */
+const INACTIVE_NO_ANIMATION_STYLE = { opacity: 0 } as const;
+
+/**
+ * 逐字歌词样式计算
+ * @param wordData 逐字歌词数据
+ * @param lyricIndex 歌词索引
+ * @returns 逐字歌词动画样式
+ */
 const getYrcStyle = (wordData: LyricContentType, lyricIndex: number) => {
-  if (settingStore.showYrcAnimation) {
-    // 如果当前歌词索引与播放歌曲的歌词索引不匹配
-    if (statusStore.lyricIndex !== lyricIndex) {
+  // 获取当前歌词行数据
+  const currentLine = musicStore.songLyric.yrcData[lyricIndex];
+  // 缓存 playSeek 值，避免多次访问响应式变量
+  const currentSeek = playSeek.value;
+
+  // 判断当前行是否处于激活状态
+  const isLineActive =
+    (currentSeek >= currentLine.time && currentSeek < currentLine.endTime) ||
+    statusStore.lyricIndex === lyricIndex;
+
+  // 如果当前歌词行不是激活状态，返回固定样式，避免不必要的计算
+  if (!isLineActive) {
+    if (settingStore.showYrcAnimation) {
+      // 判断单词是否已经唱过：已唱过保持填充状态(0%)，未唱到保持未填充状态(100%)
+      const hasPlayed = currentSeek >= wordData.time + wordData.duration;
       return {
-        transitionDuration: `0ms, 0ms, 0.35s`,
-        transitionDelay: `0ms`,
+        WebkitMaskPositionX: hasPlayed ? "0%" : "100%",
       };
+    } else {
+      return INACTIVE_NO_ANIMATION_STYLE;
     }
+  }
+
+  // 激活状态的样式计算
+  if (settingStore.showYrcAnimation) {
     // 如果播放状态不是加载中，且当前单词的时间加上持续时间减去播放进度大于 0
-    if (
-      statusStore.playLoading === false &&
-      wordData.time + wordData.duration - playSeek.value > 0
-    ) {
+    if (statusStore.playLoading === false && wordData.time + wordData.duration - currentSeek > 0) {
       return {
         transitionDuration: `0s, 0s, 0.35s`,
         transitionDelay: `0ms`,
         WebkitMaskPositionX: `${
-          100 - Math.max(((playSeek.value - wordData.time) / wordData.duration) * 100, 0)
+          100 - Math.max(((currentSeek - wordData.time) / wordData.duration) * 100, 0)
         }%`,
-        // 最大上移2px
-        // transform: `translateY(-${Math.min(
-        //   ((playSeek.value - wordData.time) / wordData.duration) * 2,
-        //   2,
-        // )}px)`,
       };
     }
-    // 如果以上条件都不满足
+    // 预计算时间差，避免重复计算
+    const timeDiff = wordData.time - currentSeek;
     return {
       transitionDuration: `${wordData.duration}ms, ${wordData.duration * 0.8}ms, 0.35s`,
-      transitionDelay: `${wordData.time - playSeek.value}ms, ${
-        wordData.time - playSeek.value + wordData.duration * 0.5
-      }ms, 0ms`,
-      // transform: "translateY(-2px)",
+      transitionDelay: `${timeDiff}ms, ${timeDiff + wordData.duration * 0.5}ms, 0ms`,
     };
   } else {
-    // 如果当前歌词索引与播放歌曲的歌词索引不匹配，或者播放状态不是加载中且当前单词的时间大于等于播放进度
-    if (
-      statusStore.lyricIndex !== lyricIndex ||
-      (statusStore.playLoading === false && wordData.time >= playSeek.value)
-    ) {
-      return { opacity: 0 };
-    }
-    // 如果以上条件都不满足
-    return { opacity: 1 };
+    // 无动画模式：根据单词时间判断透明度
+    return statusStore.playLoading === false && wordData.time >= currentSeek
+      ? { opacity: 0 }
+      : { opacity: 1 };
   }
 };
 
@@ -281,6 +291,9 @@ onMounted(() => {
   nextTick().then(() => {
     lyricsScroll(statusStore.lyricIndex);
   });
+  if (isElectron) {
+    window.electron.ipcRenderer.on("lyricsScroll", () => lyricsScroll(statusStore.lyricIndex));
+  }
 });
 
 onBeforeUnmount(() => {
@@ -315,6 +328,8 @@ onBeforeUnmount(() => {
   :deep(.n-scrollbar-content) {
     padding-left: 10px;
     padding-right: 80px;
+    max-width: 100%; /* 新增：防止宽度溢出 */
+    box-sizing: border-box; /* 新增：确保 padding 不影响宽度 */
   }
   .placeholder {
     width: 100%;
@@ -331,6 +346,7 @@ onBeforeUnmount(() => {
   .lyric-content {
     width: 100%;
     height: 100%;
+    box-sizing: border-box; /* 新增：确保宽度计算正确 */
   }
   .lrc-line {
     position: relative;
@@ -346,16 +362,22 @@ onBeforeUnmount(() => {
       opacity 0.35s,
       transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
     cursor: pointer;
-    // 歌词
+    width: 100%;
     .content {
       display: block;
       font-size: var(--lrc-size);
       font-weight: var(--lrc-bold);
-      word-wrap: break-word;
-      // 逐字歌词
+      width: 100%;
+      overflow-wrap: anywhere; /* 支持超长单词换行 */
+      word-break: break-word; /* 优先空格或连字符换行，超长单词强制换行 */
+      white-space: normal; /* 新增：明确文本换行行为 */
+      hyphens: auto; /* 英文自动连字符 */
       .content-text {
         position: relative;
         display: inline-block;
+        overflow-wrap: anywhere; /* 新增：逐字歌词单词支持换行 */
+        word-break: break-word; /* 新增：单词内换行 */
+        white-space: normal; /* 新增：确保逐字歌词换行 */
         .word {
           opacity: 0.3;
           display: inline-block;
@@ -367,6 +389,8 @@ onBeforeUnmount(() => {
           top: 0;
           transform: none;
           will-change: -webkit-mask-position-x, transform, opacity;
+          // padding: 2px 8px;
+          // margin: -2px -8px;
           mask-image: linear-gradient(
             to right,
             rgb(0, 0, 0) 45.4545454545%,
@@ -383,7 +407,7 @@ onBeforeUnmount(() => {
           -webkit-mask-repeat: no-repeat;
           transition:
             opacity 0.3s,
-            filter 0.5s,
+            filter 0.3s,
             margin 0.3s,
             padding 0.3s !important;
         }
@@ -401,22 +425,32 @@ onBeforeUnmount(() => {
           }
         }
       }
+      &:lang(ja) {
+        font-family: var(--ja-font-family);
+      }
     }
-    // 翻译
     .tran {
       margin-top: 8px;
       opacity: 0.6;
       font-size: var(--lrc-tran-size);
       transition: opacity 0.35s;
+      width: 100%;
+      overflow-wrap: anywhere; /* 支持超长单词换行 */
+      word-break: break-word; /* 优先空格或连字符换行，超长单词强制换行 */
+      white-space: normal; /* 新增：明确文本换行行为 */
+      hyphens: auto; /* 英文自动连字符 */
     }
-    // 音译
     .roma {
       margin-top: 4px;
       opacity: 0.5;
       font-size: var(--lrc-roma-size);
       transition: opacity 0.35s;
+      width: 100%;
+      overflow-wrap: anywhere; /* 支持超长单词换行 */
+      word-break: break-word; /* 优先空格或连字符换行，超长单词强制换行 */
+      white-space: normal; /* 新增：明确文本换行行为 */
+      hyphens: auto; /* 英文自动连字符 */
     }
-    // 倒计时
     .count-down-content {
       height: 50px;
       margin-top: 40px;
@@ -432,16 +466,33 @@ onBeforeUnmount(() => {
       .content {
         display: flex;
         flex-wrap: wrap;
+        width: 100%;
+        overflow-wrap: anywhere; /* 逐字歌词支持超长单词换行 */
+        word-break: break-word; /* 优先空格或连字符换行 */
+        white-space: normal; /* 确保换行行为 */
       }
       .tran,
       .roma {
         opacity: 0.3;
       }
+      &.is-bg {
+        opacity: 0.4;
+        transform: scale(0.7);
+        padding: 0px 20px;
+      }
+      &.is-duet {
+        transform-origin: right;
+        .content,
+        .tran,
+        .roma {
+          text-align: right;
+          justify-content: flex-end;
+        }
+      }
     }
     &.on {
-      opacity: 1;
+      opacity: 1 !important;
       transform: scale(1);
-      // 逐字歌词
       .content-text {
         .filler {
           opacity: 1;
@@ -453,6 +504,9 @@ onBeforeUnmount(() => {
       .tran,
       .roma {
         opacity: 0.6;
+      }
+      &.is-bg {
+        opacity: 0.85 !important;
       }
     }
     &::before {
@@ -486,69 +540,6 @@ onBeforeUnmount(() => {
       }
     }
   }
-  .menu {
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-    width: 80px;
-    padding: 20% 0;
-    opacity: 0;
-    transition: opacity 0.3s;
-    .divider {
-      height: 2px;
-      width: 40px;
-      background-color: rgba(var(--main-color), 0.12);
-    }
-    .time {
-      width: 40px;
-      margin: 8px 0;
-      padding: 4px 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      background-color: rgba(var(--main-color), 0.14);
-      backdrop-filter: blur(10px);
-      border-radius: 8px;
-      border: 1px solid rgba(var(--main-color), 0.12);
-      transition: background-color 0.3s;
-      cursor: pointer;
-      &::after {
-        content: "s";
-        margin-left: 2px;
-      }
-      &:hover {
-        background-color: rgba(var(--main-color), 0.28);
-      }
-    }
-    .menu-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 6px;
-      border-radius: 8px;
-      transition:
-        background-color 0.3s,
-        transform 0.3s;
-      cursor: pointer;
-      .n-icon {
-        font-size: 30px;
-        color: rgb(var(--main-color));
-      }
-      &:hover {
-        transform: scale(1.1);
-        background-color: rgba(var(--main-color), 0.14);
-      }
-      &:active {
-        transform: scale(1);
-      }
-    }
-  }
   &.flex-end {
     span {
       text-align: right;
@@ -558,7 +549,6 @@ onBeforeUnmount(() => {
     }
     .lrc-line {
       transform-origin: right;
-      align-items: flex-end;
       .content {
         text-align: right;
       }
@@ -578,9 +568,9 @@ onBeforeUnmount(() => {
     }
     .lrc-line {
       transform-origin: center !important;
-      align-items: center !important;
       .content {
         text-align: center !important;
+        justify-content: center !important;
       }
       .count-down {
         transform-origin: center;
@@ -591,6 +581,8 @@ onBeforeUnmount(() => {
   &.pure {
     :deep(.n-scrollbar-content) {
       padding: 0 80px;
+      max-width: 100%; /* 新增：防止宽度溢出 */
+      box-sizing: border-box; /* 新增：确保 padding 不影响宽度 */
       @media (max-width: 768px) {
         padding: 0;
       }
@@ -614,9 +606,17 @@ onBeforeUnmount(() => {
     .lrc-line {
       filter: blur(0) !important;
     }
-    .menu {
-      opacity: 0.6;
-    }
   }
+}
+</style>
+
+<style scoped>
+.lyric-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
 }
 </style>

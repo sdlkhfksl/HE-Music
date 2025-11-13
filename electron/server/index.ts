@@ -1,60 +1,26 @@
 import { join } from "path";
-import { isDev } from "../main/utils";
-import initNcmAPI from "./netease";
-import initUnblockAPI from "./unblock";
+import { isDev } from "../main/utils/config";
+import { serverLog } from "../main/logger";
+import { initNcmAPI } from "./netease";
+import { initUnblockAPI } from "./unblock";
+import { initControlAPI } from "./control";
 import fastifyCookie from "@fastify/cookie";
 import fastifyMultipart from "@fastify/multipart";
 import fastifyStatic from "@fastify/static";
-import Fastify from "fastify";
-import log from "../main/logger";
-import { BrowserWindow } from "electron";
+import fastify from "fastify";
+import { initLoginAPI } from "./login";
 
-const loginFailTxt = `
-  <!DOCTYPE html>
-  <html lang="zh">
-  <head>
-    <meta charset="UTF-8">
-    <title>Login Status</title>
-  </head>
-  <body>
-    <h1>Login fail!</h1>
-    <script>
-      alert("Login fail!");
-    </script>
-  </body>
-  </html>
-`;
-
-const loginSuccessTxt = `
-  <!DOCTYPE html>
-  <html lang="zh">
-  <head>
-    <meta charset="UTF-8">
-    <title>Login Status</title>
-  </head>
-  <body>
-    <h1>登录成功！</h1>
-    <p>请手动关闭此窗口</p>
-    <script>
-      alert("登录成功！");
-      window.close();
-    </script>
-  </body>
-  </html>
-`;
-
-const initAppServer = async (getWin: () => { mainWin: BrowserWindow | null }) => {
+const initAppServer = async () => {
   try {
-    const server = Fastify({
+    const server = fastify({
       ignoreDuplicateSlashes: true, // 忽略尾随斜杠
     });
-
     // 注册插件
     server.register(fastifyCookie);
     server.register(fastifyMultipart);
     // 生产环境启用静态文件
     if (!isDev) {
-      log.info("📂 Serving static files from /renderer");
+      serverLog.info("📂 Serving static files from /renderer");
       server.register(fastifyStatic, {
         root: join(__dirname, "../renderer"),
       });
@@ -80,23 +46,15 @@ const initAppServer = async (getWin: () => { mainWin: BrowserWindow | null }) =>
     // 注册接口
     server.register(initNcmAPI, { prefix: "/api" });
     server.register(initUnblockAPI, { prefix: "/api" });
-
-    server.get("/login/success", async (req, reply) => {
-      const { token } = req.query as { token?: string };
-      if (!token) {
-        reply.type("text/html").send(loginFailTxt);
-        return;
-      }
-      getWin().mainWin?.webContents.send("login-success", { token });
-      reply.type("text/html").send(loginSuccessTxt);
-    });
+    server.register(initControlAPI, { prefix: "/api" });
+    server.register(initLoginAPI, { prefix: "/login" });
     // 启动端口
     const port = Number(process.env["VITE_SERVER_PORT"] || 25666);
     await server.listen({ port });
-    log.info(`🌐 Starting AppServer on port ${port}`);
+    serverLog.info(`🌐 Starting AppServer on port ${port}`);
     return server;
   } catch (error) {
-    log.error("🚫 AppServer failed to start");
+    serverLog.error("🚫 AppServer failed to start");
     throw error;
   }
 };
