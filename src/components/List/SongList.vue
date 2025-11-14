@@ -74,6 +74,9 @@
               @contextmenu.stop="
                 songListMenuRef?.openDropdown($event, listData, itemData, index, playlist)
               "
+              @click-more="
+                songListMenuRef?.openDropdown($event, listData, itemData, index, playlist)
+              "
             />
           </template>
           <!-- 加载更多 -->
@@ -153,8 +156,6 @@ const props = withDefaults(
     hiddenScrollbar?: boolean;
     // 禁用排序
     disabledSort?: boolean;
-    // 播放歌单 ID
-    playListId?: string;
     playlist?: {
       id: string;
       platform?: string;
@@ -170,7 +171,6 @@ const props = withDefaults(
   {
     type: "song",
     loadingText: "",
-    playListId: "",
     showFooter: true,
     hiddenSize: true,
     showHeader: true,
@@ -242,12 +242,14 @@ const listData = computed<SongInfo[]>(() => {
 // 虚拟列表 key
 const listKey = computed(() => {
   // 其他列表长度（检测增删操作）
-  return listData.value?.length || 0;
+  return listData?.[0]?.id;
 });
 
 // 列表是否具有播放歌曲
 const hasPlaySong = computed(() => {
-  return listData.value.findIndex((item) => item.id === musicStore.playSong.id);
+  return listData.value.findIndex(
+    (item) => item.id === musicStore.playSong.id && item.platform === musicStore.playSong.platform,
+  );
 });
 
 // 列表元素高度
@@ -330,12 +332,12 @@ onBeforeUnmount(() => {
   // 悬浮顶栏
   .list-header {
     width: 100%;
-    height: 40px;
+    //height:50px;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 12px;
+    padding: 5px 12px;
     // margin-right: 4px;
     border: 1px solid transparent;
     background-color: var(--background-hex);
@@ -412,6 +414,9 @@ onBeforeUnmount(() => {
       }
       &.date {
         width: 80px;
+      }
+      @media (max-width: 768px) {
+        display: none;
       }
     }
   }

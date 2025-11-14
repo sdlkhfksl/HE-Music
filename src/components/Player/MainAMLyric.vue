@@ -84,7 +84,8 @@ const amLyricsData = computed<LyricLine[]>(() => {
 const jumpSeek = (line: any) => {
   if (!line?.line?.lyricLine?.startTime) return;
   const time = msToS(line.line.lyricLine.startTime);
-  player.setSeek(time);
+  const offsetSeconds = statusStore.getSongOffset(musicStore.playSong);
+  player.setSeek(time - offsetSeconds);
   player.play();
 };
 

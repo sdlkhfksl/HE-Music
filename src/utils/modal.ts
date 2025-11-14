@@ -1,5 +1,6 @@
 import { h } from "vue";
 import type { SettingType, UpdateInfoType } from "@/types/main";
+import type { ModalReactive } from "naive-ui";
 import { isLogin } from "./auth";
 import { isArray, isFunction } from "lodash-es";
 import router from "@/router";
@@ -218,9 +219,13 @@ export const openDownloadSong = (song: SongInfo) => {
   return;
 };
 
+let settingModal: ModalReactive | null = null;
 // 打开设置
 export const openSetting = (type: SettingType = "general") => {
-  window.$modal.create({
+  if (settingModal) {
+    settingModal.destroy();
+  }
+  settingModal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
     autoFocus: false,
@@ -228,6 +233,9 @@ export const openSetting = (type: SettingType = "general") => {
     closeOnEsc: false,
     bordered: true,
     class: "main-setting",
+    onClose: () => {
+      settingModal = null;
+    },
     content: () => {
       return h(MainSetting, { type });
     },

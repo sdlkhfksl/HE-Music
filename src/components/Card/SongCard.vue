@@ -147,8 +147,10 @@
           :name="dataStore.isLikeSong(song) ? 'Favorite' : 'FavoriteBorder'"
           :size="20"
           @click.stop="toLikeSong(song, !dataStore.isLikeSong(song))"
-          @delclick.stop
+          @dblclick.stop
         />
+        <!-- 更多操作 -->
+        <SvgIcon class="more" name="More" :size="20" @click.stop="clickMore" @dblclick.stop />
       </div>
       <!--      &lt;!&ndash; 更新日期 &ndash;&gt;-->
       <!--      <n-text v-if="song.type === 'radio'" class="meta date" depth="3">-->
@@ -290,6 +292,11 @@ const showSublist = ref(false);
 // 切换子列表显示状态
 const toggleSublist = (data: any) => {
   showSublist.value = data.expanded;
+};
+
+const emit = defineEmits(["clickMore"]);
+const clickMore = (event: Event) => {
+  emit("clickMore", event);
 };
 </script>
 
@@ -511,6 +518,15 @@ const toggleSublist = (data: any) => {
         transform: scale(1);
       }
     }
+    .more {
+      display: none;
+      margin-left: 5px;
+    }
+    @media (max-width: 768px) {
+      .more {
+        display: initial;
+      }
+    }
   }
   .meta {
     width: 50px;
@@ -521,6 +537,9 @@ const toggleSublist = (data: any) => {
     }
     &.date {
       width: 80px;
+    }
+    @media (max-width: 768px) {
+      display: none;
     }
   }
   &.header {
