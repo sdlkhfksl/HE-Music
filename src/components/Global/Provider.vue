@@ -191,6 +191,7 @@ const changeGlobalTheme = () => {
         Tabs: {
           colorSegment: toRGBA(primaryRGB, 0.08),
           tabColorSegment: toRGBA(primaryRGB, 0.12),
+          tabColor: toRGBA(primaryRGB, 0.08),
         },
         Drawer: {
           headerBorderBottom: `1px solid ${toRGBA(primaryRGB, 0.09)}`,

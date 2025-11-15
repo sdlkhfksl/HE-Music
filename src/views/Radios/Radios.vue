@@ -8,7 +8,7 @@
       @update:value="platformChange"
     >
       <n-tab-pane
-        v-for="platform in supportPlatforms.concat(supportPlatforms)"
+        v-for="platform in supportPlatforms"
         :key="`radios-${platform.id}`"
         :name="platform.id"
         :tab="platform.shortname"
