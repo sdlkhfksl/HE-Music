@@ -294,6 +294,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/desktop-lyric",
     name: "desktop-lyric",
+    meta: { offline: true },
     component: () => import("@/views/DesktopLyric/index.vue"),
   },
   // 404

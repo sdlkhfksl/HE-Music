@@ -224,7 +224,7 @@ const getArtistDetail = async (id: string, platform: string) => {
     artistDetailData.value = null;
     artistDetailData.value = await artistDetail(id, platform);
   } catch (error) {
-    console.error("Erorr getting artist detail:", error);
+    console.error("Error getting artist detail:", error);
     window.$message.error(t("message.get_artist_detail_fail"));
   }
 };
@@ -255,7 +255,7 @@ const listScroll = (e: Event) => {
 
 onBeforeRouteUpdate((to) => {
   listScrolling.value = false;
-  if (to.matched[0].name !== "artist") return;
+  if (to.matched[1]?.name !== "artist") return;
   artistType.value = to.name as string;
   const id = to.query.id as string;
   const pt = to.query.platform as string;
