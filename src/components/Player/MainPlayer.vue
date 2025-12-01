@@ -205,7 +205,6 @@ import player from "@/utils/player";
 import { FeatureSupportFlag } from "@/api/platform";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
-import { isMobile } from "@/utils/env";
 
 const { t } = useI18n();
 
@@ -262,7 +261,7 @@ const songMoreOptions = computed<DropdownOption[]>(() => {
           statusStore.$patch({
             showFullPlayer: true,
             showPlayerComment: true,
-            pureLyricMode: isMobile.value ? false : statusStore.pureLyricMode,
+            pureLyricMode: false,
           });
         },
       },

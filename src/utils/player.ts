@@ -315,7 +315,7 @@ class Player {
         this.executeAutoClose();
         return;
       }
-      this.nextOrPrev("next");
+      this.nextOrPrev("next", true, true);
     });
     // 错误
     // 错误
