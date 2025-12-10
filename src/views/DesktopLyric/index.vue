@@ -93,7 +93,7 @@
                   :key="textIndex"
                   :class="{
                     'content-text': true,
-                    'end-with-space': text.word.endsWith(' ') || text.startTime === 0,
+                    'end-with-space': text.word.endsWith(' '),
                   }"
                 >
                   <span

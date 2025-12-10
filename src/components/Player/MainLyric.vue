@@ -77,7 +77,7 @@
                         settingStore.showYrcLongEffect &&
                         text.endTime - text.startTime >= 1500 &&
                         playSeek <= text.endTime,
-                      'end-with-space': text.word.endsWith(' ') || text.startTime === 0,
+                      'end-with-space': text.word.endsWith(' '),
                     }"
                   >
                     <span class="word" :lang="getLyricLanguage(text.word)">
