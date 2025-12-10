@@ -131,8 +131,8 @@ import { entries, isEmpty, snakeCase } from "lodash-es";
 import { sortOptions } from "@/utils/meta";
 import { renderIcon } from "@/utils/helper";
 import SongListMenu from "@/components/Menu/SongListMenu.vue";
-import player from "@/utils/player";
-import { SongInfo } from "@/types/main.hemusic";
+import { usePlayer } from "@/utils/player";
+import type { SongInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
@@ -186,6 +186,7 @@ const emit = defineEmits<{
   removeSong: [info: SongInfo[]];
 }>();
 
+const player = usePlayer();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 

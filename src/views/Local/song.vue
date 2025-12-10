@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import { useSettingStore } from "@/stores";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
 
 const settingStore = useSettingStore();
 

@@ -1,10 +1,10 @@
 import { useDataStore, useSettingStore, useShortcutStore, useStatusStore } from "@/stores";
 import { useEventListener } from "@vueuse/core";
 import { openUserAgreement } from "@/utils/modal";
-import { debounce } from "lodash-es";
+import { cloneDeep, debounce } from "lodash-es";
 import { isElectron } from "./env";
 import packageJson from "@/../package.json";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import log from "./log";
 import { useI18n } from "vue-i18n";
 
@@ -16,6 +16,8 @@ const init = async () => {
   const settingStore = useSettingStore();
   const shortcutStore = useShortcutStore();
   const { locale } = useI18n();
+  // init pinia-data
+  const player = usePlayer();
 
   locale.value = settingStore.language;
 
@@ -44,6 +46,7 @@ const init = async () => {
   if (isElectron) {
     // 注册全局快捷键
     shortcutStore.registerAllShortcuts();
+    console.log("register-protocol", settingStore.registryProtocols);
     // 显示窗口
     window.electron.ipcRenderer.send("win-loaded");
     // 显示桌面歌词
@@ -52,6 +55,11 @@ const init = async () => {
     if (settingStore.checkUpdateOnStart) window.electron.ipcRenderer.send("check-update");
     // 语言切换
     window.electron.ipcRenderer.send("change-language", settingStore.language);
+    // 注册协议
+    window.electron.ipcRenderer.send(
+      "register-protocol",
+      cloneDeep(settingStore.registryProtocols),
+    );
   }
 };
 
@@ -63,6 +71,7 @@ const initEventListener = () => {
 
 // 键盘事件
 const keyDownEvent = debounce((event: KeyboardEvent) => {
+  const player = usePlayer();
   const shortcutStore = useShortcutStore();
   const target = event.target as HTMLElement;
   // 排除元素

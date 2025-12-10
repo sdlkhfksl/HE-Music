@@ -108,7 +108,7 @@
 <script setup lang="ts">
 import { coverLoaded } from "@/utils/helper";
 import { formatCommentTime } from "@/utils/time";
-import { CommentInfo } from "@/types/main.hemusic";
+import type { CommentInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t, n } = useI18n();
 
@@ -215,6 +215,9 @@ const getContent = (content: string) => {
             color: var(--primary-hex);
           }
         }
+        .text {
+          white-space: pre-wrap;
+        }
       }
       .reply {
         width: 100%;
@@ -223,6 +226,9 @@ const getContent = (content: string) => {
         font-size: 13px;
         margin-top: 6px;
         background-color: rgba(var(--main-color), 0.08);
+        .text {
+          white-space: pre-wrap;
+        }
       }
 
       .sub-comment {

@@ -50,7 +50,7 @@
 import { NText } from "naive-ui";
 import SvgIcon from "@/components/Global/SvgIcon.vue";
 import { discoverPage } from "@/api/page";
-import { AlbumInfo, MVInfo, PlaylistInfo, SongInfo } from "@/types/main.hemusic";
+import type { AlbumInfo, MVInfo, PlaylistInfo, SongInfo } from "@/types/main.hemusic";
 import AlbumList from "@/components/List/AlbumList.vue";
 import SongList from "@/components/List/SongList.vue";
 import VideoList from "@/components/List/VideoList.vue";
@@ -166,6 +166,7 @@ onMounted(getAllDiscoverData);
 .title {
   margin-top: 10px;
   padding: 0 16px;
+  width: max-content;
   .n-h {
     margin: 0;
     display: flex;

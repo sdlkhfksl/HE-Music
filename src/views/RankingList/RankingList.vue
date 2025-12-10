@@ -26,7 +26,7 @@ import { usePlatformStore } from "@/stores";
 import { onBeforeRouteUpdate } from "vue-router";
 import { FeatureSupportFlag } from "@/api/platform";
 import { computed, onActivated, watch } from "vue";
-import { PlatformInfo } from "@/types/main.hemusic";
+import type { PlatformInfo } from "@/types/main.hemusic";
 import RankingListResult from "@/views/RankingList/RankingListResult.vue";
 
 const router = useRouter();

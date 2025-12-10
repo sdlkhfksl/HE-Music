@@ -31,7 +31,7 @@ import HomeOnline from "./HomeOnline.vue";
 import HomeLocal from "./HomeLocal.vue";
 import { FeatureSupportFlag } from "@/api/platform";
 import { computed, onActivated, watch } from "vue";
-import { PlatformInfo } from "@/types/main.hemusic";
+import type { PlatformInfo } from "@/types/main.hemusic";
 
 const settingStore = useSettingStore();
 const router = useRouter();

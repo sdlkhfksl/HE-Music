@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { searchResultHemusic } from "@/api/search";
-import { MVInfo } from "@/types/main.hemusic";
+import type { MVInfo } from "@/types/main.hemusic";
 import VideoList from "@/components/List/VideoList.vue";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();

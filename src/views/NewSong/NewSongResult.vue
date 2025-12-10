@@ -16,7 +16,7 @@
 import { newSongs } from "@/api/song";
 import SongList from "@/components/List/SongList.vue";
 import { useStatusStore } from "@/stores";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
 
 const props = defineProps<{
   tab_id: string;

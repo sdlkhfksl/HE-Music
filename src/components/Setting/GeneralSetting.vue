@@ -352,6 +352,21 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
+          <n-text class="name">{{ t("setting.general.registry_protocols") }}}</n-text>
+          <n-text class="tip" :depth="3">
+            {{ t("setting.general.registry_protocols_tip") }}
+          </n-text>
+        </div>
+        <n-select
+          v-model:value="settingStore.registryProtocols"
+          multiple
+          class="set"
+          :round="false"
+          :options="registryProtocols"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
           <n-text class="name">
             {{ t("setting.general.check_update_on_start") }}
           </n-text>
@@ -373,7 +388,7 @@ import { isEmpty } from "lodash-es";
 import themeColor from "@/assets/data/themeColor.json";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
-import { getCoverColor } from "@/utils/player/song";
+import songManager from "@/utils/songManager";
 
 // 国际化
 const { t } = useI18n();
@@ -413,6 +428,19 @@ const themeColorOptions = computed(() => {
         color: themeColor[key].color,
       },
     })),
+  ];
+});
+
+const registryProtocols = computed(() => {
+  return [
+    {
+      label: t("platform.netease"),
+      value: "orpheus",
+    },
+    {
+      label: t("platform.kuwo"),
+      value: "kuwo",
+    },
   ];
 });
 
@@ -481,7 +509,7 @@ const modeChange = (val: boolean) => {
         localStorage.removeItem("data-store");
         localStorage.removeItem("music-store");
         // 重启
-        if (!isDev) window.electron.ipcRenderer.send("win-reload");
+        if (!isDev) window.electron.ipcRenderer.send("win-restart");
       },
       onNegativeClick: () => {
         useOnlineService.value = true;
@@ -493,7 +521,7 @@ const modeChange = (val: boolean) => {
 
 // 全局着色更改
 const themeGlobalColorChange = (val: boolean) => {
-  if (val) getCoverColor(musicStore.songCover);
+  if (val) songManager.getCoverColor(musicStore.songCover);
 };
 
 onMounted(() => {

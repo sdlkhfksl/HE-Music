@@ -14,9 +14,9 @@
 
 <script setup lang="ts">
 import type { DropdownOption } from "naive-ui";
-import { renderIcon } from "@/utils/helper";
+import { copyData, renderIcon } from "@/utils/helper";
 import { useMusicStore, useStatusStore } from "@/stores";
-import { CoverType } from "@/types/main.hemusic";
+import type { CoverType } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
@@ -78,6 +78,22 @@ const openDropdown = async (
             onClick: () => emit("toPlay", item),
           },
           icon: renderIcon("Pause"),
+        },
+        {
+          key: "copy-name",
+          label: `${t("common.copy_name")}`,
+          props: {
+            onClick: () => copyData(item.name),
+          },
+          icon: renderIcon("Copy", { size: 18 }),
+        },
+        {
+          key: "copy-id",
+          label: `${t("common.copy_id")}`,
+          props: {
+            onClick: () => copyData(item.id),
+          },
+          icon: renderIcon("Copy", { size: 18 }),
         },
       ];
       // 显示菜单

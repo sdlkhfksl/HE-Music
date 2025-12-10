@@ -255,6 +255,7 @@ export interface CoverType {
   loading: boolean;
   id: string;
   platform: string;
+  name: string;
 }
 
 export interface SearchDefaultInfo {

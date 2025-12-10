@@ -57,11 +57,12 @@
 
 <script setup lang="ts">
 import { useDataStore } from "@/stores";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import SongList from "@/components/List/SongList.vue";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
+const player = usePlayer();
 const dataStore = useDataStore();
 
 // 清空最近播放

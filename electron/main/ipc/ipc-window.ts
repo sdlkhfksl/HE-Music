@@ -2,9 +2,15 @@ import { app, ipcMain } from "electron";
 import { useStore } from "../store";
 import { isDev } from "../utils/config";
 import { initThumbar } from "../thumbar";
+import { processProtocolFromCommand } from "../utils/protocol";
 import mainWindow from "../windows/main-window";
 import loadWindow from "../windows/load-window";
 import loginWindow from "../windows/login-window";
+
+/** 是否已首次启动 */
+let isFirstLaunch = false;
+/** 是否已处理协议 */
+let isProtocolProcessed = false;
 
 /**
  * 窗口 IPC 通信
@@ -31,18 +37,28 @@ const initWindowsIpc = (): void => {
     if (!mainWin) return;
     mainWin?.show();
     mainWin?.focus();
-    // 解决窗口不立即显示
-    mainWin?.setAlwaysOnTop(true);
-    // 100ms 后取消置顶
-    const timer = setTimeout(() => {
-      if (mainWin && !mainWin.isDestroyed()) {
-        mainWin.setAlwaysOnTop(false);
-        mainWin.focus();
-        clearTimeout(timer);
-      }
-    }, 100);
+    if (!isFirstLaunch) {
+      // 解决窗口不立即显示
+      mainWin?.setAlwaysOnTop(true);
+      // 100ms 后取消置顶
+      const timer = setTimeout(() => {
+        if (mainWin && !mainWin.isDestroyed()) {
+          mainWin.setAlwaysOnTop(false);
+          mainWin.focus();
+          clearTimeout(timer);
+        }
+      }, 100);
+      isFirstLaunch = true;
+    }
     // 初始化缩略图工具栏
-    if (mainWin) initThumbar(mainWin);
+    if (mainWin) {
+      initThumbar(mainWin);
+      // 检查是否有自定义协议启动（仅执行一次）
+      if (!isProtocolProcessed) {
+        processProtocolFromCommand(process.argv);
+        isProtocolProcessed = true;
+      }
+    }
   });
 
   // 最小化
@@ -82,8 +98,15 @@ const initWindowsIpc = (): void => {
     mainWin?.focus();
   });
 
-  // 重启
+  // 重载
   ipcMain.on("win-reload", () => {
+    const mainWin = mainWindow.getWin();
+    if (!mainWin) return;
+    mainWin.reload();
+  });
+
+  // 重启
+  ipcMain.on("win-restart", () => {
     app.quit();
     app.relaunch();
   });

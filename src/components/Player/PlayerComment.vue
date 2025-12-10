@@ -75,7 +75,7 @@
 import { useMusicStore, useStatusStore } from "@/stores";
 import { getComment, getSubComment } from "@/api/comment";
 import { isEmpty } from "lodash-es";
-import { CommentInfo } from "@/types/main.hemusic";
+import type { CommentInfo } from "@/types/main.hemusic";
 import { NScrollbar } from "naive-ui";
 import { coverLoaded } from "@/utils/helper";
 import { useI18n } from "vue-i18n";
@@ -187,10 +187,11 @@ const loadSubMore = async (item: CommentInfo) => {
 watch(
   () => songId.value,
   () => {
-    if (!isShowComment.value) {
-      commentData.value = [];
-      return;
-    }
+    commentData.value = [];
+    commentHotData.value = [];
+    commentPage.value = 1;
+    commentHasMore.value = true;
+    if (!isShowComment.value) return;
     getHotCommentData();
     getAllComment();
   },

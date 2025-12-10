@@ -1,12 +1,14 @@
 import { isElectron } from "./env";
 import { openSetting, openUpdateApp } from "./modal";
 import { useMusicStore, useDataStore, useStatusStore } from "@/stores";
-import player from "./player";
+import { usePlayer } from "./player";
 import { toLikeSong } from "./auth";
 import { t } from "@/i18n";
 import { cloneDeep } from "lodash-es";
-import { getPlayerInfo } from "@/utils/player/song";
+import songManager from "./songManager";
 import { SettingType } from "@/types/main";
+import { handleProtocolUrl } from "@/utils/protocol";
+
 // 关闭更新状态
 const closeUpdateStatus = () => {
   const statusStore = useStatusStore();
@@ -16,6 +18,7 @@ const closeUpdateStatus = () => {
 const initIpc = () => {
   try {
     if (!isElectron) return;
+    const player = usePlayer();
     // 播放
     window.electron.ipcRenderer.on("play", () => player.play());
     // 暂停
@@ -53,11 +56,13 @@ const initIpc = () => {
       const musicStore = useMusicStore();
       const statusStore = useStatusStore();
       if (player) {
+        const { name, artist } = songManager.getPlayerInfoObj() || {};
         window.electron.ipcRenderer.send(
           "update-desktop-lyric-data",
           cloneDeep({
             playStatus: statusStore.playStatus,
-            playName: getPlayerInfo() || "HE-Music",
+            playName: name,
+            artistName: artist,
             currentTime: statusStore.currentTime,
             songId: musicStore.playSong?.id,
             songOffset: statusStore.getSongOffset(musicStore.playSong),
@@ -78,6 +83,11 @@ const initIpc = () => {
       console.error("Error updating:", error);
       closeUpdateStatus();
       window.$message.error(t("message.update_error"));
+    });
+    // 协议数据
+    window.electron.ipcRenderer.on("protocol-url", (_, url) => {
+      console.log("📡 Received protocol url:", url);
+      handleProtocolUrl(url);
     });
   } catch (error) {
     console.log(error);

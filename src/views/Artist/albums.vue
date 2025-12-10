@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import { artistAlbums } from "@/api/artist";
-import { AlbumInfo } from "@/types/main.hemusic";
+import type { AlbumInfo } from "@/types/main.hemusic";
 import AlbumList from "@/components/List/AlbumList.vue";
 
 const props = defineProps<{

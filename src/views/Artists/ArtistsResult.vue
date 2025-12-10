@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { tabArtists } from "@/api/artist";
-import { ArtistInfo } from "@/types/main.hemusic";
+import type { ArtistInfo } from "@/types/main.hemusic";
 import { useDataStore } from "@/stores";
 
 const props = defineProps<{

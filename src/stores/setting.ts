@@ -41,6 +41,10 @@ interface SettingState {
   lyricsPosition: "flex-start" | "center" | "flex-end";
   lyricsScrollPosition: "start" | "center";
   downloadPath: string;
+  /** 音乐命名格式 */
+  fileNameFormat: "title" | "artist-title" | "title-artist";
+  /** 文件智能分类 */
+  folderStrategy: "none" | "artist" | "artist-album";
   downloadMeta: boolean;
   downloadCover: boolean;
   downloadLyric: boolean;
@@ -60,14 +64,16 @@ interface SettingState {
   barLyricShow: boolean;
   playerType: "cover" | "record";
   playerBackgroundType: "none" | "animation" | "blur" | "color";
+  /** 背景动画帧率 */
+  playerBackgroundFps: number;
+  /** 背景动画流动速度 */
+  playerBackgroundFlowSpeed: number;
   memoryLastSeek: boolean;
   showPlaylistCount: boolean;
   showSpectrums: boolean;
   smtcOpen: boolean;
-  smtcOutputHighQualityCover: boolean;
   lyricsBlur: boolean;
   lrcMousePause: boolean;
-  playSongDemo: boolean;
   showSearchHistory: boolean;
   useAMLyrics: boolean;
   useAMSpring: boolean;
@@ -87,8 +93,12 @@ interface SettingState {
   lyricsExcludeKeywords: string[];
   lyricsExcludeRegexes: string[];
   showDefaultLocalPath: boolean;
+  /** 展示当前歌曲歌词状态信息 */
+  showPlayMeta: boolean;
   enableTTMLLyrics: boolean;
   language: string;
+  /** 自定义协议注册 **/
+  registryProtocols: string[];
 }
 
 export const useSettingStore = defineStore("setting", {
@@ -127,12 +137,12 @@ export const useSettingStore = defineStore("setting", {
     barLyricShow: true, // 显示歌词条
     playerType: "cover", // 播放器类型
     playerBackgroundType: "blur", // 背景类型
+    playerBackgroundFps: 30,
+    playerBackgroundFlowSpeed: 4,
     memoryLastSeek: true, // 记忆最后进度
     showPlaylistCount: true, // 显示播放列表数量
     showSpectrums: true, // 是否显示音乐频谱
     smtcOpen: true, // 是否开启 SMTC
-    smtcOutputHighQualityCover: false, // 是否输出高清封面
-    playSongDemo: false, // 是否播放试听歌曲
     // 歌词
     lyricFontSize: 46, // 歌词大小
     lyricTranFontSize: 22, // 歌词翻译大小
@@ -162,6 +172,8 @@ export const useSettingStore = defineStore("setting", {
     showLocalCover: true,
     // 下载
     downloadPath: "", // 默认下载路径
+    fileNameFormat: "title-artist",
+    folderStrategy: "none",
     downloadMeta: true, // 同时下载元信息
     downloadCover: true, // 同时下载封面
     downloadLyric: true, // 同时下载歌词
@@ -174,6 +186,8 @@ export const useSettingStore = defineStore("setting", {
     proxyPort: 80, // 代理端口
     useRealIP: false, // 是否使用真实 IP
     realIP: "116.25.146.177", // 真实IP地址
+    showPlayMeta: false,
+    registryProtocols: [],
   }),
   getters: {
     /**

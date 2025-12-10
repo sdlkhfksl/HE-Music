@@ -18,11 +18,12 @@
 
 <script setup lang="ts">
 import { useStatusStore } from "@/stores";
-import player from "@/utils/player";
-import { secondsToTime } from "@/utils/time";
+import { msToTime } from "@/utils/time";
+import { usePlayer } from "@/utils/player";
 
 withDefaults(defineProps<{ showTooltip?: boolean }>(), { showTooltip: true });
 
+const player = usePlayer();
 const statusStore = useStatusStore();
 
 // 拖动时的临时值
@@ -66,7 +67,7 @@ const endDrag = () => {
 
 // 格式化提示
 const formatTooltip = (value: number) => {
-  return `${secondsToTime(value)} / ${secondsToTime(statusStore.duration)}`;
+  return `${msToTime(value)} / ${msToTime(statusStore.duration)}`;
 };
 </script>
 

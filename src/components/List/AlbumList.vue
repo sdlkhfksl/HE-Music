@@ -114,9 +114,9 @@ import { albumDetail } from "@/api/album";
 import { useMusicStore, useStatusStore } from "@/stores";
 import { debounce } from "lodash-es";
 import CoverMenu from "@/components/Menu/CoverMenu.vue";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import { formatTimestamp } from "@/utils/time";
-import { AlbumInfo, CoverType, UserFavouriteAlbumInfo } from "@/types/main.hemusic";
+import type { AlbumInfo, CoverType, UserFavouriteAlbumInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t, n } = useI18n();
 
@@ -138,6 +138,7 @@ const emit = defineEmits<{
   loadMore: [];
 }>();
 
+const player = usePlayer();
 const router = useRouter();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();

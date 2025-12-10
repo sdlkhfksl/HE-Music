@@ -164,7 +164,7 @@ import { matchSong, neteaseSongLyric } from "@/api/song";
 import { debounce, isArray, isEmpty, isObject } from "lodash-es";
 import blob from "@/utils/blob";
 import { formatSongsList } from "@/utils/format";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 import { romaSeparator, transSeparator } from "@/utils/lyric";
 const { t } = useI18n();

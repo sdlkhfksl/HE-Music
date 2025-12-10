@@ -31,7 +31,7 @@ import { updateUserData } from "@/utils/auth";
 import { useDataStore, usePlatformStore, useSettingStore, useStatusStore } from "@/stores";
 
 import LoginPassword from "@/components/Modal/Login/LoginPassword.vue";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import { useI18n } from "vue-i18n";
 import { authCodeURL, authProviders } from "@/api/auth";
 import SvgIcon from "@/components/Global/SvgIcon.vue";
@@ -45,6 +45,7 @@ const emit = defineEmits<{
   close: [];
 }>();
 
+const player = usePlayer();
 const dataStore = useDataStore();
 const platformStore = usePlatformStore();
 const statusStore = useStatusStore();

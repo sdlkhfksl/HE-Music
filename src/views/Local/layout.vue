@@ -7,9 +7,8 @@
       <n-flex class="status">
         <n-text class="item">
           <SvgIcon name="Music" :depth="3" />
-          <n-number-animation :from="0" :to="localStore.localSongs?.length || 0" />{{
-            t("common.song_count_noun")
-          }}
+          <n-number-animation :from="0" :to="localStore.localSongs?.length || 0" />
+          {{ t("common.song_count_unit", localStore.localSongs?.length || 0) }}
         </n-text>
         <n-text class="item">
           <SvgIcon name="Storage" :depth="3" />
@@ -164,12 +163,13 @@ import { useLocalStore, useSettingStore } from "@/stores";
 import { debounce, flattenDeep, uniqBy } from "lodash-es";
 import { changeLocalPath, fuzzySearch, renderIcon } from "@/utils/helper";
 import { openBatchList } from "@/utils/modal";
-import player from "@/utils/player";
-import { SongInfo } from "@/types/main.hemusic";
+import { usePlayer } from "@/utils/player";
+import type { SongInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 const router = useRouter();
+const player = usePlayer();
 const localStore = useLocalStore();
 const settingStore = useSettingStore();
 
@@ -199,10 +199,12 @@ const listData = computed<SongInfo[]>(() => {
 // 获取音乐文件夹
 const getMusicFolder = async (): Promise<string[]> => {
   defaultMusicPath.value = await window.electron.ipcRenderer.invoke("get-default-dir", "music");
-  return [
+  const paths = [
     settingStore.showDefaultLocalPath ? defaultMusicPath.value : "",
     ...settingStore.localFilesPath,
   ];
+  // 过滤空路径
+  return paths.filter((p) => p && p.trim() !== "");
 };
 
 // 全部音乐大小
@@ -233,45 +235,53 @@ const moreOptions = computed<DropdownOption[]>(() => [
 // 获取全部路径歌曲
 const getAllLocalMusic = debounce(
   async (showTip: boolean = false) => {
-    // 获取路径
-    const allPath = await getMusicFolder();
-    if (!allPath || !allPath.length) return;
-    // 加载提示
-    if (showTip) {
-      loadingMsg.value = window.$message.loading(t("message.loading_local_music"), {
-        duration: 0,
-      });
-    }
-    // 获取全部歌曲
-    loading.value = true;
-    const dirContentsPromises = allPath.map((path) =>
-      window.electron.ipcRenderer.invoke("get-music-files", path),
-    );
-    const results = await Promise.allSettled(dirContentsPromises);
-    const allSongData = results
-      .filter((result) => result.status === "fulfilled")
-      .map((result) => (result as PromiseFulfilledResult<any>).value);
-    // 展平去重
-    const songData = uniqBy(flattenDeep(allSongData), "id");
-    // 处理数据
-    const listData = songData;
-    // 数据是否变化
-    const oldLength = localStore.localSongs.length;
-    if (oldLength === 0 && listData.length > 0) {
-      window.$message.success(t("message.found_local_music_count", { count: listData.length }));
-    } else if (listData.length > oldLength) {
-      window.$message.success(
-        t("message.added_local_music_count", { count: listData.length - oldLength }),
+    try {
+      // 获取路径
+      const allPath = await getMusicFolder();
+      if (!allPath || !allPath.length) {
+        loading.value = false;
+        return;
+      }
+      // 加载提示
+      if (showTip) {
+        loadingMsg.value = window.$message.loading(t("message.loading_local_music"), {
+          duration: 0,
+        });
+      }
+      // 获取全部歌曲
+      loading.value = true;
+      const dirContentsPromises = allPath.map((path) =>
+        window.electron.ipcRenderer.invoke("get-music-files", path),
       );
+      const results = await Promise.allSettled(dirContentsPromises);
+      const allSongData = results
+        .filter((result) => result.status === "fulfilled")
+        .map((result) => (result as PromiseFulfilledResult<any>).value);
+      // 展平去重
+      const songData = uniqBy(flattenDeep(allSongData), "id");
+      // 处理数据
+      const listData = songData;
+      // 数据是否变化
+      const oldLength = localStore.localSongs.length;
+      if (oldLength === 0 && listData.length > 0) {
+        window.$message.success(t("message.found_local_music_count", { count: listData.length }));
+      } else if (listData.length > oldLength) {
+        window.$message.success(
+          t("message.added_local_music_count", { count: listData.length - oldLength }),
+        );
+      }
+      if (showTip)
+        window.$message.success(t("message.found_local_music_count", { count: listData.length }));
+      // 保存并更新
+      localStore.updateLocalSong(listData);
+    } catch (error) {
+      console.error("获取本地音乐失败:", error);
+      window.$message.error("获取本地音乐失败，请重试");
+    } finally {
+      loading.value = false;
+      loadingMsg.value?.destroy();
+      loadingMsg.value = null;
     }
-    if (showTip)
-      window.$message.success(t("message.found_local_music_count", { count: listData.length }));
-    // 保存并更新
-    localStore.updateLocalSong(listData);
-    // 关闭加载
-    loading.value = false;
-    loadingMsg.value?.destroy();
-    loadingMsg.value = null;
   },
   300,
   { leading: true, trailing: false },

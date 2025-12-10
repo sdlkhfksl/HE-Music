@@ -124,17 +124,18 @@
 import { useDataStore, usePlatformStore, useStatusStore } from "@/stores";
 import { getMVUrlStr, videoDetail } from "@/api/video";
 import { getComment, getSubComment } from "@/api/comment";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 // Plyr
 import Plyr from "plyr";
 import "plyr/dist/plyr.css";
-import { CommentInfo, MVInfo } from "@/types/main.hemusic";
+import type { CommentInfo, MVInfo } from "@/types/main.hemusic";
 import { FeatureSupportFlag } from "@/api/platform";
 import { useI18n } from "vue-i18n";
 import Hls from "hls.js";
 
 const { t, n } = useI18n();
 
+const player = usePlayer();
 const router = useRouter();
 const statusStore = useStatusStore();
 const dataStore = useDataStore();

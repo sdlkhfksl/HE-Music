@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { SongInfo, SongInfoArtistInfo } from "@/types/main.hemusic";
+import type { SongInfo, SongInfoArtistInfo } from "@/types/main.hemusic";
 import { usePlatformStore, useSettingStore } from "@/stores";
 import { searchResultHemusic } from "@/api/search";
 import { uniq } from "lodash-es";

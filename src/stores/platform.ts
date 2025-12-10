@@ -1,4 +1,4 @@
-import { PlatformInfo } from "@/types/main.hemusic";
+import type { PlatformInfo } from "@/types/main.hemusic";
 import { defineStore } from "pinia";
 import { platforms } from "@/api/platform";
 

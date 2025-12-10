@@ -14,7 +14,11 @@
         </div>
 
         <!-- 下载 -->
-        <div class="menu-icon" @click.stop="openDownloadSong(musicStore.playSong)">
+        <div
+          v-if="!musicStore.playSong.path"
+          class="menu-icon"
+          @click.stop="openDownloadSong(musicStore.playSong)"
+        >
           <SvgIcon name="Download" />
         </div>
         <!-- 音质切换 -->
@@ -42,9 +46,9 @@
     <div class="player-control-middle">
       <!-- 进度条 -->
       <div class="slider">
-        <span>{{ secondsToTime(statusStore.currentTime) }}</span>
+        <span>{{ msToTime(statusStore.currentTime) }}</span>
         <PlayerSlider :show-tooltip="false" />
-        <span>{{ secondsToTime(statusStore.duration) }}</span>
+        <span>{{ msToTime(statusStore.duration) }}</span>
       </div>
     </div>
     <div class="player-control-footer">
@@ -140,11 +144,12 @@
 <script setup lang="ts">
 import { useDataStore, useMusicStore, usePlatformStore, useStatusStore } from "@/stores";
 import { toLikeSong } from "@/utils/auth";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import type { DropdownOption } from "naive-ui";
 import { openDownloadSong, openPlaylistAdd } from "@/utils/modal";
-import { secondsToTime } from "@/utils/time";
+import { msToTime } from "@/utils/time";
 
+const player = usePlayer();
 const dataStore = useDataStore();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();

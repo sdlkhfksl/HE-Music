@@ -14,6 +14,12 @@
     "hide_desktop_lyrics": "Hide desktop lyrics",
     "lock_desktop_lyrics": "Lock desktop lyrics",
     "unlock_desktop_lyrics": "Unlock desktop lyrics",
-    "exit": "Exit"
+    "exit": "Exit",
+    "export_settings": "Export settings",
+    "import_settings": "Import settings",
+    "choose_folder": "Choose folder"
+  },
+  "message": {
+    "file_exists": "File exists"
   }
 }

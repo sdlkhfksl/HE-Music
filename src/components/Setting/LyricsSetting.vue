@@ -315,7 +315,7 @@
     </div>
     <div class="set-list">
       <n-h3 prefix="bar"> Apple Music-like Lyrics </n-h3>
-      <n-tag type="warning" size="small" round>Beta</n-tag>
+      <n-tag type="warning" size="small" round> Beta </n-tag>
       <n-card class="set-item">
         <div class="label">
           <n-text class="name">
@@ -567,6 +567,35 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
+          <n-text class="name">{{
+            t("setting.lyrics.desktop_lyrics_text_background_mask")
+          }}</n-text>
+        </div>
+        <n-switch
+          v-model:value="desktopLyricConfig.textBackgroundMask"
+          :round="false"
+          class="set"
+          @update:value="saveDesktopLyricConfig"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{
+            t("setting.lyrics.desktop_lyrics_always_show_play_info")
+          }}</n-text>
+          <n-text class="tip" :depth="3">{{
+            t("setting.lyrics.desktop_lyrics_always_show_play_info_tip")
+          }}</n-text>
+        </div>
+        <n-switch
+          v-model:value="desktopLyricConfig.alwaysShowPlayInfo"
+          :round="false"
+          class="set"
+          @update:value="saveDesktopLyricConfig"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
           <n-text class="name">
             {{ t("setting.lyrics.desktop_lyrics_reset_default") }}
           </n-text>
@@ -590,12 +619,13 @@ import { openLyricExclude } from "@/utils/modal";
 import { useI18n } from "vue-i18n";
 import { LyricConfig } from "@/types/desktop-lyric";
 import defaultDesktopLyricConfig from "@/assets/data/lyricConfig";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import type { SelectOption } from "naive-ui";
 import { computed } from "vue";
 
 const { t } = useI18n();
 
+const player = usePlayer();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 

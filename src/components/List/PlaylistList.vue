@@ -100,8 +100,8 @@ import { useMusicStore, useStatusStore } from "@/stores";
 import { debounce } from "lodash-es";
 import { playlistDetail } from "@/api/playlist";
 import CoverMenu from "@/components/Menu/CoverMenu.vue";
-import player from "@/utils/player";
-import {
+import { usePlayer } from "@/utils/player";
+import type {
   CoverType,
   PlaylistInfo,
   UserFavouritePlaylistInfo,
@@ -130,6 +130,7 @@ const emit = defineEmits<{
 }>();
 
 const router = useRouter();
+const player = usePlayer();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 

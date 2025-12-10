@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import { newAlbums } from "@/api/album";
-import { AlbumInfo } from "@/types/main.hemusic";
+import type { AlbumInfo } from "@/types/main.hemusic";
 import AlbumList from "@/components/List/AlbumList.vue";
 
 const props = defineProps<{

@@ -34,13 +34,14 @@
 
 <script setup lang="ts">
 import { LyricPlayer } from "@applemusic-like-lyrics/vue";
-import { LyricLine } from "@applemusic-like-lyrics/core";
+import { type LyricLine } from "@applemusic-like-lyrics/lyric";
 import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
 import { msToS } from "@/utils/time";
-import { getLyricLanguage } from "@/utils/lyric";
-import player from "@/utils/player";
+import { getLyricLanguage } from "@/utils/format";
+import { usePlayer } from "@/utils/player";
 import LyricMenu from "./LyricMenu.vue";
 
+const player = usePlayer();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
@@ -49,14 +50,13 @@ const lyricPlayerRef = ref<any | null>(null);
 
 // 实时播放进度
 const playSeek = ref<number>(
-  Math.floor((player.getSeek() + statusStore.getSongOffset(musicStore.playSong)) * 1000),
+  Math.floor(player.getSeek() + statusStore.getSongOffset(musicStore.playSong)),
 );
 
 // 实时更新播放进度
 const { pause: pauseSeek, resume: resumeSeek } = useRafFn(() => {
-  const offsetSeconds = statusStore.getSongOffset(musicStore.playSong);
-  const seekInSeconds = player.getSeek() + offsetSeconds;
-  playSeek.value = Math.floor(seekInSeconds * 1000);
+  const offsetTime = statusStore.getSongOffset(musicStore.playSong);
+  playSeek.value = player.getSeek() + offsetTime;
 });
 
 // 歌词主色
@@ -71,8 +71,9 @@ const amLyricsData = computed<LyricLine[]>(() => {
   if (!songLyric) return [];
 
   // 优先使用逐字歌词(YRC/TTML)
-  const useYrc = songLyric.yrcAMData?.length && settingStore.showYrc;
-  const lyrics = useYrc ? songLyric.yrcAMData : songLyric.lrcAMData;
+  // 优先使用逐字歌词(YRC/TTML)
+  const useYrc = songLyric.yrcData?.length && settingStore.showYrc;
+  const lyrics = useYrc ? songLyric.yrcData : songLyric.lrcData;
 
   // 简单检查歌词有效性
   if (!Array.isArray(lyrics) || lyrics.length === 0) return [];
@@ -84,8 +85,8 @@ const amLyricsData = computed<LyricLine[]>(() => {
 const jumpSeek = (line: any) => {
   if (!line?.line?.lyricLine?.startTime) return;
   const time = msToS(line.line.lyricLine.startTime);
-  const offsetSeconds = statusStore.getSongOffset(musicStore.playSong);
-  player.setSeek(time - offsetSeconds);
+  const offsetMs = statusStore.getSongOffset(musicStore.playSong);
+  player.setSeek(time - offsetMs);
   player.play();
 };
 

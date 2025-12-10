@@ -30,19 +30,13 @@
           </n-h2>
           <n-collapse-transition :show="!listScrolling" class="collapse">
             <!-- 简介 -->
-            <n-ellipsis
+            <n-text
               v-if="albumDetailData.description"
-              :line-clamp="1"
-              :tooltip="{
-                trigger: 'click',
-                placement: 'bottom',
-                width: 'trigger',
-                scrollable: true,
-                contentStyle: 'white-space: pre-line; max-height:400px',
-              }"
+              class="description text-hidden"
+              @click="openDescModal(albumDetailData.description)"
             >
               {{ albumDetailData.description }}
-            </n-ellipsis>
+            </n-text>
             <!-- 信息 -->
             <n-flex class="meta">
               <div class="item">
@@ -175,14 +169,14 @@
 
 <script setup lang="ts">
 import { albumDetail } from "@/api/album";
-import { coverLoaded, fuzzySearch, renderIcon } from "@/utils/helper";
+import { copyData, coverLoaded, fuzzySearch, renderIcon } from "@/utils/helper";
 import { renderToolbar } from "@/utils/meta";
 import { useDataStore, usePlatformStore, useStatusStore } from "@/stores";
 import { debounce } from "lodash-es";
 import { formatTimestamp } from "@/utils/time";
-import { openBatchList, openJumpArtist } from "@/utils/modal";
-import player from "@/utils/player";
-import { AlbumInfo, SongInfo } from "@/types/main.hemusic";
+import { openDescModal, openBatchList, openJumpArtist } from "@/utils/modal";
+import { usePlayer } from "@/utils/player";
+import type { AlbumInfo, SongInfo } from "@/types/main.hemusic";
 import { computed } from "vue";
 import SongList from "@/components/List/SongList.vue";
 import { toLikeAlbum } from "@/utils/auth";
@@ -193,6 +187,7 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 const router = useRouter();
+const player = usePlayer();
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
 const platformStore = usePlatformStore();
@@ -241,6 +236,18 @@ const moreOptions = computed<DropdownOption[]>(() => [
       onClick: () => openBatchList(albumDataShow.value, false),
     },
     icon: renderIcon("Batch"),
+  },
+  {
+    label: t("menu.copy_share_link"),
+    key: "copy",
+    show: platformStore.isFeatureSupport(platform.value, FeatureSupportFlag.BuildSourceUrl),
+    props: {
+      onClick: async () => {
+        const { url } = await buildSourceUrl(platform.value, albumId.value, "album");
+        copyData(url, t("menu.share_link_copied"));
+      },
+    },
+    icon: renderIcon("Share"),
   },
   {
     label: t("common.open_source_page"),

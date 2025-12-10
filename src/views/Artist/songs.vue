@@ -13,9 +13,9 @@
 <script setup lang="ts">
 import { artistAllSongs } from "@/api/artist";
 import { debounce } from "lodash-es";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import SongList from "@/components/List/SongList.vue";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
 
 const props = defineProps<{
   id: string;
@@ -26,6 +26,7 @@ const emit = defineEmits<{
   scroll: [e: Event];
 }>();
 
+const player = usePlayer();
 // 歌曲数据
 const loading = ref<boolean>(true);
 const hasMore = ref<boolean>(true);

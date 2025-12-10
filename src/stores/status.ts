@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { ColorScheme, PlayModeType, RGB, SortType } from "@/types/main";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
 
 interface StatusState {
   menuCollapsed: boolean;
@@ -137,16 +137,21 @@ export const useStatusStore = defineStore("status", {
     },
   }),
   actions: {
-    /** 获取指定歌曲的偏移（默认 0） */
+    /**
+     * 获取指定歌曲的偏移
+     * 单位：毫秒
+     */
     getSongOffset(song?: SongInfo): number {
       if (!song) return 0;
-      return this.currentTimeOffsetMap?.[`${song.platform}-${song.id}`] ?? 0;
+      const offsetTime = this.currentTimeOffsetMap?.[`${song.platform}-${song.id}`] ?? 0;
+      return Math.floor(offsetTime * 1000);
     },
     /** 设置指定歌曲的偏移 */
     setSongOffset(song?: SongInfo, offset: number = 0) {
       if (!song) return;
       if (!this.currentTimeOffsetMap) this.currentTimeOffsetMap = {};
-      const fixed = Number(offset.toFixed(2));
+      const offsetSeconds = offset / 1000;
+      const fixed = Number(offsetSeconds.toFixed(2));
       if (fixed === 0) {
         // 为 0 时移除记录，避免占用空间
         delete this.currentTimeOffsetMap[`${song.platform}-${song.id}`];
@@ -155,10 +160,10 @@ export const useStatusStore = defineStore("status", {
       }
     },
     /** 调整指定歌曲的偏移（增量） */
-    incSongOffset(song?: SongInfo, delta: number = 0.5) {
+    incSongOffset(song?: SongInfo, delta: number = 500) {
       if (!song) return;
       const current = this.getSongOffset(song);
-      const next = Number((current + delta).toFixed(2));
+      const next = current + delta;
       if (next === 0) {
         delete this.currentTimeOffsetMap[`${song.platform}-${song.id}`];
       } else {

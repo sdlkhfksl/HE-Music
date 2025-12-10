@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { RadioInfo } from "@/types/main.hemusic";
+import type { RadioInfo } from "@/types/main.hemusic";
 
 import { onMounted } from "vue";
 import { listRadios } from "@/api/radio";

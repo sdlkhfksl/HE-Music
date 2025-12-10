@@ -1,7 +1,7 @@
 import type { SongType, CoverType, ArtistType, CommentType, MetaData, CatType } from "@/types/main";
 import { msToTime } from "./time";
 import { flatMap, isArray, uniqBy } from "lodash-es";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
 import { getCoverUrlStr } from "@/api/song";
 import { useDataStore, usePlatformStore } from "@/stores";
 
@@ -267,4 +267,18 @@ export const getSizeCover = (song: SongInfo, size = 300) => {
   }
   const dataStore = useDataStore();
   return getCoverUrlStr(platform, id, size, true, dataStore.token);
+};
+
+/**
+ * 检测歌词语言
+ * @param lyric 歌词内容
+ * @returns 语言代码（"ja" | "zh-CN" | "en"）
+ */
+export const getLyricLanguage = (lyric: string): string => {
+  // 判断日语 根据平假名和片假名
+  if (/[\u3040-\u309f\u30a0-\u30ff]/.test(lyric)) return "ja";
+  // 判断简体中文 根据中日韩统一表意文字基本区
+  if (/[\u4e00-\u9fa5]/.test(lyric)) return "zh-CN";
+  // 默认英语
+  return "en";
 };

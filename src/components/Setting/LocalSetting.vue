@@ -171,6 +171,28 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
+          <n-text class="name">{{ t("setting.local.file_naming_format") }}</n-text>
+          <n-text class="tip" :depth="3"> {{ t("setting.local.file_naming_format_tip") }} </n-text>
+        </div>
+        <n-select
+          v-model:value="settingStore.fileNameFormat"
+          :options="fileNameFormatOptions"
+          class="set"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{ t("setting.local.folder_strategy") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.local.folder_strategy_tip") }}</n-text>
+        </div>
+        <n-select
+          v-model:value="settingStore.folderStrategy"
+          :options="folderStrategyOptions"
+          class="set"
+        />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
           <n-text class="name">
             {{ t("setting.local.save_song_meta_file") }}
           </n-text>
@@ -193,9 +215,40 @@
 import { useSettingStore } from "@/stores";
 import { changeLocalPath } from "@/utils/helper";
 import { useI18n } from "vue-i18n";
+import { computed } from "vue";
 
 const { t } = useI18n();
 const settingStore = useSettingStore();
+
+const fileNameFormatOptions = computed(() => [
+  {
+    label: t("setting.local.download_file_naming_format_title"),
+    value: "title",
+  },
+  {
+    label: t("setting.local.download_file_naming_format_artist_title"),
+    value: "artist-title",
+  },
+  {
+    label: t("setting.local.download_file_naming_format_title_artist"),
+    value: "title-artist",
+  },
+]);
+
+const folderStrategyOptions = computed(() => [
+  {
+    label: t("common.none"),
+    value: "none",
+  },
+  {
+    label: t("common.artist"),
+    value: "artist",
+  },
+  {
+    label: `${t("common.artist")}/${t("common.album")}`,
+    value: "artist-album",
+  },
+]);
 
 // 选择下载路径
 const choosePath = async () => {

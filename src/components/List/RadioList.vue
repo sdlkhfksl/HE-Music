@@ -61,8 +61,8 @@
 <script setup lang="ts">
 import { useMusicStore, useStatusStore } from "@/stores";
 import { debounce } from "lodash-es";
-import player from "@/utils/player";
-import { RadioInfo } from "@/types/main.hemusic";
+import { usePlayer } from "@/utils/player";
+import type { RadioInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
@@ -77,6 +77,7 @@ withDefaults(defineProps<Props>(), {
   cols: "3 600:3 800:4 900:5 1200:6 1400:7",
 });
 
+const player = usePlayer();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 

@@ -40,7 +40,7 @@ import type { FormInst, FormRules } from "naive-ui";
 import { useFormRule } from "@/utils/rules";
 import { debounce } from "lodash-es";
 import { updateUserCreatedPlaylist } from "@/utils/auth";
-import { UserPlaylistInfo } from "@/types/main.hemusic";
+import type { UserPlaylistInfo } from "@/types/main.hemusic";
 import { updateUserPlaylist } from "@/api/userplaylist";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();

@@ -169,14 +169,15 @@ import { renderToolbar } from "@/utils/meta";
 import { debounce } from "lodash-es";
 import { useStatusStore } from "@/stores";
 import { openBatchList } from "@/utils/modal";
-import player from "@/utils/player";
-import { SongInfo, RankingInfo } from "@/types/main.hemusic";
+import { usePlayer } from "@/utils/player";
+import type { SongInfo, RankingInfo } from "@/types/main.hemusic";
 import { computed } from "vue";
 import SongList from "@/components/List/SongList.vue";
 import { useI18n } from "vue-i18n";
 const { t, n } = useI18n();
 
 const router = useRouter();
+const player = usePlayer();
 const statusStore = useStatusStore();
 
 // 搜索数据

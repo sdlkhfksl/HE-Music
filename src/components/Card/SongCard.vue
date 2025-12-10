@@ -190,9 +190,9 @@ import { openJumpArtist } from "@/utils/modal";
 import { toLikeSong } from "@/utils/auth";
 import { isObject } from "lodash-es";
 import { secondsToTime } from "@/utils/time";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import blob from "@/utils/blob";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
 import { getSizeCover } from "@/utils/format";
 import { TagProps } from "naive-ui";
 import { IsValidId, songEqual } from "@/utils/song";
@@ -213,6 +213,7 @@ const props = defineProps<{
   hiddenSize?: boolean;
 }>();
 
+const player = usePlayer();
 const router = useRouter();
 const dataStore = useDataStore();
 const musicStore = useMusicStore();

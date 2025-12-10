@@ -21,7 +21,7 @@ const initTrayIpc = (): void => {
   ipcMain.on("play-song-change", (_, title) => {
     // 更改标题
     tray?.setTitle(title || appName);
-    tray?.setPlayName(title);
+    tray?.setPlayName(title || appName);
     tray?.setSongValid(!!title);
   });
 

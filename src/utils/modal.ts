@@ -1,8 +1,10 @@
 import { h } from "vue";
 import type { SettingType, UpdateInfoType } from "@/types/main";
 import type { ModalReactive } from "naive-ui";
+import type { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 import { isLogin } from "./auth";
 import { isArray, isFunction } from "lodash-es";
+import { NScrollbar } from "naive-ui";
 import router from "@/router";
 import Login from "@/components/Modal/Login/Login.vue";
 import JumpArtist from "@/components/Modal/JumpArtist.vue";
@@ -15,7 +17,7 @@ import UpdatePlaylist from "@/components/Modal/UpdatePlaylist.vue";
 import DownloadSong from "@/components/Modal/DownloadSong.vue";
 import MainSetting from "@/components/Setting/MainSetting.vue";
 import UpdateApp from "@/components/Modal/UpdateApp.vue";
-import { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
+
 import UpdateUserPassword from "@/components/Modal/UpdateUserPassword.vue";
 import UpdateUserInfo from "@/components/Modal/UpdateUserInfo.vue";
 import ExcludeLyrics from "@/components/Modal/ExcludeLyrics.vue";
@@ -26,6 +28,7 @@ import ParseSourceUrl from "@/components/Modal/ParseSourceUrl.vue";
 import { usePlatformStore } from "@/stores";
 import { FeatureSupportFlag } from "@/api/platform";
 import Captcha from "@/components/Modal/Captcha.vue";
+import CopyLyrics from "@/components/Modal/CopyLyrics.vue";
 import { t } from "@/i18n";
 
 // 用户协议
@@ -365,6 +368,46 @@ export const openEqualizer = () => {
     title: t("common.equalizer"),
     content: () => {
       return h(Equalizer);
+    },
+  });
+};
+
+/**
+ * 打开简介弹窗
+ * @param content 简介内容
+ */
+export const openDescModal = (content: string) => {
+  window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    style: { width: "600px" },
+    title: t("common.description"),
+    content: () => {
+      return h(
+        NScrollbar,
+        { style: { maxHeight: "400px" } },
+        {
+          default: () =>
+            h("div", { style: { whiteSpace: "pre-wrap" } }, { default: () => content }),
+        },
+      );
+    },
+  });
+};
+
+/** 打开复制歌词弹窗 */
+export const openCopyLyrics = () => {
+  const modal = window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    style: { width: "500px" },
+    title: t("common.copy_lyrics"),
+    content: () => {
+      return h(CopyLyrics, {
+        onClose: () => modal.destroy(),
+      });
     },
   });
 };

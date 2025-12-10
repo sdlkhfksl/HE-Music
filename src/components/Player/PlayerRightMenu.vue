@@ -87,7 +87,7 @@
       v-if="!statusStore.radioMode"
       :value="dataStore.playList?.length ?? 0"
       :show="settingStore.showPlaylistCount && !isMobile"
-      :max="999"
+      :max="9999"
       :style="{
         marginRight: !isMobile && settingStore.showPlaylistCount ? '12px' : null,
       }"
@@ -111,10 +111,11 @@ import {
 import { openAutoClose, openChangeRate, openEqualizer } from "@/utils/modal";
 import { isElectron, isMobile } from "@/utils/env";
 import { renderIcon } from "@/utils/helper";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
+const player = usePlayer();
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();

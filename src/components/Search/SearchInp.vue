@@ -28,7 +28,7 @@
       />
     </Transition>
     <!-- 默认内容 -->
-    <SearchDefault @to-search="toSearch" />
+    <SearchDefault v-if="settingStore.useOnlineService" @to-search="toSearch" />
     <!-- 搜索结果 -->
     <SearchSuggest @to-search="toSearch" />
     <!-- 右键菜单 -->
@@ -37,12 +37,12 @@
 </template>
 
 <script setup lang="ts">
-import { useDataStore, usePlatformStore, useStatusStore } from "@/stores";
+import { useDataStore, usePlatformStore, useSettingStore, useStatusStore } from "@/stores";
 import { searchDefault } from "@/api/search";
 import SearchInpMenu from "@/components/Menu/SearchInpMenu.vue";
 import SearchDefault from "@/components/Search/SearchDefault.vue";
 import SearchSuggest from "@/components/Search/SearchSuggest.vue";
-import { SearchDefaultInfo } from "@/types/main.hemusic";
+import type { SearchDefaultInfo } from "@/types/main.hemusic";
 import { watch } from "vue";
 import { useI18n } from "vue-i18n";
 const { t, locale } = useI18n();
@@ -51,6 +51,7 @@ const router = useRouter();
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
 const platformStore = usePlatformStore();
+const settingStore = useSettingStore();
 
 // 右键菜单
 const searchInpMenuRef = ref<InstanceType<typeof SearchInpMenu> | null>(null);

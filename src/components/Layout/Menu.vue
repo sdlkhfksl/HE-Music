@@ -40,7 +40,11 @@ import { RouterLink, useRouter } from "vue-router";
 import { renderIcon } from "@/utils/helper";
 import { isElectron, isMobile } from "@/utils/env";
 import { openCreatePlaylist } from "@/utils/modal";
-import { PlaylistInfo, UserFavouritePlaylistInfo, UserPlaylistInfo } from "@/types/main.hemusic";
+import type {
+  PlaylistInfo,
+  UserFavouritePlaylistInfo,
+  UserPlaylistInfo,
+} from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 
 const router = useRouter();
@@ -152,6 +156,12 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
           link: "like",
           label: t("nav.my_collection"),
           icon: renderIcon("Star"),
+        },
+        {
+          key: "download",
+          label: t("nav.download_manager"),
+          show: isElectron,
+          icon: renderIcon("Download"),
         },
         {
           key: "local",
@@ -301,7 +311,7 @@ const dropdownSelect = (key: string, item: MenuOption) => {
 };
 
 // 菜单项更改
-const menuUpdate = (_: string, item: MenuOption) => {
+const menuUpdate = (key: string, item: MenuOption) => {
   if (item.platform) {
     router.push({
       name: (item.type as string) || "",
@@ -312,16 +322,37 @@ const menuUpdate = (_: string, item: MenuOption) => {
       name: (item.type as string) || "",
       query: { id: item.id as string },
     });
+  } else {
+    switch (key) {
+      case "download":
+        router.push({
+          name:
+            dataStore.downloadingSongs.length > 0 ? "download-downloading" : "download-downloaded",
+        });
+        break;
+    }
   }
 };
 
 // 选中菜单项
 const checkMenuItem = () => {
   // 当前路由名称
-  const routerName =
+  let routerName =
     (router.currentRoute.value.matched?.[0]?.name as string) ||
     (router.currentRoute.value?.name as string);
   if (!routerName) return;
+  // 处理本地歌曲子路由
+  if (routerName.startsWith("local-")) {
+    routerName = "local";
+  }
+  // 处理收藏子路由
+  if (routerName.startsWith("like-")) {
+    routerName = "like";
+  }
+  // 处理下载子路由
+  if (routerName.startsWith("download-")) {
+    routerName = "download";
+  }
   // 显示菜单
   menuRef.value?.showOption(routerName);
   // 高亮菜单

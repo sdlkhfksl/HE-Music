@@ -1,6 +1,6 @@
 // 获取用户喜欢的歌单
 import { requestHemusic } from "@/utils/request";
-import { IDPlatformInfo } from "@/types/main.hemusic";
+import type { IDPlatformInfo } from "@/types/main.hemusic";
 
 export const createUserPlaylist = (name: string, cover: string, description: string) => {
   return requestHemusic({

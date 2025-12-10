@@ -88,7 +88,7 @@
 <script setup lang="ts">
 import { debounce } from "lodash-es";
 import CoverMenu from "@/components/Menu/CoverMenu.vue";
-import { CoverType, MVInfo } from "@/types/main.hemusic";
+import type { CoverType, MVInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t, n } = useI18n();
 

@@ -89,8 +89,8 @@
 import { useMusicStore, useStatusStore } from "@/stores";
 import { debounce } from "lodash-es";
 import CoverMenu from "@/components/Menu/CoverMenu.vue";
-import player from "@/utils/player";
-import { CoverType, RankingInfo } from "@/types/main.hemusic";
+import { usePlayer } from "@/utils/player";
+import type { CoverType, RankingInfo } from "@/types/main.hemusic";
 import { getRanking } from "@/api/playlist";
 import { useI18n } from "vue-i18n";
 const { t, n } = useI18n();
@@ -113,6 +113,7 @@ const emit = defineEmits<{
   loadMore: [];
 }>();
 
+const player = usePlayer();
 const router = useRouter();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();

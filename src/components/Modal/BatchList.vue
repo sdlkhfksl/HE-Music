@@ -54,7 +54,7 @@ import type { DataTableColumns, DataTableRowKey } from "naive-ui";
 import { isArray, isObject } from "lodash-es";
 import { openPlaylistAdd } from "@/utils/modal";
 import { deleteSongs } from "@/utils/auth";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 

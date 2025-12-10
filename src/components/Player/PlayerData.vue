@@ -4,7 +4,7 @@
     <div class="name">
       <span class="name-text text-hidden">{{ musicStore.playSong.name || "未知曲目" }}</span>
       <!-- 额外信息 -->
-      <div v-if="statusStore.playUblock" class="extra-info">
+      <n-flex v-if="statusStore.playUblock" class="extra-info" align="center">
         <n-popover :show-arrow="false" placement="right" raw>
           <template #trigger>
             <SvgIcon :depth="3" name="CloudLockOpen" size="22" />
@@ -13,63 +13,83 @@
             {{ t("play.unlock_music_tip") }}
           </div>
         </n-popover>
-      </div>
+      </n-flex>
     </div>
     <!-- 别名 -->
     <span v-if="musicStore.playSong.alias" class="alia text-hidden">
       {{ musicStore.playSong.alias }}
     </span>
-    <!-- 歌手 -->
-    <div class="artists">
-      <SvgIcon :depth="3" name="Artist" size="20" />
-      <div v-if="Array.isArray(musicStore.playSong.artists)" class="ar-list">
+    <n-flex :align="center ? 'center' : undefined" size="small" vertical>
+      <!-- 播放状态 -->
+      <n-flex
+        v-if="settingStore.showPlayMeta && !light"
+        class="play-meta"
+        size="small"
+        align="center"
+      >
+        <!--        &lt;!&ndash; 音质 &ndash;&gt;-->
+        <!--        <span class="meta-item">{{-->
+        <!--            statusStore.playUblock || !statusStore.songQuality ? "未知音质" : statusStore.songQuality-->
+        <!--          }}</span>-->
+        <!-- 歌词模式 -->
+        <span class="meta-item">{{ lyricMode }}</span>
+        <!-- 是否在线 -->
+        <span class="meta-item">
+          {{ musicStore.playSong.path ? "LOCAL" : "ONLINE" }}
+        </span>
+      </n-flex>
+      <!-- 歌手 -->
+      <div class="artists">
+        <SvgIcon :depth="3" name="Artist" size="20" />
+        <div v-if="Array.isArray(musicStore.playSong.artists)" class="ar-list">
+          <span
+            v-for="ar in musicStore.playSong.artists"
+            :key="ar.id"
+            class="ar"
+            @click="
+              IsValidId(ar.id) &&
+              platformStore.isFeatureSupport(
+                musicStore.playSong.platform,
+                FeatureSupportFlag.GetSingerInfo,
+              ) &&
+              jumpPage({
+                name: 'artist',
+                query: { id: ar.id, platform: musicStore.playSong.platform },
+              })
+            "
+          >
+            {{ ar.name }}
+          </span>
+        </div>
+        <div v-else class="ar-list">
+          <span class="ar">{{ musicStore.playSong.artists || "未知艺术家" }}</span>
+        </div>
+      </div>
+      <!-- 专辑 -->
+      <div class="album">
+        <SvgIcon :depth="3" name="Album" size="20" />
         <span
-          v-for="ar in musicStore.playSong.artists"
-          :key="ar.id"
-          class="ar"
+          v-if="isObject(musicStore.playSong.album)"
+          class="name-text text-hidden"
           @click="
-            IsValidId(ar.id) &&
+            IsValidId(musicStore.playSong.album.id) &&
             platformStore.isFeatureSupport(
               musicStore.playSong.platform,
-              FeatureSupportFlag.GetSingerInfo,
+              FeatureSupportFlag.GetAlbumInfo,
             ) &&
             jumpPage({
-              name: 'artist',
-              query: { id: ar.id, platform: musicStore.playSong.platform },
+              name: 'album',
+              query: { id: musicStore.playSong.album.id, platform: musicStore.playSong.platform },
             })
           "
         >
-          {{ ar.name }}
+          {{ musicStore.playSong.album?.name || "未知专辑" }}
+        </span>
+        <span v-else class="name-text text-hidden">
+          {{ musicStore.playSong.album || "未知专辑" }}
         </span>
       </div>
-      <div v-else class="ar-list">
-        <span class="ar">{{ musicStore.playSong.artists || "未知艺术家" }}</span>
-      </div>
-    </div>
-    <!-- 专辑 -->
-    <div class="album">
-      <SvgIcon :depth="3" name="Album" size="20" />
-      <span
-        v-if="isObject(musicStore.playSong.album)"
-        class="name-text text-hidden"
-        @click="
-          IsValidId(musicStore.playSong.album.id) &&
-          platformStore.isFeatureSupport(
-            musicStore.playSong.platform,
-            FeatureSupportFlag.GetAlbumInfo,
-          ) &&
-          jumpPage({
-            name: 'album',
-            query: { id: musicStore.playSong.album.id, platform: musicStore.playSong.platform },
-          })
-        "
-      >
-        {{ musicStore.playSong.album?.name || "未知专辑" }}
-      </span>
-      <span v-else class="name-text text-hidden">
-        {{ musicStore.playSong.album || "未知专辑" }}
-      </span>
-    </div>
+    </n-flex>
   </div>
 </template>
 
@@ -85,6 +105,8 @@ const { t } = useI18n();
 defineProps<{
   center?: boolean;
   theme?: string;
+  // 少量数据模式
+  light?: boolean;
 }>();
 
 const router = useRouter();
@@ -93,6 +115,13 @@ const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 const platformStore = usePlatformStore();
 
+// 当前歌词模式
+const lyricMode = computed(() => {
+  if (settingStore.showYrc) {
+    if (musicStore.isHasYrc) return "YRC";
+  }
+  return musicStore.isHasLrc ? "LRC" : "NO-LRC";
+});
 const jumpPage = debounce(
   (go: RouteLocationRaw) => {
     if (!go) return;
@@ -136,14 +165,13 @@ const jumpPage = debounce(
     }
   }
   .alia {
-    margin: 6px 0 6px 2px;
+    margin: 6px 0 6px 4px;
     opacity: 0.6;
     font-size: 18px;
     line-clamp: 1;
     -webkit-line-clamp: 1;
   }
   .artists {
-    margin-top: 2px;
     display: flex;
     align-items: center;
     .n-icon {
@@ -180,7 +208,6 @@ const jumpPage = debounce(
   }
   .album,
   .dj {
-    margin-top: 2px;
     font-size: 16px;
     display: flex;
     align-items: center;
@@ -196,6 +223,16 @@ const jumpPage = debounce(
       &:hover {
         opacity: 1;
       }
+    }
+  }
+  .play-meta {
+    padding: 4px 4px;
+    opacity: 0.6;
+    .meta-item {
+      font-size: 12px;
+      border-radius: 8px;
+      padding: 2px 6px;
+      border: 1px solid rgba(var(--main-color), 0.6);
     }
   }
   &.record {
@@ -219,6 +256,20 @@ const jumpPage = debounce(
     padding: 0 2px;
     .name {
       text-align: center;
+    }
+  }
+  &.light {
+    .name {
+      .name-text {
+        line-clamp: 1;
+        -webkit-line-clamp: 1;
+      }
+      .extra-info {
+        display: none;
+      }
+    }
+    .alia {
+      display: none;
     }
   }
 }

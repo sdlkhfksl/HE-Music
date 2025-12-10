@@ -31,7 +31,7 @@ import { onBeforeRouteUpdate } from "vue-router";
 import PlaylistSquareResult from "@/views/PlaylistSquare/PlaylistSquareResult.vue";
 import { computed, onActivated, watch } from "vue";
 import { FeatureSupportFlag } from "@/api/platform";
-import { PlatformInfo } from "@/types/main.hemusic";
+import type { PlatformInfo } from "@/types/main.hemusic";
 
 const router = useRouter();
 const platformStore = usePlatformStore();

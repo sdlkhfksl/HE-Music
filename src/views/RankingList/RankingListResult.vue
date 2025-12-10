@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { RankingInfo } from "@/types/main.hemusic";
+import type { RankingInfo } from "@/types/main.hemusic";
 import { listRankings } from "@/api/playlist";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();

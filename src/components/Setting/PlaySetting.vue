@@ -166,7 +166,6 @@
           :options="[
             {
               label: t('setting.play.player_background_type_value_animation'),
-              disabled: true,
               value: 'animation',
             },
             {
@@ -192,6 +191,40 @@
         </div>
         <n-switch v-model:value="settingStore.fullPlayerCache" class="set" :round="false" />
       </n-card>
+      <n-collapse-transition :show="settingStore.playerBackgroundType === 'animation'">
+        <n-card class="set-item">
+          <div class="label">
+            <n-text class="name">{{ t("setting.play.player_background_fps") }}</n-text>
+            <n-text class="tip" :depth="3"
+              >{{ t("setting.play.player_background_fps_tip") }}单位 fps，最小 24，最大 240</n-text
+            >
+          </div>
+          <n-input-number
+            v-model:value="settingStore.playerBackgroundFps"
+            :min="24"
+            :max="256"
+            :show-button="false"
+            class="set"
+            :placeholder="t('setting.play.player_background_fps_placeholder')"
+          />
+        </n-card>
+        <n-card class="set-item">
+          <div class="label">
+            <n-text class="name">{{ t("setting.play.player_background_flow_speed") }}</n-text>
+            <n-text class="tip" :depth="3">{{
+              t("setting.play.player_background_flow_speed_tip")
+            }}</n-text>
+          </div>
+          <n-input-number
+            v-model:value="settingStore.playerBackgroundFlowSpeed"
+            :min="0.1"
+            :max="10"
+            :show-button="false"
+            class="set"
+            :placeholder="t('setting.play.player_background_flow_speed_placeholder')"
+          />
+        </n-card>
+      </n-collapse-transition>
       <n-card class="set-item">
         <div class="label">
           <n-text class="name">
@@ -213,6 +246,13 @@
           </n-text>
         </div>
         <n-switch v-model:value="settingStore.barLyricShow" class="set" :round="false" />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name"> {{ t("setting.play.show_play_meta") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.play.show_play_meta_tip") }}</n-text>
+        </div>
+        <n-switch v-model:value="settingStore.showPlayMeta" class="set" :round="false" />
       </n-card>
       <n-card class="set-item">
         <div class="label">
@@ -254,22 +294,6 @@
         </div>
         <n-switch v-model:value="settingStore.smtcOpen" class="set" :round="false" />
       </n-card>
-      <n-card class="set-item">
-        <div class="label">
-          <n-text class="name">
-            {{ t("setting.play.smtc_output_high_quality_cover") }}
-          </n-text>
-          <n-text class="tip" :depth="3">
-            {{ t("setting.play.smtc_output_high_quality_cover_tip") }}
-          </n-text>
-        </div>
-        <n-switch
-          v-model:value="settingStore.smtcOutputHighQualityCover"
-          class="set"
-          :round="false"
-          :disabled="!settingStore.smtcOpen || true"
-        />
-      </n-card>
     </div>
   </div>
 </template>
@@ -280,10 +304,12 @@ import { useSettingStore, useStatusStore } from "@/stores";
 import { renderOption } from "@/utils/helper";
 import { isElectron } from "@/utils/env";
 import { uniqBy } from "lodash";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
+
 const { t } = useI18n();
+const player = usePlayer();
 const settingStore = useSettingStore();
 const statusStore = useStatusStore();
 
@@ -369,52 +395,52 @@ const getOutputDevices = async () => {
 
 // 切换输出设备
 const playDeviceChange = (deviceId: string, option: SelectOption) => {
-  if (isElectron && settingStore.showSpectrums) {
-    window.$dialog.warning({
-      title: t("setting.play.output_device_audio_channel_occupancy"),
-      content: t("message.output_device_audio_channel_occupancy_confirm"),
-      positiveText: t("common.continue"),
-      negativeText: t("common.cancel"),
-      closeOnEsc: false,
-      closable: false,
-      maskClosable: false,
-      autoFocus: false,
-      onPositiveClick: () => {
-        showSpectrums.value = false;
-        settingStore.showSpectrums = false;
-        player.toggleOutputDevice(deviceId);
-        window.$message.success(
-          t("message.output_device_change_success", { device: option.label }),
-        );
-      },
-      onNegativeClick: () => {
-        settingStore.playDevice = "default";
-      },
-    });
-  } else {
-    player.toggleOutputDevice(deviceId);
-    window.$message.success(t("message.output_device_change_success", { device: option.label }));
-  }
+  // if (isElectron && settingStore.showSpectrums) {
+  //   window.$dialog.warning({
+  //     title: t("setting.play.output_device_audio_channel_occupancy"),
+  //     content: t("message.output_device_audio_channel_occupancy_confirm"),
+  //     positiveText: t("common.continue"),
+  //     negativeText: t("common.cancel"),
+  //     closeOnEsc: false,
+  //     closable: false,
+  //     maskClosable: false,
+  //     autoFocus: false,
+  //     onPositiveClick: () => {
+  //       showSpectrums.value = false;
+  //       settingStore.showSpectrums = false;
+  //       player.toggleOutputDevice(deviceId);
+  //       window.$message.success(
+  //         t("message.output_device_change_success", { device: option.label }),
+  //       );
+  //     },
+  //     onNegativeClick: () => {
+  //       settingStore.playDevice = "default";
+  //     },
+  //   });
+  // } else {
+  player.toggleOutputDevice(deviceId);
+  window.$message.success(t("message.output_device_change_success", { device: option.label }));
+  // }
 };
 
 // 显示音乐频谱更改
 const showSpectrumsChange = (value: boolean) => {
   if (value) {
-    if (settingStore.playDevice !== "default") {
-      window.$dialog.warning({
-        title: t("setting.play.spectrum_audio_channel_occupancy"),
-        content: t("message.spectrum_audio_channel_occupancy_confirm"),
-        positiveText: t("common.ok"),
-        negativeText: t("common.cancel"),
-        onPositiveClick: () => {
-          showSpectrums.value = true;
-          settingStore.showSpectrums = true;
-          settingStore.playDevice = "default";
-          player.toggleOutputDevice("default");
-        },
-      });
-      return;
-    }
+    // if (settingStore.playDevice !== "default") {
+    //   window.$dialog.warning({
+    //     title: t("setting.play.spectrum_audio_channel_occupancy"),
+    //     content: t("message.spectrum_audio_channel_occupancy_confirm"),
+    //     positiveText: t("common.ok"),
+    //     negativeText: t("common.cancel"),
+    //     onPositiveClick: () => {
+    //       showSpectrums.value = true;
+    //       settingStore.showSpectrums = true;
+    //       settingStore.playDevice = "default";
+    //       player.toggleOutputDevice("default");
+    //     },
+    //   });
+    //   return;
+    // }
     showSpectrums.value = true;
     settingStore.showSpectrums = true;
   } else {

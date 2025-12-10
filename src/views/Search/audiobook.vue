@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { AlbumInfo } from "@/types/main.hemusic";
+import type { AlbumInfo } from "@/types/main.hemusic";
 import { searchResultHemusic } from "@/api/search";
 import AlbumList from "@/components/List/AlbumList.vue";
 import { useI18n } from "vue-i18n";

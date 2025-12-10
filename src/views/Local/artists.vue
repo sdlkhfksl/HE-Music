@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { useSettingStore } from "@/stores";
 import { isArray, some } from "lodash-es";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 

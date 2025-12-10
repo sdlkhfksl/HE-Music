@@ -39,11 +39,11 @@
 <script setup lang="ts">
 import { isElectron } from "@/utils/env";
 import { useStatusStore } from "@/stores";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
-
+const player = usePlayer();
 const statusStore = useStatusStore();
 
 type PresetKey = keyof typeof presetList;

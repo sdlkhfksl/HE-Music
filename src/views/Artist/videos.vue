@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { artistVideos } from "@/api/artist";
-import { MVInfo } from "@/types/main.hemusic";
+import type { MVInfo } from "@/types/main.hemusic";
 import VideoList from "@/components/List/VideoList.vue";
 
 const props = defineProps<{

@@ -46,19 +46,13 @@
           </n-h2>
           <n-collapse-transition :show="!listScrolling" class="collapse">
             <!-- 简介 -->
-            <n-ellipsis
+            <n-text
               v-if="playlistDetailData.description"
-              :line-clamp="1"
-              :tooltip="{
-                trigger: 'click',
-                placement: 'bottom',
-                width: 'trigger',
-                scrollable: true,
-                contentStyle: 'white-space: pre-line; max-height:400px',
-              }"
+              class="description text-hidden"
+              @click="openDescModal(playlistDetailData.description)"
             >
               {{ playlistDetailData.description }}
-            </n-ellipsis>
+            </n-text>
             <!-- 信息 -->
             <n-flex class="meta">
               <div class="item">
@@ -146,7 +140,7 @@
                 </n-button>
               </n-dropdown>
             </n-flex>
-            <n-flex class="right">
+            <n-flex class="right" align="center">
               <!-- 模糊搜索 -->
               <n-input
                 v-if="playlistData?.length"
@@ -204,14 +198,14 @@
 <script setup lang="ts">
 import type { DropdownOption, MessageReactive } from "naive-ui";
 import { playlistDetail } from "@/api/playlist";
-import { coverLoaded, fuzzySearch, renderIcon } from "@/utils/helper";
+import { copyData, coverLoaded, fuzzySearch, renderIcon } from "@/utils/helper";
 import { renderToolbar } from "@/utils/meta";
 import { toLikePlaylist } from "@/utils/auth";
 import { debounce } from "lodash-es";
 import { useDataStore, usePlatformStore, useStatusStore } from "@/stores";
-import { openBatchList } from "@/utils/modal";
-import player from "@/utils/player";
-import { PlaylistInfo, SongInfo } from "@/types/main.hemusic";
+import { openBatchList, openDescModal } from "@/utils/modal";
+import { usePlayer } from "@/utils/player";
+import type { PlaylistInfo, SongInfo } from "@/types/main.hemusic";
 import { computed } from "vue";
 import SongList from "@/components/List/SongList.vue";
 import { buildSourceUrl } from "@/api/source";
@@ -220,6 +214,7 @@ import { useI18n } from "vue-i18n";
 const { t, n } = useI18n();
 
 const router = useRouter();
+const player = usePlayer();
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
 const platformStore = usePlatformStore();
@@ -278,6 +273,17 @@ const moreOptions = computed<DropdownOption[]>(() => [
       onClick: () => openBatchList(playlistDataShow.value, false),
     },
     icon: renderIcon("Batch"),
+  },
+  {
+    label: t("menu.copy_share_link"),
+    key: "copy",
+    props: {
+      onClick: async () => {
+        const { url } = await buildSourceUrl(platform.value, playlistId.value, "playlist");
+        copyData(url, t("menu.share_link_copied"));
+      },
+    },
+    icon: renderIcon("Share"),
   },
   {
     label: t("common.open_source_page"),

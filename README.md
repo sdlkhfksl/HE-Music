@@ -1,6 +1,6 @@
 # HE-Music
 
-> 一个简约的音乐播放器，基于 [SPlayer](https://github.com/imsyy/SPlayer) 修改, SPlayer是一个非常漂亮的播放器。
+> 一个简约的音乐播放器，基于 [SPlayer](https://github.com/imsyy/SPlayer) 修改和跟随, SPlayer 是一个非常漂亮的播放器。
 >
 > 该版本为特别修改版，和SPlayer不兼容，需搭配定制的服务端运行，不知道后端服务的用户请使用 SPlayer
 

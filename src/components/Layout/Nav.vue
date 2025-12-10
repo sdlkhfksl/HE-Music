@@ -171,7 +171,7 @@ const setOptions = computed<DropdownOption[]>(() => [
     ),
   },
   {
-    key: "header-divider",
+    key: "divider-1",
     type: "divider",
   },
   {
@@ -179,7 +179,7 @@ const setOptions = computed<DropdownOption[]>(() => [
     key: "restart",
     label: t("nav.software_hot_reload"),
     show: isElectron,
-    props: { onClick: () => window.location.reload() },
+    props: { onClick: () => window.electron.ipcRenderer.send("win-reload") },
     icon: renderIcon("Restart"),
   },
   {

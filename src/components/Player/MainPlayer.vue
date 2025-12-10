@@ -123,6 +123,7 @@
         strong
         secondary
         circle
+        @click.stop="player.playOrPause()"
       >
         <template #icon>
           <Transition name="fade" mode="out-in">
@@ -157,8 +158,8 @@
             vertical
           >
             <div class="time">
-              <n-text depth="2">{{ secondsToTime(statusStore.currentTime) }}</n-text>
-              <n-text depth="2">{{ secondsToTime(statusStore.duration) }}</n-text>
+              <n-text depth="2">{{ msToTime(statusStore.currentTime) }}</n-text>
+              <n-text depth="2">{{ msToTime(statusStore.duration) }}</n-text>
             </div>
             <!-- 定时关闭 -->
             <n-tag
@@ -191,7 +192,7 @@ import {
   useSettingStore,
   useStatusStore,
 } from "@/stores";
-import { secondsToTime, convertSecondsToTime } from "@/utils/time";
+import { msToTime, convertSecondsToTime } from "@/utils/time";
 import { renderIcon, coverLoaded } from "@/utils/helper";
 import { toLikeSong } from "@/utils/auth";
 import {
@@ -201,13 +202,13 @@ import {
   openJumpArtist,
   openPlaylistAdd,
 } from "@/utils/modal";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import { FeatureSupportFlag } from "@/api/platform";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 
 const { t } = useI18n();
-
+const player = usePlayer();
 const router = useRouter();
 const dataStore = useDataStore();
 const musicStore = useMusicStore();
@@ -222,6 +223,14 @@ const songMoreOptions = computed<DropdownOption[]>(() => {
   const isHasMv = !!song?.mv_id;
   const isLocal = !!song?.path;
   return [
+    {
+      key: "search",
+      label: t("menu.same_name_search"),
+      props: {
+        onClick: () => router.push({ name: "search", query: { keyword: song.name } }),
+      },
+      icon: renderIcon("Search"),
+    },
     {
       key: "playlist-add",
       label: t("menu.add_to_playlist"),
@@ -274,7 +283,11 @@ const songMoreOptions = computed<DropdownOption[]>(() => {
 const isShowLyrics = computed(() => {
   const isHasLrc = musicStore.isHasLrc;
   return (
-    isHasLrc && settingStore.barLyricShow && statusStore.playStatus && statusStore.lyricIndex !== -1
+    isHasLrc &&
+    !statusStore.lyricLoading &&
+    settingStore.barLyricShow &&
+    statusStore.playStatus &&
+    statusStore.lyricIndex !== -1
   );
 });
 
@@ -284,9 +297,10 @@ const instantLyrics = computed(() => {
   const content = isYrc
     ? musicStore.songLyric.yrcData[statusStore.lyricIndex]
     : musicStore.songLyric.lrcData[statusStore.lyricIndex];
-  return content?.tran && settingStore.showTran
-    ? `${content?.content}（ ${content?.tran} ）`
-    : content?.content;
+  const contentStr = content?.words?.map((v) => v.word).join("") || "";
+  return content?.translatedLyric && settingStore.showTran
+    ? `${contentStr}（ ${content?.translatedLyric} ）`
+    : contentStr || "";
 });
 </script>
 
@@ -301,7 +315,7 @@ const instantLyrics = computed(() => {
   background-color: var(--surface-container-hex);
   // background-color: rgba(var(--surface-container), 0.28);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   z-index: 10;
   transition: bottom 0.3s;
@@ -325,7 +339,7 @@ const instantLyrics = computed(() => {
   .play-data {
     display: flex;
     flex-direction: row;
-    max-width: 100%;
+    max-width: 640px;
     overflow: hidden;
     .cover {
       position: relative;
@@ -377,7 +391,8 @@ const instantLyrics = computed(() => {
     .info {
       display: flex;
       flex-direction: column;
-      width: 100%;
+      flex: 1;
+      min-width: 0;
       .data {
         display: flex;
         align-items: center;
@@ -385,22 +400,24 @@ const instantLyrics = computed(() => {
         .name {
           font-weight: bold;
           font-size: 16px;
-          width: max-content;
-          max-width: calc(100% - 100px);
+          flex: 0 1 auto;
+          width: auto;
+          min-width: 0;
           transition: color 0.3s;
-
           @media (max-width: 768px) {
             font-size: 12px;
           }
         }
         .n-tag {
           margin-left: 4px;
+          flex-shrink: 0;
         }
         .like {
           color: var(--primary-hex);
           margin-left: 8px;
           transition: transform 0.3s;
           cursor: pointer;
+          flex-shrink: 0;
           &:hover {
             transform: scale(1.15);
           }
@@ -411,6 +428,7 @@ const instantLyrics = computed(() => {
         .more {
           margin-left: 4px;
           cursor: pointer;
+          flex-shrink: 0;
         }
       }
       .artists {
@@ -500,6 +518,8 @@ const instantLyrics = computed(() => {
     }
   }
   .play-menu {
+    margin-left: auto;
+    max-width: 640px;
     flex-wrap: nowrap !important;
     .time-container {
       margin-right: 8px;

@@ -58,11 +58,12 @@
 <script lang="ts" setup>
 import { coverLoaded } from "@/utils/helper";
 import { sampleSize } from "lodash-es";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
+import { VNodeChild } from "vue";
 
 const props = defineProps<{
   size: "normal" | "small";
-  title: string | VNode;
+  title: string | VNodeChild;
   data?: SongInfo[];
   description?: string;
   loading?: boolean;

@@ -5,6 +5,7 @@
       v-if="searchCount > 0"
       :data="searchResultData"
       :loading="loading"
+      doubleClickAction="add"
       load-more
       disabled-sort
       :height="songListHeight"
@@ -28,7 +29,7 @@
 import { searchResultHemusic } from "@/api/search";
 import SongList from "@/components/List/SongList.vue";
 import { useStatusStore } from "@/stores";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 

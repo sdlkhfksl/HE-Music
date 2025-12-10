@@ -26,7 +26,7 @@ import { usePlatformStore } from "@/stores";
 import { onBeforeRouteUpdate } from "vue-router";
 import { computed, onActivated, watch } from "vue";
 import { FeatureSupportFlag } from "@/api/platform";
-import { PlatformInfo } from "@/types/main.hemusic";
+import type { PlatformInfo } from "@/types/main.hemusic";
 import ArtistsResult from "@/views/Artists/ArtistsResult.vue";
 
 const router = useRouter();

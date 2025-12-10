@@ -1,7 +1,7 @@
 import { reactive, ref } from "vue";
 import { cloneDeep } from "lodash-es";
 import localforage from "localforage";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
 
 // localDB
 const localDB = localforage.createInstance({

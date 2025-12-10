@@ -16,23 +16,27 @@
 
 <script setup lang="ts">
 import { type DropdownOption, NAlert } from "naive-ui";
-import { useLocalStore, usePlatformStore, useStatusStore } from "@/stores";
+import { useDataStore, useLocalStore, usePlatformStore, useStatusStore } from "@/stores";
 import { copyData, renderIcon } from "@/utils/helper";
 import { openDownloadSong, openPlaylistAdd, openSongInfoEditor } from "@/utils/modal";
 import { deleteSongs, isLogin } from "@/utils/auth";
-import player from "@/utils/player";
-import { SongInfo } from "@/types/main.hemusic";
+import { usePlayer } from "@/utils/player";
+import type { SongInfo } from "@/types/main.hemusic";
 import { buildSourceUrl } from "@/api/source";
 import { FeatureSupportFlag } from "@/api/platform";
+import DownloadManager from "@/utils/downloadManager";
 import { useI18n } from "vue-i18n";
+import { songEqual } from "@/utils/song";
 const { t } = useI18n();
 
 const emit = defineEmits<{ removeSong: [index: SongInfo[]] }>();
 
 const router = useRouter();
+const player = usePlayer();
 const localStore = useLocalStore();
 const statusStore = useStatusStore();
 const platformStore = usePlatformStore();
+const dataStore = useDataStore();
 
 // 右键菜单数据
 const dropdownX = ref<number>(0);
@@ -67,6 +71,8 @@ const openDropdown = (
     const isCurrent = statusStore.playIndex === index;
     // 是否为用户歌单
     const isUserPlaylist = !!(playlist?.id && playlist?.type === "user-playlist");
+    // 是否正在下载或下载失败
+    const isDownloading = dataStore.downloadingSongs.some((item) => songEqual(song, item.song));
 
     // 生成菜单
     nextTick().then(() => {
@@ -134,7 +140,7 @@ const openDropdown = (
             },
             {
               key: "share",
-              label: t("menu.share_song_link"),
+              label: t("menu.copy_share_link"),
               show:
                 !isLocal &&
                 platformStore.isFeatureSupport(song.platform, FeatureSupportFlag.BuildSourceUrl),
@@ -221,9 +227,16 @@ const openDropdown = (
         {
           key: "download",
           label: t("common.download_song"),
-          show: !isLocal,
+          show: !isLocal && !isDownloading,
           props: { onClick: () => openDownloadSong(song) },
           icon: renderIcon("Download"),
+        },
+        {
+          key: "retry-download",
+          label: t("download.retry"),
+          show: isDownloading,
+          props: { onClick: () => DownloadManager.retryDownload(song) },
+          icon: renderIcon("Refresh"),
         },
       ];
       // 显示菜单
@@ -233,7 +246,7 @@ const openDropdown = (
     });
   } catch (error) {
     console.error("右键菜单出现异常：", error);
-    window.$message.error("右键菜单出现异常");
+    window.$message.error(t("message.right_click_menu_error"));
   }
 };
 

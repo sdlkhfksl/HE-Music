@@ -121,6 +121,30 @@
         </n-card>
       </n-collapse-transition>
     </div>
+    <div v-if="isElectron" class="set-list">
+      <n-h3 prefix="bar">
+        {{ t("setting.other.backup_and_restore") }}
+        <n-tag type="warning" size="small" round>Beta</n-tag>
+      </n-h3>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{ t("setting.other.export_settings") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.other.export_settings_tip") }}</n-text>
+        </div>
+        <n-button type="primary" strong secondary @click="exportSettings">
+          {{ t("setting.other.export_settings") }}
+        </n-button>
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">{{ t("setting.other.import_settings") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.other.import_settings_tip") }}</n-text>
+        </div>
+        <n-button type="primary" strong secondary @click="importSettings">
+          {{ t("setting.other.import_settings") }}
+        </n-button>
+      </n-card>
+    </div>
     <div class="set-list">
       <n-h3 prefix="bar">
         {{ t("common.reset") }}
@@ -159,6 +183,7 @@
 import { useSettingStore, useDataStore } from "@/stores";
 import { isElectron } from "@/utils/env";
 import { debounce } from "lodash-es";
+import { NTag } from "naive-ui";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -195,6 +220,67 @@ const testProxy = async () => {
     window.$message.error(t("message.proxy_test_fail"));
   }
   testProxyLoading.value = false;
+};
+
+// 导出设置
+const exportSettings = async () => {
+  console.log("[Frontend] Export settings clicked");
+  try {
+    // 收集渲染进程数据 (localStorage)
+    const rendererData = {
+      "setting-store": localStorage.getItem("setting-store"),
+      "shortcut-store": localStorage.getItem("shortcut-store"),
+    };
+
+    const result = await window.api.store.export(rendererData);
+    console.log("[Frontend] Export result:", result);
+    if (result) {
+      window.$message.success(t("message.export_settings_success"));
+    } else {
+      window.$message.error(t("message.export_settings_fail"));
+    }
+  } catch (error) {
+    console.error("[Frontend] Export error:", error);
+    window.$message.error(t("message.export_settings_error"));
+  }
+};
+
+// 导入设置
+const importSettings = async () => {
+  console.log("[Frontend] Import settings clicked");
+  window.$dialog.warning({
+    title: t("setting.other.import_settings"),
+    content: t("message.import_settings_confirm"),
+    positiveText: t("common.ok"),
+    negativeText: t("common.cancel"),
+    onPositiveClick: async () => {
+      console.log("[Frontend] Import confirmed");
+      try {
+        const data = await window.api.store.import();
+        console.log("[Frontend] Import data:", data);
+
+        if (data) {
+          // 恢复渲染进程数据
+          if (data.renderer) {
+            if (data.renderer["setting-store"])
+              localStorage.setItem("setting-store", data.renderer["setting-store"]);
+            if (data.renderer["shortcut-store"])
+              localStorage.setItem("shortcut-store", data.renderer["shortcut-store"]);
+          }
+
+          window.$message.success(t("message.export_settings_success"));
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          window.$message.error(t("message.import_settings_fail"));
+        }
+      } catch (error) {
+        console.error("[Frontend] Import error:", error);
+        window.$message.error(t("message.import_settings_error"));
+      }
+    },
+  });
 };
 
 // 重置设置

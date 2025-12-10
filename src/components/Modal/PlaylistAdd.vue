@@ -37,7 +37,7 @@
               <n-thing :title="index === 0 ? t('playlist.my_favorite_music') : item.name">
                 <template #description>
                   <n-text depth="3" class="size">
-                    {{ t("common.song_count_noun", { count: item.song_count }) }}
+                    {{ t("common.song_count", { count: item.song_count }) }}
                   </n-text>
                 </template>
               </n-thing>
@@ -59,7 +59,7 @@ import { coverLoaded } from "@/utils/helper";
 import { debounce } from "lodash-es";
 import { updateUserCreatedPlaylist, updateUserLikeSongs } from "@/utils/auth";
 import { openCreatePlaylist } from "@/utils/modal";
-import { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
+import type { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 import { addSongToPlaylist } from "@/api/userplaylist";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();

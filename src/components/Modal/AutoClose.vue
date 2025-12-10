@@ -63,10 +63,11 @@
 <script setup lang="ts">
 import { useStatusStore } from "@/stores";
 import { convertSecondsToTime } from "@/utils/time";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
+const player = usePlayer();
 const statusStore = useStatusStore();
 
 // 自定义时长

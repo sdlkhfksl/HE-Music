@@ -34,19 +34,15 @@
           </n-h2>
           <n-collapse-transition :show="!listScrolling" class="collapse">
             <!-- 简介 -->
-            <n-ellipsis
+            <n-text
               v-if="playlistDetailData.description || t('playlist.empty_description')"
-              :line-clamp="1"
-              :tooltip="{
-                trigger: 'click',
-                placement: 'bottom',
-                width: 'trigger',
-                scrollable: true,
-                contentStyle: 'white-space: pre-line; max-height:400px',
-              }"
+              class="description text-hidden"
+              @click="
+                openDescModal(playlistDetailData.description || t('playlist.empty_description'))
+              "
             >
               {{ playlistDetailData.description || t("playlist.empty_description") }}
-            </n-ellipsis>
+            </n-text>
             <!-- 信息 -->
             <n-flex class="meta">
               <div class="item">
@@ -173,9 +169,9 @@ import { renderToolbar } from "@/utils/meta";
 import { updateUserCreatedPlaylist } from "@/utils/auth";
 import { debounce } from "lodash-es";
 import { useDataStore, useStatusStore } from "@/stores";
-import { openBatchList, openUpdatePlaylist } from "@/utils/modal";
-import player from "@/utils/player";
-import { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
+import { openBatchList, openDescModal, openUpdatePlaylist } from "@/utils/modal";
+import { usePlayer } from "@/utils/player";
+import type { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 import { computed } from "vue";
 import SongList from "@/components/List/SongList.vue";
 import { deleteUserPlaylist, getUserPlaylistDetail } from "@/api/userplaylist";
@@ -183,6 +179,7 @@ import { formatTimestamp } from "@/utils/time";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
+const player = usePlayer();
 const router = useRouter();
 const statusStore = useStatusStore();
 const dataStore = useDataStore();

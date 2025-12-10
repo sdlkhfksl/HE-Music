@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { TabInfo } from "@/types/main.hemusic";
+import type { TabInfo } from "@/types/main.hemusic";
 
 import { newSongTabs } from "@/api/song";
 import { usePlatformStore } from "@/stores";

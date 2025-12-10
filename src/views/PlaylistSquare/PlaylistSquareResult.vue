@@ -93,7 +93,7 @@
 
 <script setup lang="ts">
 import { useDataStore } from "@/stores";
-import { PlaylistInfo, CategoryInfo } from "@/types/main.hemusic";
+import type { PlaylistInfo, CategoryInfo } from "@/types/main.hemusic";
 import PlaylistList from "@/components/List/PlaylistList.vue";
 import { watch } from "vue";
 import { categoryPlaylists } from "@/api/playlist";

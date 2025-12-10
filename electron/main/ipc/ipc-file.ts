@@ -1,16 +1,27 @@
 import { app, BrowserWindow, DownloadItem, dialog, ipcMain, shell } from "electron";
 import { basename, isAbsolute, join, relative, resolve } from "path";
-import { access, readFile, stat, unlink, writeFile } from "fs/promises";
+import { access, mkdir, readFile, stat, unlink, writeFile } from "fs/promises";
 import { getFileID, getFileMD5, parseFile } from "../utils/helper";
-import { File, Picture } from "node-taglib-sharp";
+import { File, Picture, TagTypes } from "node-taglib-sharp";
 import { ipcLog } from "../logger";
 import { download } from "electron-dl";
-import fg from "fast-glob";
+import { Options as GlobOptions } from "fast-glob/out/settings";
+import FastGlob from "fast-glob";
+import { t } from "../i18n";
 
 /**
  * 文件相关 IPC
  */
 const initFileIpc = (): void => {
+  /**
+   * 获取全局搜索配置
+   * @param cwd 当前工作目录
+   */
+  const globOpt = (cwd?: string): GlobOptions => ({
+    cwd,
+    caseSensitiveMatch: false,
+  });
+
   // 默认文件夹
   ipcMain.handle(
     "get-default-dir",
@@ -22,19 +33,45 @@ const initFileIpc = (): void => {
   // 遍历音乐文件
   ipcMain.handle("get-music-files", async (_, dirPath: string) => {
     try {
+      // 校验路径有效性
+      if (!dirPath || dirPath.trim() === "") {
+        ipcLog.warn("⚠️ Empty directory path provided, skipping");
+        return [];
+      }
       // 规范化路径
-      const filePath = resolve(dirPath);
+      const filePath = resolve(dirPath).replace(/\\/g, "/");
+      // 检查目录是否存在
+      try {
+        await access(filePath);
+      } catch {
+        ipcLog.warn(`⚠️ Directory not accessible: ${filePath}`);
+        return [];
+      }
+      console.info(`📂 Fetching music files from: ${filePath}`);
+      // 音乐文件扩展名
+      const musicExtensions = [
+        "mp3",
+        "wav",
+        "flac",
+        "aac",
+        "webm",
+        "m4a",
+        "mp4",
+        "ogg",
+        "aiff",
+        "aif",
+        "ape",
+      ];
       // 查找指定目录下的所有音乐文件
-      const musicFiles = await fg("**/*.{mp3,aac,m4a,ogg,flac,ape,wav,webm}", { cwd: filePath });
+      const musicFiles = await FastGlob(`**/*.{${musicExtensions.join(",")}}`, globOpt(filePath));
       // 解析元信息
       const metadataPromises = musicFiles.map(async (file) => {
-        const filePath = join(dirPath, file);
-
+        const fullPath = join(dirPath, file);
         try {
           // 处理元信息
-          const file = parseFile(filePath);
+          const file = parseFile(fullPath);
           // 获取文件大小
-          const { size } = await stat(filePath);
+          const { size } = await stat(fullPath);
           // 判断音质等级
           let quality: string = "";
           const { lossless, bitsPerSample = 0, sampleRate = 0, bitrate = 0 } = file;
@@ -50,26 +87,28 @@ const initFileIpc = (): void => {
             quality = "HQ"; // High Quality
           }
           return {
-            id: getFileID(filePath),
-            name: file.title || basename(filePath),
+            id: getFileID(fullPath),
+            name: file.title || basename(fullPath),
             artists: file.artists?.join(" / ") || "",
             album: file.album || "",
             alia: file.alia,
             duration: file.duration ?? 0,
             size: size,
-            path: filePath,
+            path: fullPath,
+            bitrate,
             quality,
           };
-        } catch {
-          // log.error("❌ Error parse music metadata:", error);
+        } catch (err) {
+          ipcLog.warn(`⚠️ Failed to parse file: ${fullPath}`, err);
           return null;
         }
       });
-      const metadataArray = await Promise.all(metadataPromises);
-      return metadataArray.filter((item) => !!item);
+      const metadataResults = await Promise.all(metadataPromises);
+      // 过滤掉解析失败的文件
+      return metadataResults.filter((item) => item !== null);
     } catch (error) {
       ipcLog.error("❌ Error fetching music metadata:", error);
-      throw error;
+      return [];
     }
   });
 
@@ -150,9 +189,9 @@ const initFileIpc = (): void => {
   });
 
   // 获取音乐歌词 先读取本地.lrc 再读取元数据
-  ipcMain.handle("get-music-lyric", async (_, path: string): Promise<string> => {
+  ipcMain.handle("get-music-lyric", async (_, musicPath: string): Promise<string> => {
     try {
-      const filePath = resolve(path).replace(/\\/g, "/");
+      const filePath = resolve(musicPath).replace(/\\/g, "/");
       const lrcFilePath = filePath.replace(/\.[^.]+$/, ".lrc");
       try {
         await access(lrcFilePath);
@@ -270,10 +309,10 @@ const initFileIpc = (): void => {
   ipcMain.handle("choose-path", async () => {
     try {
       const { filePaths } = await dialog.showOpenDialog({
-        title: "选择文件夹",
+        title: t("common.choose_folder"),
         defaultPath: app.getPath("downloads"),
         properties: ["openDirectory", "createDirectory"],
-        buttonLabel: "选择文件夹",
+        buttonLabel: t("common.choose_folder"),
       });
       if (!filePaths || filePaths.length === 0) return null;
       return filePaths[0];
@@ -299,16 +338,17 @@ const initFileIpc = (): void => {
         saveMetaFile?: boolean;
         lyric?: string;
         songData?: any;
+        overwrite?: boolean;
       } = {
         fileName: "未知文件名",
         fileType: "mp3",
         path: app.getPath("downloads"),
       },
-    ): Promise<boolean> => {
+    ): Promise<{ status: "success" | "skipped" | "error"; message?: string }> => {
       try {
         // 获取窗口
         const win = BrowserWindow.fromWebContents(event.sender);
-        if (!win) return false;
+        if (!win) return { status: "error", message: "Window not found" };
         // 获取配置
         const {
           fileName,
@@ -320,6 +360,7 @@ const initFileIpc = (): void => {
           downloadLyric,
           saveMetaFile,
           songData,
+          overwrite,
         } = options;
         // 规范化路径
         const downloadPath = resolve(path);
@@ -327,22 +368,49 @@ const initFileIpc = (): void => {
         try {
           await access(downloadPath);
         } catch {
-          throw new Error("❌ Folder not found");
+          await mkdir(downloadPath, { recursive: true });
+        }
+
+        // 检查文件是否存在
+        if (!overwrite) {
+          const filePath = join(downloadPath, `${fileName}.${fileType}`);
+          try {
+            await access(filePath);
+            return { status: "skipped", message: t("message.file_exists") };
+          } catch {
+            // 文件不存在，继续下载
+          }
         }
         // 下载文件
         const songDownload = await download(win, url, {
           directory: downloadPath,
           filename: `${fileName}.${fileType}`,
+          showProgressBar: false,
+          onProgress: (progress) => {
+            win.webContents.send("download-progress", {
+              ...progress,
+              id: songData?.id,
+              platform: songData?.platform,
+            });
+          },
         });
-        if (!downloadMeta || !songData?.cover) return true;
+        if (!downloadMeta || !songData?.cover) return { status: "success" };
         // 下载封面
         const coverUrl = songData?.coverSize?.l || songData.cover;
         const coverDownload = await download(win, coverUrl, {
           directory: downloadPath,
           filename: `${fileName}.jpg`,
+          showProgressBar: false,
         });
         // 读取歌曲文件
-        const songFile = File.createFromPath(songDownload.getSavePath());
+        let songFile = File.createFromPath(songDownload.getSavePath());
+        // 清除原有标签，防止脏数据（如模拟播放下载时的乱码歌词）
+        songFile.removeTags(TagTypes.AllTags);
+        songFile.save();
+        songFile.dispose();
+        // 重新读取文件以写入新标签
+        // 读取歌曲文件
+        songFile = File.createFromPath(songDownload.getSavePath());
         // 生成图片信息
         const songCover = Picture.fromPath(coverDownload.getSavePath());
         // 保存修改后的元数据
@@ -364,10 +432,13 @@ const initFileIpc = (): void => {
         }
         // 是否删除封面
         if (!saveMetaFile || !downloadCover) await unlink(coverDownload.getSavePath());
-        return true;
+        return { status: "success" };
       } catch (error) {
         ipcLog.error("❌ Error downloading file:", error);
-        return false;
+        return {
+          status: "error",
+          message: error instanceof Error ? error.message : "Unknown error",
+        };
       }
     },
   );

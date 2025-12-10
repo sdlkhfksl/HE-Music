@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import { some } from "lodash-es";
 import blob from "@/utils/blob";
-import { SongInfo } from "@/types/main.hemusic";
+import type { SongInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 

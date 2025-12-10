@@ -16,7 +16,7 @@ import {
 import { useDataStore } from "@/stores";
 import { debounce, isFunction } from "lodash-es";
 import { isElectron } from "./env";
-import {
+import type {
   AlbumInfo,
   IDPlatformInfo,
   PlaylistInfo,

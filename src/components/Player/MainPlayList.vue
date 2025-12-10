@@ -89,13 +89,7 @@
       <template #footer>
         <n-grid :cols="2" x-gap="16" class="playlist-menu">
           <n-gi>
-            <n-button
-              :focusable="false"
-              size="large"
-              strong
-              secondary
-              @click="player.cleanPlayList()"
-            >
+            <n-button :focusable="false" size="large" strong secondary @click="cleanPlayList">
               <template #icon>
                 <SvgIcon name="DeleteSweep" />
               </template>
@@ -125,11 +119,11 @@
 <script setup lang="ts">
 import { useStatusStore, useDataStore } from "@/stores";
 import type { VirtualListInst } from "naive-ui";
-import player from "@/utils/player";
+import { usePlayer } from "@/utils/player";
 import { useI18n } from "vue-i18n";
 import { isMobile } from "@/utils/env";
 const { t } = useI18n();
-
+const player = usePlayer();
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
 
@@ -148,6 +142,20 @@ const playListData = computed(() => {
 // 滚动至指定元素
 const scrollToItem = (index: number, behavior: "smooth" | "auto" = "smooth") => {
   playListRef.value?.scrollTo({ index, behavior });
+};
+
+// 清空播放列表
+const cleanPlayList = () => {
+  window.$dialog.warning({
+    title: t("common.clear_list"),
+    content: t("common.clear_play_list_confirm"),
+    positiveText: t("common.ok"),
+    negativeText: t("common.cancel"),
+    onPositiveClick: () => {
+      player.cleanPlayList();
+      window.$message.success(t("message.play_list_cleared"));
+    },
+  });
 };
 </script>
 

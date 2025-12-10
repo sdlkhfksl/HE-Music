@@ -44,6 +44,7 @@ import { setColorSchemes } from "@/utils/color";
 import themeColor from "@/assets/data/themeColor.json";
 import { isElectron } from "@/utils/env";
 import { useI18n } from "vue-i18n";
+import { difference } from "lodash-es";
 
 const { locale, t } = useI18n();
 
@@ -263,6 +264,21 @@ watch(
     if (isElectron) {
       // 语言切换
       window.electron.ipcRenderer.send("change-language", lang);
+    }
+  },
+);
+watch(
+  () => settingStore.registryProtocols,
+  (protocols, pre) => {
+    if (isElectron) {
+      const toUnregister = difference(pre, protocols);
+      if (toUnregister.length) {
+        window.electron.ipcRenderer.send("unregister-protocol", toUnregister);
+      }
+      const toRegister = difference(protocols, pre);
+      if (toRegister.length) {
+        window.electron.ipcRenderer.send("register-protocol", toRegister);
+      }
     }
   },
 );
