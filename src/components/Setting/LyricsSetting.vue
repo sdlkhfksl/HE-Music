@@ -278,15 +278,15 @@
         <n-switch v-model:value="settingStore.enableLyricsExclude" class="set" :round="false" />
       </n-card>
       <n-collapse-transition :show="settingStore.enableLyricsExclude">
-        <n-card class="set-item">
-          <div class="label">
-            <n-text class="name">{{ t("setting.lyrics.lyrics_exclude_ttml") }}</n-text>
-            <n-text class="tip" :depth="3">
-              {{ t("setting.lyrics.lyrics_exclude_ttml_tip") }}
-            </n-text>
-          </div>
-          <n-switch v-model:value="settingStore.enableTTMLExclude" class="set" :round="false" />
-        </n-card>
+        <!--        <n-card class="set-item">-->
+        <!--          <div class="label">-->
+        <!--            <n-text class="name">{{ t("setting.lyrics.lyrics_exclude_ttml") }}</n-text>-->
+        <!--            <n-text class="tip" :depth="3">-->
+        <!--              {{ t("setting.lyrics.lyrics_exclude_ttml_tip") }}-->
+        <!--            </n-text>-->
+        <!--          </div>-->
+        <!--          <n-switch v-model:value="settingStore.enableTTMLExclude" class="set" :round="false" />-->
+        <!--        </n-card>-->
         <n-card class="set-item">
           <div class="label">
             <n-text class="name">{{ t("setting.lyrics.lyrics_exclude_local") }}</n-text>
