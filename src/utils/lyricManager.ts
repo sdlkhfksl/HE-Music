@@ -3,7 +3,7 @@ import { songLyric } from "@/api/song";
 import { type SongLyric } from "@/types/lyric";
 import { type LyricLine } from "@applemusic-like-lyrics/lyric";
 import { isElectron } from "./env";
-import { parseLineLyric, parseLyric, splitLocalLyrics } from "@/utils/lyric";
+import { isWordLyric, parseLineLyric, parseWordLyric, splitLocalLyrics } from "@/utils/lyric";
 
 class LyricManager {
   /**
@@ -29,7 +29,11 @@ class LyricManager {
     const result: SongLyric = { lrcData: [], yrcData: [] };
     // 处理 LRC 歌词
     const data = await songLyric(id, platform);
-    result.yrcData = parseLyric(data).line;
+    if (isWordLyric(data.lyric)) {
+      result.yrcData = parseWordLyric(data).line;
+    } else {
+      result.lrcData = parseLineLyric(data).line;
+    }
     // 先返回一次，避免 TTML 请求过慢
     const lyricData = this.handleLyricExclude(result);
     this.setFinalLyric(lyricData);

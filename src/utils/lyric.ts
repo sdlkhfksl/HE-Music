@@ -49,8 +49,10 @@ const wordLineRegex = /<(?<begin>\d+),(?<end>\d+)>(?<word>.*?)(?=<\d+,\d+>|$)/g;
 const extractLrcRegex = /^(?<lyricTimestamps>(?:\[.+?\])+)(?!\[)(?<content>.+)$/gm;
 const extractTimestampRegex = /\[(?<min>\d+):(?<sec>\d+)(?:\.|:)*(?<ms>\d+)*\]/g;
 
+export const isWordLyric = (lyric: string = "") => wordTimestampRegex.test(lyric);
+
 export const parseLyric = ({ lyric, roma, trans }) => {
-  if (!wordTimestampRegex.test(lyric)) {
+  if (!isWordLyric(lyric)) {
     return parseLineLyric({ lyric, roma, trans });
   }
   return parseWordLyric({ lyric, roma, trans });
