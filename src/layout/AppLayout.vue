@@ -79,8 +79,6 @@
 
 <script setup lang="ts">
 import { useMusicStore, useStatusStore, useSettingStore } from "@/stores";
-import blob from "@/utils/blob";
-import { isElectron } from "@/utils/env";
 import init from "@/utils/init";
 
 const musicStore = useMusicStore();
@@ -99,13 +97,6 @@ watchEffect(() => {
 
 onMounted(async () => {
   await init();
-  if (!isElectron) {
-    window.addEventListener("beforeunload", (event) => {
-      event.preventDefault();
-      // 释放所有 blob URL
-      blob.revokeAllBlobURLs();
-    });
-  }
 });
 </script>
 

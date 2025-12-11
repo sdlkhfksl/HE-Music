@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from "electron";
+import { BrowserWindow, shell } from "electron";
 import { createWindow } from "./index";
 import { mainWinUrl } from "../utils/config";
 import { useStore } from "../store";
@@ -84,14 +84,11 @@ class MainWindow {
     }
     // 窗口关闭
     this.win?.on("close", (event) => {
+      if (this.isQuit) {
+        return;
+      }
       event.preventDefault();
       this.win?.hide();
-      event.preventDefault();
-      if (this.isQuit) {
-        app.exit();
-      } else {
-        this.win?.hide();
-      }
     });
   }
   /**

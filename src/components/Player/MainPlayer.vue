@@ -114,7 +114,6 @@
       </div>
       <!-- 播放暂停 -->
       <n-button
-        v-debounce="() => player.playOrPause()"
         :loading="statusStore.playLoading"
         :focusable="false"
         :keyboard="false"

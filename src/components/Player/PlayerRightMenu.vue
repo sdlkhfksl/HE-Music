@@ -61,7 +61,6 @@
     </n-popover>
 
     <n-button
-      v-debounce="() => player.playOrPause()"
       :loading="statusStore.playLoading"
       :focusable="false"
       :keyboard="false"
@@ -70,6 +69,7 @@
       strong
       secondary
       circle
+      @click.stop="player.playOrPause()"
     >
       <template #icon>
         <Transition name="fade" mode="out-in">

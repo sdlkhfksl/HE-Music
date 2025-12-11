@@ -4,6 +4,8 @@
  * @author imsyy
  */
 
+import { isElectron } from "@/utils/env";
+
 /** 扩充 AudioContext 接口以支持 setSinkId (实验性 API) */
 interface IExtendedAudioContext extends AudioContext {
   setSinkId(deviceId: string): Promise<void>;
@@ -59,7 +61,9 @@ class AudioManager {
    */
   constructor() {
     this.audioElement = new Audio();
-    // this.audioElement.crossOrigin = "anonymous";
+    if (isElectron) {
+      this.audioElement.crossOrigin = "anonymous";
+    }
     this.bindInternalEvents();
   }
 
@@ -71,41 +75,40 @@ class AudioManager {
     if (this.isInitialized) return;
 
     try {
-      // 使用标准 AudioContext
-      this.audioCtx = new AudioContext() as IExtendedAudioContext;
+      if (isElectron) {
+        // 使用标准 AudioContext
+        this.audioCtx = new AudioContext() as IExtendedAudioContext;
+        // 创建节点
+        this.sourceNode = this.audioCtx.createMediaElementSource(this.audioElement!);
+        this.gainNode = this.audioCtx.createGain();
+        this.analyserNode = this.audioCtx.createAnalyser();
 
-      // 创建节点
-      this.sourceNode = this.audioCtx.createMediaElementSource(this.audioElement!);
-      this.gainNode = this.audioCtx.createGain();
-      this.analyserNode = this.audioCtx.createAnalyser();
+        // 配置分析器
+        this.analyserNode.fftSize = 512;
 
-      // 配置分析器
-      this.analyserNode.fftSize = 512;
+        // 创建均衡器滤波器
+        this.filters = this.eqFrequencies.map((freq) => {
+          const filter = this.audioCtx!.createBiquadFilter();
+          filter.type = "peaking";
+          filter.frequency.value = freq;
+          filter.Q.value = 1;
+          filter.gain.value = 0; // 默认平坦
+          return filter;
+        });
 
-      // 创建均衡器滤波器
-      this.filters = this.eqFrequencies.map((freq) => {
-        const filter = this.audioCtx!.createBiquadFilter();
-        filter.type = "peaking";
-        filter.frequency.value = freq;
-        filter.Q.value = 1;
-        filter.gain.value = 0; // 默认平坦
-        return filter;
-      });
+        // 连接图谱: Source -> EQ[0] -> ... -> EQ[9] -> Analyser -> Gain -> Destination
+        let currentNode: AudioNode = this.sourceNode;
+        for (const filter of this.filters) {
+          currentNode.connect(filter);
+          currentNode = filter;
+        }
 
-      // 连接图谱: Source -> EQ[0] -> ... -> EQ[9] -> Analyser -> Gain -> Destination
-      let currentNode: AudioNode = this.sourceNode;
-
-      for (const filter of this.filters) {
-        currentNode.connect(filter);
-        currentNode = filter;
+        currentNode.connect(this.analyserNode);
+        this.analyserNode.connect(this.gainNode);
+        this.gainNode.connect(this.audioCtx.destination);
+        // 同步音量
+        this.gainNode.gain.value = this.volume;
       }
-
-      currentNode.connect(this.analyserNode);
-      this.analyserNode.connect(this.gainNode);
-      this.gainNode.connect(this.audioCtx.destination);
-
-      // 同步音量
-      this.gainNode.gain.value = this.volume;
 
       this.isInitialized = true;
     } catch (error) {

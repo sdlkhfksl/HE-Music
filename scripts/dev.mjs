@@ -69,6 +69,8 @@ const startElectronVite = () => {
     runArgs.push(...args);
   }
 
+  console.log(`🚀 启动参数: ${runArgs.join(" ")}`);
+
   const electronVite = spawn("electron-vite", runArgs, {
     stdio: "inherit",
     shell: true,
