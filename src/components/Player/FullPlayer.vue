@@ -298,6 +298,11 @@ onBeforeUnmount(() => {
           padding: 0 5px;
         }
       }
+      &.no-lrc {
+        .content-left {
+          width: 50%;
+        }
+      }
     }
   }
   &.show-comment {
