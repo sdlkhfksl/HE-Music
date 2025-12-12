@@ -691,6 +691,7 @@
       "player_background_type": "Player Background Style",
       "player_background_type_tip": "Change player background type",
       "player_background_type_value_animation": "Fluid Effect",
+      "player_background_type_value_artist-photo": "Artist Photo",
       "player_background_type_value_blur": "Cover Blur",
       "player_background_type_value_color": "Cover Main Color",
       "player_background_type_value_none": "No Background",

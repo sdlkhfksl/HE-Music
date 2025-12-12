@@ -691,6 +691,7 @@
       "player_background_type": "播放器背景样式",
       "player_background_type_tip": "切换播放器背景类型",
       "player_background_type_value_animation": "流体效果",
+      "player_background_type_value_artist-photo": "歌手写真",
       "player_background_type_value_blur": "封面模糊",
       "player_background_type_value_color": "封面主色",
       "player_background_type_value_none": "无背景",

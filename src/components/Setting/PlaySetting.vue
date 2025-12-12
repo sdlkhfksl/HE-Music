@@ -176,6 +176,10 @@
               label: t('setting.play.player_background_type_value_color'),
               value: 'color',
             },
+            {
+              label: t('setting.play.player_background_type_value_artist-photo'),
+              value: 'artist-photo',
+            },
           ]"
           class="set"
         />

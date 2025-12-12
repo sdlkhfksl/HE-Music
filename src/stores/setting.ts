@@ -63,7 +63,7 @@ interface SettingState {
   countDownShow: boolean;
   barLyricShow: boolean;
   playerType: "cover" | "record";
-  playerBackgroundType: "none" | "animation" | "blur" | "color";
+  playerBackgroundType: "none" | "animation" | "blur" | "color" | "artist-photo";
   /** 背景动画帧率 */
   playerBackgroundFps: number;
   /** 背景动画流动速度 */

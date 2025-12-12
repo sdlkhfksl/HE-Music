@@ -18,6 +18,8 @@
         class="bg-img"
         alt="cover"
       />
+      <!-- 歌手写真 -->
+      <ArtistPhotoBackground v-else-if="settingStore.playerBackgroundType === 'artist-photo'" />
       <!-- 流体效果 -->
       <BackgroundRender
         v-else-if="settingStore.playerBackgroundType === 'animation'"
@@ -56,7 +58,7 @@ const settingStore = useSettingStore();
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(20px);
+    //backdrop-filter: blur(20px);
   }
   &.blur {
     display: flex;
@@ -75,6 +77,14 @@ const settingStore = useSettingStore();
       width: 100%;
       height: 100%;
       background-color: rgb(var(--main-color));
+    }
+  }
+  &.artist-photo {
+    /* reuse logic if needed, but SingerBackground handles its own style */
+    ::v-deep(.photo-background) {
+      position: absolute;
+      width: 100%;
+      height: 100%;
     }
   }
   &.animation {

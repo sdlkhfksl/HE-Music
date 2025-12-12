@@ -99,3 +99,17 @@ export const artistVideos = (
     params: { id, platform, page_index, page_size },
   });
 };
+
+/**
+ * 获取歌手写真
+ * @param platform 平台
+ * @param ids - 歌手id
+ * @param names - 歌手名字
+ */
+export const artistPhotos = (platform: string, ids: string[], names: string[]) => {
+  return requestHemusic({
+    url: "/v1/artist/photos",
+    method: "get",
+    params: { platform, ids, names },
+  });
+};

@@ -5,6 +5,8 @@ import { isElectron } from "@/utils/env";
 import { cloneDeep } from "lodash-es";
 import { SongLyric } from "@/types/lyric";
 import blob from "@/utils/blob";
+import { artistPhotos } from "@/api/artist";
+import { shuffleArray } from "@/utils/helper";
 
 interface MusicState {
   playSong: SongInfo;
@@ -21,6 +23,11 @@ interface MusicState {
     list: SongInfo[];
     playIndex: number;
     pageIndex: number;
+  };
+  artistPhoto: {
+    urls: string[];
+    key: string;
+    index: number;
   };
 }
 
@@ -59,6 +66,11 @@ export const useMusicStore = defineStore("music", {
       list: [], // 电台歌曲
       playIndex: 0, // 电台播放索引
       pageIndex: 1, // 电台页码
+    },
+    artistPhoto: {
+      urls: [],
+      key: "",
+      index: 0,
     },
   }),
   getters: {
@@ -146,6 +158,47 @@ export const useMusicStore = defineStore("music", {
             yrcData: this.songLyric.yrcData ?? [],
           }),
         );
+      }
+    },
+    /**
+     * 获取歌手写真
+     * @param artistName 歌手名字
+     */
+    /**
+     * 获取歌手写真
+     * @param platform 平台
+     * @param ids 歌手id
+     * @param names 歌手名字
+     */
+    async fetchArtistPictures(platform: string, ids: string[], names: string[]) {
+      const key = `${platform}-${ids.join(",")}-${names.join(",")}`;
+      if (!names.length && !ids.length) {
+        this.artistPhoto.urls = [];
+        this.artistPhoto.key = "";
+        this.artistPhoto.index = 0;
+        return;
+      }
+      // 缓存命中
+      if (this.artistPhoto.key === key && this.artistPhoto.urls.length > 0) {
+        return;
+      }
+
+      try {
+        const res = await artistPhotos(platform, ids, names);
+        if (res.urls && Array.isArray(res.urls)) {
+          this.artistPhoto.urls = shuffleArray(res.urls); // 随机排序
+          this.artistPhoto.key = key;
+          this.artistPhoto.index = 0;
+        } else {
+          this.artistPhoto.urls = [];
+          this.artistPhoto.key = "";
+          this.artistPhoto.index = 0;
+        }
+      } catch (e) {
+        console.error("fetch artist photos failed:", e);
+        this.artistPhoto.urls = [];
+        this.artistPhoto.key = "";
+        this.artistPhoto.index = 0;
       }
     },
   },
