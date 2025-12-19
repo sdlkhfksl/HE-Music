@@ -6,7 +6,7 @@ import { shuffleArray } from "./helper";
 import songManager from "./songManager";
 import { isElectron } from "./env";
 import lyricManager from "./lyricManager";
-import audioManager from "./audioManager";
+import audioManager, { AudioEventType } from "./audioManager";
 import blob from "./blob";
 import { listRadioSongs } from "@/api/radio";
 import { t } from "@/i18n";
@@ -22,6 +22,9 @@ class Player {
   private autoCloseInterval: ReturnType<typeof setInterval> | undefined;
   /** 当前曲目重试信息（按歌曲维度计数） */
   private retryInfo: { songId: string; count: number } = { songId: "", count: 0 };
+  /** 存储事件回调函数的引用，用于清理 */
+  private eventCallbacks: Map<AudioEventType, (e: Event) => void> = new Map();
+
   constructor() {
     // 初始化媒体会话
     this.initMediaSession();
@@ -29,11 +32,24 @@ class Player {
     this.bindAudioEvents();
   }
   /**
+   * 解绑 AudioManager 事件
+   */
+  private unbindAudioEvents() {
+    // 清理所有音频事件监听器
+    this.eventCallbacks.forEach((callback, event) => {
+      audioManager.off(event, callback);
+    });
+    this.eventCallbacks.clear();
+  }
+  /**
    * 绑定 AudioManager 事件
    */
   private bindAudioEvents() {
+    // 清理可能存在的旧事件监听器
+    this.unbindAudioEvents();
     // 播放
-    audioManager.on("play", () => {
+    // 播放
+    const playCallback = () => {
       const statusStore = useStatusStore();
       const playSongData = songManager.getPlaySongData();
       const { name, artist } = songManager.getPlayerInfoObj() || {};
@@ -51,9 +67,11 @@ class Player {
         });
       }
       console.log("▶️ song play:", playSongData);
-    });
+    };
+    audioManager.on("play", playCallback);
+    this.eventCallbacks.set("play", playCallback);
     // 暂停
-    audioManager.on("pause", () => {
+    const pauseCallback = () => {
       const statusStore = useStatusStore();
       const playSongData = songManager.getPlaySongData();
       statusStore.playStatus = false;
@@ -63,9 +81,11 @@ class Player {
         window.electron.ipcRenderer.send("play-status-change", false);
       }
       console.log("⏸️ song pause:", playSongData);
-    });
+    };
+    audioManager.on("pause", pauseCallback);
+    this.eventCallbacks.set("pause", pauseCallback);
     // 结束
-    audioManager.on("ended", () => {
+    const endedCallback = () => {
       const statusStore = useStatusStore();
       const playSongData = songManager.getPlaySongData();
       console.log("⏹️ song end:", playSongData);
@@ -79,15 +99,19 @@ class Player {
         return;
       }
       this.nextOrPrev("next", true, true);
-    });
+    };
+    audioManager.on("ended", endedCallback);
+    this.eventCallbacks.set("ended", endedCallback);
     // 错误
-    audioManager.on("error", (e: Event) => {
+    const errorCallback = (e: Event) => {
       const playSongData = songManager.getPlaySongData();
       console.error("❌ song error:", playSongData, e);
       this.handlePlaybackError();
-    });
+    };
+    audioManager.on("error", errorCallback);
+    this.eventCallbacks.set("error", errorCallback);
     // 进度更新
-    audioManager.on("timeupdate", () => {
+    const timeupdateCallback = () => {
       const musicStore = useMusicStore();
       const statusStore = useStatusStore();
       const settingStore = useSettingStore();
@@ -119,14 +143,18 @@ class Player {
           window.electron.ipcRenderer.send("set-bar", progress);
         }
       }
-    });
+    };
+    audioManager.on("timeupdate", timeupdateCallback);
+    this.eventCallbacks.set("timeupdate", timeupdateCallback);
     // 加载开始
-    audioManager.on("loadstart", () => {
+    const loadstartCallback = () => {
       const statusStore = useStatusStore();
       statusStore.playLoading = true;
-    });
+    };
+    audioManager.on("loadstart", loadstartCallback);
+    this.eventCallbacks.set("loadstart", loadstartCallback);
     // 可以播放
-    audioManager.on("canplay", () => {
+    const canplayCallback = () => {
       const statusStore = useStatusStore();
       statusStore.playLoading = false;
       // 恢复均衡器
@@ -147,7 +175,9 @@ class Player {
           dataStore.isLikeSong(playSongData || { id: "", platform: "" }),
         );
       }
-    });
+    };
+    audioManager.on("canplay", canplayCallback);
+    this.eventCallbacks.set("canplay", canplayCallback);
   }
   /**
    * 创建播放器并播放
@@ -177,6 +207,7 @@ class Player {
       }
     } catch (e) {
       console.error("Player create failed", e);
+      throw e;
     }
     // 获取歌词数据
     lyricManager.handleLyric(id, platform, path);
@@ -379,6 +410,13 @@ class Player {
           await this.parseLocalMusicInfo(path);
         } catch (err) {
           console.error("播放器初始化错误（本地）：", err);
+          // createPlayer 内部已触发 handlePlaybackError，这里只记录日志
+          // 如果 createPlayer 没有触发错误处理，则手动触发
+          const errCode = audioManager.getErrorCode();
+          if (errCode === 0) {
+            // 如果没有错误码，可能是其他类型的错误，触发通用错误处理
+            await this.handlePlaybackError(undefined);
+          }
         }
       }
       // 在线歌曲
@@ -413,6 +451,13 @@ class Player {
             }
           } catch (err) {
             console.error("播放器初始化错误（在线）：", err);
+            // createPlayer 内部已触发 handlePlaybackError，这里只记录日志
+            // 如果 createPlayer 没有触发错误处理，则手动触发
+            const errCode = audioManager.getErrorCode();
+            if (errCode === 0) {
+              // 如果没有错误码，可能是其他类型的错误，触发通用错误处理
+              await this.handlePlaybackError(undefined);
+            }
           }
         }
       }

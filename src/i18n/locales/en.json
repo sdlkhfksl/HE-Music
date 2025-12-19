@@ -666,6 +666,8 @@
       "reset_setting_tip": "Reset all settings to default values"
     },
     "play": {
+      "auto_hide_player_meta": "Player meta automatically hidden",
+      "auto_hide_player_meta_tip": "Mouse control elements automatically hide when inactive or when the cursor leaves the player.",
       "auto_play": "Auto Play",
       "auto_play_not_support_tip": "Not supported in web version",
       "auto_play_tip": "Automatically play music on startup",
@@ -712,7 +714,7 @@
       "song_quality_value_128mp3_tip": "Standard Quality 128kbps",
       "song_quality_value_192mp3_tip": "Higher Quality 192kbps",
       "song_quality_value_320mp3_tip": "Premium Quality 320kbps",
-      "song_quality_value_auto_tip": "Auto: {quality}(Last selected)>hires>flac>320mp3>128mp3",
+      "song_quality_value_auto_tip": "Auto: {quality}(Last Selected)>{left}",
       "song_quality_value_dolby_tip": "Dolby Atmos Music, immersive listening experience",
       "song_quality_value_flac_tip": "Lossless FLAC Quality, up to 48kHz/16bit",
       "song_quality_value_galaxy_tip": "Premium Spatial Audio",

@@ -253,6 +253,13 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
+          <n-text class="name">{{ t("setting.play.auto_hide_player_meta") }}</n-text>
+          <n-text class="tip" :depth="3">{{ t("setting.play.auto_hide_player_meta_tip") }}</n-text>
+        </div>
+        <n-switch v-model:value="settingStore.autoHidePlayerMeta" class="set" :round="false" />
+      </n-card>
+      <n-card class="set-item">
+        <div class="label">
           <n-text class="name"> {{ t("setting.play.show_play_meta") }}</n-text>
           <n-text class="tip" :depth="3">{{ t("setting.play.show_play_meta_tip") }}</n-text>
         </div>
@@ -327,7 +334,12 @@ const showSpectrums = ref<boolean>(settingStore.showSpectrums);
 const songLevelData = computed(() => ({
   auto: {
     label: t("common.auto"),
-    tip: t("setting.play.song_quality_value_auto_tip", { quality: statusStore.selectedQuality }),
+    tip: t("setting.play.song_quality_value_auto_tip", {
+      quality: statusStore.selectedQuality,
+      left: ["hires", "flac", "320mp3", "128mp3"]
+        .filter((item) => item !== statusStore.selectedQuality)
+        .join(">"),
+    }),
     value: "auto",
   },
   "128mp3": {

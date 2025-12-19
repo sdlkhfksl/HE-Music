@@ -108,7 +108,11 @@
         </div>
         <n-flex class="right" align="center" justify="end">
           <!-- 音量调节 -->
-          <n-popover :show-arrow="false" :style="{ '--main-color': statusStore.mainColor }" raw>
+          <n-popover
+            :show-arrow="false"
+            :style="{ '--main-cover-color': statusStore.mainColor }"
+            raw
+          >
             <template #trigger>
               <div class="menu-icon" @click.stop="player.toggleMute" @wheel="player.setVolume">
                 <SvgIcon :name="statusStore.playVolumeIcon" />
@@ -274,17 +278,17 @@ const qualityOptions = computed(() => {
           cursor: pointer;
 
           .n-icon {
-            color: rgb(var(--main-color));
+            color: rgb(var(--main-cover-color));
           }
         }
 
         .play-pause {
           --n-width: 44px;
           --n-height: 44px;
-          --n-color: rgba(var(--main-color), 0.14);
-          --n-color-hover: rgba(var(--main-color), 0.2);
-          --n-color-focus: rgba(var(--main-color), 0.2);
-          --n-color-pressed: rgba(var(--main-color), 0.12);
+          --n-color: rgba(var(--main-cover-color), 0.14);
+          --n-color-hover: rgba(var(--main-cover-color), 0.2);
+          --n-color-focus: rgba(var(--main-cover-color), 0.2);
+          --n-color-pressed: rgba(var(--main-cover-color), 0.12);
           backdrop-filter: blur(10px);
           margin: 0 12px;
           transition:
@@ -292,12 +296,12 @@ const qualityOptions = computed(() => {
             transform 0.3s;
 
           .n-icon {
-            color: rgb(var(--main-color));
+            color: rgb(var(--main-cover-color));
             transition: opacity 0.1s ease-in-out;
           }
 
           :deep(.n-base-loading) {
-            color: rgb(var(--main-color));
+            color: rgb(var(--main-cover-color));
           }
 
           &:hover {
@@ -323,7 +327,7 @@ const qualityOptions = computed(() => {
 
   .n-icon {
     font-size: 24px;
-    color: rgb(var(--main-color));
+    color: rgb(var(--main-cover-color));
   }
 }
 
@@ -336,21 +340,21 @@ const qualityOptions = computed(() => {
   height: 200px;
   padding: 12px 16px;
   backdrop-filter: blur(10px);
-  background-color: rgba(var(--main-color), 0.14);
+  background-color: rgba(var(--main-cover-color), 0.14);
 
   .slider-num {
     margin-top: 4px;
     font-size: 12px;
-    color: rgb(var(--main-color));
+    color: rgb(var(--main-cover-color));
   }
 }
 
 // slider
 .n-slider {
-  --n-rail-color: rgba(var(--main-color), 0.14);
-  --n-rail-color-hover: rgba(var(--main-color), 0.3);
-  --n-fill-color: rgb(var(--main-color));
-  --n-handle-color: rgb(var(--main-color));
-  --n-fill-color-hover: rgb(var(--main-color));
+  --n-rail-color: rgba(var(--main-cover-color), 0.14);
+  --n-rail-color-hover: rgba(var(--main-cover-color), 0.3);
+  --n-fill-color: rgb(var(--main-cover-color));
+  --n-handle-color: rgb(var(--main-cover-color));
+  --n-fill-color-hover: rgb(var(--main-cover-color));
 }
 </style>

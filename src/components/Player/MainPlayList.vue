@@ -5,7 +5,6 @@
     v-model:show="statusStore.playListShow"
     :class="{ 'full-player': statusStore.showFullPlayer }"
     :style="{
-      '--main-color': statusStore.mainColor,
       'max-width': isMobile ? '100%' : '400px',
     }"
     :auto-focus="false"
@@ -38,7 +37,7 @@
               :key="index"
               v-debounce="
                 () => {
-                  player.togglePlayIndex(index);
+                  player.togglePlayIndex(index, true);
                   statusStore.playListShow = false;
                 }
               "
@@ -277,8 +276,8 @@ const cleanPlayList = () => {
     padding: 16px;
   }
   &.full-player {
-    --n-color: rgb(var(--main-color));
-    --n-close-icon-color: rgba(var(--main-color), 0.58);
+    --n-color: rgb(var(--main-cover-color));
+    --n-close-icon-color: rgba(var(--main-cover-color), 0.58);
     background-color: transparent;
     box-shadow: none;
     .n-drawer-header,
@@ -288,25 +287,25 @@ const cleanPlayList = () => {
     a,
     span,
     .n-icon {
-      color: rgb(var(--main-color));
+      color: rgb(var(--main-cover-color));
     }
     .n-button {
-      --n-color: rgba(var(--main-color), 0.08);
-      --n-color-hover: rgba(var(--main-color), 0.12);
+      --n-color: rgba(var(--main-cover-color), 0.08);
+      --n-color-hover: rgba(var(--main-cover-color), 0.12);
       --n-color-pressed: var(--n-color);
       --n-color-focus: var(--n-color-hover);
     }
     .playlist-list {
       .song-item {
-        background-color: rgba(var(--main-color), 0.08);
+        background-color: rgba(var(--main-cover-color), 0.08);
         &.on {
-          border-color: rgb(var(--main-color));
+          border-color: rgb(var(--main-cover-color));
         }
         &:hover {
-          border-color: rgb(var(--main-color));
+          border-color: rgb(var(--main-cover-color));
         }
         .num {
-          color: rgba(var(--main-color), 0.52);
+          color: rgba(var(--main-cover-color), 0.52);
         }
       }
     }

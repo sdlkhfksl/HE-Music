@@ -14,7 +14,7 @@ interface IExtendedAudioContext extends AudioContext {
 /**
  * 音频事件类型定义
  */
-type AudioEventType =
+export type AudioEventType =
   | "play"
   | "pause"
   | "ended"
@@ -280,6 +280,13 @@ class AudioManager {
   }
 
   /**
+   * 移除所有事件监听
+   */
+  public offAll() {
+    this.eventListeners.clear();
+  }
+
+  /**
    * 绑定内部音频元素事件并转发
    * @param event 事件名称
    */
@@ -303,9 +310,21 @@ class AudioManager {
 
     events.forEach((event) => {
       this.audioElement!.addEventListener(event, (e) => {
-        const listeners = this.eventListeners.get(event);
-        if (listeners) {
-          listeners.forEach((cb) => cb(e));
+        // 传递错误码
+        if (event === "error" && this.audioElement) {
+          const errCode = this.getErrorCode();
+          const customEvent = new CustomEvent("error", {
+            detail: { originalEvent: e, errorCode: errCode },
+          });
+          const listeners = this.eventListeners.get(event);
+          if (listeners) {
+            listeners.forEach((cb) => cb(customEvent));
+          }
+        } else {
+          const listeners = this.eventListeners.get(event);
+          if (listeners) {
+            listeners.forEach((cb) => cb(e));
+          }
         }
       });
     });
@@ -392,6 +411,31 @@ class AudioManager {
    */
   public get src() {
     return this.audioElement?.src || "";
+  }
+  /**
+   * 获取音频错误码
+   * @returns 错误码
+   */
+  public getErrorCode(): number {
+    if (!this.audioElement?.error) return 0;
+
+    // 参考 HTML Audio Element 错误码
+    // MEDIA_ERR_ABORTED (1): 用户中止了加载
+    // MEDIA_ERR_NETWORK (2): 网络错误或资源过期
+    // MEDIA_ERR_DECODE (3): 解码错误
+    // MEDIA_ERR_SRC_NOT_SUPPORTED (4): 不支持的格式
+    switch (this.audioElement.error.code) {
+      case MediaError.MEDIA_ERR_ABORTED:
+        return 1;
+      case MediaError.MEDIA_ERR_NETWORK:
+        return 2; // 网络错误或资源过期
+      case MediaError.MEDIA_ERR_DECODE:
+        return 3;
+      case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+        return 4;
+      default:
+        return 0;
+    }
   }
 }
 

@@ -6,6 +6,7 @@
       :show-arrow="true"
       :disabled="musicStore.isLocalSong"
       @select="(quality) => player.changeQuality(quality)"
+      :class="{ player: statusStore.showFullPlayer }"
     >
       <div class="menu-icon quality-selector">
         <span class="current-quality">{{ statusStore.playQuality }}</span>
@@ -19,7 +20,11 @@
     </n-badge>
 
     <!-- 其他控制 -->
-    <n-dropdown :options="controlsOptions" :show-arrow="false">
+    <n-dropdown
+      :options="controlsOptions"
+      :show-arrow="false"
+      :class="{ player: statusStore.showFullPlayer }"
+    >
       <div class="menu-icon controls">
         <SvgIcon name="Controls" />
       </div>
@@ -29,6 +34,7 @@
       v-if="!statusStore.radioMode"
       :options="playModeOptions"
       :show-arrow="false"
+      :class="{ player: statusStore.showFullPlayer }"
       @select="(mode) => player.togglePlayMode(mode)"
     >
       <div class="menu-icon play-mode" @click.stop="player.togglePlayMode(false)">
@@ -36,7 +42,11 @@
       </div>
     </n-dropdown>
     <!-- 音量调节 -->
-    <n-popover :show-arrow="false" :style="{ padding: 0 }">
+    <n-popover
+      :show-arrow="false"
+      :style="{ padding: 0 }"
+      :class="{ player: statusStore.showFullPlayer }"
+    >
       <template #trigger>
         <div
           class="menu-icon volume-mute"

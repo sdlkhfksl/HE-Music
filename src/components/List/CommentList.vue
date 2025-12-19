@@ -225,7 +225,7 @@ const getContent = (content: string) => {
         border-radius: 8px;
         font-size: 13px;
         margin-top: 6px;
-        background-color: rgba(var(--main-color), 0.08);
+        background-color: rgba(var(--main-cover-color), 0.08);
         .text {
           white-space: pre-wrap;
         }
@@ -269,7 +269,7 @@ const getContent = (content: string) => {
   &.transparent {
     .comments {
       border-color: transparent;
-      background-color: rgba(var(--main-color), 0.08);
+      background-color: rgba(var(--main-cover-color), 0.08);
       .content {
         font-size: 16px;
       }

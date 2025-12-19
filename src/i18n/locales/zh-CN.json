@@ -666,6 +666,8 @@
       "reset_setting_tip": "重置所有设置，恢复软件默认值"
     },
     "play": {
+      "auto_hide_player_meta": "播放器元素自动隐藏",
+      "auto_hide_player_meta_tip": "鼠标静止一段时间或者离开播放器时自动隐藏控制元素",
       "auto_play": "自动播放",
       "auto_play_not_support_tip": "网页端不支持该功能",
       "auto_play_tip": "启动时是否自动播放",
@@ -712,7 +714,7 @@
       "song_quality_value_128mp3_tip": "标准音质 128kbps",
       "song_quality_value_192mp3_tip": "较高音质 192kbps",
       "song_quality_value_320mp3_tip": "超高音质 320kbps",
-      "song_quality_value_auto_tip": "自动：{quality}（最后选择）>hires>flac>320mp3>128mp3",
+      "song_quality_value_auto_tip": "自动：{quality}(最后选择)>{left}",
       "song_quality_value_dolby_tip": "杜比全景声音乐，沉浸式聆听体验",
       "song_quality_value_flac_tip": "高保真无损音质，最高 48kHz/16bit",
       "song_quality_value_galaxy_tip": "臻品全景声",

@@ -62,6 +62,8 @@ interface SettingState {
   useSongUnlock: boolean;
   countDownShow: boolean;
   barLyricShow: boolean;
+  /** 播放器元素自动隐藏 */
+  autoHidePlayerMeta: boolean;
   playerType: "cover" | "record";
   playerBackgroundType: "none" | "animation" | "blur" | "color" | "artist-photo";
   /** 背景动画帧率 */
@@ -135,6 +137,7 @@ export const useSettingStore = defineStore("setting", {
     useSongUnlock: true, // 是否使用解灰
     countDownShow: true, // 显示倒计时
     barLyricShow: true, // 显示歌词条
+    autoHidePlayerMeta: true, // 播放器元素自动隐藏
     playerType: "cover", // 播放器类型
     playerBackgroundType: "blur", // 背景类型
     playerBackgroundFps: 30,

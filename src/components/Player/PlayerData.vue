@@ -9,7 +9,7 @@
           <template #trigger>
             <SvgIcon :depth="3" name="CloudLockOpen" size="22" />
           </template>
-          <div :style="{ '--theme': theme }" class="player-tip">
+          <div class="player-tip">
             {{ t("play.unlock_music_tip") }}
           </div>
         </n-popover>
@@ -104,7 +104,6 @@ const { t } = useI18n();
 
 defineProps<{
   center?: boolean;
-  theme?: string;
   // 少量数据模式
   light?: boolean;
 }>();
@@ -145,7 +144,7 @@ const jumpPage = debounce(
   margin-top: 24px;
   padding: 0 2px;
   .n-icon {
-    color: rgb(var(--main-color));
+    color: rgb(var(--main-cover-color));
   }
   .name {
     position: relative;
@@ -232,7 +231,7 @@ const jumpPage = debounce(
       font-size: 12px;
       border-radius: 8px;
       padding: 2px 6px;
-      border: 1px solid rgba(var(--main-color), 0.6);
+      border: 1px solid rgba(var(--main-cover-color), 0.6);
     }
   }
   &.record {
@@ -277,8 +276,8 @@ const jumpPage = debounce(
   max-width: 240px;
   padding: 12px 20px;
   border-radius: 12px;
-  color: rgb(var(--theme));
-  background-color: rgba(var(--theme), 0.18);
+  color: rgb(var(--main-cover-color));
+  background-color: rgba(var(--main-cover-color), 0.18);
   backdrop-filter: blur(10px);
 }
 </style>
