@@ -226,6 +226,8 @@ class AudioManager {
     if (this.gainNode && this.audioCtx) {
       this.gainNode.gain.cancelScheduledValues(this.audioCtx.currentTime);
       this.gainNode.gain.setValueAtTime(this.volume, this.audioCtx.currentTime);
+    } else if (this.audioElement){
+      this.audioElement.volume = this.volume;
     }
   }
 
