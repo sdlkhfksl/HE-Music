@@ -228,7 +228,7 @@ const renderUserPlaylist = (playlist: UserPlaylistInfo[], showCover: boolean) =>
         ? h("div", { class: "pl-cover" }, [
             h(NAvatar, {
               src: playlist.cover,
-              fallbackSrc: "/images/album.jpg?assest",
+              fallbackSrc: "/images/album.jpg?asset",
               lazy: true,
             }),
             h(NEllipsis, null, () =>
@@ -257,7 +257,7 @@ const renderPlaylist = (
         ? h("div", { class: "pl-cover" }, [
             h(NAvatar, {
               src: playlist.cover,
-              fallbackSrc: "/images/album.jpg?assest",
+              fallbackSrc: "/images/album.jpg?asset",
               lazy: true,
             }),
             h(NEllipsis, null, () => playlist.name),

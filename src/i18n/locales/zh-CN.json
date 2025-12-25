@@ -558,8 +558,11 @@
       "show_local_cover_tip": "当数量过多时请勿开启，会严重影响性能"
     },
     "lyrics": {
+      "am_hide_passed_lines": "隐藏已播放歌词",
       "am_lyrics_spring": "歌词弹簧效果",
       "am_lyrics_spring_tip": "是否使用物理弹簧算法实现歌词动画效果，需要高性能设备",
+      "am_word_fade_width": "文字动画的渐变宽度",
+      "am_word_fade_width_tip": "单位以歌词行的主文字字体大小的倍数为单位，默认为 0.5，即一个全角字符的一半宽度，若模拟 Apple Music for Android 的效果，可以设为 1，若模拟 Apple Music for iPad 的效果，可以设为 0.5，若需近乎禁用渐变，可设为非常接近 0 的小数，如 0.01。",
       "desktop_lyrics_align": "对齐方式",
       "desktop_lyrics_align_tip": "桌面歌词对齐方式",
       "desktop_lyrics_align_value_both": "左右分离",

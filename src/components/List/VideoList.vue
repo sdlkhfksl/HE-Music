@@ -13,7 +13,7 @@
               <s-image
                 :key="item.cover"
                 :src="item.cover"
-                default-src="/images/video.jpg?assest"
+                default-src="/images/video.jpg?asset"
                 class="cover-img"
                 once
               />

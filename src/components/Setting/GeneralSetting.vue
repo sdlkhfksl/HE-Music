@@ -352,7 +352,7 @@
       </n-card>
       <n-card class="set-item">
         <div class="label">
-          <n-text class="name">{{ t("setting.general.registry_protocols") }}}</n-text>
+          <n-text class="name">{{ t("setting.general.registry_protocols") }}</n-text>
           <n-text class="tip" :depth="3">
             {{ t("setting.general.registry_protocols_tip") }}
           </n-text>

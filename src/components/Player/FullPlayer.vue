@@ -54,14 +54,8 @@
                 :light="pureLyricMode"
               />
               <!-- 歌词 -->
-              <MainAMLyric
-                v-if="settingStore.useAMLyrics"
-                :key="`am-lyric-${musicStore.playSong.id}-${musicStore.playSong.platform}`"
-              />
-              <MainLyric
-                v-else
-                :key="`lyric-${musicStore.playSong.id}-${musicStore.playSong.platform}`"
-              />
+              <MainAMLyric v-if="settingStore.useAMLyrics" />
+              <MainLyric v-else />
             </div>
           </div>
         </Transition>

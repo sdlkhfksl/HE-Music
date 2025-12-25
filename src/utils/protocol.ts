@@ -14,6 +14,10 @@ class OrpheusData {
 }
 
 export const handleProtocolUrl = (url: string) => {
+  // QQ音乐
+  // qqmusicmac://QQMusic/?version==1173&&from==y.qq.com&&cmd_count==1&&cmd_0==downloadsong&&id_0==628753930|622029054&&songtype_0==0|0&&info_0==&&quality_0==quality
+  // 酷狗音乐
+  // mackugou://download?p=eyJGaWxlcyI6W3siZmlsZW5hbWUiOiLml7bku6PlsJHlubTlm6It5Yas5pel5p2l5L+hwqAoV2ludGVywqBMb3ZlwqBMZXR0ZXIpLm1wMyIsImhhc2giOiJCQ0E5N0Q3RkFFRkJFRjI4OTZGODdDMEExRUZEQkQ2NCIsInNpemUiOiI0MTAwNDY1IiwiZHVyYXRpb24iOiIyNTYwMDAiLCJiaXRyYXRlIjoiMTI4IiwiaXNmaWxlaGVhZCI6IjEwMCIsInByaXZpbGVnZSI6IjgiLCJhbGJ1bV9pZCI6IjE3MTE5NDQyNyJ9XX0=
   switch (true) {
     case url.startsWith("orpheus://"):
       handleOpenOrpheus(url);

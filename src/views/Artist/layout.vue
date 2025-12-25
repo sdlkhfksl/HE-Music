@@ -14,7 +14,7 @@
           >
             <template #placeholder>
               <div class="cover-loading">
-                <img src="/images/artist.jpg?assest" class="loading-img" alt="loading-img" />
+                <img src="/images/artist.jpg?asset" class="loading-img" alt="loading-img" />
               </div>
             </template>
           </n-image>
@@ -56,19 +56,13 @@
               </div>
             </n-flex>
             <!-- 简介 -->
-            <n-ellipsis
+            <n-text
               v-if="artistDetailData.description"
-              :line-clamp="1"
-              :tooltip="{
-                trigger: 'click',
-                placement: 'bottom',
-                width: 'trigger',
-                scrollable: true,
-                contentStyle: 'white-space: pre-line; max-height:400px',
-              }"
+              class="description text-hidden"
+              @click="openDescModal(artistDetailData.description)"
             >
               {{ artistDetailData.description }}
-            </n-ellipsis>
+            </n-text>
           </n-collapse-transition>
           <n-flex class="menu" justify="space-between">
             <n-flex class="left" align="flex-end">
@@ -168,6 +162,7 @@ import { FeatureSupportFlag } from "@/api/platform";
 import { DropdownOption } from "naive-ui";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import { openDescModal } from "@/utils/modal";
 const { t } = useI18n();
 
 const router = useRouter();

@@ -107,7 +107,6 @@ const getCaptchaData = () => {
     });
 };
 
-// 新建歌单
 const verify = debounce(
   async (angle: number = 0, point: object = {}, dots: object[] = [], reset: () => void) => {
     try {

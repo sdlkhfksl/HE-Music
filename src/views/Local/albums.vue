@@ -12,7 +12,7 @@
           <n-image
             :key="item?.[0]?.cover"
             v-visible.once="(show: boolean) => loadAlbumCover(show, key)"
-            :src="item?.[0]?.cover || '/images/album.jpg?assest'"
+            :src="item?.[0]?.cover || '/images/album.jpg?asset'"
             preview-disabled
             class="cover"
           />

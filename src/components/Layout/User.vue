@@ -10,7 +10,7 @@
           <n-avatar
             v-if="dataStore.userLoginStatus"
             :src="dataStore.userData?.avatar"
-            fallback-src="/images/avatar.jpg?assest"
+            fallback-src="/images/avatar.jpg?asset"
             round
           />
           <n-avatar v-else round>

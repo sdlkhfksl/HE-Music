@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <img src="/icons/favicon.png?assest" alt="logo" class="logo" />
+    <img src="/icons/favicon.png?asset" alt="logo" class="logo" />
     <!-- 登录方式 -->
     <LoginPassword @save-login="saveLogin" />
     <!-- 其他方式 -->

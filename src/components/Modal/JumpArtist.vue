@@ -13,7 +13,7 @@
           hoverable
           @click="jumpArtist(item.id, platform)"
         >
-          <n-avatar :src="'/images/artist.jpg?assest'" class="cover" round />
+          <n-avatar :src="'/images/artist.jpg?asset'" class="cover" round />
           <n-text class="name">
             {{ item.name }}
           </n-text>

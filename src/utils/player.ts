@@ -338,7 +338,7 @@ class Player {
         const blobURL = blob.createBlobURL(data, format, path);
         if (blobURL) musicStore.playSong.cover = blobURL;
       } else {
-        musicStore.playSong.cover = "/images/song.jpg?assest";
+        musicStore.playSong.cover = "/images/song.jpg?asset";
       }
       // 更新媒体会话
       this.updateMediaSession();
@@ -402,7 +402,7 @@ class Player {
       musicStore.playSong = playSongData;
       statusStore.playLoading = true;
       // 停止当前播放
-      audioManager.stop();
+      audioManager.pause();
       // 本地歌曲
       if (path) {
         try {

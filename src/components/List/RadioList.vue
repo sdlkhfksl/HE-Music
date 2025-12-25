@@ -9,7 +9,7 @@
               <s-image
                 :key="item.cover"
                 :src="item.cover"
-                default-src="/images/album.jpg?assest"
+                default-src="/images/album.jpg?asset"
                 class="cover-img"
                 once
               />

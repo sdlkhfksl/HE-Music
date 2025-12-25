@@ -79,6 +79,8 @@ interface SettingState {
   showSearchHistory: boolean;
   useAMLyrics: boolean;
   useAMSpring: boolean;
+  AMHidePassedLines: boolean;
+  AMWordFadeWidth: number;
   menuShowCover: boolean;
   preventSleep: boolean;
   localFilesPath: string[];
@@ -153,6 +155,8 @@ export const useSettingStore = defineStore("setting", {
     lyricFontBold: true, // 歌词字体加粗
     useAMLyrics: false, // 是否使用 AM 歌词
     useAMSpring: false, // 是否使用 AM 歌词弹簧效果
+    AMHidePassedLines: false /** 隐藏已播放歌词 */,
+    AMWordFadeWidth: 0.5 /** 文字动画的渐变宽度 */,
     showYrc: true, // 显示逐字歌词
     showYrcAnimation: true, // 显示逐字歌词动画
     showYrcLongEffect: true,

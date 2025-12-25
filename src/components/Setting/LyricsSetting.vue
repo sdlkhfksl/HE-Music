@@ -327,17 +327,44 @@
         </div>
         <n-switch v-model:value="settingStore.useAMLyrics" class="set" :round="false" />
       </n-card>
-      <n-card class="set-item">
-        <div class="label">
-          <n-text class="name">
-            {{ t("setting.lyrics.am_lyrics_spring") }}
-          </n-text>
-          <n-text class="tip" :depth="3">
-            {{ t("setting.lyrics.am_lyrics_spring_tip") }}
-          </n-text>
-        </div>
-        <n-switch v-model:value="settingStore.useAMSpring" class="set" :round="false" />
-      </n-card>
+
+      <n-collapse-transition :show="settingStore.useAMLyrics">
+        <n-card class="set-item">
+          <div class="label">
+            <n-text class="name">
+              {{ t("setting.lyrics.am_lyrics_spring") }}
+            </n-text>
+            <n-text class="tip" :depth="3">
+              {{ t("setting.lyrics.am_lyrics_spring_tip") }}
+            </n-text>
+          </div>
+          <n-switch v-model:value="settingStore.useAMSpring" class="set" :round="false" />
+        </n-card>
+        <n-card class="set-item">
+          <div class="label">
+            <n-text class="name"> {{ t("setting.lyrics.am_hide_passed_lines") }}</n-text>
+          </div>
+          <n-switch v-model:value="settingStore.AMHidePassedLines" class="set" :round="false" />
+        </n-card>
+        <n-card class="set-item">
+          <div class="label">
+            <n-text class="name">{{ t("setting.lyrics.am_word_fade_width") }}</n-text>
+            <n-text class="tip" :depth="3">
+              {{ t("setting.lyrics.am_word_fade_width_tip") }}
+            </n-text>
+          </div>
+          <n-flex>
+            <n-input-number
+              v-model:value="settingStore.AMWordFadeWidth"
+              class="set"
+              :min="0.01"
+              :max="1"
+              :step="0.01"
+              :round="false"
+            />
+          </n-flex>
+        </n-card>
+      </n-collapse-transition>
       <!--      <n-card class="set-item">-->
       <!--        <div class="label">-->
       <!--          <n-text class="name">{{ t("setting.lyrics.enable_online_ttml_lyrics") }}</n-text>-->

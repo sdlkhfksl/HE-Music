@@ -558,8 +558,11 @@
       "show_local_cover_tip": "Do not enable when there are many tracks as it may severely impact performance"
     },
     "lyrics": {
+      "am_hide_passed_lines": "Hide Played Lyrics",
       "am_lyrics_spring": "Lyrics Spring Effect",
       "am_lyrics_spring_tip": "Use physics-based spring algorithm for lyrics animation (requires high-performance device)",
+      "am_word_fade_width": "Gradient width of text animation",
+      "am_word_fade_width_tip": "The unit is a multiple of the main text font size in the lyrics line, with a default value of 0.5, which is half the width of a full-width character. To mimic the effect of Apple Music for Android, set it to 1; for Apple Music for iPad, set it to 0.5. If you want to nearly disable the gradient, set it to a very small decimal close to 0, such as 0.01.",
       "desktop_lyrics_align": "Alignment",
       "desktop_lyrics_align_tip": "Desktop lyrics alignment method",
       "desktop_lyrics_align_value_both": "Left and Right Separation",
