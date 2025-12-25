@@ -38,7 +38,7 @@
       <Menu v-if="isMobile" mobile :setOptions="setOptions" @setSelect="setSelect" />
     </n-flex>
     <!-- 客户端控制 -->
-    <n-flex v-if="isElectron" align="center" class="client-control">
+    <n-flex v-if="isElectron && !isMac" align="center" class="client-control">
       <n-divider class="divider" vertical />
       <n-button :focusable="false" :title="t('nav.minimize')" tertiary circle @click="min">
         <template #icon>
@@ -103,7 +103,7 @@
 import type { DropdownOption } from "naive-ui";
 import { useSettingStore } from "@/stores";
 import { renderIcon } from "@/utils/helper";
-import { isDev, isElectron, isMobile } from "@/utils/env";
+import { isDev, isElectron, isMac, isMobile } from "@/utils/env";
 import { openParseSourceUrl, openSetting } from "@/utils/modal";
 import { useI18n } from "vue-i18n";
 import { ref } from "vue";

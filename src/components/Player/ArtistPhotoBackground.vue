@@ -90,7 +90,6 @@ onMounted(() => {
   height: 100%;
   background-size: cover;
   background-position: center;
-  //filter: brightness(0.9);
   transform: scale(1.1);
 }
 </style>

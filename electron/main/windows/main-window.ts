@@ -1,6 +1,6 @@
 import { BrowserWindow, shell } from "electron";
 import { createWindow } from "./index";
-import { mainWinUrl } from "../utils/config";
+import { isMac, mainWinUrl } from "../utils/config";
 import { useStore } from "../store";
 import { isLinux } from "../utils/config";
 
@@ -99,8 +99,11 @@ class MainWindow {
     const store = useStore();
     const { width, height } = store.get("window");
     this.win = createWindow({
-      // 菜单栏
-      titleBarStyle: "customButtonsOnHover",
+      titleBarStyle: isMac ? "hiddenInset" : "customButtonsOnHover",
+      trafficLightPosition: {
+        x: 5,
+        y: 0,
+      },
       width,
       height,
       minHeight: 600,
