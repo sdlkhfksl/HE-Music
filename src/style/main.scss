@@ -121,6 +121,7 @@ audio {
     color: var(--primary-hex);
   }
   &.player {
+    color: rgb(var(--main-cover-color));
     --n-color: rgba(var(--main-cover-color), 0.14);
     .volume-change {
       .slider-num {
