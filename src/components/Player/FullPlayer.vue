@@ -73,7 +73,7 @@
         <!-- 音乐频谱 -->
         <PlayerSpectrum
           v-if="isElectron && settingStore.showSpectrums"
-          :color="statusStore.mainColor ? `rgb(${statusStore.mainColor})` : 'rgb(239 239 239)'"
+          :color="`rgb(${mainCoverColor})`"
           :show="!statusStore.playerMetaShow"
           :height="60"
         />
@@ -177,14 +177,14 @@ const playerLeave = () => {
 
 // 封面主色变化
 watch(
-  () => statusStore.mainColor,
+  () => statusStore.playerMainColor,
   (newVal) => {
-    mainCoverColor.value = newVal;
+    mainCoverColor.value = `${newVal.r}, ${newVal.g}, ${newVal.b}`;
   },
 );
 
 onMounted(() => {
-  mainCoverColor.value = statusStore.mainColor;
+  mainCoverColor.value = `${statusStore.playerMainColor.r}, ${statusStore.playerMainColor.g}, ${statusStore.playerMainColor.b}`;
   // 阻止息屏
   if (isElectron && settingStore.preventSleep) {
     window.electron.ipcRenderer.send("prevent-sleep", true);

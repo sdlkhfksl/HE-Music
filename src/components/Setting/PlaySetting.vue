@@ -187,6 +187,52 @@
       <n-card class="set-item">
         <div class="label">
           <n-text class="name">
+            {{ t("setting.play.player_main_color_type") }}
+          </n-text>
+        </div>
+        <n-select
+          v-model:value="settingStore.playerMainColorType"
+          :options="[
+            {
+              label: t('setting.play.player_main_color_type_value_default'),
+              value: 'default',
+            },
+            {
+              label: t('setting.play.player_main_color_type_value_follow_cover'),
+              value: 'follow-cover',
+            },
+            {
+              label: t('setting.play.player_main_color_type_value_follow-theme'),
+              value: 'follow-theme',
+            },
+            {
+              label: t('setting.play.player_main_color_type_value_custom'),
+              value: 'custom',
+            },
+          ]"
+          class="set"
+        />
+      </n-card>
+      <n-collapse-transition :show="settingStore.playerMainColorType === 'custom'">
+        <n-card class="set-item">
+          <div class="label">
+            <n-text class="name">
+              {{ t("setting.play.player_main_color_custom") }}
+            </n-text>
+          </div>
+          <n-color-picker
+            v-model:value="settingStore.playerMainColorCustom"
+            :show-alpha="false"
+            :modes="['hex']"
+            class="set"
+          />
+          <!--          @complete="saveDesktopLyricConfig"-->
+        </n-card>
+      </n-collapse-transition>
+
+      <n-card class="set-item">
+        <div class="label">
+          <n-text class="name">
             {{ t("setting.play.full_player_cache") }}
           </n-text>
           <n-text class="tip" :depth="3">

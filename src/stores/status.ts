@@ -22,6 +22,7 @@ interface StatusState {
     light?: ColorScheme;
     dark?: ColorScheme;
   };
+  playerMainColor: RGB;
   spectrumsData: number[];
   pureLyricMode: boolean;
   playIndex: number;
@@ -134,6 +135,11 @@ export const useStatusStore = defineStore("status", {
       time: 30,
       remainTime: 0,
       waitSongEnd: true,
+    },
+    playerMainColor: {
+      r: 239,
+      g: 239,
+      b: 239,
     },
   }),
   actions: {

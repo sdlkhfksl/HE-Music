@@ -45,6 +45,7 @@ import themeColor from "@/assets/data/themeColor.json";
 import { isElectron } from "@/utils/env";
 import { useI18n } from "vue-i18n";
 import { difference } from "lodash-es";
+import { hexToRgb, rgbToHex } from "@imsyy/color-utils";
 
 const { locale, t } = useI18n();
 
@@ -235,6 +236,38 @@ const changeGlobalTheme = () => {
   }
 };
 
+const changePlayerColor = () => {
+  const color = getPlayerMainColor();
+  const rgb = hexToRgb(color);
+  if (!rgb) {
+    return;
+  }
+  statusStore.playerMainColor = { r: rgb.r, g: rgb.g, b: rgb.b };
+};
+
+const getPlayerMainColor = () => {
+  switch (settingStore.playerMainColorType) {
+    case "default":
+      return "#EFEFEF";
+    case "custom":
+      return settingStore.playerMainColorCustom;
+    case "follow-cover":
+      const mainColor = statusStore.songCoverTheme?.main;
+      if (!mainColor) return "#EFEFEF";
+      return rgbToHex(mainColor.r, mainColor.g, mainColor.b);
+    default:
+      if (settingStore.themeFollowCover && statusStore.songCoverTheme) {
+        const mainColor = statusStore.songCoverTheme?.main;
+        if (!mainColor) return "#EFEFEF";
+        return rgbToHex(mainColor.r, mainColor.g, mainColor.b);
+      } else if (settingStore.themeColorType !== "custom") {
+        return themeColor[settingStore.themeColorType].color;
+      } else {
+        return settingStore.themeCustomColor;
+      }
+  }
+};
+
 // 挂载 naive 组件
 const setupNaiveTools = () => {
   // 进度条
@@ -308,7 +341,28 @@ watchDebounced(
   { debounce: 500, maxWait: 1000 },
 );
 
+// 播放器主题色
+watch(
+  () => [
+    settingStore.themeColorType,
+    settingStore.themeFollowCover,
+    settingStore.themeGlobalColor,
+    settingStore.playerMainColorType,
+    statusStore.songCoverTheme?.main,
+  ],
+  () => changePlayerColor(),
+);
+// 自定义颜色更改
+watchDebounced(
+  () => settingStore.playerMainColorCustom,
+  () => {
+    changePlayerColor();
+  },
+  { debounce: 500, maxWait: 1000 },
+);
+
 onMounted(() => {
   changeGlobalTheme();
+  changePlayerColor();
 });
 </script>

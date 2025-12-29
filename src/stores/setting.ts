@@ -70,6 +70,8 @@ interface SettingState {
   playerBackgroundFps: number;
   /** 背景动画流动速度 */
   playerBackgroundFlowSpeed: number;
+  playerMainColorType: "default" | "follow-cover" | "follow-theme" | "custom"; // 播放器主题色类型
+  playerMainColorCustom: string;
   memoryLastSeek: boolean;
   showPlaylistCount: boolean;
   showSpectrums: boolean;
@@ -144,6 +146,8 @@ export const useSettingStore = defineStore("setting", {
     playerBackgroundType: "blur", // 背景类型
     playerBackgroundFps: 30,
     playerBackgroundFlowSpeed: 4,
+    playerMainColorType: "follow-cover", // 播放器主题色类型
+    playerMainColorCustom: "#EFEFEF", // 播放器主题色
     memoryLastSeek: true, // 记忆最后进度
     showPlaylistCount: true, // 显示播放列表数量
     showSpectrums: true, // 是否显示音乐频谱

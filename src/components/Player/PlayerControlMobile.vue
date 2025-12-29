@@ -25,6 +25,8 @@
         <n-dropdown
           :options="qualityOptions"
           :show-arrow="true"
+          :style="{ padding: 0 }"
+          :class="{ player: statusStore.showFullPlayer }"
           :disabled="musicStore.isLocalSong"
           @select="(quality) => player.changeQuality(quality)"
         >
@@ -110,8 +112,8 @@
           <!-- 音量调节 -->
           <n-popover
             :show-arrow="false"
-            :style="{ '--main-cover-color': statusStore.mainColor }"
-            raw
+            :style="{ padding: 0 }"
+            :class="{ player: statusStore.showFullPlayer }"
           >
             <template #trigger>
               <div class="menu-icon" @click.stop="player.toggleMute" @wheel="player.setVolume">
