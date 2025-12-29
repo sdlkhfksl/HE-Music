@@ -17,7 +17,7 @@
             {{ t("common.play_queue") }}
           </n-text>
           <n-text class="count" depth="3">
-            {{ t("common.song_count_unit", { count: dataStore.playList.length }) }}
+            {{ t("common.song_count", { count: dataStore.playList.length }) }}
           </n-text>
         </div>
       </template>

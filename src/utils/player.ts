@@ -54,7 +54,7 @@ class Player {
       const playSongData = songManager.getPlaySongData();
       const { name, artist } = songManager.getPlayerInfoObj() || {};
       const playTitle = `${name} - ${artist}`;
-      window.document.title = `${playTitle} | SPlayer`;
+      window.document.title = `${playTitle} | HE-Music`;
       statusStore.playStatus = true;
       this.retryInfo = { songId: `${playSongData?.id}-${playSongData?.platform}`, count: 0 };
       // IPC 通知
@@ -75,7 +75,7 @@ class Player {
       const statusStore = useStatusStore();
       const playSongData = songManager.getPlaySongData();
       statusStore.playStatus = false;
-      if (!isElectron) window.document.title = "SPlayer";
+      if (!isElectron) window.document.title = "HE-Music";
       // IPC 通知
       if (isElectron) {
         window.electron.ipcRenderer.send("play-status-change", false);
