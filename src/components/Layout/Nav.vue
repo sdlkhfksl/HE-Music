@@ -106,7 +106,7 @@ import { renderIcon } from "@/utils/helper";
 import { isDev, isElectron, isMac, isMobile } from "@/utils/env";
 import { openParseSourceUrl, openSetting } from "@/utils/modal";
 import { useI18n } from "vue-i18n";
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import Menu from "@/components/Layout/Menu.vue";
 
 const { t } = useI18n();
@@ -140,6 +140,7 @@ const hideOrClose = (action: "hide" | "exit") => {
     settingStore.closeAppMethod = action;
   }
   showCloseModal.value = false;
+  // 延迟执行，等待模态对话框关闭动画完成（150ms）
   window.electron.ipcRenderer.send(action === "hide" ? "win-hide" : "quit-app");
 };
 
@@ -231,6 +232,18 @@ onMounted(() => {
     window.electron.ipcRenderer.on("win-state-change", (_event, value: boolean) => {
       isMax.value = value;
     });
+    // Mac 下点击原生关闭按钮时，触发关闭确认逻辑
+    window.electron.ipcRenderer.on("win-close-triggered", () => {
+      tryClose();
+    });
+  }
+});
+
+onUnmounted(() => {
+  // 清理事件监听器
+  if (isElectron) {
+    window.electron.ipcRenderer.removeAllListeners("win-state-change");
+    window.electron.ipcRenderer.removeAllListeners("win-close-triggered");
   }
 });
 </script>

@@ -248,8 +248,6 @@ class CreateTray implements MainTray {
   }
   // 托盘事件
   private initEvents() {
-    // 点击
-    // this._tray.on("click", () => this._win.show());
     // 明暗变化
     nativeTheme.on("updated", () => {
       this.initTrayMenu();

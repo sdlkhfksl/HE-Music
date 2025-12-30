@@ -88,7 +88,11 @@ class MainWindow {
         return;
       }
       event.preventDefault();
-      this.win?.hide();
+      // Mac 下点击原生关闭按钮时，通知渲染进程处理关闭逻辑
+      // Windows 下自定义按钮已经处理了，这里主要是为了 Mac 的原生关闭按钮
+      if (this.win && !this.win.isDestroyed() && !this.win.webContents.isDestroyed()) {
+        this.win.webContents.send("win-close-triggered");
+      }
     });
   }
   /**
