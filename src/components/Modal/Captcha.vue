@@ -62,6 +62,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: [];
+  success: [];
 }>();
 
 /*  // 点击文本
@@ -122,7 +123,7 @@ const verify = debounce(
         return;
       }
       window.$message.success(t("message.captcha_success"));
-      emit("close");
+      emit("success"); // 触发成功事件
     } catch (e: any) {
       window.$message.error(e?.message || t("message.captcha_fail"));
       refreshCaptcha(reset);

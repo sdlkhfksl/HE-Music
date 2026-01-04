@@ -3,7 +3,6 @@ import { isDev, isElectron } from "./env";
 import { useDataStore, useSettingStore } from "@/stores";
 import { isLogin } from "./auth";
 import { openCaptcha, openUserLogin } from "@/utils/modal";
-import { t } from "@/i18n";
 
 export const API_URL = String(
   isDev ? import.meta.env["VITE_API_URL"] : isElectron ? import.meta.env["VITE_API_URL"] : "",
@@ -59,7 +58,7 @@ serverHemusic.interceptors.request.use(
 // 响应拦截器
 serverHemusic.interceptors.response.use(
   (response: AxiosResponse) => response,
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
     const { response } = error;
     // 状态码处理
     switch (response?.status) {
@@ -76,7 +75,24 @@ serverHemusic.interceptors.response.use(
         console.error("禁止访问：", response.status, response.statusText);
         if (response && (response.data as { reason?: string }).reason === "CAPTCHA_REQUIRED") {
           const { metadata } = response.data as { metadata: { scene: string; meta: string } };
-          openCaptcha(Number(metadata.scene), metadata.meta);
+          // 等待验证码验证
+          const captchaSuccess = await openCaptcha(Number(metadata.scene), metadata.meta);
+
+          if (captchaSuccess) {
+            console.log("验证码验证成功，自动重试原请求");
+            // 重新发送原始请求
+            const originalConfig = error.config;
+            if (originalConfig) {
+              try {
+                return await serverHemusic.request(originalConfig); // 返回重试成功的响应
+              } catch (retryError) {
+                console.error("重试请求失败：", retryError);
+                return Promise.reject(retryError);
+              }
+            }
+          } else {
+            console.log("验证码验证失败或取消");
+          }
         }
         // 执行禁止访问的处理逻辑
         break;
@@ -93,13 +109,16 @@ serverHemusic.interceptors.response.use(
         console.error("未处理的错误：", error.message);
     }
 
-    window.$notification.error({
-      title: t("message.request_error"),
-      description: `${t("common.status_code")}: ${response?.status || ""}`,
-      content: (response && (response.data as { message?: string }).message) || error.message,
-      meta: t("message.request_error_tips"),
-      duration: 5000,
-    });
+    window.$message.error(
+      (response && (response.data as { message?: string }).message) || error.message,
+    );
+    // window.$notification.error({
+    //   title: t("message.request_error"),
+    //   description: `${t("common.status_code")}: ${response?.status || ""}`,
+    //   content: (response && (response.data as { message?: string }).message) || error.message,
+    //   meta: t("message.request_error_tips"),
+    //   duration: 5000,
+    // });
     // 返回错误
     return Promise.reject(error);
   },

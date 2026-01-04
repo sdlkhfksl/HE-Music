@@ -316,17 +316,30 @@ export const openParseSourceUrl = () => {
   });
 };
 
-export const openCaptcha = (scene: number, meta: string) => {
-  const modal = window.$modal.create({
-    preset: "card",
-    transformOrigin: "center",
-    autoFocus: false,
-    style: { width: "375px" },
-    title: t("modal.security_verify"),
-    maskClosable: false,
-    content: () => {
-      return h(Captcha, { scene, meta, onClose: () => modal.destroy() });
-    },
+export const openCaptcha = (scene: number, meta: string): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const modal = window.$modal.create({
+      preset: "card",
+      transformOrigin: "center",
+      autoFocus: false,
+      style: { width: "375px" },
+      title: t("modal.security_verify"),
+      maskClosable: false,
+      content: () => {
+        return h(Captcha, {
+          scene,
+          meta,
+          onClose: () => {
+            modal.destroy();
+            resolve(false); // 用户关闭弹窗，验证失败
+          },
+          onSuccess: () => {
+            modal.destroy();
+            resolve(true); // 验证成功
+          },
+        });
+      },
+    });
   });
 };
 
