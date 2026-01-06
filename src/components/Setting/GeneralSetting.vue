@@ -188,17 +188,17 @@
       <n-h3 prefix="bar">
         {{ t("setting.general.system_setting") }}
       </n-h3>
-      <n-card class="set-item">
-        <div class="label">
-          <n-text class="name">
-            {{ t("setting.general.use_online_service") }}
-          </n-text>
-          <n-text class="tip" :depth="3">
-            {{ t("setting.general.use_online_service_tip") }}
-          </n-text>
-        </div>
-        <n-switch class="set" :value="useOnlineService" :round="false" @update:value="modeChange" />
-      </n-card>
+      <!--      <n-card class="set-item">-->
+      <!--        <div class="label">-->
+      <!--          <n-text class="name">-->
+      <!--            {{ t("setting.general.use_online_service") }}-->
+      <!--          </n-text>-->
+      <!--          <n-text class="tip" :depth="3">-->
+      <!--            {{ t("setting.general.use_online_service_tip") }}-->
+      <!--          </n-text>-->
+      <!--        </div>-->
+      <!--        <n-switch class="set" :value="useOnlineService" :round="false" @update:value="modeChange" />-->
+      <!--      </n-card>-->
       <n-card class="set-item">
         <div class="label">
           <n-text class="name">
@@ -473,6 +473,7 @@ const getAllSystemFonts = async () => {
 };
 
 // 在线模式切换
+// @ts-ignore
 const modeChange = (val: boolean) => {
   if (val) {
     window.$dialog.warning({

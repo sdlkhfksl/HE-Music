@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <n-tabs
-      v-if="settingStore.useOnlineService"
+      v-if="true"
       v-model:value="platform"
       class="tabs"
       type="bar"
@@ -19,21 +19,19 @@
         <HomeOnline :platform="platform.id" />
       </n-tab-pane>
     </n-tabs>
-    <!-- 在线模式 -->
-    <!-- 本地模式 -->
-    <HomeLocal v-else />
+    <n-flex v-else wrap class="tabs">
+      <n-skeleton v-for="i in 5" :key="'tag1-' + i" text :width="60" :height="30" round />
+    </n-flex>
   </div>
 </template>
 
 <script setup lang="ts">
-import { usePlatformStore, useSettingStore } from "@/stores";
+import { usePlatformStore } from "@/stores";
 import HomeOnline from "./HomeOnline.vue";
-import HomeLocal from "./HomeLocal.vue";
 import { FeatureSupportFlag } from "@/api/platform";
 import { computed, onActivated, watch } from "vue";
 import type { PlatformInfo } from "@/types/main.hemusic";
 
-const settingStore = useSettingStore();
 const router = useRouter();
 const platformStore = usePlatformStore();
 

@@ -16,13 +16,10 @@
     </div>
     <div v-else class="menu">
       <n-flex wrap class="category">
-        <n-skeleton v-for="i in 26" :key="'tag1-' + i" text :width="35" height="30px" round />
+        <n-skeleton v-for="i in 26" :key="'tag1-' + i" text :width="30" :height="30" round />
       </n-flex>
       <n-flex wrap class="category">
-        <n-skeleton v-for="i in 10" :key="'tag1-' + i" text :width="45" height="30px" round />
-      </n-flex>
-      <n-flex wrap class="category">
-        <n-skeleton v-for="i in 4" :key="'tag1-' + i" text :width="45" height="30px" round />
+        <n-skeleton v-for="i in 10" :key="'tag2-' + i" text :width="50" :height="30" round />
       </n-flex>
     </div>
     <ArtistList

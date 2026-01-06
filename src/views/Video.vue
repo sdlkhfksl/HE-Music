@@ -163,7 +163,7 @@ const hlsRef = ref<Hls | null>(null);
 
 // 播放器配置
 const playerOptions: Plyr.Options = {
-  fullscreen:{
+  fullscreen: {
     enabled: true,
     fallback: true,
     iosNative: true,

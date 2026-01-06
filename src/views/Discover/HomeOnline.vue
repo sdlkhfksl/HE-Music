@@ -173,16 +173,12 @@ onMounted(getAllDiscoverData);
     align-items: center;
     cursor: pointer;
     .n-icon {
-      opacity: 0;
-      transform: translateX(4px);
-      transition:
-        opacity 0.3s,
-        transform 0.3s;
+      opacity: 0.5;
+      transition: opacity 0.3s;
     }
     &:hover {
       .n-icon {
         opacity: 1;
-        transform: translateX(0);
       }
     }
   }
