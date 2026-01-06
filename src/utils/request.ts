@@ -36,6 +36,7 @@ serverHemusic.interceptors.request.use(
       const token = useDataStore().token;
       request.headers.set("Authorization", "Bearer " + token);
     }
+    request.headers.set("Accept-Language", `${settingStore.language};q=0.9`);
     // proxy
     if (settingStore.proxyProtocol !== "off") {
       const protocol = settingStore.proxyProtocol.toLowerCase();

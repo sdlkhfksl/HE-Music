@@ -284,7 +284,6 @@ const handleOnlinePlaylist = async (id: string) => {
   // 获取歌单详情
   const detail = await getUserPlaylistDetail(id);
   playlistDetailData.value = detail;
-  playlistData.value = detail.songs;
   loading.value = false;
   // 默认歌单
   if (detail.is_default === 1) {

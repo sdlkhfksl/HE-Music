@@ -64,8 +64,8 @@ export const getUserPlaylistDetail = (id: string) => {
 
 export const listUserPlaylistSongs = (
   id: string,
-  page_size: number = 50,
   page_index: number = 1,
+  page_size: number = 1000,
 ) => {
   return requestHemusic({
     url: "/v1/user/playlist/songs",
