@@ -1,12 +1,10 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import { isDev, isElectron } from "./env";
+import { isDev } from "./env";
 import { useDataStore, useSettingStore } from "@/stores";
 import { isLogin } from "./auth";
 import { openCaptcha, openUserLogin } from "@/utils/modal";
 
-export const API_URL = String(
-  isDev ? import.meta.env["VITE_API_URL"] : isElectron ? import.meta.env["VITE_API_URL"] : "",
-);
+export const API_URL = String(import.meta.env["VITE_API_URL"]);
 // 全局地址
 const baseURL: string = String(isDev ? "/api/netease" : import.meta.env["VITE_NETEASE_API_URL"]);
 

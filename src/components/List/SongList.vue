@@ -167,6 +167,7 @@ const props = withDefaults(
     hiddenSize?: boolean;
     // 双击播放操作
     doubleClickAction?: "all" | "add";
+    keepOffset?: boolean;
   }>(),
   {
     type: "song",
@@ -174,6 +175,7 @@ const props = withDefaults(
     showFooter: true,
     hiddenSize: true,
     showHeader: true,
+    keepOffset: true,
   },
 );
 
@@ -311,6 +313,7 @@ onBeforeRouteLeave(() => {
 onActivated(() => {
   floatToolShow.value = true;
   if (props.height === "auto") stopCalcHeight();
+  if (!props.keepOffset) offset.value = 0;
   if (offset.value > 0) listRef.value?.scrollToOffset(offset.value);
 });
 

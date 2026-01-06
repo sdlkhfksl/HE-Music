@@ -96,8 +96,8 @@
             <n-flex class="left" align="flex-end">
               <n-button
                 :focusable="false"
-                :disabled="loading"
-                :loading="loading"
+                :disabled="songLoading"
+                :loading="songLoading"
                 type="primary"
                 strong
                 secondary
@@ -108,14 +108,12 @@
                   <SvgIcon name="Play" />
                 </template>
                 {{
-                  loading
-                    ? isSamePlaylist
-                      ? t("common.updating") + "..."
-                      : `${t("common.loading")}... (${
-                          playlistData.length === Number(playlistDetailData.song_count)
-                            ? 0
-                            : playlistData.length
-                        }/${playlistDetailData.song_count})`
+                  songLoading
+                    ? `${t("common.loading")}... (${
+                        playlistData.length === Number(playlistDetailData.song_count)
+                          ? 0
+                          : playlistData.length
+                      }/${playlistDetailData.song_count})`
                     : t("common.play")
                 }}
               </n-button>
@@ -171,15 +169,19 @@
       <SongList
         v-if="!searchValue || searchData?.length"
         :data="playlistDataShow"
-        :loading="loading"
+        :loading="songLoading"
         :height="songListHeight"
+        :disabled-sort="songHasMore"
+        load-more
         :playlist="{
           id: playlistId,
           platform: playlistDetailData?.platform,
           type: 'playlist',
         }"
-        :doubleClickAction="searchData?.length ? 'add' : 'all'"
+        :double-click-action="searchData?.length ? 'add' : 'all'"
         @scroll="listScroll"
+        @reach-bottom="reachBottom"
+        :keep-offset="isSamePlaylist"
       />
       <n-empty
         v-else
@@ -197,7 +199,7 @@
 
 <script setup lang="ts">
 import type { DropdownOption, MessageReactive } from "naive-ui";
-import { playlistDetail } from "@/api/playlist";
+import { playlistDetail, playlistSongs } from "@/api/playlist";
 import { copyData, coverLoaded, fuzzySearch, renderIcon } from "@/utils/helper";
 import { renderToolbar } from "@/utils/meta";
 import { toLikePlaylist } from "@/utils/auth";
@@ -211,6 +213,7 @@ import SongList from "@/components/List/SongList.vue";
 import { buildSourceUrl } from "@/api/source";
 import { FeatureSupportFlag } from "@/api/platform";
 import { useI18n } from "vue-i18n";
+
 const { t, n } = useI18n();
 
 const router = useRouter();
@@ -236,6 +239,11 @@ const platform = computed<string>(() => router.currentRoute.value.query.platform
 // 加载提示
 const loading = ref<boolean>(true);
 const loadingMsg = ref<MessageReactive | null>(null);
+
+// 搜索数据
+const songHasMore = ref<boolean>(false);
+const songLoading = ref<boolean>(false);
+const songPageIndex = ref<number>(1);
 
 // 列表是否滚动
 const listScrolling = ref<boolean>(false);
@@ -320,6 +328,7 @@ const resetPlaylistData = () => {
   playlistDetailData.value = null;
   playlistData.value = [];
   listScrolling.value = false;
+  songPageIndex.value = 1;
 };
 
 // 获取本地歌单
@@ -333,11 +342,25 @@ const handleOnlinePlaylist = async (id: string, platform: string) => {
   playlistDetail(id, platform)
     .then((detail) => {
       playlistDetailData.value = detail;
-      playlistData.value = detail.songs;
+      handleSongs(id, platform);
     })
     .finally(() => {
       loading.value = false;
     });
+};
+
+// 获取在线歌单
+const handleSongs = async (id: string, platform: string) => {
+  songLoading.value = true;
+  // 获取歌单详情
+  const { list, has_more } = await playlistSongs(id, platform, songPageIndex.value, 1000);
+  if (songPageIndex.value == 1) {
+    playlistData.value = [];
+  }
+  playlistData.value = playlistData.value?.concat(list);
+  songHasMore.value = has_more;
+  loading.value = false;
+  songLoading.value = false;
 };
 
 // 列表滚动
@@ -370,23 +393,39 @@ const loadingMsgShow = (show: boolean = true, count?: number) => {
 };
 
 // 播放全部歌曲
-const playAllSongs = debounce(() => {
+const playAllSongs = debounce(async () => {
+  await loadAllSongs();
   if (!playlistDetailData.value || !playlistData.value?.length) return;
-  player.updatePlayList(playlistData.value, undefined, {
+  await player.updatePlayList(playlistData.value, undefined, {
     id: playlistDetailData.value.id,
     platform: playlistDetailData.value.platform,
     type: "playlist",
   });
 }, 300);
 
+const loadAllSongs = async () => {
+  for (; songHasMore.value; ) {
+    await reachBottom();
+  }
+};
+
 // 模糊搜索
 const listSearch = debounce((val: string) => {
   val = val.trim();
   if (!val || val === "") return;
   // 获取搜索结果
-  const result = fuzzySearch(val, playlistData.value);
-  searchData.value = result;
+  searchData.value = fuzzySearch(val, playlistData.value);
 }, 300);
+
+// 列表触底
+const reachBottom = async () => {
+  if (songHasMore.value) {
+    songPageIndex.value++;
+    await handleSongs(playlistId.value, platform.value);
+  } else {
+    songLoading.value = false;
+  }
+};
 
 onBeforeRouteUpdate((to) => {
   const id = to.query.id as string;

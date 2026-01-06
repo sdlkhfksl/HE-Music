@@ -98,16 +98,17 @@
 <script setup lang="ts">
 import { useMusicStore, useStatusStore } from "@/stores";
 import { debounce } from "lodash-es";
-import { playlistDetail } from "@/api/playlist";
+import { playlistSongs } from "@/api/playlist";
 import CoverMenu from "@/components/Menu/CoverMenu.vue";
 import { usePlayer } from "@/utils/player";
 import type {
   CoverType,
   PlaylistInfo,
+  SongInfo,
   UserFavouritePlaylistInfo,
   UserPlaylistInfo,
 } from "@/types/main.hemusic";
-import { getUserPlaylistDetail } from "@/api/userplaylist";
+import { listUserPlaylistSongs } from "@/api/userplaylist";
 import { useI18n } from "vue-i18n";
 const { t, n } = useI18n();
 
@@ -166,10 +167,8 @@ const playList = debounce(
       // 开始加载
       item.loading = true;
       // 获取播放列表
-      const list = item.platform
-        ? await playlistDetail(item.id, item.platform)
-        : await getUserPlaylistDetail(item.id);
-      player.updatePlayList(list.songs, undefined, {
+      const songs = await getPlaylistAllSongs(item.id, item.platform);
+      player.updatePlayList(songs, undefined, {
         id: item.id,
         platform: item.platform,
         type: "playlist",
@@ -183,6 +182,26 @@ const playList = debounce(
   300,
   { leading: true, trailing: false },
 );
+
+const getPlaylistAllSongs = async (id: string, platform?: string) => {
+  let songs: SongInfo[] = [];
+  let page_index = 1;
+  const page_size = 1000;
+
+  for (;;) {
+    const result = platform
+      ? await playlistSongs(id, platform, page_index, page_size)
+      : await listUserPlaylistSongs(id, page_index, page_size);
+    const { list, total, has_more } = result;
+    if (list.length === 0) break;
+    songs = songs.concat(list);
+    if (!has_more) break;
+    if (songs.length >= total) break;
+    page_index++;
+  }
+
+  return songs;
+};
 </script>
 
 <style lang="scss" scoped>

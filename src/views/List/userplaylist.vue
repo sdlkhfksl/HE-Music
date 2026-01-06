@@ -67,8 +67,8 @@
             <n-flex class="left" align="flex-end">
               <n-button
                 :focusable="false"
-                :disabled="loading"
-                :loading="loading"
+                :disabled="songLoading"
+                :loading="songLoading"
                 type="primary"
                 strong
                 secondary
@@ -79,14 +79,12 @@
                   <SvgIcon name="Play" />
                 </template>
                 {{
-                  loading
-                    ? isSamePlaylist
-                      ? t("common.updating") + "..."
-                      : `${t("common.loading")}... (${
-                          playlistData.length === Number(playlistDetailData.song_count)
-                            ? 0
-                            : playlistData.length
-                        }/${playlistDetailData.song_count})`
+                  songLoading
+                    ? `${t("common.loading")}... (${
+                        playlistData.length === Number(playlistDetailData.song_count)
+                          ? 0
+                          : playlistData.length
+                      }/${playlistDetailData.song_count})`
                     : t("common.play")
                 }}
               </n-button>
@@ -136,8 +134,10 @@
       <SongList
         v-if="!searchValue || searchData?.length"
         :data="playlistDataShow"
-        :loading="loading"
+        :loading="songLoading"
         :height="songListHeight"
+        :disabled-sort="songHasMore"
+        load-more
         :playlist="{
           id: playlistId,
           platform: '',
@@ -145,7 +145,9 @@
         }"
         @scroll="listScroll"
         @remove-song="removeSong"
-        :doubleClickAction="searchData?.length ? 'add' : 'all'"
+        :double-click-action="searchData?.length ? 'add' : 'all'"
+        @reach-bottom="reachBottom"
+        :keep-offset="isSamePlaylist"
       />
       <n-empty
         v-else
@@ -174,9 +176,14 @@ import { usePlayer } from "@/utils/player";
 import type { SongInfo, UserPlaylistInfo } from "@/types/main.hemusic";
 import { computed } from "vue";
 import SongList from "@/components/List/SongList.vue";
-import { deleteUserPlaylist, getUserPlaylistDetail } from "@/api/userplaylist";
+import {
+  deleteUserPlaylist,
+  getUserPlaylistDetail,
+  listUserPlaylistSongs,
+} from "@/api/userplaylist";
 import { formatTimestamp } from "@/utils/time";
 import { useI18n } from "vue-i18n";
+
 const { t } = useI18n();
 
 const player = usePlayer();
@@ -199,6 +206,11 @@ const playlistId = computed<string>(() => router.currentRoute.value.query.id as 
 // 加载提示
 const loading = ref<boolean>(true);
 const loadingMsg = ref<MessageReactive | null>(null);
+
+// 搜索数据
+const songHasMore = ref<boolean>(false);
+const songLoading = ref<boolean>(false);
+const songPageIndex = ref<number>(1);
 
 // 列表是否滚动
 const listScrolling = ref<boolean>(false);
@@ -258,6 +270,7 @@ const resetPlaylistData = () => {
   playlistDetailData.value = null;
   playlistData.value = [];
   listScrolling.value = false;
+  songPageIndex.value = 1;
 };
 
 // 获取本地歌单
@@ -276,6 +289,21 @@ const handleOnlinePlaylist = async (id: string) => {
   if (detail.is_default === 1) {
     await dataStore.setUserLikeData("songs", detail.song_ids);
   }
+  await handleSongs(id);
+};
+
+// 获取在线歌单
+const handleSongs = async (id: string) => {
+  songLoading.value = true;
+  // 获取歌单详情
+  const { list, has_more } = await listUserPlaylistSongs(id, songPageIndex.value, 1000);
+  if (songPageIndex.value == 1) {
+    playlistData.value = [];
+  }
+  playlistData.value = playlistData.value?.concat(list);
+  songHasMore.value = has_more;
+  loading.value = false;
+  songLoading.value = false;
 };
 
 // 列表滚动
@@ -308,22 +336,39 @@ const loadingMsgShow = (show: boolean = true, count?: number) => {
 };
 
 // 播放全部歌曲
-const playAllSongs = debounce(() => {
+const playAllSongs = debounce(async () => {
+  await loadAllSongs();
   if (!playlistDetailData.value || !playlistData.value?.length) return;
-  player.updatePlayList(playlistData.value, undefined, {
+  await player.updatePlayList(playlistData.value, undefined, {
     id: playlistDetailData.value?.id,
     platform: "",
     type: "user-playlist",
   });
 }, 300);
 
+const loadAllSongs = async () => {
+  for (; songHasMore.value; ) {
+    await reachBottom();
+  }
+};
+
+// 列表触底
+const reachBottom = async () => {
+  if (songHasMore.value) {
+    songPageIndex.value++;
+    await handleSongs(playlistId.value);
+  } else {
+    songLoading.value = false;
+  }
+};
+
 // 模糊搜索
 const listSearch = debounce((val: string) => {
   val = val.trim();
   if (!val || val === "") return;
   // 获取搜索结果
-  const result = fuzzySearch(val, playlistData.value);
-  searchData.value = result;
+
+  searchData.value = fuzzySearch(val, playlistData.value);
 }, 300);
 
 // 删除歌单

@@ -52,13 +52,28 @@ export const deleteUserPlaylist = (id: string) => {
   });
 };
 
-export const getUserPlaylistDetail = (id: string, with_song: boolean = true) => {
+export const getUserPlaylistDetail = (id: string) => {
   return requestHemusic({
     url: "/v1/user/playlist",
     method: "GET",
     params: {
       id,
-      with_song,
+    },
+  });
+};
+
+export const listUserPlaylistSongs = (
+  id: string,
+  page_size: number = 50,
+  page_index: number = 1,
+) => {
+  return requestHemusic({
+    url: "/v1/user/playlist/songs",
+    method: "GET",
+    params: {
+      id,
+      page_size,
+      page_index,
     },
   });
 };

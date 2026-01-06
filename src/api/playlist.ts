@@ -11,6 +11,23 @@ export const playlistDetail = (id: string, platform: string) => {
   });
 };
 
+export const playlistSongs = (
+  id: string,
+  platform: string,
+  page_index: number = 1,
+  page_size: number = 1000,
+) => {
+  return requestHemusic({
+    url: `/v1/playlist/songs`,
+    params: {
+      id,
+      platform,
+      page_index,
+      page_size,
+    },
+  });
+};
+
 // 获取歌单分类信息
 export const playlistCategories = (platform: string) => {
   return requestHemusic({

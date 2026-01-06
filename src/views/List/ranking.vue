@@ -263,6 +263,7 @@ const handleOnlinePlaylist = async (id: string, platform: string) => {
   const detail = await getRanking(id, platform, songPageIndex.value, 100);
   if (songPageIndex.value == 1) {
     playlistDetailData.value = detail;
+    playlistData.value = [];
   }
   playlistData.value = playlistData.value?.concat(detail.songs);
   songHasMore.value = detail.has_more;

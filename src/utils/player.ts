@@ -21,7 +21,11 @@ class Player {
   /** 自动关闭定时器 */
   private autoCloseInterval: ReturnType<typeof setInterval> | undefined;
   /** 当前曲目重试信息（按歌曲维度计数） */
-  private retryInfo: { songId: string; count: number } = { songId: "", count: 0 };
+  private retryInfo: { songId: string; count: number; total: number } = {
+    songId: "",
+    count: 0,
+    total: 0,
+  };
   /** 存储事件回调函数的引用，用于清理 */
   private eventCallbacks: Map<AudioEventType, (e: Event) => void> = new Map();
 
@@ -56,7 +60,11 @@ class Player {
       const playTitle = `${name} - ${artist}`;
       window.document.title = `${playTitle} | HE-Music`;
       statusStore.playStatus = true;
-      this.retryInfo = { songId: `${playSongData?.id}-${playSongData?.platform}`, count: 0 };
+      this.retryInfo = {
+        songId: `${playSongData?.id}-${playSongData?.platform}`,
+        count: 0,
+        total: 0,
+      };
       // IPC 通知
       if (isElectron) {
         window.electron.ipcRenderer.send("play-status-change", true);
@@ -296,9 +304,10 @@ class Player {
     const currentSongId = `${playSongData?.id}-${playSongData?.platform}`;
     // 初始化/切换曲目时重置计数
     if (!this.retryInfo.songId || this.retryInfo.songId !== currentSongId) {
-      this.retryInfo = { songId: currentSongId, count: 0 };
+      this.retryInfo = { songId: currentSongId, count: 0, total: this.retryInfo.total };
     }
     this.retryInfo.count += 1;
+    this.retryInfo.total += 1;
     // 错误码 2：资源过期或临时网络错误，允许较少次数的刷新
     if (errCode === 2 && this.retryInfo.count <= 2) {
       await this.initPlayer(true, this.getSeek());
@@ -307,6 +316,11 @@ class Player {
     // 其它错误：最多 3 次
     if (this.retryInfo.count <= 3) {
       await this.initPlayer(true, 0);
+      return;
+    }
+
+    if (this.retryInfo.total >= 15) {
+      window.$message.error("播放错误次数过多，已停止播放");
       return;
     }
     // 超过次数：切到下一首或清空
