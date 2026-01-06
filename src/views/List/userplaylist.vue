@@ -254,6 +254,7 @@ const getPlaylistDetail = async (id: string, refresh: boolean = false) => {
   if (!id) return;
   // 设置加载状态
   loading.value = true;
+  songLoading.value = true;
   // 清空数据
   clearInput();
   if (!refresh) resetPlaylistData();
