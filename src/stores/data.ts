@@ -3,15 +3,16 @@ import type { CoverType, UserLikeDataType } from "@/types/main";
 import { playlistCategories } from "@/api/playlist";
 import { cloneDeep, isEmpty } from "lodash-es";
 import localforage from "localforage";
-import type {
+import {
   SongInfo,
   CategoryGroupInfo,
   UserInfo,
   UserPlaylistInfo,
-  ArtistTabInfo,
+  FilterInfo,
 } from "@/types/main.hemusic";
-import { artistTabs } from "@/api/artist";
+import { artistFilters } from "@/api/artist";
 import { songEqual } from "@/utils/song";
+import { mvFilters } from "@/api/video";
 
 interface ListState {
   playList: SongInfo[];
@@ -27,7 +28,8 @@ interface ListState {
   userLikeData: UserLikeDataType;
   userCreatedPlaylist: UserPlaylistInfo[]; //用户创建的歌单
   playlistCategories: Record<string, CategoryGroupInfo[]>;
-  artistTabs: Record<string, ArtistTabInfo[]>;
+  artistFilters: Record<string, FilterInfo[]>;
+  mvFilters: Record<string, FilterInfo[]>;
   /** 正在下载的歌曲列表 */
   downloadingSongs: Array<{
     /** 歌曲信息 */
@@ -95,7 +97,8 @@ export const useDataStore = defineStore("data", {
     },
     // 分类数据
     playlistCategories: {},
-    artistTabs: {},
+    artistFilters: {},
+    mvFilters: {},
     // 正在下载的歌曲列表
     downloadingSongs: [],
   }),
@@ -312,14 +315,26 @@ export const useDataStore = defineStore("data", {
       }
     },
     // 获取歌手分类
-    async getArtistTabs(platform: string) {
-      if (!isEmpty(this.artistTabs[platform])) return;
+    async getArtistFilters(platform: string) {
+      if (!isEmpty(this.artistFilters[platform])) return;
       // 获取歌单分类
       try {
-        const res = await artistTabs(platform);
-        this.artistTabs[platform] = res.tabs;
+        const res = await artistFilters(platform);
+        this.artistFilters[platform] = res.filters;
       } catch (error) {
-        console.error("Error getting artist tab list:", error);
+        console.error("Error getting artist filters:", error);
+        throw error;
+      }
+    },
+    // 获取歌手分类
+    async getMVFilters(platform: string) {
+      if (!isEmpty(this.mvFilters[platform])) return;
+      // 获取歌单分类
+      try {
+        const res = await mvFilters(platform);
+        this.mvFilters[platform] = res.filters;
+      } catch (error) {
+        console.error("Error getting mv filters:", error);
         throw error;
       }
     },

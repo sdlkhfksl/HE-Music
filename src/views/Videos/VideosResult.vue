@@ -1,14 +1,14 @@
 <template>
-  <div class="discover-artists">
-    <div v-if="dataStore.artistFilters[platform]" class="menu">
-      <n-flex v-for="tab in dataStore.artistFilters[platform]" :key="tab.id" class="category">
+  <div class="discover-mvs">
+    <div v-if="dataStore.mvFilters[platform]" class="menu">
+      <n-flex v-for="tab in dataStore.mvFilters[platform]" :key="tab.id" class="category">
         <n-tag
           v-for="opt in tab.options"
           :key="opt.value"
           :bordered="false"
           :class="{ choose: opt.value == filters[tab.id] }"
           round
-          @click="artistQueryChange(tab.id, opt.value)"
+          @click="queryChange(tab.id, opt.value)"
         >
           {{ opt.label }}
         </n-tag>
@@ -22,20 +22,19 @@
         <n-skeleton v-for="i in 10" :key="'tag2-' + i" text :width="50" :height="30" round />
       </n-flex>
     </div>
-    <ArtistList
-      :data="artistsData"
+    <VideoList
+      :data="videosData"
       :loading="loading"
       :load-more="hasMore"
-      hidden-item
       @load-more="loadMore"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { filterArtists } from "@/api/artist";
-import type { ArtistInfo } from "@/types/main.hemusic";
+import type { MVInfo } from "@/types/main.hemusic";
 import { useDataStore } from "@/stores";
+import { filterMVs } from "@/api/video";
 
 const props = defineProps<{
   platform: string;
@@ -47,55 +46,46 @@ const filters = ref({});
 // 歌手数据
 const hasMore = ref<boolean>(true);
 const loading = ref<boolean>(true);
-const artistsPageIndex = ref<number>(1);
-const artistsData = ref<ArtistInfo[]>([]);
+const pageIndex = ref<number>(1);
+const videosData = ref<MVInfo[]>([]);
 
 // 获取歌手数据
-const getArtistListData = async () => {
+const getListData = async () => {
   // 获取数据
   loading.value = true;
-  const result = await filterArtists(props.platform, artistsPageIndex.value, 50, filters.value);
+  const result = await filterMVs(props.platform, pageIndex.value, 50, filters.value);
   // 是否还有
   hasMore.value = result?.has_more;
-  artistsData.value = artistsData.value?.concat(result.list);
+  videosData.value = videosData.value?.concat(result.list);
   loading.value = false;
 };
 
 // 参数变化
-const artistQueryChange = (tabId: string, value: string) => {
+const queryChange = (tabId: string, value: string) => {
   filters.value[tabId] = value;
-  artistsPageIndex.value = 1;
+  pageIndex.value = 1;
   loading.value = true;
-  artistsData.value = [];
-  getArtistListData();
+  videosData.value = [];
+  getListData();
 };
 
 // 加载更多
 const loadMore = () => {
-  artistsPageIndex.value++;
-  getArtistListData();
+  pageIndex.value++;
+  getListData();
 };
 
-// 参数变化
-// onBeforeRouteUpdate((to) => {
-//   // 获取歌单
-//   loading.value = true;
-//   artistsData.value = [];
-//   getArtistListData();
-// });
-
 onMounted(async () => {
-  await dataStore.getArtistFilters(props.platform);
-  dataStore.artistFilters[props.platform]?.forEach((tab) => {
+  await dataStore.getMVFilters(props.platform);
+  dataStore.mvFilters[props.platform]?.forEach((tab) => {
     filters.value[tab.id] = tab.options[0]?.value;
   });
-
-  await getArtistListData();
+  await getListData();
 });
 </script>
 
 <style lang="scss" scoped>
-.discover-artists {
+.discover-mvs {
   .menu {
     margin-top: 5px;
     .category {

@@ -85,6 +85,11 @@ const appRoutes: Array<RouteRecordRaw> = [
     name: "artists",
     component: () => import("@/views/Artists/Artists.vue"),
   },
+  {
+    path: "/videos",
+    name: "videos",
+    component: () => import("@/views/Videos/Videos.vue"),
+  },
 
   {
     path: "/radios",

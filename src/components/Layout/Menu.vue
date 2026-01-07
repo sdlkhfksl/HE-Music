@@ -121,6 +121,16 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
           }),
         },
         {
+          key: "videos",
+          link: "videos",
+          label: t("common.videos"),
+          icon: renderIcon("Video", {
+            style: {
+              transform: "translateY(-1px)",
+            },
+          }),
+        },
+        {
           key: "radios",
           link: "radios",
           label: t("common.radios"),

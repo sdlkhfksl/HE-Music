@@ -3,14 +3,14 @@ import { requestHemusic } from "@/utils/request";
 /**
  * 歌手分类列表
  */
-export const tabArtists = (
+export const filterArtists = (
   platform: string = "",
   page_index: number = 0,
   page_size: number = 50,
   filters: Record<string, string> = {},
 ) => {
   return requestHemusic({
-    url: "/v1/artist/tab/artists",
+    url: "/v1/artist/filter/artists",
     params: {
       platform,
       page_index,
@@ -21,12 +21,12 @@ export const tabArtists = (
 };
 
 /**
- * 获取歌手详情
+ * 筛选歌手
  * @param platform
  */
-export const artistTabs = (platform: string) => {
+export const artistFilters = (platform: string) => {
   return requestHemusic({
-    url: "/v1/artist/tabs",
+    url: "/v1/artist/filters",
     params: { platform },
   });
 };

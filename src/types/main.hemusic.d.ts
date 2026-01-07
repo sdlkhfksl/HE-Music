@@ -263,11 +263,6 @@ export interface SearchDefaultInfo {
   description: string;
 }
 
-export interface ArtistTabInfo {
-  id: string;
-  platform: string;
-  options: Option[];
-}
 
 export interface Option {
   value: string;
@@ -281,4 +276,10 @@ export interface RadioInfo {
   platform: string;
 
   loading: boolean;
+}
+
+export interface FilterInfo {
+  id: string;
+  platform: string;
+  options: Option[];
 }

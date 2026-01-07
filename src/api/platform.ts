@@ -60,6 +60,11 @@ export const FeatureSupportFlag = {
 
   ListRadios: 1n << 39n, // 获取电台列表
   ListRadioSongs: 1n << 40n, // 获取电台歌曲列表
+
+  FeatureSupportListArtistPhotos: 1n << 41n,
+
+  FeatureSupportListMVFilters: 1n << 42n, // 获取MV筛选列表
+  FeatureSupportListFilterMVs: 1n << 43n, // 获取筛选后的MV列表
 };
 
 // 获取发现页面

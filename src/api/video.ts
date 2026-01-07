@@ -61,3 +61,34 @@ export const allMv = (
     params: { area, type, order, limit, offset },
   });
 };
+
+/**
+ * mv分类
+ */
+export const filterMVs = (
+  platform: string = "",
+  page_index: number = 0,
+  page_size: number = 50,
+  filters: Record<string, string> = {},
+) => {
+  return requestHemusic({
+    url: "/v1/mv/filter/mvs",
+    params: {
+      platform,
+      page_index,
+      page_size,
+      filters,
+    },
+  });
+};
+
+/**
+ * 筛选mv
+ * @param platform
+ */
+export const mvFilters = (platform: string) => {
+  return requestHemusic({
+    url: "/v1/mv/filters",
+    params: { platform },
+  });
+};
