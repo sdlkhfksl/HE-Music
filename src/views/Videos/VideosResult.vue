@@ -22,12 +22,7 @@
         <n-skeleton v-for="i in 10" :key="'tag2-' + i" text :width="50" :height="30" round />
       </n-flex>
     </div>
-    <VideoList
-      :data="videosData"
-      :loading="loading"
-      :load-more="hasMore"
-      @load-more="loadMore"
-    />
+    <VideoList :data="videosData" :loading="loading" :load-more="hasMore" @load-more="loadMore" />
   </div>
 </template>
 

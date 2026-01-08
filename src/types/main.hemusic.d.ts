@@ -263,7 +263,6 @@ export interface SearchDefaultInfo {
   description: string;
 }
 
-
 export interface Option {
   value: string;
   label: string;

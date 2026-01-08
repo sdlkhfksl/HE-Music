@@ -25,6 +25,10 @@
                   <SvgIcon name="Play" />
                   <span class="num">{{ n(Number(item.play_count) || 0, "number") }}</span>
                 </div>
+                <!-- 播放量 -->
+                <div class="duration" v-if="item.duration > 0">
+                  <span class="num">{{ secondsToTime(item.duration) }}</span>
+                </div>
               </template>
               <!-- 播放按钮 -->
               <div class="play-btn" @click.stop>
@@ -90,6 +94,7 @@ import { debounce } from "lodash-es";
 import CoverMenu from "@/components/Menu/CoverMenu.vue";
 import type { CoverType, MVInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
+import { secondsToTime } from "@/utils/time";
 const { t, n } = useI18n();
 
 interface Props {
@@ -196,6 +201,15 @@ const playList = debounce(
           font-size: 16px;
           margin-right: 4px;
         }
+      }
+      .duration {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        top: 10px;
+        left: 12px;
+        color: #fff;
+        z-index: 2;
       }
       .description {
         position: absolute;
