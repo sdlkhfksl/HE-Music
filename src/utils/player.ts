@@ -114,7 +114,11 @@ class Player {
     const errorCallback = (e: Event) => {
       const playSongData = songManager.getPlaySongData();
       console.error("❌ song error:", playSongData, e);
-      this.handlePlaybackError();
+      const customEvent = e as CustomEvent<{
+          originalEvent: Event;
+          errorCode: number;
+      }>;
+      this.handlePlaybackError(customEvent.detail.errorCode);
     };
     audioManager.on("error", errorCallback);
     this.eventCallbacks.set("error", errorCallback);
@@ -313,13 +317,8 @@ class Player {
       await this.initPlayer(true, this.getSeek());
       return;
     }
-    // 其它错误：最多 3 次
-    if (this.retryInfo.count <= 3) {
-      await this.initPlayer(true, 0);
-      return;
-    }
 
-    if (this.retryInfo.total >= 15) {
+    if (this.retryInfo.count == 4 || this.retryInfo.total >= 15) {
       window.$message.error("播放错误次数过多，已停止播放");
       return;
     }
