@@ -190,13 +190,13 @@ const listScrolling = ref<boolean>(false);
 // 更多操作
 const moreOptions = computed<DropdownOption[]>(() => [
   {
-    label: "复制分享链接",
+    label: t("menu.copy_share_link"),
     key: "copy",
     show: platformStore.isFeatureSupport(platform.value, FeatureSupportFlag.BuildSourceUrl),
     props: {
       onClick: async () => {
         const { url } = await buildSourceUrl(platform.value, artistId.value, "artist");
-        copyData(url, "已复制分享链接到剪贴板");
+        copyData(url, t("menu.share_link_copied"));
       },
     },
     icon: renderIcon("Share"),

@@ -143,8 +143,8 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
         {
           key: "setting-layout",
           show: isMobile.value,
-          label: t("common.setting"),
-          icon: renderIcon("Settings", {
+          label: t("common.more"),
+          icon: renderIcon("More", {
             style: {
               transform: "translateY(-1px)",
             },

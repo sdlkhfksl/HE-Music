@@ -41,29 +41,15 @@
             >
               {{ song?.name }}
             </n-ellipsis>
+          </div>
+          <n-flex :size="4" :wrap="false" class="desc" align="center">
             <!-- 音质 -->
-            <n-tag
-              v-if="quality.name"
-              :bordered="false"
-              :type="quality.type || 'default'"
-              class="quality"
-              round
-            >
+            <n-tag v-if="quality.name" :bordered="false" :type="quality.type || 'default'" round>
               {{ quality.name }}
             </n-tag>
-            <!-- 特权 -->
-            <!--            <n-tag v-if="song.originCoverType === 1" :bordered="false" type="primary" round>-->
-            <!--              原-->
-            <!--            </n-tag>-->
-            <!--            <n-tag v-if="song.free === 1" :bordered="false" type="error" round> VIP </n-tag>-->
-            <!--            <n-tag v-if="song.free === 4" :bordered="false" type="error" round> EP </n-tag>-->
-            <!-- 云盘 -->
-            <!--            <n-tag v-if="song?.pc" :bordered="false" class="cloud" type="info" round>-->
-            <!--              <template #icon>-->
-            <!--                <SvgIcon name="Cloud" />-->
-            <!--              </template>-->
-            <!--            </n-tag>-->
-            <!-- MV -->
+            <n-tag v-if="song.original_type === 1" :bordered="false" type="primary" round>
+              原唱
+            </n-tag>
             <n-tag
               v-if="song?.mv_id && song?.mv_id != '0'"
               :bordered="false"
@@ -79,30 +65,30 @@
             >
               MV
             </n-tag>
-          </div>
-          <!-- 歌手 -->
-          <div v-if="Array.isArray(song.artists)" class="artists text-hidden">
-            <n-text
-              v-for="ar in song.artists"
-              :key="ar.id"
-              class="ar"
-              @click="openJumpArtist(song.platform, song.artists)"
+            <!-- 歌手 -->
+            <div v-if="Array.isArray(song.artists)" class="artists text-hidden">
+              <n-text
+                v-for="ar in song.artists"
+                :key="ar.id"
+                class="ar"
+                @click.stop="openJumpArtist(song.platform, song.artists)"
+              >
+                {{ ar.name }}
+              </n-text>
+            </div>
+            <!--          <div v-else-if="song.type === 'radio'" class="artists">-->
+            <!--            <n-text class="ar"> 电台节目 </n-text>-->
+            <!--          </div>-->
+            <div
+              v-else
+              class="artists text-hidden"
+              @click.stop="openJumpArtist(song.platform, song.artists)"
             >
-              {{ ar.name }}
-            </n-text>
-          </div>
-          <!--          <div v-else-if="song.type === 'radio'" class="artists">-->
-          <!--            <n-text class="ar"> 电台节目 </n-text>-->
-          <!--          </div>-->
-          <div
-            v-else
-            class="artists text-hidden"
-            @click="openJumpArtist(song.platform, song.artists)"
-          >
-            <n-text class="ar">
-              {{ song.artists || t("common.unknown_artist") }}
-            </n-text>
-          </div>
+              <n-text class="ar">
+                {{ song.artists || t("common.unknown_artist") }}
+              </n-text>
+            </div>
+          </n-flex>
           <!--别名-->
           <n-text v-if="song.subtitle" class="alia text-hidden" depth="3">
             {{ song.subtitle }}
@@ -412,55 +398,41 @@ const clickMore = (event: Event) => {
         :deep(.name-text) {
           margin-right: 6px;
         }
+      }
+      .desc {
+        margin-top: 2px;
+        font-size: 13px;
         .n-tag {
-          --n-height: 20px;
-          font-size: 12px;
+          --n-height: 18px;
+          font-size: 9px;
           cursor: pointer;
-          margin-right: 6px;
           pointer-events: none;
           &:last-child {
             margin-right: 0;
           }
         }
-        .quality {
-          font-size: 10px;
-        }
-        .cloud {
-          padding: 0 10px;
-          align-items: center;
-          justify-content: center;
-          :deep(.n-tag__icon) {
-            margin-right: 0;
-            width: 100%;
-          }
-          .n-icon {
-            font-size: 12px;
-            color: var(--n-text-color);
-          }
-        }
         .mv {
           pointer-events: auto;
         }
-      }
-      .artists {
-        margin-top: 2px;
-        font-size: 13px;
-        .ar {
-          display: inline-flex;
-          transition: opacity 0.3s;
-          opacity: 0.6;
-          cursor: pointer;
-          &::after {
-            content: "/";
-            margin: 0 4px;
-          }
-          &:last-child {
+        .artists {
+          font-size: 13px;
+          .ar {
+            display: inline-flex;
+            transition: opacity 0.3s;
+            opacity: 0.6;
+            cursor: pointer;
             &::after {
-              display: none;
+              content: "/";
+              margin: 0 4px;
             }
-          }
-          &:hover {
-            opacity: 0.8;
+            &:last-child {
+              &::after {
+                display: none;
+              }
+            }
+            &:hover {
+              opacity: 0.8;
+            }
           }
         }
       }

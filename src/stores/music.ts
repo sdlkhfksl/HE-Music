@@ -44,6 +44,7 @@ const defaultMusicData: SongInfo = {
   subtitle: "",
   links: [],
   sublist: [],
+  original_type: 0,
 };
 
 export const useMusicStore = defineStore("music", {

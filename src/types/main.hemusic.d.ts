@@ -58,6 +58,7 @@ export interface SongInfo {
   platform: string;
   cover: string;
   sublist: SongInfo[]; // 更多版本
+  original_type: number;
 
   // 以下
   path?: string;

@@ -285,6 +285,7 @@ const moreOptions = computed<DropdownOption[]>(() => [
   {
     label: t("menu.copy_share_link"),
     key: "copy",
+    show: platformStore.isFeatureSupport(platform.value, FeatureSupportFlag.BuildSourceUrl),
     props: {
       onClick: async () => {
         const { url } = await buildSourceUrl(platform.value, playlistId.value, "playlist");
