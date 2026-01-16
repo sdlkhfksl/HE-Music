@@ -278,7 +278,14 @@ onMounted(() => {
       padding: 0 60px;
     }
     .n-skeleton {
-      background-color: rgba(var(--main-cover-color), 0.08);
+      background: rgba(var(--main-cover-color), 0.08)
+        linear-gradient(
+          90deg,
+          rgba(var(--main-cover-color), 0.08) 25%,
+          rgba(var(--main-cover-color), 0.14) 37%,
+          rgba(var(--main-cover-color), 0.08) 63%
+        );
+      background-size: 400% 100%;
     }
   }
   .comment-list {

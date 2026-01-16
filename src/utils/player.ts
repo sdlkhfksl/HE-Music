@@ -115,8 +115,8 @@ class Player {
       const playSongData = songManager.getPlaySongData();
       console.error("❌ song error:", playSongData, e);
       const customEvent = e as CustomEvent<{
-          originalEvent: Event;
-          errorCode: number;
+        originalEvent: Event;
+        errorCode: number;
       }>;
       this.handlePlaybackError(customEvent.detail.errorCode);
     };

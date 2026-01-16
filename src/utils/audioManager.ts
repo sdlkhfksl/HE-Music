@@ -237,6 +237,7 @@ class AudioManager {
    */
   public setRate(value: number) {
     if (this.audioElement) {
+      this.audioElement.defaultPlaybackRate = value;
       this.audioElement.playbackRate = value;
     }
   }
