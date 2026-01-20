@@ -1072,9 +1072,9 @@ class Player {
           musicStore.radio.platform,
           musicStore.radio.pageIndex || 1,
         );
-        console.log(`🌐 radio :`, result.songs);
+        console.log(`🌐 radio :`, result.list);
         musicStore.radio.playIndex = 0;
-        musicStore.radio.list = result.songs;
+        musicStore.radio.list = result.list;
         musicStore.radio.pageIndex = result.page_index || musicStore.radio.pageIndex;
       };
       // 若为空
