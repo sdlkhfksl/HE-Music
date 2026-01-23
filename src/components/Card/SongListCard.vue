@@ -40,11 +40,11 @@
       </div>
       <!-- 信息 -->
       <div v-if="size === 'small'" class="info">
-        <n-text v-if="typeof title === 'string'" class="name">
+        <n-text v-if="typeof title === 'string'" class="name text-hidden">
           {{ title }}
         </n-text>
-        <component :is="title" v-else />
-        <n-text v-if="description" depth="3" class="desc">
+        <component v-else :is="title" />
+        <n-text v-if="description" depth="3" class="desc text-hidden">
           {{ description }}
         </n-text>
       </div>

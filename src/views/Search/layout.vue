@@ -180,7 +180,6 @@ onBeforeRouteUpdate((to) => {
     margin-top: 12px;
     margin-bottom: 12px;
     font-size: 22px;
-    padding: 0 16px;
     .keyword {
       font-size: 36px;
       font-weight: bold;
@@ -191,13 +190,21 @@ onBeforeRouteUpdate((to) => {
     .n-text {
       display: inline-block;
     }
+
+    @media (max-width: 512px) {
+      margin-top: 5px;
+      margin-bottom: 5px;
+      .n-text {
+        font-size: 16px;
+      }
+      .keyword {
+        font-size: 24px;
+      }
+    }
   }
   .tabs {
     width: 100%;
     overflow: hidden;
-    :deep(.n-tabs-nav) {
-      padding: 0 16px;
-    }
     :deep(.n-tabs-pane-wrapper) {
       overflow: hidden;
     }

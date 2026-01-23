@@ -46,14 +46,14 @@
               <n-text v-else class="title">
                 {{ t("common.title") }}
               </n-text>
-              <n-text v-if="!hiddenAlbum" class="album">
+              <n-text v-if="!hiddenAlbum && !isSmallScreen" class="album">
                 {{ t("common.album") }}
               </n-text>
-              <n-text class="actions" />
-              <n-text class="meta">
+              <n-text class="actions">{{ t("common.operation") }}</n-text>
+              <n-text v-if="!isSmallScreen" class="meta">
                 {{ t("common.duration") }}
               </n-text>
-              <n-text v-if="!hiddenSize" class="meta">
+              <n-text v-if="!hiddenSize && !isSmallScreen" class="meta">
                 {{ t("common.size") }}
               </n-text>
             </div>
@@ -77,6 +77,7 @@
               @click-more="
                 songListMenuRef?.openDropdown($event, listData, itemData, index, playlist)
               "
+              @show-menu="handleShowMenu($event, itemData, index)"
             />
           </template>
           <!-- 加载更多 -->
@@ -93,6 +94,7 @@
       </Transition>
       <!-- 右键菜单 -->
       <SongListMenu ref="songListMenuRef" @remove-song="removeSong" />
+      <MobileSongMenu ref="mobileSongMenuRef" @remove-song="removeSong" />
       <!-- 列表操作 -->
       <Teleport to="body">
         <Transition name="fade" mode="out-in">
@@ -134,6 +136,8 @@ import SongListMenu from "@/components/Menu/SongListMenu.vue";
 import { usePlayer } from "@/utils/player";
 import type { SongInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
+import { useMobile } from "@/composables/useMobile";
+import MobileSongMenu from "@/components/Menu/MobileSongMenu.vue";
 const { t } = useI18n();
 
 const props = withDefaults(
@@ -192,6 +196,8 @@ const player = usePlayer();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 
+const { isSmallScreen } = useMobile();
+
 // 列表状态
 const offset = ref<number>(0);
 const scrollTop = ref<number>(0);
@@ -205,6 +211,14 @@ const floatToolShow = ref<boolean>(true);
 
 // 右键菜单
 const songListMenuRef = ref<InstanceType<typeof SongListMenu> | null>(null);
+const mobileSongMenuRef = ref<InstanceType<typeof MobileSongMenu> | null>(null);
+const handleShowMenu = (e: MouseEvent, song: SongInfo, index: number) => {
+  if (isSmallScreen.value) {
+    mobileSongMenuRef.value?.open(song, index, props.playlist);
+  } else {
+    songListMenuRef.value?.openDropdown(e, listData.value, song, index, props.playlist);
+  }
+};
 
 // 列表数据
 const listData = computed<SongInfo[]>(() => {
@@ -357,9 +371,6 @@ onBeforeUnmount(() => {
       min-width: 40px;
       font-weight: bold;
       margin-right: 12px;
-      @media (max-width: 768px) {
-        display: none;
-      }
     }
     .title {
       position: relative;
@@ -400,9 +411,6 @@ onBeforeUnmount(() => {
     .album {
       flex: 1;
       padding-right: 20px;
-      @media (max-width: 768px) {
-        display: none;
-      }
     }
     .actions {
       display: flex;
@@ -418,9 +426,6 @@ onBeforeUnmount(() => {
       }
       &.date {
         width: 80px;
-      }
-      @media (max-width: 768px) {
-        display: none;
       }
     }
   }

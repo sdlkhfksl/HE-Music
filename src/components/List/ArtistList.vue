@@ -1,10 +1,11 @@
 <template>
   <Transition name="fade" mode="out-in">
     <div v-if="data.length > 0" class="artist-list">
-      <n-grid :cols="cols" x-gap="20" y-gap="20">
-        <n-gi
+      <div class="artist-grid">
+        <div
           v-for="(item, index) in data"
           :key="index"
+          class="artist-item"
           @click="
             router.push({
               name: 'artist',
@@ -12,50 +13,48 @@
             })
           "
         >
-          <div class="artist-item">
-            <!-- 封面 -->
-            <div class="cover">
-              <s-image :src="item.cover" default-src="/images/artist.jpg?asset" class="cover-img" />
-              <!-- 封面背板 -->
-              <s-image
-                :src="item.cover"
-                default-src="/images/artist.jpg?asset"
-                class="cover-shadow"
-              />
-              <!-- 图标 -->
-              <SvgIcon name="Artist" />
-            </div>
-            <!-- 信息 -->
-            <div class="cover-data">
-              <n-text class="name text-hidden">
-                {{ item.name }}
-              </n-text>
-              <!-- 数量 -->
+          <!-- 封面 -->
+          <div class="cover">
+            <s-image :src="item.cover" default-src="/images/artist.jpg?asset" class="cover-img" />
+            <!-- 封面背板 -->
+            <s-image
+              :src="item.cover"
+              default-src="/images/artist.jpg?asset"
+              class="cover-shadow"
+            />
+            <!-- 图标 -->
+            <SvgIcon name="Artist" />
+          </div>
+          <!-- 信息 -->
+          <div class="cover-data">
+            <n-text class="name text-hidden">
+              {{ item.name }}
+            </n-text>
+            <!-- 数量 -->
 
-              <div v-if="!hiddenItem" class="item">
-                <div v-if="item.song_count" class="num">
-                  <SvgIcon name="Music" :depth="3" />
-                  <n-text class="num" :depth="3">
-                    {{ item.song_count }}
-                  </n-text>
-                </div>
-                <div v-if="item.album_count" class="num">
-                  <SvgIcon name="Album" :depth="3" />
-                  <n-text class="num" :depth="3">
-                    {{ item.album_count }}
-                  </n-text>
-                </div>
-                <div v-if="item.mv_count" class="num">
-                  <SvgIcon name="Video" :depth="3" />
-                  <n-text class="num" :depth="3">
-                    {{ item.mv_count }}
-                  </n-text>
-                </div>
+            <div v-if="!hiddenItem" class="item">
+              <div v-if="item.song_count" class="num">
+                <SvgIcon name="Music" :depth="3" />
+                <n-text class="num" :depth="3">
+                  {{ item.song_count }}
+                </n-text>
+              </div>
+              <div v-if="item.album_count" class="num">
+                <SvgIcon name="Album" :depth="3" />
+                <n-text class="num" :depth="3">
+                  {{ item.album_count }}
+                </n-text>
+              </div>
+              <div v-if="item.mv_count" class="num">
+                <SvgIcon name="Video" :depth="3" />
+                <n-text class="num" :depth="3">
+                  {{ item.mv_count }}
+                </n-text>
               </div>
             </div>
           </div>
-        </n-gi>
-      </n-grid>
+        </div>
+      </div>
       <!-- 加载更多 -->
       <n-flex v-if="loadMore" class="load-more" justify="center">
         <n-button :loading="loading" size="large" strong secondary round @click="emit('loadMore')">
@@ -64,18 +63,16 @@
       </n-flex>
     </div>
     <div v-else-if="loading" class="artist-list">
-      <n-grid :cols="cols" x-gap="20" y-gap="20">
-        <n-gi v-for="item in 50" :key="item">
-          <div class="artist-item">
-            <div class="cover">
-              <n-skeleton class="cover-img" />
-            </div>
-            <div class="cover-data">
-              <n-skeleton text round :repeat="2" />
-            </div>
+      <div class="artist-grid">
+        <div v-for="item in 50" :key="item" class="artist-item">
+          <div class="cover">
+            <n-skeleton class="cover-img" />
           </div>
-        </n-gi>
-      </n-grid>
+          <div class="cover-data">
+            <n-skeleton text round :repeat="2" />
+          </div>
+        </div>
+      </div>
     </div>
     <!-- 空列表 -->
     <n-empty v-else :description="t('common.list_empty')" size="large" />
@@ -87,18 +84,13 @@ import type { ArtistInfo, UserFavouriteArtistInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
-interface Props {
+defineProps<{
   data: ArtistInfo[] | UserFavouriteArtistInfo[];
-  cols?: string;
   loadMore?: boolean;
   loading?: boolean;
   loadingText?: string;
   hiddenItem?: boolean;
-}
-
-withDefaults(defineProps<Props>(), {
-  cols: "3 600:4 800:5 900:6 1200:7 1400:8",
-});
+}>();
 
 const emit = defineEmits<{
   // 加载更多
@@ -112,6 +104,15 @@ const router = useRouter();
 .artist-list {
   width: 100%;
   padding: 20px 4px;
+  .artist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 20px;
+    @media (max-width: 600px) {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+  }
   .artist-item {
     position: relative;
     height: auto;

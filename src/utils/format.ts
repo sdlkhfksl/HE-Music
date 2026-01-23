@@ -242,7 +242,7 @@ const getCoverSizeUrl = (url: string, size: number | null = null) => {
   }
 };
 
-export const getSizeCover = (song: SongInfo, size = 300) => {
+export const getSizeCover = (song: SongInfo | null, size = 300) => {
   if (!song) {
     return "/images/song.jpg?asset";
   }

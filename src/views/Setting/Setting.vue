@@ -146,10 +146,6 @@ const tabChange = (key: SettingType) => {
         &.n-switch {
           width: max-content;
         }
-        @media (max-width: 768px) {
-          width: 140px;
-          min-width: 140px;
-        }
       }
     }
   }

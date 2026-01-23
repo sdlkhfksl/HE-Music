@@ -205,6 +205,7 @@ import { usePlayer } from "@/utils/player";
 import { FeatureSupportFlag } from "@/api/platform";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
+import { useMobile } from "@/composables/useMobile";
 
 const { t } = useI18n();
 const player = usePlayer();
@@ -214,6 +215,23 @@ const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 const platformStore = usePlatformStore();
+
+const playerRef = ref<HTMLElement | null>(null);
+const { isSmallScreen } = useMobile();
+
+// 触摸滑动切换歌曲
+const { direction } = useSwipe(playerRef, {
+  threshold: 50,
+  onSwipeEnd: () => {
+    if (direction.value === "left") {
+      // 左滑
+      player.nextOrPrev("next");
+    } else if (direction.value === "right") {
+      // 右滑
+      player.nextOrPrev("prev");
+    }
+  },
+});
 
 // 歌曲更多操作
 const songMoreOptions = computed<DropdownOption[]>(() => {
@@ -263,6 +281,7 @@ const songMoreOptions = computed<DropdownOption[]>(() => {
       label: t("menu.view_comment"),
       show:
         !isLocal &&
+        !isSmallScreen.value &&
         platformStore.isFeatureSupport(song.platform, FeatureSupportFlag.GetCommentList),
       props: {
         onClick: () => {
@@ -318,10 +337,6 @@ const instantLyrics = computed(() => {
   align-items: center;
   z-index: 10;
   transition: bottom 0.3s;
-  @media (max-width: 768px) {
-    grid-template-columns: auto 60px;
-    padding: 0 5px;
-  }
   &.show {
     bottom: 0;
   }
@@ -403,9 +418,6 @@ const instantLyrics = computed(() => {
           width: auto;
           min-width: 0;
           transition: color 0.3s;
-          @media (max-width: 768px) {
-            font-size: 12px;
-          }
         }
         .n-tag {
           margin-left: 4px;
@@ -511,10 +523,6 @@ const instantLyrics = computed(() => {
         transform: scale(1);
       }
     }
-
-    @media (max-width: 768px) {
-      display: none;
-    }
   }
   .play-menu {
     margin-left: auto;
@@ -525,9 +533,6 @@ const instantLyrics = computed(() => {
       .n-tag {
         justify-content: center;
         font-size: 12px;
-      }
-      @media (max-width: 768px) {
-        display: none !important;
       }
     }
     .time {
@@ -544,6 +549,22 @@ const instantLyrics = computed(() => {
             margin: 0 4px;
           }
         }
+      }
+    }
+  }
+  @media (max-width: 1024px) {
+    .play-menu {
+      .time-container {
+        display: none !important;
+      }
+    }
+  }
+  @media (max-width: 810px) {
+    grid-template-columns: 1fr auto auto;
+    .play-control {
+      margin: 0 0 0 12px;
+      .play-icon {
+        display: none;
       }
     }
   }

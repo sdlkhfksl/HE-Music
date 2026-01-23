@@ -1,66 +1,66 @@
 <template>
   <Transition name="fade" mode="out-in">
     <div v-if="data.length > 0" class="cover-list video">
-      <n-grid :cols="cols" x-gap="20" y-gap="20">
-        <n-gi v-for="(item, index) in data" :key="index">
-          <div
-            class="cover-item"
-            @click="goDetail(item)"
-            @contextmenu="coverMenuRef?.openDropdown($event, item, 'video')"
-          >
-            <!-- 封面 -->
-            <div class="cover">
-              <s-image
-                :key="item.cover"
-                :src="item.cover"
-                default-src="/images/video.jpg?asset"
-                class="cover-img"
-                once
-              />
-              <template v-if="item.play_count && Number(item.play_count) > 0">
-                <!-- 遮罩 -->
-                <div class="cover-mask" />
-                <!-- 播放量 -->
-                <div class="play-count">
-                  <SvgIcon name="Play" />
-                  <span class="num">{{ n(Number(item.play_count) || 0, "number") }}</span>
-                </div>
-                <!-- 播放量 -->
-                <div class="duration" v-if="item.duration > 0">
-                  <span class="num">{{ secondsToTime(item.duration) }}</span>
-                </div>
-              </template>
-              <!-- 播放按钮 -->
-              <div class="play-btn" @click.stop>
-                <n-button
-                  :focusable="false"
-                  secondary
-                  circle
-                  class="play"
-                  @click.stop="playList(item)"
-                >
-                  <template #icon>
-                    <SvgIcon :size="32" :name="'Play'" />
-                  </template>
-                </n-button>
+      <div class="cover-grid">
+        <div
+          v-for="(item, index) in data"
+          :key="index"
+          class="cover-item"
+          @click="goDetail(item)"
+          @contextmenu="coverMenuRef?.openDropdown($event, item, 'video')"
+        >
+          <!-- 封面 -->
+          <div class="cover">
+            <s-image
+              :key="item.cover"
+              :src="item.cover"
+              default-src="/images/video.jpg?asset"
+              class="cover-img"
+              once
+            />
+            <template v-if="item.play_count && Number(item.play_count) > 0">
+              <!-- 遮罩 -->
+              <div class="cover-mask" />
+              <!-- 播放量 -->
+              <div class="play-count">
+                <SvgIcon name="Play" />
+                <span class="num">{{ n(Number(item.play_count) || 0, "number") }}</span>
               </div>
-            </div>
-            <!-- 信息 -->
-            <div class="cover-data">
-              <n-text class="name text-hidden">
-                {{ item.name }}
-              </n-text>
-              <template v-if="item.creator">
-                <div class="artists text-hidden">
-                  <n-text class="ar">
-                    {{ item.creator || "未知艺术家" }}
-                  </n-text>
-                </div>
-              </template>
+              <!-- 播放量 -->
+              <div class="duration" v-if="item.duration > 0">
+                <span class="num">{{ secondsToTime(item.duration) }}</span>
+              </div>
+            </template>
+            <!-- 播放按钮 -->
+            <div class="play-btn" @click.stop>
+              <n-button
+                :focusable="false"
+                secondary
+                circle
+                class="play"
+                @click.stop="playList(item)"
+              >
+                <template #icon>
+                  <SvgIcon :size="32" :name="'Play'" />
+                </template>
+              </n-button>
             </div>
           </div>
-        </n-gi>
-      </n-grid>
+          <!-- 信息 -->
+          <div class="cover-data">
+            <n-text class="name text-hidden">
+              {{ item.name }}
+            </n-text>
+            <template v-if="item.creator">
+              <div class="artists text-hidden">
+                <n-text class="ar">
+                  {{ item.creator || "未知艺术家" }}
+                </n-text>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
       <!-- 加载更多 -->
       <n-flex v-if="loadMore" class="load-more" justify="center">
         <n-button :loading="loading" size="large" strong secondary round @click="emit('loadMore')">
@@ -71,18 +71,16 @@
       <CoverMenu ref="coverMenuRef" @to-play="playList" />
     </div>
     <div v-else-if="loading" class="cover-list loading video">
-      <n-grid :cols="cols" x-gap="20" y-gap="20">
-        <n-gi v-for="item in loadingNum || 50" :key="item">
-          <div class="cover-item">
-            <div class="cover">
-              <n-skeleton class="cover-img" />
-            </div>
-            <div class="cover-data">
-              <n-skeleton text round :repeat="2" />
-            </div>
+      <div class="cover-grid">
+        <div v-for="item in loadingNum || 50" :key="item" class="cover-item">
+          <div class="cover">
+            <n-skeleton class="cover-img" />
           </div>
-        </n-gi>
-      </n-grid>
+          <div class="cover-data">
+            <n-skeleton text round :repeat="2" />
+          </div>
+        </div>
+      </div>
     </div>
     <!-- 空列表 -->
     <n-empty v-else :description="t('common.list_empty')" size="large" />
@@ -97,18 +95,14 @@ import { useI18n } from "vue-i18n";
 import { secondsToTime } from "@/utils/time";
 const { t, n } = useI18n();
 
-interface Props {
+defineProps<{
   data: MVInfo[];
   cols?: string;
   loadMore?: boolean;
   loading?: boolean;
   loadingNum?: number;
   loadingText?: string;
-}
-
-withDefaults(defineProps<Props>(), {
-  cols: "2 600:2 800:3 900:4 1200:5 1400:6",
-});
+}>();
 
 const emit = defineEmits<{
   // 加载更多
@@ -146,6 +140,14 @@ const playList = debounce(
 .cover-list {
   width: 100%;
   padding: 20px 4px;
+  .cover-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    @media (max-width: 600px) {
+      gap: 12px;
+    }
+  }
   .cover-item {
     position: relative;
     height: auto;
@@ -161,7 +163,7 @@ const playList = debounce(
       align-items: center;
       justify-content: center;
       width: 100%;
-      aspect-ratio: 1 / 1;
+      aspect-ratio: 16/9;
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0px 0px 4px 2px rgba(0, 0, 0, 0.1);
@@ -174,6 +176,7 @@ const playList = debounce(
         // opacity: 0;
         transition: opacity 0.35s ease-in-out;
       }
+
       .cover-img {
         transition:
           filter 0.3s,
@@ -319,13 +322,6 @@ const playList = debounce(
   }
   .load-more {
     margin: 20px 0;
-  }
-  &.video {
-    .cover-item {
-      .cover {
-        aspect-ratio: 16/9;
-      }
-    }
   }
   &.loading {
     .cover {

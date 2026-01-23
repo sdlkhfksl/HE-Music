@@ -11,87 +11,102 @@
       >
         <!-- 背景 -->
         <PlayerBackground />
-        <!-- 独立歌词 -->
-        <Transition name="fade" mode="out-in">
-          <div v-if="isShowComment" :key="instantLyrics.content" class="lrc-instant">
-            <span class="lrc">{{ instantLyrics.content }}</span>
-            <span v-if="instantLyrics.tran" class="lrc-tran">{{ instantLyrics.tran }}</span>
-          </div>
-        </Transition>
-        <!-- 菜单 -->
-        <PlayerMenu @mouseenter.stop="stopHide" @mouseleave.stop="playerMove" />
-        <!-- 主内容 -->
-        <Transition name="zoom" mode="out-in">
-          <div
-            :key="playerContentKey"
-            :class="[
-              'player-content',
-              {
-                'no-lrc': noLrc,
-                pure: statusStore.pureLyricMode && musicStore.isHasLrc,
-              },
-            ]"
-            @mousemove="playerMove"
-          >
-            <Transition name="zoom">
-              <div
-                v-if="!pureLyricMode"
-                :key="`${musicStore.playSong.id}-${musicStore.playSong.platform}`"
-                class="content-left"
-              >
-                <!-- 封面 -->
-                <PlayerCover />
-                <!-- 数据 -->
-                <PlayerData :center="playerDataCenter" />
-              </div>
-            </Transition>
-            <!-- 歌词 -->
-            <div class="content-right">
-              <!-- 数据 -->
-              <PlayerData
-                v-if="statusStore.pureLyricMode && musicStore.isHasLrc"
-                :center="statusStore.pureLyricMode"
-                :light="pureLyricMode"
-              />
-              <!-- 歌词 -->
-              <MainAMLyric v-if="settingStore.useAMLyrics" />
-              <MainLyric v-else />
+        <!-- 移动端 -->
+        <FullPlayerMobile v-if="isTablet" />
+        <!-- 桌面端 -->
+        <template v-else>
+          <!-- 独立歌词 -->
+          <Transition name="fade" mode="out-in">
+            <div
+              v-if="isShowComment && !statusStore.pureLyricMode"
+              :key="instantLyrics.content"
+              class="lrc-instant"
+            >
+              <span class="lrc">{{ instantLyrics.content }}</span>
+              <span v-if="instantLyrics.tran" class="lrc-tran">{{ instantLyrics.tran }}</span>
             </div>
-          </div>
-        </Transition>
-        <!-- 评论 -->
-        <Transition name="zoom" mode="out-in">
-          <PlayerComment v-show="isShowComment && !statusStore.pureLyricMode" />
-        </Transition>
-        <!-- 控制中心 -->
-        <PlayerControlMobile
-          v-if="isMobile"
-          @mouseenter.stop="stopHide"
-          @mouseleave.stop="playerMove"
-        />
-        <PlayerControl v-else @mouseenter.stop="stopHide" @mouseleave.stop="playerMove" />
-        <!-- 音乐频谱 -->
-        <PlayerSpectrum
-          v-if="isElectron && settingStore.showSpectrums"
-          :color="`rgb(${mainCoverColor})`"
-          :show="!statusStore.playerMetaShow"
-          :height="60"
-        />
+          </Transition>
+          <!-- 菜单 -->
+          <PlayerMenu @mouseenter.stop="stopHide" @mouseleave.stop="playerMove" />
+          <!-- 主内容 -->
+          <Transition name="zoom" mode="out-in">
+            <div
+              :key="playerContentKey"
+              :class="[
+                'player-content',
+                {
+                  'no-lrc': noLrc,
+                  pure: statusStore.pureLyricMode && musicStore.isHasLrc,
+                },
+              ]"
+              @mousemove="playerMove"
+            >
+              <Transition name="zoom">
+                <div
+                  v-if="!pureLyricMode"
+                  :key="musicStore.playSong.id"
+                  class="content-left"
+                  :style="{
+                    width: `50%`,
+                    minWidth: `50%`,
+                  }"
+                >
+                  <!-- 封面 -->
+                  <PlayerCover />
+                  <!-- 数据 -->
+                  <PlayerData :center="playerDataCenter" />
+                </div>
+              </Transition>
+              <!-- 歌词 -->
+              <div
+                class="content-right"
+                :style="{
+                  width: `50%`,
+                  minWidth: `50%`,
+                }"
+              >
+                <!-- 数据 -->
+                <PlayerData
+                  v-if="statusStore.pureLyricMode && musicStore.isHasLrc"
+                  :center="statusStore.pureLyricMode"
+                  :light="pureLyricMode"
+                />
+                <!-- 歌词 -->
+                <PlayerLyric />
+              </div>
+            </div>
+          </Transition>
+          <!-- 评论 -->
+          <Transition name="zoom" mode="out-in">
+            <PlayerComment v-show="isShowComment && !statusStore.pureLyricMode" />
+          </Transition>
+          <!-- 控制中心 -->
+          <PlayerControl @mouseenter.stop="stopHide" @mouseleave.stop="playerMove" />
+          <!-- 音乐频谱 -->
+          <PlayerSpectrum
+            v-if="settingStore.showSpectrums"
+            :color="statusStore.mainColor ? `rgb(${statusStore.mainColor})` : 'rgb(239 239 239)'"
+            :show="!statusStore.playerMetaShow"
+            :height="60"
+          />
+        </template>
       </div>
     </Transition>
   </Teleport>
 </template>
 
 <script setup lang="ts">
-import { useMusicStore, usePlatformStore, useSettingStore, useStatusStore } from "@/stores";
-import { isElectron, isMobile } from "@/utils/env";
+import { useMobile } from "@/composables/useMobile";
+import { useStatusStore, useMusicStore, useSettingStore, usePlatformStore } from "@/stores";
+import { isElectron } from "@/utils/env";
 import { FeatureSupportFlag } from "@/api/platform";
-import PlayerControlMobile from "@/components/Player/PlayerControlMobile.vue";
 
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 const platformStore = usePlatformStore();
+
+const { isTablet } = useMobile();
 
 /** 封面主颜色 */
 const mainCoverColor = useCssVar("--main-cover-color", document.documentElement);
@@ -231,7 +246,7 @@ onBeforeUnmount(() => {
     }
   }
   .player-content {
-    position: relative;
+    position: absolute;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -246,14 +261,13 @@ onBeforeUnmount(() => {
       position: absolute;
       left: 0;
       flex: 1;
-      min-width: 50%;
-      width: 50%;
       height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       transition:
+        width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
         opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
         transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -262,11 +276,11 @@ onBeforeUnmount(() => {
       right: 0;
       flex: 1;
       height: 100%;
-      width: 50%;
-      max-width: 50%;
       display: flex;
       flex-direction: column;
-      transition: opacity 0.3s;
+      transition:
+        width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
       transition-delay: 0.5s;
       .player-data {
         margin-top: 0;
@@ -276,13 +290,14 @@ onBeforeUnmount(() => {
     &.pure {
       .content-right {
         align-items: center;
-        width: 100%;
-        max-width: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
       }
     }
     // 无歌词
     &.no-lrc {
       .content-left {
+        width: 50% !important;
         transform: translateX(50%);
       }
       .content-right {
@@ -290,37 +305,11 @@ onBeforeUnmount(() => {
         pointer-events: none;
       }
     }
-
-    @media (max-width: 768px) {
-      .content-right {
-        display: none;
-      }
-      .content-left {
-        width: 100%;
-        align-items: center;
-      }
-
-      &.pure {
-        .content-right {
-          align-items: center;
-          max-width: 100%;
-          display: flex;
-        }
-        :deep(.n-scrollbar-content) {
-          padding: 0 5px;
-        }
-      }
-      &.no-lrc {
-        .content-left {
-          width: 50%;
-        }
-      }
-    }
   }
   &.show-comment {
     .player-content {
       &:not(.pure) {
-        transform: scale(0.8);
+        transform: scale(0.95);
         opacity: 0;
       }
     }

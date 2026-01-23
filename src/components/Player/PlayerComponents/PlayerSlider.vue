@@ -85,5 +85,27 @@ const formatTooltip = (value: number) => {
       }
     }
   }
+  :deep(.n-slider-handles) {
+    .n-slider-handle {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+  }
+  &:hover,
+  &.drag {
+    :deep(.n-slider-handles) {
+      .n-slider-handle {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+  &.player {
+    --n-rail-color: rgba(var(--main-cover-color), 0.14);
+    --n-rail-color-hover: rgba(var(--main-cover-color), 0.3);
+    --n-fill-color: rgb(var(--main-cover-color));
+    --n-handle-color: rgb(var(--main-cover-color));
+    --n-fill-color-hover: rgb(var(--main-cover-color));
+  }
 }
 </style>

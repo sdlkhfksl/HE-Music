@@ -16,6 +16,7 @@ interface IExtendedAudioContext extends AudioContext {
  */
 export type AudioEventType =
   | "play"
+  | "playing"
   | "pause"
   | "ended"
   | "timeupdate"

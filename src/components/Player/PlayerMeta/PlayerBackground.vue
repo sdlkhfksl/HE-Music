@@ -24,6 +24,7 @@
         :fps="settingStore.playerBackgroundFps ?? 60"
         :flowSpeed="settingStore.playerBackgroundFlowSpeed ?? 4"
         :hasLyric="musicStore.isHasLrc"
+        :renderScale="0.5"
       />
     </Transition>
   </div>
@@ -31,7 +32,6 @@
 
 <script setup lang="ts">
 import { useMusicStore, useSettingStore } from "@/stores";
-import BackgroundRender from "../Special/BackgroundRender.vue";
 
 const musicStore = useMusicStore();
 const settingStore = useSettingStore();

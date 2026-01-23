@@ -1,32 +1,20 @@
 <template>
-  <n-flex :size="8" align="center" class="right-menu" :wrap="false">
+  <n-flex :size="8" align="center" class="right-menu">
+    <n-badge v-if="isElectron" value="ON" :show="statusStore.showDesktopLyric">
+      <div class="menu-icon hidden" @click.stop="player.toggleDesktopLyric()">
+        <SvgIcon name="DesktopLyric2" :depth="statusStore.showDesktopLyric ? 1 : 3" />
+      </div>
+    </n-badge>
     <!-- 音质切换 -->
     <n-dropdown
-      :options="qualityOptions"
+      :options="getQualityMenuOptions(musicStore.playSong)"
       :show-arrow="true"
       :disabled="musicStore.isLocalSong"
       @select="(quality) => player.changeQuality(quality)"
       :class="{ player: statusStore.showFullPlayer }"
     >
-      <div class="menu-icon quality-selector">
+      <div class="menu-icon quality-selector hidden">
         <span class="current-quality">{{ statusStore.playQuality }}</span>
-      </div>
-    </n-dropdown>
-
-    <n-badge v-if="isElectron" value="ON" :show="statusStore.showDesktopLyric">
-      <div class="menu-icon" @click.stop="player.toggleDesktopLyric">
-        <SvgIcon name="DesktopLyric2" :depth="statusStore.showDesktopLyric ? 1 : 3" />
-      </div>
-    </n-badge>
-
-    <!-- 其他控制 -->
-    <n-dropdown
-      :options="controlsOptions"
-      :show-arrow="false"
-      :class="{ player: statusStore.showFullPlayer }"
-    >
-      <div class="menu-icon controls">
-        <SvgIcon name="Controls" />
       </div>
     </n-dropdown>
     <!-- 播放模式 -->
@@ -37,22 +25,30 @@
       :class="{ player: statusStore.showFullPlayer }"
       @select="(mode) => player.togglePlayMode(mode)"
     >
-      <div class="menu-icon play-mode" @click.stop="player.togglePlayMode(false)">
+      <div class="menu-icon play-mode hidden" @click.stop="player.togglePlayMode(false)">
         <SvgIcon :name="statusStore.playModeIcon" />
       </div>
     </n-dropdown>
-    <!-- 音量调节 -->
+
+    <!-- 其他控制 -->
+    <n-dropdown
+      :options="controlsOptions"
+      :show-arrow="false"
+      :class="{ player: statusStore.showFullPlayer }"
+      @select="handleControls"
+    >
+      <div class="menu-icon hidden">
+        <SvgIcon name="Controls" />
+      </div>
+    </n-dropdown>
+    <!-- 音量 -->
     <n-popover
       :show-arrow="false"
       :style="{ padding: 0 }"
       :class="{ player: statusStore.showFullPlayer }"
     >
       <template #trigger>
-        <div
-          class="menu-icon volume-mute"
-          @click.stop="player.toggleMute"
-          @wheel="player.setVolume"
-        >
+        <div class="menu-icon hidden" @click.stop="player.toggleMute" @wheel="player.setVolume">
           <SvgIcon :name="statusStore.playVolumeIcon" />
         </div>
       </template>
@@ -66,40 +62,17 @@
           vertical
           @update:value="(val: number) => player.setVolume(val)"
         />
-        <n-text class="slider-num">{{ statusStore.playVolumePercent }}%</n-text>
+        <n-text class="slider-num hidden">{{ statusStore.playVolumePercent }}%</n-text>
       </div>
     </n-popover>
-
-    <n-button
-      :loading="statusStore.playLoading"
-      :focusable="false"
-      :keyboard="false"
-      class="play-pause"
-      type="primary"
-      strong
-      secondary
-      circle
-      @click.stop="player.playOrPause()"
-    >
-      <template #icon>
-        <Transition name="fade" mode="out-in">
-          <SvgIcon
-            :key="statusStore.playStatus ? 'Pause' : 'Play'"
-            :name="statusStore.playStatus ? 'Pause' : 'Play'"
-            :size="28"
-          />
-        </Transition>
-      </template>
-    </n-button>
-
     <!-- 播放列表 -->
     <n-badge
       v-if="!statusStore.radioMode"
       :value="dataStore.playList?.length ?? 0"
-      :show="settingStore.showPlaylistCount && !isMobile"
+      :show="settingStore.showPlaylistCount"
       :max="9999"
       :style="{
-        marginRight: !isMobile && settingStore.showPlaylistCount ? '12px' : null,
+        marginRight: settingStore.showPlaylistCount ? '12px' : null,
       }"
     >
       <div class="menu-icon" @click.stop="statusStore.playListShow = !statusStore.playListShow">
@@ -110,28 +83,24 @@
 </template>
 
 <script setup lang="ts">
-import type { DropdownOption } from "naive-ui";
-import {
-  useStatusStore,
-  useDataStore,
-  useSettingStore,
-  useMusicStore,
-  usePlatformStore,
-} from "@/stores";
-import { openAutoClose, openChangeRate, openEqualizer } from "@/utils/modal";
-import { isElectron, isMobile } from "@/utils/env";
+import { useDataStore, useMusicStore, useSettingStore, useStatusStore } from "@/stores";
+import { isElectron } from "@/utils/env";
 import { renderIcon } from "@/utils/helper";
+import { openAutoClose, openChangeRate, openEqualizer } from "@/utils/modal";
+import type { DropdownOption } from "naive-ui";
 import { usePlayer } from "@/utils/player";
 import { useI18n } from "vue-i18n";
+import { useSongMenu } from "@/composables/useSongMenu";
+
 const { t } = useI18n();
 
-const player = usePlayer();
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 const musicStore = useMusicStore();
-const platformStore = usePlatformStore();
-// 播放模式数据
+const player = usePlayer();
+
+const { getQualityMenuOptions } = useSongMenu();
 const playModeOptions = computed(() => [
   {
     label: t("common.play_mode_repeat"),
@@ -150,37 +119,12 @@ const playModeOptions = computed(() => [
   },
 ]);
 
-// 音质选项
-const qualityOptions = computed(() => {
-  if (musicStore.isLocalSong) {
-    return [
-      {
-        label: musicStore.playSong?.quality,
-        key: musicStore.playSong?.quality,
-      },
-    ];
-  }
-  return musicStore.playSong?.links?.map((item): DropdownOption => {
-    const desc = platformStore.getPlatformQualityDescription(
-      musicStore.playSong?.platform,
-      item.name,
-    );
-    return {
-      label: desc ? `${item.name}(${desc})` : `${item.name}`,
-      key: item.name,
-    };
-  });
-});
-
-// 其他控制：播放速度下拉菜单
+// 更多功能
 const controlsOptions = computed<DropdownOption[]>(() => [
   {
     label: t("common.equalizer"),
     key: "equalizer",
     icon: renderIcon("Eq"),
-    props: {
-      onClick: () => openEqualizer(),
-    },
   },
   {
     label: t("common.auto_close"),
@@ -194,11 +138,23 @@ const controlsOptions = computed<DropdownOption[]>(() => [
     label: t("common.play_rate"),
     key: "rate",
     icon: renderIcon("PlayRate"),
-    props: {
-      onClick: () => openChangeRate(),
-    },
   },
 ]);
+
+// 更多功能选择
+const handleControls = (key: string) => {
+  switch (key) {
+    case "equalizer":
+      openEqualizer();
+      break;
+    case "autoClose":
+      openAutoClose();
+      break;
+    case "rate":
+      openChangeRate();
+      break;
+  }
+};
 </script>
 
 <style scoped lang="scss">
@@ -214,7 +170,7 @@ const controlsOptions = computed<DropdownOption[]>(() => [
       transform 0.3s;
     cursor: pointer;
     .n-icon {
-      font-size: 20px;
+      font-size: 22px;
       color: var(--primary-hex);
     }
     &:hover {
@@ -224,11 +180,7 @@ const controlsOptions = computed<DropdownOption[]>(() => [
     &:active {
       transform: scale(1);
     }
-    @media (max-width: 768px) {
-      padding: 2px;
-    }
   }
-
   :deep(.n-badge-sup) {
     background-color: rgba(var(--primary), 0.28);
     backdrop-filter: blur(20px);
@@ -250,6 +202,11 @@ const controlsOptions = computed<DropdownOption[]>(() => [
   .play-pause {
     display: none;
   }
+  @media (max-width: 810px) {
+    .hidden {
+      display: none;
+    }
+  }
 }
 .volume-change {
   padding: 12px;
@@ -263,21 +220,6 @@ const controlsOptions = computed<DropdownOption[]>(() => [
     font-size: 13px;
     color: var(--color);
     white-space: nowrap;
-  }
-}
-
-@media (max-width: 768px) {
-  .right-menu {
-    .quality-selector,
-    .controls,
-    .play-mode,
-    .volume-mute {
-      display: none;
-    }
-
-    .play-pause {
-      display: flex;
-    }
   }
 }
 </style>

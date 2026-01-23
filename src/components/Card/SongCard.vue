@@ -107,7 +107,7 @@
         </div>
       </div>
       <!-- 专辑 -->
-      <div v-if="!hiddenAlbum" class="album text-hidden">
+      <div v-if="!hiddenAlbum && !isSmallScreen" class="album text-hidden">
         <n-text
           v-if="isObject(song.album)"
           class="album-text"
@@ -130,13 +130,14 @@
       <div class="actions" @click.stop @dblclick.stop>
         <!-- 喜欢歌曲 -->
         <SvgIcon
+          v-if="!isSmallScreen"
           :name="dataStore.isLikeSong(song) ? 'Favorite' : 'FavoriteBorder'"
           :size="20"
           @click.stop="toLikeSong(song, !dataStore.isLikeSong(song))"
           @dblclick.stop
         />
-        <!-- 更多操作 -->
-        <SvgIcon class="more" name="More" :size="20" @click.stop="clickMore" @dblclick.stop />
+        <!-- 移动端菜单 -->
+        <SvgIcon v-else name="More" :size="20" @click.stop="emit('show-menu', $event)" />
       </div>
       <!--      &lt;!&ndash; 更新日期 &ndash;&gt;-->
       <!--      <n-text v-if="song.type === 'radio'" class="meta date" depth="3">-->
@@ -147,11 +148,11 @@
       <!--        {{ formatNumber(song.playCount || 0) }}-->
       <!--      </n-text>-->
       <!-- 时长 -->
-      <n-text class="meta" depth="3">
+      <n-text v-if="!isSmallScreen" class="meta" depth="3">
         {{ secondsToTime(song.duration) }}
       </n-text>
       <!-- 大小 -->
-      <n-text v-if="!hiddenSize" class="meta size" depth="3">
+      <n-text v-if="!hiddenSize && !isSmallScreen" class="meta size" depth="3">
         {{ formatFileSize(song.size || 0) }}
       </n-text>
     </div>
@@ -187,6 +188,7 @@ import SongList from "@/components/List/SongList.vue";
 import { useI18n } from "vue-i18n";
 import { isElectron } from "@/utils/env";
 const { t } = useI18n();
+import { useMobile } from "@/composables/useMobile";
 
 const props = defineProps<{
   // 歌曲
@@ -208,6 +210,12 @@ const platformStore = usePlatformStore();
 
 // 歌曲数据
 const song = toRef(props, "song");
+
+const emit = defineEmits<{
+  "show-menu": [event: MouseEvent];
+}>();
+
+const { isSmallScreen } = useMobile();
 
 // 加载本地歌曲封面
 const localCover = async (show: boolean) => {
@@ -279,11 +287,6 @@ const showSublist = ref(false);
 // 切换子列表显示状态
 const toggleSublist = (data: any) => {
   showSublist.value = data.expanded;
-};
-
-const emit = defineEmits(["clickMore"]);
-const clickMore = (event: Event) => {
-  emit("clickMore", event);
 };
 </script>
 
@@ -366,9 +369,6 @@ const clickMore = (event: Event) => {
       &:active {
         opacity: 0.6 !important;
       }
-    }
-    @media (max-width: 768px) {
-      display: none;
     }
   }
   .title {
@@ -473,9 +473,6 @@ const clickMore = (event: Event) => {
         color: var(--primary-hex);
       }
     }
-    @media (max-width: 768px) {
-      display: none;
-    }
   }
   .actions {
     display: flex;
@@ -483,6 +480,7 @@ const clickMore = (event: Event) => {
     justify-content: center;
     width: 40px;
     .n-icon {
+      color: var(--primary-hex);
       transition: transform 0.3s;
       cursor: pointer;
       &:hover {
@@ -490,15 +488,6 @@ const clickMore = (event: Event) => {
       }
       &:active {
         transform: scale(1);
-      }
-    }
-    .more {
-      display: none;
-      margin-left: 5px;
-    }
-    @media (max-width: 768px) {
-      .more {
-        display: initial;
       }
     }
   }
@@ -511,9 +500,6 @@ const clickMore = (event: Event) => {
     }
     &.date {
       width: 80px;
-    }
-    @media (max-width: 768px) {
-      display: none;
     }
   }
   &.header {

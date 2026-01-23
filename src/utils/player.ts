@@ -20,6 +20,7 @@ import { AxiosError } from "axios";
 class Player {
   /** 自动关闭定时器 */
   private autoCloseInterval: ReturnType<typeof setInterval> | undefined;
+  private lastErrorTime = 0;
   /** 当前曲目重试信息（按歌曲维度计数） */
   private retryInfo: { songId: string; count: number; total: number } = {
     songId: "",
@@ -60,11 +61,6 @@ class Player {
       const playTitle = `${name} - ${artist}`;
       window.document.title = `${playTitle} | HE-Music`;
       statusStore.playStatus = true;
-      this.retryInfo = {
-        songId: `${playSongData?.id}-${playSongData?.platform}`,
-        count: 0,
-        total: 0,
-      };
       // IPC 通知
       if (isElectron) {
         window.electron.ipcRenderer.send("play-status-change", true);
@@ -78,6 +74,19 @@ class Player {
     };
     audioManager.on("play", playCallback);
     this.eventCallbacks.set("play", playCallback);
+
+    const canPlayCallback = () => {
+      const playSongData = songManager.getPlaySongData();
+      this.retryInfo = {
+        songId: `${playSongData?.id}-${playSongData?.platform}`,
+        count: 0,
+        total: 0,
+      };
+
+      console.log("▶️ song canplay:", playSongData);
+    };
+    audioManager.on("canplay", canPlayCallback);
+    this.eventCallbacks.set("canplay", canPlayCallback);
     // 暂停
     const pauseCallback = () => {
       const statusStore = useStatusStore();
@@ -303,6 +312,10 @@ class Player {
    * 集中处理播放错误与重试策略
    */
   private async handlePlaybackError(errCode?: number) {
+    // 错误防抖
+    const now = Date.now().valueOf();
+    if (now - this.lastErrorTime < 200) return;
+    this.lastErrorTime = now;
     const dataStore = useDataStore();
     const playSongData = songManager.getPlaySongData();
     const currentSongId = `${playSongData?.id}-${playSongData?.platform}`;
@@ -312,6 +325,8 @@ class Player {
     }
     this.retryInfo.count += 1;
     this.retryInfo.total += 1;
+
+    console.log(this.retryInfo);
     // 错误码 2：资源过期或临时网络错误，允许较少次数的刷新
     if (errCode === 2 && this.retryInfo.count <= 2) {
       await this.initPlayer(true, this.getSeek());

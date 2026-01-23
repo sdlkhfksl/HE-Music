@@ -1,57 +1,57 @@
 <template>
   <Transition name="fade" mode="out-in">
     <div v-if="data.length > 0" class="cover-list album">
-      <n-grid :cols="cols" x-gap="20" y-gap="20">
-        <n-gi v-for="(item, index) in data" :key="index">
-          <div :class="['cover-item', { current: isCurrent(item) }]">
-            <!-- 封面 -->
-            <div class="cover">
-              <s-image
-                :key="item.cover"
-                :src="item.cover"
-                default-src="/images/album.jpg?asset"
-                class="cover-img"
-                once
-              />
-              <!-- 播放按钮 -->
-              <div class="play-btn" @click.stop>
-                <n-button
-                  :focusable="false"
-                  :loading="item.loading"
-                  secondary
-                  circle
-                  class="play"
-                  @click.stop="playList(item)"
-                >
-                  <template #icon>
-                    <SvgIcon :size="32" :name="isPlaying(item) ? 'Pause' : 'Play'" />
-                  </template>
-                </n-button>
-              </div>
-            </div>
-            <!-- 信息 -->
-            <div class="cover-data">
-              <n-text class="name text-hidden">
-                {{ item.name }}
-              </n-text>
+      <div class="cover-grid">
+        <div
+          v-for="(item, index) in data"
+          :key="index"
+          :class="['cover-item', { current: isCurrent(item) }]"
+        >
+          <!-- 封面 -->
+          <div class="cover">
+            <s-image
+              :key="item.cover"
+              :src="item.cover"
+              default-src="/images/album.jpg?asset"
+              class="cover-img"
+              once
+            />
+            <!-- 播放按钮 -->
+            <div class="play-btn" @click.stop>
+              <n-button
+                :focusable="false"
+                :loading="item.loading"
+                secondary
+                circle
+                class="play"
+                @click.stop="playList(item)"
+              >
+                <template #icon>
+                  <SvgIcon :size="32" :name="isPlaying(item) ? 'Pause' : 'Play'" />
+                </template>
+              </n-button>
             </div>
           </div>
-        </n-gi>
-      </n-grid>
+          <!-- 信息 -->
+          <div class="cover-data">
+            <n-text class="name text-hidden">
+              {{ item.name }}
+            </n-text>
+          </div>
+        </div>
+      </div>
     </div>
     <div v-else-if="loading" class="cover-list loading album">
-      <n-grid :cols="cols" x-gap="20" y-gap="20">
-        <n-gi v-for="item in loadingNum || 50" :key="item">
-          <div class="cover-item">
-            <div class="cover">
-              <n-skeleton class="cover-img" />
-            </div>
-            <div class="cover-data">
-              <n-skeleton text round :repeat="1" />
-            </div>
+      <div class="cover-grid">
+        <div v-for="item in loadingNum || 50" :key="item" class="cover-item">
+          <div class="cover">
+            <n-skeleton class="cover-img" />
           </div>
-        </n-gi>
-      </n-grid>
+          <div class="cover-data">
+            <n-skeleton text round :repeat="1" />
+          </div>
+        </div>
+      </div>
     </div>
     <!-- 空列表 -->
     <n-empty v-else :description="t('common.list_empty')" size="large" />
@@ -115,6 +115,15 @@ const playList = debounce(
 .cover-list {
   width: 100%;
   padding: 20px 4px;
+  .cover-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    @media (max-width: 600px) {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+  }
   .cover-item {
     position: relative;
     height: auto;
@@ -266,13 +275,6 @@ const playList = debounce(
   }
   .load-more {
     margin: 20px 0;
-  }
-  &.video {
-    .cover-item {
-      .cover {
-        aspect-ratio: 16/9;
-      }
-    }
   }
   &.loading {
     .cover {

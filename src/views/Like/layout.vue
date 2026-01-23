@@ -20,7 +20,8 @@
     <n-tabs
       v-model:value="likeType"
       class="tabs"
-      type="segment"
+      :type="isSmall ? 'line' : 'segment'"
+      justify-content="space-evenly"
       @update:value="(name: string) => router.push({ name })"
     >
       <n-tab name="like-playlists">
@@ -48,6 +49,9 @@
 
 <script setup lang="ts">
 import { useDataStore, useSettingStore } from "@/stores";
+import { useMobile } from "@/composables/useMobile";
+
+const { isSmall } = useMobile();
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
@@ -123,6 +127,12 @@ watch(
           margin-right: 4px;
         }
       }
+    }
+  }
+  // 512px
+  @media (max-width: 512px) {
+    .status {
+      display: none !important;
     }
   }
 }

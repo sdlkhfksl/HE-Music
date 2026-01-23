@@ -11,6 +11,7 @@
     >
       <!-- 侧边栏 -->
       <n-layout-sider
+        v-if="isDesktop"
         id="main-sider"
         :style="{
           height:
@@ -47,7 +48,7 @@
             display: 'grid',
             gridTemplateRows: '1fr',
             minHeight: '100%',
-            padding: '0 24px',
+            padding: isMobile ? '0 16px' : '0 24px',
           }"
           position="absolute"
           embedded
@@ -79,6 +80,7 @@
 
 <script setup lang="ts">
 import { useMusicStore, useStatusStore, useSettingStore } from "@/stores";
+import { useMobile } from "@/composables/useMobile";
 import init from "@/utils/init";
 
 const musicStore = useMusicStore();
@@ -87,6 +89,7 @@ const settingStore = useSettingStore();
 
 // 主内容
 const contentRef = ref<HTMLElement | null>(null);
+const { isDesktop, isMobile } = useMobile();
 
 // 主内容高度
 const { height: contentHeight } = useElementSize(contentRef);

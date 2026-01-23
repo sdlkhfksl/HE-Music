@@ -90,6 +90,9 @@ export const openJumpArtist = (platform: string, data: SongInfo["artists"]) => {
   if (!platformStore.isFeatureSupport(platform, FeatureSupportFlag.GetSingerInfo)) {
     return;
   }
+  if (data?.length == 0) {
+    return;
+  }
 
   // 若 data 为数组且只有一个元素，则直接跳转
   if (isArray(data) && data.length === 1) {

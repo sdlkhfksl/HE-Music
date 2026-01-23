@@ -22,11 +22,12 @@
 <script setup lang="ts">
 import { useMusicStore, useStatusStore } from "@/stores";
 import { openSetting, openCopyLyrics } from "@/utils/modal";
-import { isMobile } from "@/utils/env";
 import router from "@/router";
+import { useMobile } from "@/composables/useMobile";
 
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
+const { isSmallScreen } = useMobile();
 
 /**
  * 当前进度偏移值
@@ -39,7 +40,7 @@ const currentTimeOffsetValue = computed(() => {
 });
 
 const openLyricSetting = () => {
-  if (isMobile.value) {
+  if (isSmallScreen.value) {
     statusStore.showFullPlayer = false;
     router.push({
       path: "/setting",

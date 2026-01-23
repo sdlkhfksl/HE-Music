@@ -1,5 +1,10 @@
 <template>
-  <n-popover trigger="manual" :show="userMenuShow" @clickoutside="userMenuShow = false">
+  <n-popover
+    :show="userMenuShow"
+    style="padding: 12px; max-width: 160px"
+    trigger="manual"
+    @clickoutside="userMenuShow = false"
+  >
     <template #trigger>
       <div
         class="user"
@@ -14,22 +19,25 @@
             round
           />
           <n-avatar v-else round>
-            <SvgIcon name="Person" :depth="3" size="24" />
+            <SvgIcon name="Person" :depth="3" size="26" />
           </n-avatar>
         </div>
-        <div class="user-data">
+        <n-flex v-if="isDesktop" class="user-data" size="small">
           <n-text class="name">
-            {{
-              dataStore.userLoginStatus
-                ? dataStore.userData.nickname || t("common.unknown_user")
-                : t("nav.un_login")
-            }}
+            {{ dataStore.userLoginStatus ? dataStore.userData.nickname || "未知用户名" : "未登录" }}
           </n-text>
           <SvgIcon :class="['down', { open: userMenuShow }]" name="DropDown" :depth="3" />
-        </div>
+        </n-flex>
       </div>
     </template>
     <div class="user-menu" @click="userMenuShow = false">
+      <!-- 用户信息 -->
+      <n-flex class="user-info" align="center" justify="center" vertical>
+        <n-text class="nickname text-hidden">{{
+          dataStore.userData.nickname || "未知用户名"
+        }}</n-text>
+      </n-flex>
+      <n-divider />
       <!-- 喜欢数量 -->
       <div class="like-num">
         <div
@@ -39,9 +47,7 @@
           @click="router.push({ name: item.name })"
         >
           <n-number-animation :from="0" :to="item.value" />
-          <n-text :depth="3">
-            {{ item.label }}
-          </n-text>
+          <n-text :depth="3">{{ item.label }}</n-text>
         </div>
       </div>
       <n-divider />
@@ -77,12 +83,15 @@
 <script setup lang="ts">
 import { useDataStore } from "@/stores";
 import { openUpdateUserInfo, openUpdateUserPassword, openUserLogin } from "@/utils/modal";
-import { isLogin, toLogout, updateUserData } from "@/utils/auth";
+import { toLogout, isLogin, updateUserData } from "@/utils/auth";
+import { useMobile } from "@/composables/useMobile";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 const router = useRouter();
 const dataStore = useDataStore();
+
+const { isDesktop } = useMobile();
 
 // 用户菜单展示
 const userMenuShow = ref<boolean>(false);
@@ -163,20 +172,16 @@ onBeforeMount(() => {
     min-width: 38px;
     border-radius: 50%;
     border: 2px solid rgba(var(--primary), 0.28);
-    //.n-avatar {
-    //  width: 100%;
-    //  height: 100%;
-    //}
+    .n-avatar {
+      width: 100%;
+      height: 100%;
+    }
   }
   .user-data {
     display: flex;
     align-items: center;
     padding-left: 8px;
     max-width: 200px;
-    .vip {
-      margin-left: 6px;
-      height: 18px;
-    }
     .down {
       font-size: 26px;
       margin-right: 4px;
@@ -192,22 +197,16 @@ onBeforeMount(() => {
   &:active {
     background-color: rgba(var(--primary), 0.12);
   }
-
-  @media (max-width: 768px) {
-    .avatar {
-      width: 24px;
-      height: 24px;
-    }
-    .user-data {
-      display: none;
-    }
-  }
 }
 .user-menu {
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding: 6px 0;
+  .user-info {
+    .nickname {
+      font-weight: bold;
+    }
+  }
   .like-num {
     display: flex;
     justify-content: space-around;

@@ -10,6 +10,7 @@
       disabled-sort
       :height="songListHeight"
       @reach-bottom="reachBottom"
+      :show-header="!isSmall"
     />
     <n-empty
       v-else
@@ -31,7 +32,9 @@ import SongList from "@/components/List/SongList.vue";
 import { useStatusStore } from "@/stores";
 import type { SongInfo } from "@/types/main.hemusic";
 import { useI18n } from "vue-i18n";
+import { useMobile } from "@/composables/useMobile";
 const { t } = useI18n();
+const { isSmall } = useMobile();
 
 const props = defineProps<{
   keyword: string;

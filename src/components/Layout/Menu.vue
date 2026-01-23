@@ -1,13 +1,12 @@
 <!-- 主菜单 -->
 <template>
   <n-menu
-    v-if="!mobile"
     ref="menuRef"
     v-model:value="menuActiveKey"
     :class="{ cover: settingStore.menuShowCover }"
     :indent="0"
     :root-indent="26"
-    :collapsed="statusStore.menuCollapsed"
+    :collapsed="statusStore.menuCollapsed && isDesktop"
     :collapsed-width="64"
     :collapsed-icon-size="22"
     :default-expand-all="true"
@@ -15,13 +14,6 @@
     :render-label="renderMenuLabel"
     @update:value="menuUpdate"
   />
-  <n-dropdown v-else trigger="click" :options="menuOptions" @select="dropdownSelect">
-    <n-button :focusable="false" tertiary class="mb-menu" circle>
-      <template #icon>
-        <SvgIcon name="Menu" />
-      </template>
-    </n-button>
-  </n-dropdown>
 </template>
 
 <script setup lang="ts">
@@ -34,18 +26,18 @@ import {
   NEllipsis,
   NText,
 } from "naive-ui";
-
+import { useMobile } from "@/composables/useMobile";
 import { useDataStore, useSettingStore, useStatusStore } from "@/stores";
 import { RouterLink, useRouter } from "vue-router";
 import { renderIcon } from "@/utils/helper";
-import { isElectron, isMobile } from "@/utils/env";
+import { isElectron } from "@/utils/env";
 import { openCreatePlaylist } from "@/utils/modal";
+import { useI18n } from "vue-i18n";
 import type {
   PlaylistInfo,
   UserFavouritePlaylistInfo,
   UserPlaylistInfo,
 } from "@/types/main.hemusic";
-import { useI18n } from "vue-i18n";
 
 const router = useRouter();
 const dataStore = useDataStore();
@@ -53,15 +45,9 @@ const statusStore = useStatusStore();
 const settingStore = useSettingStore();
 
 const { t } = useI18n();
+const { isDesktop } = useMobile();
 
-const props = defineProps<{
-  mobile?: boolean;
-  setOptions?: MenuOption[];
-}>();
-const emit = defineEmits<{
-  // 加载更多
-  setSelect: [string];
-}>();
+const emit = defineEmits<{ (e: "menu-click", key: string): void }>();
 // 菜单数据
 const menuRef = ref<MenuInst | null>(null);
 const menuActiveKey = ref<string | number>((router.currentRoute.value.name as string) || "home");
@@ -139,17 +125,6 @@ const menuOptions = computed<MenuOption[] | MenuGroupOption[]>(() => {
               transform: "translateY(-1px)",
             },
           }),
-        },
-        {
-          key: "setting-layout",
-          show: isMobile.value,
-          label: t("common.more"),
-          icon: renderIcon("More", {
-            style: {
-              transform: "translateY(-1px)",
-            },
-          }),
-          children: props.setOptions,
         },
         {
           key: "divider",
@@ -297,31 +272,9 @@ const renderMenuLabel = (option: MenuOption) => {
   return typeof option.label === "function" ? option.label() : (option.label as string);
 };
 
-const dropdownSelect = (key: string, item: MenuOption) => {
-  if (props.setOptions && props.setOptions.findIndex((item2) => item2 === item) > -1) {
-    emit("setSelect", key);
-    return;
-  }
-
-  if (item.platform) {
-    router.push({
-      name: (item.type as string) || "",
-      query: { id: item.id as string, platform: item.platform as string },
-    });
-  } else if ((item.type as string) === "user-playlist") {
-    router.push({
-      name: (item.type as string) || "",
-      query: { id: item.id as string },
-    });
-  } else {
-    router.push({
-      name: (item.link as string) || "",
-    });
-  }
-};
-
 // 菜单项更改
 const menuUpdate = (key: string, item: MenuOption) => {
+  emit("menu-click", key);
   if (item.platform) {
     router.push({
       name: (item.type as string) || "",

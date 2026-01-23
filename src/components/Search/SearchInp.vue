@@ -1,13 +1,13 @@
 <template>
-  <div class="search">
+  <div :class="['search', { focus: statusStore.searchFocus }]">
     <!-- 搜索框 -->
     <n-input
       ref="searchInputRef"
       v-model:value="statusStore.searchInputValue"
-      :class="['search-input', { focus: statusStore.searchFocus }]"
       :input-props="{ autocomplete: 'off' }"
       :placeholder="searchPlaceholder"
       :allow-input="noSideSpace"
+      class="search-input"
       round
       clearable
       @focus="searchInputToFocus"
@@ -193,8 +193,12 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .search {
-  position: relative;
+  position: absolute;
+  left: 0;
   -webkit-app-region: no-drag;
+  transition:
+    left 0.3s,
+    width 0.3s;
   .search-input {
     width: 200px;
     height: 40px;
@@ -203,18 +207,27 @@ onMounted(async () => {
       background-color 0.3s var(--n-bezier),
       width 0.3s var(--n-bezier);
     z-index: 101;
-    &.focus {
-      width: 300px;
-    }
-    @media (max-width: 768px) {
-      width: 190px;
-      &.focus {
-        width: 190px;
-      }
-    }
     :deep(input) {
       height: 100%;
       width: 100%;
+    }
+  }
+  &.focus {
+    .search-input {
+      width: 300px;
+    }
+  }
+  @media (max-width: 768px) {
+    width: calc(100% - 150px);
+    .search-input {
+      width: 100%;
+    }
+    &.focus {
+      left: -52px;
+      width: calc(100% + 52px);
+      .search-input {
+        width: 100%;
+      }
     }
   }
   .search-mask {

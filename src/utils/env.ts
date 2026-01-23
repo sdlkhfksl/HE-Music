@@ -12,5 +12,3 @@ export const isMac = userAgent.includes("Macintosh");
 export const isLinux = userAgent.includes("Linux");
 /** 是否为 Electron 环境 */
 export const isElectron = userAgent.includes("Electron") || typeof window?.electron !== "undefined";
-
-export const isMobile = useMediaQuery("(max-width: 768px)");

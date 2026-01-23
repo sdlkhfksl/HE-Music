@@ -3,6 +3,10 @@
     <Transition name="fade" mode="out-in">
       <div v-show="statusStore.playerMetaShow" class="control-content" @click.stop>
         <n-flex class="left" align="center">
+          <!-- 收起 -->
+          <div class="menu-icon" @click.stop="statusStore.showFullPlayer = false">
+            <SvgIcon name="Down" />
+          </div>
           <!-- 喜欢歌曲 -->
           <div
             class="menu-icon"
@@ -29,7 +33,14 @@
           </div>
           <!-- 显示评论 -->
           <div
-            v-if="!musicStore.playSong.path && !statusStore.pureLyricMode"
+            v-if="
+              !musicStore.playSong.path &&
+              !statusStore.pureLyricMode &&
+              platformStore.isFeatureSupport(
+                musicStore.playSong.platform,
+                FeatureSupportFlag.GetCommentList,
+              )
+            "
             class="menu-icon"
             @click.stop="statusStore.showPlayerComment = !statusStore.showPlayerComment"
           >
@@ -76,7 +87,7 @@
           <!-- 进度条 -->
           <div class="slider">
             <span>{{ msToTime(statusStore.currentTime) }}</span>
-            <PlayerSlider :show-tooltip="false" />
+            <PlayerSlider class="player" :show-tooltip="false" />
             <span>{{ msToTime(statusStore.duration) }}</span>
           </div>
         </div>
@@ -89,20 +100,24 @@
 </template>
 
 <script setup lang="ts">
-import { useDataStore, useMusicStore, useStatusStore } from "@/stores";
+import { useDataStore, useMusicStore, useStatusStore, usePlatformStore } from "@/stores";
 import { msToTime } from "@/utils/time";
 import { openDownloadSong, openPlaylistAdd } from "@/utils/modal";
 import { toLikeSong } from "@/utils/auth";
 import { usePlayer } from "@/utils/player";
+import { FeatureSupportFlag } from "@/api/platform";
 
 const player = usePlayer();
 const dataStore = useDataStore();
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
+const platformStore = usePlatformStore();
 </script>
 
 <style lang="scss" scoped>
 .player-control {
+  position: absolute;
+  bottom: 0;
   width: 100%;
   height: 80px;
   overflow: hidden;
@@ -239,13 +254,5 @@ const statusStore = useStatusStore();
       opacity: 1;
     }
   }
-}
-// slider
-.n-slider {
-  --n-rail-color: rgba(var(--main-cover-color), 0.14);
-  --n-rail-color-hover: rgba(var(--main-cover-color), 0.3);
-  --n-fill-color: rgb(var(--main-cover-color));
-  --n-handle-color: rgb(var(--main-cover-color));
-  --n-fill-color-hover: rgb(var(--main-cover-color));
 }
 </style>

@@ -5,7 +5,7 @@
     v-model:show="statusStore.playListShow"
     :class="{ 'full-player': statusStore.showFullPlayer }"
     :style="{
-      'max-width': isMobile ? '100%' : '400px',
+      'max-width': isSmallScreen ? '100%' : '400px',
     }"
     :auto-focus="false"
     style="width: 400px"
@@ -120,11 +120,12 @@ import { useStatusStore, useDataStore } from "@/stores";
 import type { VirtualListInst } from "naive-ui";
 import { usePlayer } from "@/utils/player";
 import { useI18n } from "vue-i18n";
-import { isMobile } from "@/utils/env";
+import { useMobile } from "@/composables/useMobile";
 const { t } = useI18n();
 const player = usePlayer();
 const dataStore = useDataStore();
 const statusStore = useStatusStore();
+const { isSmallScreen } = useMobile();
 
 const playListRef = ref<VirtualListInst | null>(null);
 

@@ -311,16 +311,5 @@ onMounted(() => {
       }
     }
   }
-
-  @media (max-width: 768px) {
-    .song-data {
-      margin: 0 5px;
-    }
-    :deep(.comment-scroll) {
-      .n-scrollbar-content {
-        padding: 0 5px;
-      }
-    }
-  }
 }
 </style>

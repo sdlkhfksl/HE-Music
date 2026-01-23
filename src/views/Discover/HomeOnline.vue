@@ -165,7 +165,7 @@ onMounted(getAllDiscoverData);
 }
 .title {
   margin-top: 10px;
-  padding: 0 16px;
+  //padding: 0 16px;
   width: max-content;
   .n-h {
     margin: 0;
@@ -188,7 +188,6 @@ onMounted(getAllDiscoverData);
   width: 100%;
   max-width: 100%;
   overflow: hidden;
-  padding: 0 16px;
   margin: 0;
   box-sizing: border-box;
 }

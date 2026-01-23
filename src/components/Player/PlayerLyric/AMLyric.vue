@@ -2,9 +2,10 @@
   <Transition name="fade" mode="out-in">
     <div
       :key="amLyricsData?.[0]?.words?.length"
-      :class="['lyric-am', { pure: statusStore.pureLyricMode }]"
+      :class="['lyric-am', { pure: statusStore.pureLyricMode, duet: hasDuet }]"
       :style="{
         '--amll-lp-color': 'rgb(var(--main-cover-color, 239 239 239))',
+        '--amll-lp-hover-bg-color': 'rgba(var(--main-cover-color), 0.08)',
       }"
     >
       <div v-if="statusStore.lyricLoading" class="lyric-loading">歌词正在加载中...</div>
@@ -12,7 +13,7 @@
         v-else
         ref="lyricPlayerRef"
         :lyricLines="amLyricsData"
-        :currentTime="playSeek"
+        :currentTime="currentTime"
         :playing="statusStore.playStatus"
         :enableSpring="settingStore.useAMSpring"
         :enableScale="settingStore.useAMSpring"
@@ -21,6 +22,7 @@
         :hidePassedLines="settingStore.AMHidePassedLines"
         :wordFadeWidth="settingStore.AMWordFadeWidth"
         :style="{
+          '--display-count-down-show': settingStore.countDownShow ? 'flex' : 'none',
           '--amll-lp-font-size': settingStore.lyricFontSize + 'px',
           '--ja-font-family':
             settingStore.japaneseLyricFont !== 'follow' ? settingStore.japaneseLyricFont : '',
@@ -30,39 +32,30 @@
         class="am-lyric"
         @line-click="jumpSeek"
       />
-      <!-- 歌词菜单组件 -->
-      <LyricMenu />
     </div>
   </Transition>
 </template>
 
 <script setup lang="ts">
-import { LyricPlayer } from "@applemusic-like-lyrics/vue";
-import { type LyricLine } from "@applemusic-like-lyrics/core";
+import { LyricLineMouseEvent, type LyricLine } from "@applemusic-like-lyrics/core";
 import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
 import { getLyricLanguage } from "@/utils/format";
-import { usePlayer } from "@/utils/player";
-import LyricMenu from "./LyricMenu.vue";
-import "@applemusic-like-lyrics/core/style.css";
 import { cloneDeep } from "lodash-es";
+import { usePlayer } from "@/utils/player";
 
-const player = usePlayer();
+defineProps({
+  currentTime: {
+    type: Number,
+    default: 0,
+  },
+});
+
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
+const player = usePlayer();
 
 const lyricPlayerRef = ref<any | null>(null);
-
-// 实时播放进度
-const playSeek = ref<number>(
-  Math.floor(player.getSeek() + statusStore.getSongOffset(musicStore.playSong)),
-);
-
-// 实时更新播放进度
-const { pause: pauseSeek, resume: resumeSeek } = useRafFn(() => {
-  const offsetTime = statusStore.getSongOffset(musicStore.playSong);
-  playSeek.value = player.getSeek() + offsetTime;
-});
 
 // 当前歌词
 const amLyricsData = computed(() => {
@@ -76,13 +69,29 @@ const amLyricsData = computed(() => {
   // 简单检查歌词有效性
   if (!Array.isArray(lyrics) || lyrics.length === 0) return [];
 
-  return cloneDeep(lyrics) as LyricLine[];
+  const clonedLyrics = cloneDeep(lyrics) as LyricLine[];
+
+  // 检查是否要不显示某一部分并删去
+  const showTran = settingStore.showTran;
+  const showRoma = settingStore.showRoma;
+  if (!showTran || !showRoma) {
+    clonedLyrics.forEach((line) => {
+      if (!showTran) line.translatedLyric = "";
+      if (!showRoma) line.romanLyric = "";
+    });
+  }
+
+  return clonedLyrics;
 });
 
+// 是否有对唱行
+const hasDuet = computed(() => amLyricsData.value?.some((line) => line.isDuet) ?? false);
+
 // 进度跳转
-const jumpSeek = (line: any) => {
-  if (!line?.line?.lyricLine?.startTime) return;
-  const time = line.line.lyricLine.startTime;
+const jumpSeek = (line: LyricLineMouseEvent) => {
+  const lineContent = line.line.getLine();
+  if (!lineContent?.startTime) return;
+  const time = lineContent.startTime;
   const offsetMs = statusStore.getSongOffset(musicStore.playSong);
   player.setSeek(time - offsetMs);
   player.play();
@@ -98,6 +107,8 @@ const processLyricLanguage = (player = lyricPlayerRef.value) => {
   for (let e of lyricLineObjects) {
     // 获取歌词行内容 (合并逐字歌词为一句)
     const content = e.lyricLine.words.map((word: any) => word.word).join("");
+    // 跳过空行
+    if (!content) continue;
     // 获取歌词语言
     const lang = getLyricLanguage(content);
     // 为主歌词设置 lang 属性 (firstChild 获取主歌词 不为翻译和音译设置属性)
@@ -112,15 +123,6 @@ watch(amLyricsData, (data) => {
 watch(lyricPlayerRef, (player) => {
   if (player) nextTick(() => processLyricLanguage(player));
 });
-
-onMounted(() => {
-  // 恢复进度
-  resumeSeek();
-});
-
-onBeforeUnmount(() => {
-  pauseSeek();
-});
 </script>
 
 <style lang="scss" scoped>
@@ -129,18 +131,6 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.2));
-  mask: linear-gradient(
-    180deg,
-    hsla(0, 0%, 100%, 0) 0,
-    hsla(0, 0%, 100%, 0.6) 5%,
-    #fff 10%,
-    #fff 75%,
-    hsla(0, 0%, 100%, 0.6) 85%,
-    hsla(0, 0%, 100%, 0)
-  );
-
-  /* 限定混合模式只作用于歌词区域，避免影响页面其它元素。 */
   isolation: isolate;
 
   :deep(.am-lyric) {
@@ -151,18 +141,31 @@ onBeforeUnmount(() => {
     top: 0;
     padding-left: 10px;
     padding-right: 80px;
+    div {
+      div[class^="_interludeDots"] {
+        display: var(--display-count-down-show);
+      }
+    }
+    @media (max-width: 990px) {
+      padding: 0;
+      margin-left: -20px;
+    }
+    @media (max-width: 500px) {
+      margin-left: 0;
+    }
   }
-
   &.pure {
-    text-align: center;
+    &:not(.duet) {
+      text-align: center;
+
+      :deep(.am-lyric) div {
+        transform-origin: center;
+      }
+    }
 
     :deep(.am-lyric) {
       margin: 0;
       padding: 0 80px;
-
-      div {
-        transform-origin: center;
-      }
     }
   }
 
@@ -205,6 +208,12 @@ onBeforeUnmount(() => {
 
   :lang(ja) {
     font-family: var(--ja-font-family);
+  }
+  :lang(en) {
+    font-family: var(--en-font-family);
+  }
+  :lang(ko) {
+    font-family: var(--ko-font-family);
   }
 }
 

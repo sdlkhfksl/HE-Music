@@ -1,7 +1,7 @@
 <template>
   <div class="player-menu">
     <Transition name="fade" mode="out-in">
-      <div v-show="isMobile || statusStore.playerMetaShow" class="menu-content">
+      <div v-show="statusStore.playerMetaShow" class="menu-content">
         <n-flex class="left">
           <div
             v-if="musicStore.isHasLrc"
@@ -27,7 +27,6 @@
 
 <script setup lang="ts">
 import { useMusicStore, useStatusStore } from "@/stores";
-import { isMobile } from "@/utils/env";
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 
@@ -42,6 +41,8 @@ const setPureLyricMode = () => {
 
 <style lang="scss" scoped>
 .player-menu {
+  position: absolute;
+  top: 0;
   width: 100%;
   min-height: 80px;
   overflow: hidden;
@@ -89,9 +90,6 @@ const setPureLyricMode = () => {
       &:active {
         transform: scale(1);
       }
-    }
-    @media (max-width: 768px) {
-      padding: 0 5px;
     }
   }
   .left {

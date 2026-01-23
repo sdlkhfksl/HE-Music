@@ -2,43 +2,65 @@
   <n-layout-header class="nav">
     <!-- 页面导航 -->
     <n-flex class="page-control">
-      <n-button :focusable="false" tertiary circle @click="router.go(-1)">
-        <template #icon>
-          <SvgIcon name="NavigateBefore" :size="26" />
-        </template>
-      </n-button>
-      <n-button :focusable="false" tertiary circle @click="router.go(1)">
-        <template #icon>
-          <SvgIcon name="NavigateNext" :size="26" />
-        </template>
-      </n-button>
+      <Logo v-if="!isDesktop" :size="40" @click="router.push('/')" />
+      <template v-if="!isSmallScreen">
+        <n-button :focusable="false" tertiary circle @click="router.go(-1)">
+          <template #icon>
+            <SvgIcon name="NavigateBefore" :size="26" />
+          </template>
+        </n-button>
+        <n-button :focusable="false" tertiary circle @click="router.go(1)">
+          <template #icon>
+            <SvgIcon name="NavigateNext" :size="26" />
+          </template>
+        </n-button>
+      </template>
     </n-flex>
     <!-- 主内容 -->
-    <n-flex class="nav-main">
+    <n-flex :wrap="false" justify="end" class="nav-main">
       <!-- 搜索 -->
       <SearchInp />
       <!-- 可拖拽 -->
-      <div class="nav-drag" />
-      <!--      &lt;!&ndash; 用户 &ndash;&gt;-->
-      <User v-if="settingStore.useOnlineService" />
-      <!-- 设置菜单 -->
-      <n-dropdown
-        v-if="!isMobile"
-        :options="setOptions"
-        trigger="click"
-        show-arrow
-        @select="setSelect"
-      >
-        <n-button :focusable="false" :title="t('common.setting')" tertiary circle>
+      <div v-if="isDesktop" class="nav-drag" />
+
+      <n-flex align="center">
+        <!-- 用户 -->
+        <User v-if="settingStore.useOnlineService" />
+        <!-- 设置菜单 -->
+        <n-dropdown :options="setOptions" trigger="click" show-arrow @select="setSelect">
+          <n-button :focusable="false" :title="t('common.setting')" tertiary circle>
+            <template #icon>
+              <SvgIcon name="Settings" />
+            </template>
+          </n-button>
+        </n-dropdown>
+        <!-- 移动端菜单 -->
+        <n-button
+          v-if="!isDesktop"
+          :focusable="false"
+          tertiary
+          circle
+          @click="showAside = !showAside"
+        >
           <template #icon>
-            <SvgIcon name="Settings" />
+            <SvgIcon name="Menu" />
           </template>
         </n-button>
-      </n-dropdown>
-      <Menu v-if="isMobile" mobile :setOptions="setOptions" @setSelect="setSelect" />
+        <n-drawer v-model:show="showAside" :width="240" placement="left">
+          <n-drawer-content :body-content-style="{ padding: 0 }" :native-scrollbar="false">
+            <template #header>
+              <n-flex align="center" justify="center" class="aside-logo">
+                <Logo />
+                <n-text>HE-Music</n-text>
+              </n-flex>
+            </template>
+            <Menu @menu-click="showAside = false" />
+          </n-drawer-content>
+        </n-drawer>
+      </n-flex>
     </n-flex>
     <!-- 客户端控制 -->
-    <n-flex v-if="isElectron && !isMac" align="center" class="client-control">
+    <n-flex v-if="isElectron && !isMac && !isSmallScreen" align="center" class="client-control">
       <n-divider class="divider" vertical />
       <n-button :focusable="false" :title="t('nav.minimize')" tertiary circle @click="min">
         <template #icon>
@@ -103,16 +125,19 @@
 import type { DropdownOption } from "naive-ui";
 import { useSettingStore } from "@/stores";
 import { renderIcon } from "@/utils/helper";
-import { isDev, isElectron, isMac, isMobile } from "@/utils/env";
+import { isDev, isElectron, isMac } from "@/utils/env";
 import { openParseSourceUrl, openSetting } from "@/utils/modal";
 import { useI18n } from "vue-i18n";
 import { ref, onMounted, onUnmounted } from "vue";
+import { useMobile } from "@/composables/useMobile";
 import Menu from "@/components/Layout/Menu.vue";
+import Logo from "@/components/Layout/Logo.vue";
 
 const { t } = useI18n();
 
 const router = useRouter();
 const settingStore = useSettingStore();
+const { isDesktop, isSmallScreen } = useMobile();
 
 const showCloseModal = ref(false);
 // 是否记住
@@ -120,7 +145,8 @@ const rememberNotAsk = ref(false);
 
 // 当前窗口状态
 const isMax = ref(false);
-
+// 是否显示侧边栏
+const showAside = ref(false);
 // 最小化
 const min = () => window.electron.ipcRenderer.send("win-min");
 
@@ -208,7 +234,7 @@ const setSelect = (key: string) => {
       settingStore.setThemeMode();
       break;
     case "setting":
-      if (isMobile.value) {
+      if (isSmallScreen.value) {
         router.push("/setting");
         return;
       }
@@ -263,6 +289,7 @@ onUnmounted(() => {
     -webkit-app-region: no-drag;
   }
   .nav-main {
+    position: relative;
     flex: 1;
     align-items: center;
     height: 100%;
@@ -282,6 +309,15 @@ onUnmounted(() => {
 .tip {
   font-size: 16px;
 }
+.aside-logo {
+  .n-text {
+    width: 90px;
+    font-size: 18px;
+    font-family: "logo";
+    margin-top: 2px;
+    line-height: 40px;
+  }
+}
 .checkbox {
   display: flex;
   flex-direction: row;
@@ -290,30 +326,6 @@ onUnmounted(() => {
   margin-top: 12px;
   :deep(.n-checkbox__label) {
     line-height: 0;
-  }
-}
-
-@media (max-width: 768px) {
-  .nav {
-    height: 60px !important;
-    padding: 0 5px !important;
-
-    .n-button {
-      width: 26px !important;
-      height: 26px !important;
-    }
-
-    .nav-main {
-      margin-left: 5px !important;
-
-      .mb-menu {
-        margin-right: 1px;
-      }
-    }
-
-    .client-control {
-      display: none !important;
-    }
   }
 }
 </style>

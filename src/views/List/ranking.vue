@@ -492,7 +492,6 @@ onMounted(() => getTopDetail(playlistId.value, platform.value));
             margin-left: 4px;
             .n-tag {
               font-size: 13px;
-              padding: 0 16px;
               line-height: 0;
               cursor: pointer;
               transition:

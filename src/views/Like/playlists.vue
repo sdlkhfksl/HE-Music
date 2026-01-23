@@ -5,8 +5,8 @@
       <n-tag
         v-for="(item, index) in plTypeName"
         :key="index"
-        :bordered="false"
-        :class="['tag', { choose: index === plTypeChoose }]"
+        :bordered="index === plTypeChoose"
+        :type="index === plTypeChoose ? 'primary' : 'default'"
         round
         @click="changeType(index)"
       >
@@ -46,7 +46,6 @@ const changeType = (index: number) => (plTypeChoose.value = index);
   margin-top: 20px;
   .n-tag {
     font-size: 14px;
-    padding: 0 16px;
     &.choose {
       background-color: rgba(var(--primary), 0.14);
     }
