@@ -353,6 +353,7 @@
     "open_online_service": "Enable Online Services",
     "open_online_service_tip": "Enable online services? This change will take effect after restart.",
     "parse_fail": "Parsing failed",
+    "parse_source_url_placeholder": "Please enter the shared link or content to import playlists, albums, songs, or videos from third-party music platforms.\n\nIf the import fails, please contact the developer.",
     "password_placeholder": "Enter password",
     "playlist_cover_url": "Playlist Cover URL",
     "playlist_cover_url_placeholder": "Enter playlist cover URL",
@@ -371,7 +372,6 @@
     "song_name_placeholder": "Enter track name",
     "unimplemented": "Feature not yet implemented",
     "update_now": "Update Now",
-    "url_placeholder": "Enter link",
     "username_placeholder": "Enter username"
   },
   "nav": {

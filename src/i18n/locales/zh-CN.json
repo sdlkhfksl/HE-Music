@@ -353,6 +353,7 @@
     "open_online_service": "开启在线服务",
     "open_online_service_tip": "确定开启软件的在线服务？更改将在重启后生效！",
     "parse_fail": "解析失败",
+    "parse_source_url_placeholder": "请输入分享的链接或内容，用于导入第三方音乐平台的歌单、专辑、歌曲、视频。\n导入失败请联系开发者。",
     "password_placeholder": "请输入密码",
     "playlist_cover_url": "歌单图片地址",
     "playlist_cover_url_placeholder": "请输入歌单图片地址",
@@ -371,7 +372,6 @@
     "song_name_placeholder": "请输入歌曲名称",
     "unimplemented": "功能尚未实现",
     "update_now": "立即更新",
-    "url_placeholder": "请输入链接",
     "username_placeholder": "请输入用户名"
   },
   "nav": {

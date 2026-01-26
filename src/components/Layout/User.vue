@@ -51,26 +51,29 @@
         </div>
       </div>
       <n-divider />
+      <n-button :focusable="false" quaternary round @click="openUpdateUserInfo">
+        <template #icon>
+          <SvgIcon name="Person" />
+        </template>
+        {{ t("nav.modify_info") }}
+      </n-button>
+      <n-button
+        :disabled="!dataStore.userData.username"
+        :focusable="false"
+        quaternary
+        round
+        @click="openUpdateUserPassword"
+      >
+        <template #icon>
+          <SvgIcon name="Password" />
+        </template>
+        {{ t("nav.modify_password") }}
+      </n-button>
 
-      <n-flex>
-        <n-button :focusable="false" size="small" tertiary round @click="openUpdateUserInfo">
-          {{ t("nav.modify_info") }}
-        </n-button>
-        <n-button
-          :disabled="!dataStore.userData.username"
-          :focusable="false"
-          size="small"
-          tertiary
-          round
-          @click="openUpdateUserPassword"
-        >
-          {{ t("nav.modify_password") }}
-        </n-button>
-      </n-flex>
       <!-- 退出登录 -->
       <n-divider />
       <!-- 退出登录 -->
-      <n-button :focusable="false" class="logout" strong secondary round @click="isLogout">
+      <n-button :focusable="false" class="logout" strong quaternary round @click="isLogout">
         <template #icon>
           <SvgIcon name="Power" />
         </template>

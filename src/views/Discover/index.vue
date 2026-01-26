@@ -93,7 +93,7 @@ const watcher = watch(
 <style lang="scss" scoped>
 .home {
   width: 100%;
-  max-width: 1500px;
+  //max-width: 1500px;
   margin: 0 auto;
   .tabs {
     width: 100%;

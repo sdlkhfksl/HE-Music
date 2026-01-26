@@ -9,7 +9,7 @@
             maxRows: 6,
           }"
           :maxlength="300"
-          :placeholder="t('modal.url_placeholder')"
+          :placeholder="t('modal.parse_source_url_placeholder')"
           type="textarea"
           show-count
           clearable
