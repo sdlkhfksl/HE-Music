@@ -243,6 +243,8 @@ class Player {
    * 初始化 MediaSession
    */
   private initMediaSession() {
+    const settingStore = useSettingStore();
+    if (!settingStore.smtcOpen) return;
     if (!("mediaSession" in navigator)) return;
     navigator.mediaSession.setActionHandler("play", () => this.play());
     navigator.mediaSession.setActionHandler("pause", () => this.pause());
@@ -255,6 +257,8 @@ class Player {
   }
   /** 更新 MediaSession */
   private updateMediaSession() {
+    const settingStore = useSettingStore();
+    if (!settingStore.smtcOpen) return;
     if (!("mediaSession" in navigator)) return;
     const musicStore = useMusicStore();
     // 获取播放数据
@@ -296,6 +300,8 @@ class Player {
    * @param currentTime 当前播放时间（毫秒）
    */
   private updateMediaSessionState(duration: number, currentTime: number) {
+    const settingStore = useSettingStore();
+    if (!settingStore.smtcOpen) return;
     if (!("mediaSession" in navigator)) return;
     navigator.mediaSession.setPositionState({
       duration: msToS(duration),
@@ -951,12 +957,7 @@ class Player {
     const statusStore = useStatusStore();
     audioManager.stop();
     this.resetStatus();
-    statusStore.$patch({
-      playListShow: false,
-      showFullPlayer: false,
-      radioMode: false,
-      playIndex: -1,
-    });
+    statusStore.resetPlayStatus();
     await dataStore.setPlayList([]);
     await dataStore.clearOriginalPlayList();
   }

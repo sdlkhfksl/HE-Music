@@ -213,9 +213,6 @@ export interface UserLikeDataType {
   mvs: MVInfo[];
 }
 
-// sort
-export type SortType = keyof typeof sortOptions;
-
 // songLevel
 export type SongLevelType = keyof typeof songLevelData;
 export type SongLevelDataType = {
@@ -227,7 +224,15 @@ export type SongLevelDataType = {
 };
 
 // setting
-export type SettingType = "general" | "play" | "lyrics" | "keyboard" | "local" | "other" | "about";
+export type SettingType =
+  | "general"
+  | "appearance"
+  | "play"
+  | "lyrics"
+  | "keyboard"
+  | "local"
+  | "network"
+  | "about";
 
 // UpdateLog
 export type UpdateLogType = {
@@ -261,3 +266,7 @@ export interface UpdateInfoType {
 
 // 登录方式
 export type LoginType = "qr" | "phone" | "cookie" | "uid" | "password";
+// sort
+export type SortField = "default" | "title" | "artist" | "album" | "duration" | "size";
+
+export type SortOrder = "default" | "asc" | "desc";

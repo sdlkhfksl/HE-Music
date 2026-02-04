@@ -1,6 +1,6 @@
 import { BrowserWindow, shell } from "electron";
 import { createWindow } from "./index";
-import { isMac, mainWinUrl } from "../utils/config";
+import { mainWinUrl } from "../utils/config";
 import { useStore } from "../store";
 import { isLinux } from "../utils/config";
 
@@ -101,9 +101,10 @@ class MainWindow {
    */
   create(): BrowserWindow | null {
     const store = useStore();
-    const { width, height } = store.get("window");
+    const { width, height, useBorderless = true } = store.get("window");
     this.win = createWindow({
-      titleBarStyle: isMac ? "hiddenInset" : "customButtonsOnHover",
+      titleBarStyle: useBorderless ? "customButtonsOnHover" : "default",
+      frame: !useBorderless,
       trafficLightPosition: {
         x: 5,
         y: 0,

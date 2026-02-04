@@ -67,9 +67,9 @@ class LyricManager {
    */
   private handleLyricExclude(lyricData: SongLyric): SongLyric {
     const settingStore = useSettingStore();
-    const { enableLyricsExclude, lyricsExcludeKeywords, lyricsExcludeRegexes } = settingStore;
+    const { enableOnlineLyricsExclude, lyricsExcludeKeywords, lyricsExcludeRegexes } = settingStore;
     // 未开启排除
-    if (!enableLyricsExclude) return lyricData;
+    if (!enableOnlineLyricsExclude) return lyricData;
     // 处理正则表达式
     const regexes = (lyricsExcludeRegexes || []).map((r: string) => new RegExp(r));
     /**

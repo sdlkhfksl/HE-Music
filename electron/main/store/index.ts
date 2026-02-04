@@ -13,6 +13,7 @@ export interface StoreType {
     x?: number;
     y?: number;
     maximized?: boolean;
+    useBorderless?: boolean;
   };
   lyric: {
     // 窗口位置
@@ -38,6 +39,7 @@ export const useStore = () => {
       window: {
         width: 1280,
         height: 800,
+        useBorderless: true,
       },
       lyric: {
         x: screenData.workAreaSize.width / 2 - 400,

@@ -6,6 +6,8 @@ type ShortcutType = {
   globalShortcut: string;
   // 是否被注册
   isRegistered?: boolean;
+  // 是否页内快捷键
+  isPageShortcut?: boolean;
 };
 
 interface ShortcutStore {
@@ -17,6 +19,9 @@ interface ShortcutStore {
     volumeUp: ShortcutType;
     volumeDown: ShortcutType;
     toggleDesktopLyric: ShortcutType;
+    openPlayer: ShortcutType;
+    openPlayList: ShortcutType;
+    closePlayer: ShortcutType;
   };
 }
 
@@ -30,29 +35,53 @@ export const useShortcutStore = defineStore("shortcut", {
       playOrPause: {
         shortcut: "CmdOrCtrl+Space",
         globalShortcut: "CmdOrCtrl+Shift+Space",
+        isPageShortcut: false,
       },
       // 上一曲 / 下一曲
       playPrev: {
         shortcut: "CmdOrCtrl+ArrowLeft",
         globalShortcut: "CmdOrCtrl+Shift+Left",
+        isPageShortcut: false,
       },
       playNext: {
         shortcut: "CmdOrCtrl+ArrowRight",
         globalShortcut: "CmdOrCtrl+Shift+Right",
+        isPageShortcut: false,
       },
       // 音量加减
       volumeUp: {
         shortcut: "CmdOrCtrl+ArrowUp",
         globalShortcut: "CmdOrCtrl+Shift+Up",
+        isPageShortcut: false,
       },
       volumeDown: {
         shortcut: "CmdOrCtrl+ArrowDown",
         globalShortcut: "CmdOrCtrl+Shift+Down",
+        isPageShortcut: false,
       },
       // 桌面歌词
       toggleDesktopLyric: {
         shortcut: "CmdOrCtrl+KeyD",
         globalShortcut: "CmdOrCtrl+Shift+D",
+        isPageShortcut: false,
+      },
+      // 打开播放界面
+      openPlayer: {
+        shortcut: "KeyP",
+        globalShortcut: "",
+        isPageShortcut: true,
+      },
+      // 打开播放列表
+      openPlayList: {
+        shortcut: "KeyL",
+        globalShortcut: "",
+        isPageShortcut: true,
+      },
+      // 关闭播放界面
+      closePlayer: {
+        shortcut: "Escape",
+        globalShortcut: "",
+        isPageShortcut: true,
       },
     },
   }),

@@ -17,7 +17,8 @@
     "exit": "退出",
     "export_settings": "导出设置",
     "import_settings": "导入设置",
-    "choose_folder": "选择文件夹"
+    "choose_folder": "选择文件夹",
+    "setting": "设置"
   },
   "message": {
     "file_exists": "文件已存在"

@@ -6,36 +6,45 @@ import { isLogin } from "./auth";
 import { isArray, isFunction } from "lodash-es";
 import { NScrollbar } from "naive-ui";
 import router from "@/router";
-import Login from "@/components/Modal/Login/Login.vue";
-import JumpArtist from "@/components/Modal/JumpArtist.vue";
-import UserAgreement from "@/components/Modal/UserAgreement.vue";
-import SongInfoEditor from "@/components/Modal/SongInfoEditor.vue";
-import PlaylistAdd from "@/components/Modal/PlaylistAdd.vue";
-import BatchList from "@/components/Modal/BatchList.vue";
-import CreatePlaylist from "@/components/Modal/CreatePlaylist.vue";
-import UpdatePlaylist from "@/components/Modal/UpdatePlaylist.vue";
-import DownloadSong from "@/components/Modal/DownloadSong.vue";
-import MainSetting from "@/components/Setting/MainSetting.vue";
-import UpdateApp from "@/components/Modal/UpdateApp.vue";
-
-import UpdateUserPassword from "@/components/Modal/UpdateUserPassword.vue";
-import UpdateUserInfo from "@/components/Modal/UpdateUserInfo.vue";
-import ExcludeLyrics from "@/components/Modal/ExcludeLyrics.vue";
-import ChangeRate from "@/components/Modal/ChangeRate.vue";
-import AutoClose from "@/components/Modal/AutoClose.vue";
-import Equalizer from "@/components/Modal/Equalizer.vue";
-import ParseSourceUrl from "@/components/Modal/ParseSourceUrl.vue";
 import { usePlatformStore } from "@/stores";
 import { FeatureSupportFlag } from "@/api/platform";
-import Captcha from "@/components/Modal/Captcha.vue";
-import CopyLyrics from "@/components/Modal/CopyLyrics.vue";
 import { t } from "@/i18n";
 
+const openedModals = new Set<string>();
+/**
+ * 检查弹窗是否已打开，若已打开则显示提示
+ * @param modalKey 弹窗唯一标识
+ * @param warningMessage 已打开时的提示信息
+ * @returns 是否已打开
+ */
+const isModalOpen = (modalKey: string, warningMessage?: string): boolean => {
+  if (openedModals.has(modalKey)) {
+    if (warningMessage) window.$message.warning(warningMessage);
+    return true;
+  }
+  return false;
+};
+
+/**
+ * 标记弹窗为打开状态
+ */
+const setModalOpen = (modalKey: string): void => {
+  openedModals.add(modalKey);
+};
+
+/**
+ * 标记弹窗为关闭状态
+ */
+const setModalClosed = (modalKey: string): void => {
+  openedModals.delete(modalKey);
+};
+
 // 用户协议
-export const openUserAgreement = () => {
+export const openUserAgreement = async () => {
   const isAgree = window.localStorage.getItem("isAgree");
   if (isAgree) return;
 
+  const { default: UserAgreement } = await import("@/components/Modal/UserAgreement.vue");
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -63,10 +72,11 @@ export const openUserAgreement = () => {
 
 let isLoginModalOpened = false;
 // 用户登录
-export const openUserLogin = (showTip: boolean = false) => {
+export const openUserLogin = async (showTip: boolean = false) => {
   if (showTip) window.$message.warning(t("message.login_required"));
   if (isLoginModalOpened) return;
   isLoginModalOpened = true;
+  const { default: Login } = await import("@/components/Modal/Login/Login.vue");
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -85,7 +95,7 @@ export const openUserLogin = (showTip: boolean = false) => {
 };
 
 // 跳转到歌手
-export const openJumpArtist = (platform: string, data: SongInfo["artists"]) => {
+export const openJumpArtist = async (platform: string, data: SongInfo["artists"]) => {
   const platformStore = usePlatformStore();
   if (!platformStore.isFeatureSupport(platform, FeatureSupportFlag.GetSingerInfo)) {
     return;
@@ -100,6 +110,7 @@ export const openJumpArtist = (platform: string, data: SongInfo["artists"]) => {
     router.push({ name: "artist", query: { id, platform } });
     return;
   }
+  const { default: JumpArtist } = await import("@/components/Modal/JumpArtist.vue");
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -113,7 +124,8 @@ export const openJumpArtist = (platform: string, data: SongInfo["artists"]) => {
 };
 
 // 编辑歌曲信息
-export const openSongInfoEditor = (song: SongInfo) => {
+export const openSongInfoEditor = async (song: SongInfo) => {
+  const { default: SongInfoEditor } = await import("@/components/Modal/SongInfoEditor.vue");
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -129,9 +141,10 @@ export const openSongInfoEditor = (song: SongInfo) => {
 };
 
 // 添加到歌单
-export const openPlaylistAdd = (data: SongInfo[], isLocal: boolean) => {
+export const openPlaylistAdd = async (data: SongInfo[], isLocal: boolean) => {
   if (!data.length) return window.$message.warning(t("message.please_select_song"));
   if (!isLogin() && !isLocal) return openUserLogin();
+  const { default: PlaylistAdd } = await import("@/components/Modal/PlaylistAdd.vue");
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -150,7 +163,8 @@ export const openPlaylistAdd = (data: SongInfo[], isLocal: boolean) => {
  * @param isLocal 是否为本地音乐
  * @param playListId 歌单 id
  */
-export const openBatchList = (data: SongInfo[], isLocal: boolean, playListId?: string) => {
+export const openBatchList = async (data: SongInfo[], isLocal: boolean, playListId?: string) => {
+  const { default: BatchList } = await import("@/components/Modal/BatchList.vue");
   window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -164,7 +178,8 @@ export const openBatchList = (data: SongInfo[], isLocal: boolean, playListId?: s
 };
 
 // 新建歌单
-export const openCreatePlaylist = () => {
+export const openCreatePlaylist = async () => {
+  const { default: CreatePlaylist } = await import("@/components/Modal/CreatePlaylist.vue");
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -178,11 +193,12 @@ export const openCreatePlaylist = () => {
 };
 
 // 编辑歌单
-export const openUpdatePlaylist = (
+export const openUpdatePlaylist = async (
   id: string,
   data: UserPlaylistInfo,
   func: () => Promise<void>,
 ) => {
+  const { default: UpdatePlaylist } = await import("@/components/Modal/UpdatePlaylist.vue");
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -204,7 +220,8 @@ export const openUpdatePlaylist = (
 };
 
 // 下载歌曲
-export const openDownloadSong = (song: SongInfo) => {
+export const openDownloadSong = async (song: SongInfo) => {
+  const { default: DownloadSong } = await import("@/components/Modal/DownloadSong.vue");
   // if (!isLogin()) return openUserLogin();
   // 是否可下载
   if (!song) return window.$message.warning(t("message.please_select_song"));
@@ -227,7 +244,8 @@ export const openDownloadSong = (song: SongInfo) => {
 
 let settingModal: ModalReactive | null = null;
 // 打开设置
-export const openSetting = (type: SettingType = "general") => {
+export const openSetting = async (type: SettingType = "general") => {
+  const { default: MainSetting } = await import("@/components/Setting/MainSetting.vue");
   if (settingModal) {
     settingModal.destroy();
   }
@@ -249,7 +267,8 @@ export const openSetting = (type: SettingType = "general") => {
 };
 
 // 软件更新
-export const openUpdateApp = (data: UpdateInfoType) => {
+export const openUpdateApp = async (data: UpdateInfoType) => {
+  const { default: UpdateApp } = await import("@/components/Modal/UpdateApp.vue");
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -263,7 +282,8 @@ export const openUpdateApp = (data: UpdateInfoType) => {
 };
 
 // 修改信息
-export const openUpdateUserInfo = () => {
+export const openUpdateUserInfo = async () => {
+  const { default: UpdateUserInfo } = await import("@/components/Modal/UpdateUserInfo.vue");
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -278,7 +298,8 @@ export const openUpdateUserInfo = () => {
 };
 
 // 修改密码
-export const openUpdateUserPassword = () => {
+export const openUpdateUserPassword = async () => {
+  const { default: UpdateUserPassword } = await import("@/components/Modal/UpdateUserPassword.vue");
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -293,7 +314,8 @@ export const openUpdateUserPassword = () => {
 };
 
 // 歌词排除内容
-export const openLyricExclude = () => {
+export const openLyricExclude = async () => {
+  const { default: ExcludeLyrics } = await import("@/components/Modal/ExcludeLyrics.vue");
   window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -306,7 +328,8 @@ export const openLyricExclude = () => {
   });
 };
 // 歌词排除内容
-export const openParseSourceUrl = () => {
+export const openParseSourceUrl = async () => {
+  const { default: ParseSourceUrl } = await import("@/components/Modal/ParseSourceUrl.vue");
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -319,7 +342,8 @@ export const openParseSourceUrl = () => {
   });
 };
 
-export const openCaptcha = (scene: number, meta: string): Promise<boolean> => {
+export const openCaptcha = async (scene: number, meta: string): Promise<boolean> => {
+  const { default: Captcha } = await import("@/components/Modal/Captcha.vue");
   return new Promise((resolve) => {
     const modal = window.$modal.create({
       preset: "card",
@@ -347,7 +371,8 @@ export const openCaptcha = (scene: number, meta: string): Promise<boolean> => {
 };
 
 /** 打开播放速度弹窗 */
-export const openChangeRate = () => {
+export const openChangeRate = async () => {
+  const { default: ChangeRate } = await import("@/components/Modal/ChangeRate.vue");
   window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -361,7 +386,8 @@ export const openChangeRate = () => {
 };
 
 /** 打开自动关闭弹窗 */
-export const openAutoClose = () => {
+export const openAutoClose = async () => {
+  const { default: AutoClose } = await import("@/components/Modal/AutoClose.vue");
   window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -375,7 +401,8 @@ export const openAutoClose = () => {
 };
 
 /** 打开均衡器弹窗 */
-export const openEqualizer = () => {
+export const openEqualizer = async () => {
+  const { default: Equalizer } = await import("@/components/Modal/Equalizer.vue");
   window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -413,7 +440,8 @@ export const openDescModal = (content: string) => {
 };
 
 /** 打开复制歌词弹窗 */
-export const openCopyLyrics = () => {
+export const openCopyLyrics = async () => {
+  const { default: CopyLyrics } = await import("@/components/Modal/CopyLyrics.vue");
   const modal = window.$modal.create({
     preset: "card",
     transformOrigin: "center",
@@ -422,6 +450,79 @@ export const openCopyLyrics = () => {
     title: t("common.copy_lyrics"),
     content: () => {
       return h(CopyLyrics, {
+        onClose: () => modal.destroy(),
+      });
+    },
+  });
+};
+
+/** 打开主题配置弹窗 */
+export const openThemeConfig = async () => {
+  if (isModalOpen("themeConfig", "主题配置已打开")) return;
+  setModalOpen("themeConfig");
+  const { default: ThemeConfig } = await import("@/components/Modal/Setting/ThemeConfig.vue");
+  window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    draggable: true,
+    style: { width: "500px" },
+    title: t("setting.general.theme_config"),
+    size: "small",
+    content: () => {
+      return h(ThemeConfig);
+    },
+    onAfterLeave: () => {
+      setModalClosed("themeConfig");
+    },
+  });
+};
+
+/** 打开本地音乐目录管理弹窗 */
+export const openLocalMusicDirectoryModal = async () => {
+  const { default: LocalMusicDirectory } = await import(
+    "@/components/Modal/Setting/LocalMusicDirectory.vue"
+  );
+  window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    maskClosable: false,
+    closeOnEsc: false,
+    style: { width: "600px" },
+    title: t("local.manage_local_music_folder"),
+    content: () => {
+      return h(LocalMusicDirectory);
+    },
+  });
+};
+
+/** 打开字体管理弹窗 */
+export const openFontManager = async () => {
+  const { default: FontManager } = await import("@/components/Modal/Setting/FontManager.vue");
+  window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    style: { width: "700px" },
+    title: t("setting.font_setting"),
+    content: () => {
+      return h(FontManager);
+    },
+  });
+};
+
+/** 打开歌词排除弹窗 */
+export const openExcludeLyric = async () => {
+  const { default: ExcludeLyrics } = await import("@/components/Modal/Setting/ExcludeLyrics.vue");
+  const modal = window.$modal.create({
+    preset: "card",
+    transformOrigin: "center",
+    autoFocus: false,
+    style: { width: "600px" },
+    title: t("setting.lyrics.lyrics_exclude"),
+    content: () => {
+      return h(ExcludeLyrics, {
         onClose: () => modal.destroy(),
       });
     },

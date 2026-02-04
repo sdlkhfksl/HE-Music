@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <Transition name="up" mode="out-in">
+    <Transition :name="settingStore.playerExpandAnimation" mode="out-in">
       <div
         v-if="statusStore.showFullPlayer"
         :style="{
@@ -28,6 +28,8 @@
           </Transition>
           <!-- 菜单 -->
           <PlayerMenu @mouseenter.stop="stopHide" @mouseleave.stop="playerMove" />
+          <!-- 全屏封面 -->
+          <PlayerCover v-if="settingStore.playerType === 'fullscreen' && !pureLyricMode" />
           <!-- 主内容 -->
           <Transition name="zoom" mode="out-in">
             <div
@@ -36,6 +38,7 @@
                 'player-content',
                 {
                   'no-lrc': noLrc,
+                  'full-screen': settingStore.playerType === 'fullscreen',
                   pure: statusStore.pureLyricMode && musicStore.isHasLrc,
                 },
               ]"
@@ -43,7 +46,7 @@
             >
               <Transition name="zoom">
                 <div
-                  v-if="!pureLyricMode"
+                  v-if="!pureLyricMode && settingStore.playerType !== 'fullscreen'"
                   :key="musicStore.playSong.id"
                   class="content-left"
                   :style="{
@@ -67,12 +70,15 @@
               >
                 <!-- 数据 -->
                 <PlayerData
-                  v-if="statusStore.pureLyricMode && musicStore.isHasLrc"
-                  :center="statusStore.pureLyricMode"
-                  :light="pureLyricMode"
+                  v-if="
+                    (pureLyricMode && musicStore.isHasLrc) ||
+                    settingStore.playerType === 'fullscreen'
+                  "
+                  :center="pureLyricMode || noLrc"
+                  :light="!(settingStore.playerType === 'fullscreen' && noLrc)"
                 />
                 <!-- 歌词 -->
-                <PlayerLyric />
+                <PlayerLyric v-if="!noLrc" />
               </div>
             </div>
           </Transition>
@@ -296,13 +302,24 @@ onBeforeUnmount(() => {
     }
     // 无歌词
     &.no-lrc {
-      .content-left {
-        width: 50% !important;
-        transform: translateX(50%);
+      &:not(.full-screen) {
+        .content-left {
+          width: 50% !important;
+          transform: translateX(50%);
+        }
+        .content-right {
+          opacity: 0;
+          pointer-events: none;
+        }
       }
-      .content-right {
-        opacity: 0;
-        pointer-events: none;
+      &.full-screen {
+        .content-right {
+          .player-data {
+            width: 100%;
+            max-width: 100%;
+            transform: translateY(30vh);
+          }
+        }
       }
     }
   }

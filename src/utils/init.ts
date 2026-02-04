@@ -69,10 +69,10 @@ const initEventListener = () => {
   useEventListener(window, "keydown", keyDownEvent);
 };
 
-// 键盘事件
 const keyDownEvent = debounce((event: KeyboardEvent) => {
   const player = usePlayer();
   const shortcutStore = useShortcutStore();
+  const statusStore = useStatusStore();
   const target = event.target as HTMLElement;
   // 排除元素
   const extendsDom = ["input", "textarea"];
@@ -90,10 +90,18 @@ const keyDownEvent = debounce((event: KeyboardEvent) => {
     const shortcutParts = shortcut.shortcut.split("+");
     // 标志位
     let match = true;
-    // 检查修饰键
-    if (shortcutParts.includes("CmdOrCtrl") && !isCtrl) match = false;
-    if (shortcutParts.includes("Shift") && !isShift) match = false;
-    if (shortcutParts.includes("Alt") && !isAlt) match = false;
+    // 检查是否包含修饰键
+    const hasCmdOrCtrl = shortcutParts.includes("CmdOrCtrl");
+    const hasShift = shortcutParts.includes("Shift");
+    const hasAlt = shortcutParts.includes("Alt");
+    // 检查修饰键匹配
+    if (hasCmdOrCtrl && !isCtrl) match = false;
+    if (hasShift && !isShift) match = false;
+    if (hasAlt && !isAlt) match = false;
+    // 如果快捷键定义中没有修饰键，确保没有按下任何修饰键
+    if (!hasCmdOrCtrl && !hasShift && !hasAlt) {
+      if (isCtrl || isShift || isAlt) match = false;
+    }
     // 检查实际按键
     const mainKey = shortcutParts.find(
       (part: string) => part !== "CmdOrCtrl" && part !== "Shift" && part !== "Alt",
@@ -119,6 +127,20 @@ const keyDownEvent = debounce((event: KeyboardEvent) => {
           break;
         case "toggleDesktopLyric":
           player.toggleDesktopLyric();
+          break;
+        case "openPlayer":
+          // 打开播放界面（任意界面）
+          statusStore.showFullPlayer = true;
+          break;
+        case "closePlayer":
+          // 关闭播放界面（仅在播放界面时）
+          if (statusStore.showFullPlayer) {
+            statusStore.showFullPlayer = false;
+          }
+          break;
+        case "openPlayList":
+          // 打开播放列表（任意界面）
+          statusStore.playListShow = !statusStore.playListShow;
           break;
         default:
           break;

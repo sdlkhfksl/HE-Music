@@ -17,7 +17,8 @@
     "exit": "Exit",
     "export_settings": "Export settings",
     "import_settings": "Import settings",
-    "choose_folder": "Choose folder"
+    "choose_folder": "Choose folder",
+    "setting": "Setting"
   },
   "message": {
     "file_exists": "File exists"

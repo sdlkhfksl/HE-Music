@@ -14,11 +14,19 @@
         display-directive="show:lazy"
       >
         <!-- 常规 -->
-        <GeneralSetting />
+        <UniversalSetting :groups="generalConfig.groups" />
       </n-tab-pane>
       <n-tab-pane name="play" :tab="t('setting.play.play_setting')" display-directive="show:lazy">
-        <!-- 播放 -->
-        <PlaySetting />
+        <!-- 外观 -->
+        <UniversalSetting :groups="appearanceConfig.groups" />
+      </n-tab-pane>
+      <n-tab-pane
+        name="appearance"
+        :tab="t('setting.play.play_setting')"
+        display-directive="show:lazy"
+      >
+        <!-- 外观 -->
+        <UniversalSetting :groups="playConfig.groups" />
       </n-tab-pane>
       <n-tab-pane
         name="lyrics"
@@ -26,7 +34,7 @@
         display-directive="show:lazy"
       >
         <!-- 歌词 -->
-        <LyricsSetting />
+        <UniversalSetting :groups="lyricConfig.groups" />
       </n-tab-pane>
       <n-tab-pane
         v-if="isElectron"
@@ -35,7 +43,7 @@
         display-directive="show:lazy"
       >
         <!-- 快捷键 -->
-        <KeyboardSetting />
+        <UniversalSetting :groups="keyboardConfig.groups" />
       </n-tab-pane>
       <n-tab-pane
         v-if="isElectron"
@@ -44,15 +52,14 @@
         display-directive="show:lazy"
       >
         <!-- 本地 -->
-        <LocalSetting />
+        <UniversalSetting :groups="localConfig.groups" />
       </n-tab-pane>
       <n-tab-pane
         name="other"
         :tab="t('setting.other.other_setting')"
         display-directive="show:lazy"
       >
-        <!-- 本地 -->
-        <OtherSetting />
+        <UniversalSetting :groups="networkConfig.groups" />
       </n-tab-pane>
       <n-tab-pane name="about" :tab="t('common.about')" display-directive="show:lazy">
         <!-- 关于 -->
@@ -67,6 +74,13 @@ import type { SettingType } from "@/types/main";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import { isElectron } from "@/utils/env";
+import { usePlaySettings } from "@/components/Setting/config/play";
+import { useGeneralSettings } from "@/components/Setting/config/general";
+import { useAppearanceSettings } from "@/components/Setting/config/appearance";
+import { useLyricSettings } from "@/components/Setting/config/lyric";
+import { useKeyboardSettings } from "@/components/Setting/config/keyboard";
+import { useLocalSettings } from "@/components/Setting/config/local";
+import { useNetworkSettings } from "@/components/Setting/config/network";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -75,6 +89,14 @@ const router = useRouter();
 const activeKey = computed<SettingType>(
   () => (router.currentRoute.value.query.type as SettingType) || "general",
 );
+
+const playConfig = computed(() => usePlaySettings());
+const generalConfig = computed(() => useGeneralSettings());
+const appearanceConfig = computed(() => useAppearanceSettings());
+const lyricConfig = computed(() => useLyricSettings());
+const keyboardConfig = computed(() => useKeyboardSettings());
+const localConfig = computed(() => useLocalSettings());
+const networkConfig = computed(() => useNetworkSettings());
 
 const tabChange = (key: SettingType) => {
   router.push({

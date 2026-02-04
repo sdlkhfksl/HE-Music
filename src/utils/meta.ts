@@ -60,19 +60,6 @@ export function getLevelsUpTo(level: string): Partial<typeof songLevelData> {
   return pick(songLevelData, compact(resultKeys));
 }
 
-// 排序选项
-export const sortOptions = {
-  default: { show: "all", icon: "Sort" },
-  titleAZ: { show: "all", icon: "SortAZ" },
-  titleZA: { show: "all", icon: "SortZA" },
-  arAZ: { show: "song", icon: "SortAZ" },
-  arZA: { show: "song", icon: "SortZA" },
-  timeUp: { show: "all", icon: "SortClockUp" },
-  timeDown: { show: "all", icon: "SortClockDown" },
-  dateUp: { show: "radio", icon: "SortDateUp" },
-  dateDown: { show: "radio", icon: "SortDateDown" },
-} as const;
-
 // 自定义图片工具栏
 export const renderToolbar = ({ nodes }: ImageRenderToolbarProps) => {
   return [
@@ -86,3 +73,24 @@ export const renderToolbar = ({ nodes }: ImageRenderToolbarProps) => {
     nodes.close,
   ];
 };
+
+/**
+ * 排序字段选项
+ */
+export const sortFieldOptions = {
+  default: { name: "默认" },
+  title: { name: "标题" },
+  artist: { name: "歌手" },
+  album: { name: "专辑" },
+  duration: { name: "时长" },
+  size: { name: "大小" },
+} as const;
+
+/**
+ * 排序方式选项
+ */
+export const sortOrderOptions = {
+  default: { name: "默认" },
+  asc: { name: "升序" },
+  desc: { name: "降序" },
+} as const;

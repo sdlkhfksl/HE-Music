@@ -174,19 +174,19 @@ const createTrayMenu = (win: BrowserWindow): MenuItemConstructorOptions[] => {
     {
       type: "separator",
     },
-    // {
-    //   id: "setting",
-    //   label: t("common.setting"),
-    //   icon: showIcon("setting"),
-    //   click: () => {
-    //     win.show();
-    //     win.focus();
-    //     win.webContents.send("openSetting");
-    //   },
-    // },
-    // {
-    //   type: "separator",
-    // },
+    {
+      id: "setting",
+      label: t("common.setting"),
+      icon: showIcon("setting"),
+      click: () => {
+        win.show();
+        win.focus();
+        win.webContents.send("openSetting");
+      },
+    },
+    {
+      type: "separator",
+    },
     {
       id: "exit",
       label: t("common.exit"),

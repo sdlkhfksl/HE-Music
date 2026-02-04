@@ -1,28 +1,24 @@
 import { defineStore } from "pinia";
 import { keywords, regexes } from "@/assets/data/exclude";
+import { ThemeColorType } from "@/types/color";
 
 interface SettingState {
   /** 明暗模式 */
   themeMode: "light" | "dark" | "auto";
-  themeColorType:
-    | "default"
-    | "orange"
-    | "blue"
-    | "pink"
-    | "brown"
-    | "indigo"
-    | "green"
-    | "purple"
-    | "yellow"
-    | "teal"
-    | "custom";
+  themeColorType: ThemeColorType;
   themeCustomColor: string;
   themeGlobalColor: boolean;
   themeFollowCover: boolean;
+  /** 主题变体 */
+  themeVariant: "primary" | "secondary" | "tertiary" | "neutral" | "neutralVariant" | "error";
   globalFont: "default" | string;
   lyricFont: "follow" | string;
   /** 日语歌词字体 */
   japaneseLyricFont: "follow" | string;
+  /** 英语歌词字体 */
+  englishLyricFont: "follow" | string;
+  /** 韩语歌词字体 */
+  koreanLyricFont: "follow" | string;
   showCloseAppTip: boolean;
   closeAppMethod: "exit" | "hide";
   showTaskbarProgress: boolean;
@@ -33,13 +29,14 @@ interface SettingState {
   lyricTranFontSize: number;
   lyricRomaFontSize: number;
   lyricFontBold: boolean;
+  lyricFontWeight: number;
   showYrc: boolean;
   showYrcAnimation: boolean;
   showYrcLongEffect: boolean;
   showTran: boolean;
   showRoma: boolean;
   lyricsPosition: "flex-start" | "center" | "flex-end";
-  lyricsScrollPosition: "start" | "center";
+  lyricsScrollOffset: number;
   downloadPath: string;
   /** 音乐命名格式 */
   fileNameFormat: "title" | "artist-title" | "title-artist";
@@ -64,7 +61,7 @@ interface SettingState {
   barLyricShow: boolean;
   /** 播放器元素自动隐藏 */
   autoHidePlayerMeta: boolean;
-  playerType: "cover" | "record";
+  playerType: "cover" | "record" | "fullscreen";
   playerBackgroundType: "none" | "animation" | "blur" | "color" | "artist-photo";
   /** 背景动画帧率 */
   playerBackgroundFps: number;
@@ -89,11 +86,12 @@ interface SettingState {
   localSeparators: string[];
   showLocalCover: boolean;
   routeAnimation: "none" | "fade" | "zoom" | "slide" | "up";
+  playerExpandAnimation: "up" | "flow";
   useRealIP: boolean;
   realIP: string;
   fullPlayerCache: boolean;
   useKeepAlive: boolean;
-  enableLyricsExclude: boolean;
+  enableOnlineLyricsExclude: boolean;
   enableTTMLExclude: boolean;
   enableLocalLyricsExclude: boolean;
   lyricsExcludeKeywords: string[];
@@ -102,7 +100,7 @@ interface SettingState {
   /** 展示当前歌曲歌词状态信息 */
   showPlayMeta: boolean;
   enableTTMLLyrics: boolean;
-  language: string;
+  language: "zh-CN" | "en";
   /** 自定义协议注册 **/
   registryProtocols: string[];
 }
@@ -115,13 +113,17 @@ export const useSettingStore = defineStore("setting", {
     themeCustomColor: "#fe7971", // 主题自定义颜色
     themeFollowCover: false, // 主题跟随歌曲封面
     themeGlobalColor: false, // 全局着色
+    themeVariant: "secondary",
     globalFont: "default", // 全局字体
     lyricFont: "follow", // 歌词区域字体
     japaneseLyricFont: "follow",
+    englishLyricFont: "follow",
+    koreanLyricFont: "follow",
     hideVipTag: false, // 隐藏 VIP 标签
     showSearchHistory: true, // 显示搜索历史
     menuShowCover: true, // 菜单显示封面
     routeAnimation: "slide", // 路由动画
+    playerExpandAnimation: "up", // 播放器展开动画
     language: "zh-CN", // 语言
     // 系统
     useOnlineService: true, // 是否使用在线服务
@@ -157,6 +159,7 @@ export const useSettingStore = defineStore("setting", {
     lyricTranFontSize: 22, // 歌词翻译大小
     lyricRomaFontSize: 18, // 歌词音译大小
     lyricFontBold: true, // 歌词字体加粗
+    lyricFontWeight: 700, // 歌词字重设置
     useAMLyrics: false, // 是否使用 AM 歌词
     useAMSpring: false, // 是否使用 AM 歌词弹簧效果
     AMHidePassedLines: false /** 隐藏已播放歌词 */,
@@ -167,10 +170,10 @@ export const useSettingStore = defineStore("setting", {
     showTran: true, // 显示歌词翻译
     showRoma: true, // 显示歌词音译
     lyricsPosition: "flex-start", // 歌词位置
+    lyricsScrollOffset: 0.25, // 歌词滚动偏移量
     lyricsBlur: false, // 歌词模糊
-    lyricsScrollPosition: "start", // 歌词滚动位置
     lrcMousePause: false, // 鼠标悬停暂停
-    enableLyricsExclude: true, // 歌词排除
+    enableOnlineLyricsExclude: true, // 在线歌词排除
     enableTTMLExclude: false, // 歌词排除 TTML
     enableLocalLyricsExclude: false,
     lyricsExcludeKeywords: keywords, // 歌词排除关键字

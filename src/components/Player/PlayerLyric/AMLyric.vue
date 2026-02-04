@@ -2,10 +2,18 @@
   <Transition name="fade" mode="out-in">
     <div
       :key="amLyricsData?.[0]?.words?.length"
-      :class="['lyric-am', { pure: statusStore.pureLyricMode, duet: hasDuet }]"
+      :class="[
+        'lyric-am',
+        {
+          pure: statusStore.pureLyricMode,
+          duet: hasDuet,
+        },
+      ]"
       :style="{
         '--amll-lp-color': 'rgb(var(--main-cover-color, 239 239 239))',
-        '--amll-lp-hover-bg-color': 'rgba(var(--main-cover-color), 0.08)',
+        '--amll-lp-hover-bg-color': statusStore.playerMetaShow
+          ? 'rgba(var(--main-cover-color), 0.08)'
+          : 'transparent',
       }"
     >
       <div v-if="statusStore.lyricLoading" class="lyric-loading">歌词正在加载中...</div>
@@ -17,17 +25,17 @@
         :playing="statusStore.playStatus"
         :enableSpring="settingStore.useAMSpring"
         :enableScale="settingStore.useAMSpring"
-        :alignPosition="settingStore.lyricsScrollPosition === 'center' ? 0.5 : 0.2"
+        :alignPosition="settingStore.lyricsScrollOffset"
+        :alignAnchor="settingStore.lyricsScrollOffset > 0.4 ? 'center' : 'top'"
         :enableBlur="settingStore.lyricsBlur"
         :hidePassedLines="settingStore.AMHidePassedLines"
         :wordFadeWidth="settingStore.AMWordFadeWidth"
         :style="{
           '--display-count-down-show': settingStore.countDownShow ? 'flex' : 'none',
           '--amll-lp-font-size': settingStore.lyricFontSize + 'px',
-          '--ja-font-family':
-            settingStore.japaneseLyricFont !== 'follow' ? settingStore.japaneseLyricFont : '',
-          'font-weight': settingStore.lyricFontBold ? 'bold' : 'normal',
+          'font-weight': settingStore.lyricFontWeight,
           'font-family': settingStore.lyricFont !== 'follow' ? settingStore.lyricFont : '',
+          ...lyricLangFontStyle(settingStore),
         }"
         class="am-lyric"
         @line-click="jumpSeek"
@@ -40,8 +48,9 @@
 import { LyricLineMouseEvent, type LyricLine } from "@applemusic-like-lyrics/core";
 import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
 import { getLyricLanguage } from "@/utils/format";
-import { cloneDeep } from "lodash-es";
 import { usePlayer } from "@/utils/player";
+import { cloneDeep } from "lodash-es";
+import { lyricLangFontStyle } from "@/utils/lyric/lyricFontConfig";
 
 defineProps({
   currentTime: {
@@ -61,26 +70,17 @@ const lyricPlayerRef = ref<any | null>(null);
 const amLyricsData = computed(() => {
   const { songLyric } = musicStore;
   if (!songLyric) return [];
-
   // 优先使用逐字歌词(YRC/TTML)
   const useYrc = songLyric.yrcData?.length && settingStore.showYrc;
   const lyrics = useYrc ? songLyric.yrcData : songLyric.lrcData;
-
   // 简单检查歌词有效性
   if (!Array.isArray(lyrics) || lyrics.length === 0) return [];
-
   const clonedLyrics = cloneDeep(lyrics) as LyricLine[];
-
-  // 检查是否要不显示某一部分并删去
-  const showTran = settingStore.showTran;
-  const showRoma = settingStore.showRoma;
-  if (!showTran || !showRoma) {
-    clonedLyrics.forEach((line) => {
-      if (!showTran) line.translatedLyric = "";
-      if (!showRoma) line.romanLyric = "";
-    });
-  }
-
+  const { showTran, showRoma } = settingStore;
+  clonedLyrics.forEach((line) => {
+    if (!showTran) line.translatedLyric = "";
+    if (!showRoma) line.romanLyric = "";
+  });
   return clonedLyrics;
 });
 
@@ -139,19 +139,30 @@ watch(lyricPlayerRef, (player) => {
     position: absolute;
     left: 0;
     top: 0;
-    padding-left: 10px;
+    padding-left: var(--amll-lyric-left-padding, 10px);
     padding-right: 80px;
     div {
       div[class^="_interludeDots"] {
         display: var(--display-count-down-show);
       }
     }
-    @media (max-width: 990px) {
-      padding: 0;
-      margin-left: -20px;
-    }
     @media (max-width: 500px) {
       margin-left: 0;
+    }
+  }
+
+  &.align-right {
+    :deep(.am-lyric) {
+      padding-left: 80px;
+      padding-right: var(--amll-lyric-right-padding, 10px);
+
+      @media (max-width: 990px) {
+        padding: 0;
+        margin-right: -20px;
+      }
+      @media (max-width: 500px) {
+        margin-right: 0;
+      }
     }
   }
   &.pure {

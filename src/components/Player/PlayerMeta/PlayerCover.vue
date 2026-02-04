@@ -1,5 +1,24 @@
 <template>
-  <div :class="['player-cover', settingStore.playerType, { playing: statusStore.playStatus }]">
+  <!-- 全屏封面 -->
+  <div
+    v-if="settingStore.playerType === 'fullscreen' && !isTablet"
+    class="full-screen"
+    :style="{ '--gradient-percent': '15%' }"
+  >
+    <s-image
+      :src="musicStore.getSongCover(-1)"
+      :alt="musicStore.playSong.name"
+      :title="musicStore.playSong.name"
+      :lazy="false"
+      :width="'100%'"
+      :height="'100%'"
+    />
+  </div>
+  <!-- 普通封面 -->
+  <div
+    v-else
+    :class="['player-cover', settingStore.playerType, { playing: statusStore.playStatus }]"
+  >
     <img
       v-if="settingStore.playerType === 'record'"
       class="pointer"
@@ -17,11 +36,13 @@
 </template>
 
 <script setup lang="ts">
+import { useMobile } from "@/composables/useMobile";
 import { useSettingStore, useStatusStore, useMusicStore } from "@/stores";
 
 const musicStore = useMusicStore();
 const statusStore = useStatusStore();
 const settingStore = useSettingStore();
+const { isTablet } = useMobile();
 </script>
 
 <style lang="scss" scoped>
@@ -186,6 +207,21 @@ const settingStore = useSettingStore();
     .cover-img {
       animation-play-state: running;
     }
+  }
+}
+.full-screen {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 60vw;
+  z-index: 0;
+  mask-image: linear-gradient(to right, #000 var(--gradient-percent), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, #000 var(--gradient-percent), transparent 100%);
+  :deep(img) {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

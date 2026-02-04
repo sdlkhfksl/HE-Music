@@ -5,17 +5,20 @@
       '--lrc-size': settingStore.lyricFontSize + 'px',
       '--lrc-tran-size': settingStore.lyricTranFontSize + 'px',
       '--lrc-roma-size': settingStore.lyricRomaFontSize + 'px',
-      '--lrc-bold': settingStore.lyricFontBold ? 'bold' : 'normal',
-      '--ja-font-family':
-        settingStore.japaneseLyricFont !== 'follow' ? settingStore.japaneseLyricFont : '',
+      '--lrc-bold': settingStore.lyricFontWeight,
       'font-family': settingStore.lyricFont !== 'follow' ? settingStore.lyricFont : '',
       cursor: statusStore.playerMetaShow ? 'auto' : 'none',
+      ...lyricLangFontStyle(settingStore),
     }"
     :class="[
       'lyric',
       settingStore.playerType,
       settingStore.lyricsPosition,
-      { pure: statusStore.pureLyricMode },
+      settingStore.lyricsPosition,
+      {
+        pure: statusStore.pureLyricMode,
+        'meta-show': statusStore.playerMetaShow,
+      },
     ]"
     @mouseleave="lrcAllLeave"
   >
@@ -109,9 +112,10 @@
 <script setup lang="ts">
 import { type LyricWord, type LyricLine } from "@applemusic-like-lyrics/lyric";
 import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
-import { usePlayer } from "@/utils/player";
 import { getLyricLanguage } from "@/utils/format";
 import { isElectron } from "@/utils/env";
+import { usePlayer } from "@/utils/player";
+import { lyricLangFontStyle } from "@/utils/lyric/lyricFontConfig";
 
 const props = defineProps({
   currentTime: {
@@ -383,7 +387,7 @@ const lyricsScroll = (index: number) => {
   const elementTop = lrcItemDom.offsetTop;
   const elementHeight = lrcItemDom.offsetHeight;
   // 居中偏移滚动
-  let targetY = elementTop - (containerHeight - elementHeight) * 0.25;
+  let targetY = elementTop - (containerHeight - elementHeight) * settingStore.lyricsScrollOffset;
   // 确保不超出边界
   targetY = Math.max(0, Math.min(targetY, container.scrollHeight - container.clientHeight));
   // 执行平滑滚动
@@ -566,7 +570,7 @@ onBeforeUnmount(() => {
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
-    padding-left: 10px;
+    padding-left: var(--lrc-left-padding, 10px);
     padding-right: 80px;
     box-sizing: border-box;
     /* 隐藏滚动条 */
@@ -774,21 +778,22 @@ onBeforeUnmount(() => {
       pointer-events: none;
     }
     @media (hover: hover) and (pointer: fine) {
-      &:hover {
+      .lyric.meta-show &:hover {
         opacity: 1;
         &::before {
           transform: scale(1);
           opacity: 1;
         }
       }
-      &:active {
+      .lyric.meta-show &:active {
         &::before {
           transform: scale(0.95);
         }
       }
     }
   }
-  &.flex-end {
+  &.flex-end,
+  &.align-right {
     span {
       text-align: right;
     }
@@ -799,6 +804,15 @@ onBeforeUnmount(() => {
       transform-origin: right;
       .content {
         text-align: right;
+      }
+      &.is-duet {
+        transform-origin: left;
+        .content,
+        .tran,
+        .roma {
+          text-align: left;
+          justify-content: flex-start;
+        }
       }
     }
     .countdown-line {
@@ -846,7 +860,7 @@ onBeforeUnmount(() => {
       }
     }
   }
-  &:hover {
+  &.meta-show:hover {
     .lrc-line {
       filter: blur(0) !important;
     }
