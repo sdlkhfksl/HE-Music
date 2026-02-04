@@ -314,20 +314,6 @@ export const openUpdateUserPassword = async () => {
 };
 
 // 歌词排除内容
-export const openLyricExclude = async () => {
-  const { default: ExcludeLyrics } = await import("@/components/Modal/ExcludeLyrics.vue");
-  window.$modal.create({
-    preset: "card",
-    transformOrigin: "center",
-    autoFocus: false,
-    style: { width: "600px" },
-    title: t("setting.lyrics.lyrics_exclude_content"),
-    content: () => {
-      return h(ExcludeLyrics);
-    },
-  });
-};
-// 歌词排除内容
 export const openParseSourceUrl = async () => {
   const { default: ParseSourceUrl } = await import("@/components/Modal/ParseSourceUrl.vue");
   const modal = window.$modal.create({

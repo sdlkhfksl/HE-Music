@@ -82,7 +82,7 @@
             :item-fixed="true"
             :items="virtualListItems"
             :height="`calc(100% - 40px)`"
-            :padding-bottom="80"
+            :padding-bottom="showFooter ? 80 : 0"
             @scroll="onScroll"
           >
             <template #default="{ item, index }">
@@ -313,7 +313,7 @@ const virtualListItems = computed<VirtualListItem[]>(() => {
     key: `${song.platform}-${song.id}`,
   }));
   // 如果有加载更多，添加 footer
-  if (props.loadMore !== undefined) {
+  if (props.showFooter && props.loadMore !== undefined) {
     items.push({
       type: "footer" as const,
       data: null,
