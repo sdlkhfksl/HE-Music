@@ -16,47 +16,47 @@
         <!-- 常规 -->
         <UniversalSetting :groups="generalConfig.groups" />
       </n-tab-pane>
-      <n-tab-pane name="play" :tab="t('setting.play.play_setting')" display-directive="show:lazy">
-        <!-- 外观 -->
-        <UniversalSetting :groups="appearanceConfig.groups" />
-      </n-tab-pane>
+      <!-- 外观 -->
       <n-tab-pane
         name="appearance"
-        :tab="t('setting.play.play_setting')"
+        :tab="t('setting.appearance.appearance_setting')"
         display-directive="show:lazy"
       >
-        <!-- 外观 -->
+        <UniversalSetting :groups="appearanceConfig.groups" />
+      </n-tab-pane>
+      <!-- 播放 -->
+      <n-tab-pane name="play" :tab="t('setting.play.play_setting')" display-directive="show:lazy">
         <UniversalSetting :groups="playConfig.groups" />
       </n-tab-pane>
+      <!-- 歌词 -->
       <n-tab-pane
         name="lyrics"
         :tab="t('setting.lyrics.lyrics_setting')"
         display-directive="show:lazy"
       >
-        <!-- 歌词 -->
         <UniversalSetting :groups="lyricConfig.groups" />
       </n-tab-pane>
+      <!-- 快捷键 -->
       <n-tab-pane
         v-if="isElectron"
         name="shortcut"
         :tab="t('setting.shortcut.shortcut_setting')"
         display-directive="show:lazy"
       >
-        <!-- 快捷键 -->
         <UniversalSetting :groups="keyboardConfig.groups" />
       </n-tab-pane>
+      <!-- 本地 -->
       <n-tab-pane
         v-if="isElectron"
         name="local"
         :tab="t('setting.local.local_setting')"
         display-directive="show:lazy"
       >
-        <!-- 本地 -->
         <UniversalSetting :groups="localConfig.groups" />
       </n-tab-pane>
       <n-tab-pane
-        name="other"
-        :tab="t('setting.other.other_setting')"
+        name="network"
+        :tab="t('setting.network.network_and_connect')"
         display-directive="show:lazy"
       >
         <UniversalSetting :groups="networkConfig.groups" />
