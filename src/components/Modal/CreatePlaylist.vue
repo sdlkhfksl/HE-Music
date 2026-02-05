@@ -1,40 +1,33 @@
 <template>
   <div class="create-playlist">
-    <n-tabs v-model:value="playlistType" type="segment" animated>
-      <n-tab-pane :disabled="!isLogin()" name="online" :tab="t('modal.online_playlist')">
-        <n-form ref="onlineFormRef" :model="onlineFormData" :rules="onlineFormRules">
-          <n-form-item :label="t('modal.playlist_name')" path="name">
-            <n-input
-              v-model:value="onlineFormData.name"
-              :placeholder="t('modal.playlist_name_placeholder')"
-            />
-          </n-form-item>
-          <n-form-item :label="t('modal.playlist_cover_url')" path="cover">
-            <n-input
-              v-model:value="onlineFormData.cover"
-              :placeholder="t('modal.playlist_cover_url_placeholder')"
-            />
-          </n-form-item>
-          <n-form-item :label="t('modal.playlist_description')" path="description">
-            <n-input
-              v-model:value="onlineFormData.description"
-              :autosize="{
-                minRows: 3,
-                maxRows: 6,
-              }"
-              :maxlength="800"
-              :placeholder="t('modal.playlist_description_placeholder')"
-              type="textarea"
-              show-count
-              clearable
-            />
-          </n-form-item>
-        </n-form>
-      </n-tab-pane>
-      <n-tab-pane name="local" :tab="t('modal.local_playlist')">
-        <n-empty :description="t('modal.unimplemented')" />
-      </n-tab-pane>
-    </n-tabs>
+    <n-form ref="onlineFormRef" :model="onlineFormData" :rules="onlineFormRules">
+      <n-form-item :label="t('modal.playlist_name')" path="name">
+        <n-input
+          v-model:value="onlineFormData.name"
+          :placeholder="t('modal.playlist_name_placeholder')"
+        />
+      </n-form-item>
+      <n-form-item :label="t('modal.playlist_cover_url')" path="cover">
+        <n-input
+          v-model:value="onlineFormData.cover"
+          :placeholder="t('modal.playlist_cover_url_placeholder')"
+        />
+      </n-form-item>
+      <n-form-item :label="t('modal.playlist_description')" path="description">
+        <n-input
+          v-model:value="onlineFormData.description"
+          :autosize="{
+            minRows: 3,
+            maxRows: 6,
+          }"
+          :maxlength="800"
+          :placeholder="t('modal.playlist_description_placeholder')"
+          type="textarea"
+          show-count
+          clearable
+        />
+      </n-form-item>
+    </n-form>
     <n-button class="create" type="primary" @click="toCreatePlaylist">
       {{ t("modal.create") }}
     </n-button>

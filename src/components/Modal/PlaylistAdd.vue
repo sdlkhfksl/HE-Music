@@ -1,54 +1,47 @@
 <!-- 添加到歌单 -->
 <template>
   <div class="playlist-add">
-    <n-tabs :default-value="isLocal ? 'local' : 'online'" type="segment" animated>
-      <n-tab-pane :disabled="isLocal" name="online" :tab="t('modal.online_playlist')">
-        <n-scrollbar style="max-height: 70vh">
-          <n-list class="playlists-list" hoverable clickable>
-            <!-- 新建歌单 -->
-            <n-list-item class="playlist add" @click="openCreatePlaylist">
-              <template #prefix>
-                <SvgIcon name="Add" :size="20" />
-              </template>
-              <n-thing :title="t('modal.create_playlist')" />
-            </n-list-item>
-            <!-- 已有歌单 -->
-            <n-list-item
-              v-for="(item, index) in dataStore.userCreatedPlaylist"
-              :key="index"
-              class="playlist"
-              @click="addPlaylist(item)"
+    <n-scrollbar style="max-height: 70vh">
+      <n-list class="playlists-list" hoverable clickable>
+        <!-- 新建歌单 -->
+        <n-list-item class="playlist add" @click="openCreatePlaylist">
+          <template #prefix>
+            <SvgIcon name="Add" :size="20" />
+          </template>
+          <n-thing :title="t('modal.create_playlist')" />
+        </n-list-item>
+        <!-- 已有歌单 -->
+        <n-list-item
+          v-for="(item, index) in dataStore.userCreatedPlaylist"
+          :key="index"
+          class="playlist"
+          @click="addPlaylist(item)"
+        >
+          <template #prefix>
+            <n-image
+              :src="item.cover || '/images/album.jpg?asset'"
+              class="cover"
+              preview-disabled
+              lazy
+              @load="coverLoaded"
             >
-              <template #prefix>
-                <n-image
-                  :src="item.cover || '/images/album.jpg?asset'"
-                  class="cover"
-                  preview-disabled
-                  lazy
-                  @load="coverLoaded"
-                >
-                  <template #placeholder>
-                    <div class="cover-loading">
-                      <img class="loading-img" src="/images/album.jpg?asset" alt="loading-img" />
-                    </div>
-                  </template>
-                </n-image>
+              <template #placeholder>
+                <div class="cover-loading">
+                  <img class="loading-img" src="/images/album.jpg?asset" alt="loading-img" />
+                </div>
               </template>
-              <n-thing :title="index === 0 ? t('playlist.my_favorite_music') : item.name">
-                <template #description>
-                  <n-text depth="3" class="size">
-                    {{ t("common.song_count", { count: item.song_count }) }}
-                  </n-text>
-                </template>
-              </n-thing>
-            </n-list-item>
-          </n-list>
-        </n-scrollbar>
-      </n-tab-pane>
-      <n-tab-pane name="local" :tab="t('modal.local_playlist')">
-        <n-empty :description="t('modal.unimplemented')" />
-      </n-tab-pane>
-    </n-tabs>
+            </n-image>
+          </template>
+          <n-thing :title="index === 0 ? t('playlist.my_favorite_music') : item.name">
+            <template #description>
+              <n-text depth="3" class="size">
+                {{ t("common.song_count", { count: item.song_count }) }}
+              </n-text>
+            </template>
+          </n-thing>
+        </n-list-item>
+      </n-list>
+    </n-scrollbar>
   </div>
 </template>
 
