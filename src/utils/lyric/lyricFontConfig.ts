@@ -1,7 +1,7 @@
 import { useSettingStore } from "@/stores";
 
 export interface LyricFontConfig {
-  keySetting: "LyricFont" | "japaneseLyricFont" | "englishLyricFont" | "koreanLyricFont";
+  keySetting: "lyricFont" | "japaneseLyricFont" | "englishLyricFont" | "koreanLyricFont";
   default: string;
 }
 
@@ -29,7 +29,7 @@ export const lyricLangFontConfigs: LyricLangFontConfig[] = [
 
 export const lyricFontConfigs: LyricFontConfig[] = [
   {
-    keySetting: "LyricFont",
+    keySetting: "lyricFont",
     default: "follow",
   },
   ...lyricLangFontConfigs,

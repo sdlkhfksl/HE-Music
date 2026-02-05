@@ -55,10 +55,10 @@
                 {{ formatCommentTime(Number(item.timestamp) * 1000) }}
               </n-text>
             </div>
-            <!--            <div v-if="item.ip" :title="item.ip.ip" class="item">-->
-            <!--              <SvgIcon name="IP" :depth="3" />-->
-            <!--              <n-text :depth="3">{{ item.ip.location }}</n-text>-->
-            <!--            </div>-->
+            <div v-if="item.ip_location" :title="item.ip_location" class="item">
+              <SvgIcon name="IP" :depth="3" />
+              <n-text :depth="3">{{ item.ip_location }}</n-text>
+            </div>
             <!-- 点赞 -->
             <div class="item like">
               <SvgIcon name="ThumbUp" :depth="1" />

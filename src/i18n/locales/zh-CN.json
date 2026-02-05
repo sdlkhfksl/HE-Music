@@ -288,6 +288,7 @@
     "get_local_music_meta_fail": "获取本地歌曲元信息失败",
     "get_url_fail": "获取链接失败",
     "get_video_data_fail": "获取视频数据失败",
+    "get_web_font_fail": "获取字体列表失败，请检查相关权限",
     "import_settings_confirm": "导入设置将覆盖当前所有配置并重启软件，是否继续？",
     "import_settings_error": "设置导入出错",
     "import_settings_fail": "设置导入失败",

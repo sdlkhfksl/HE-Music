@@ -112,6 +112,7 @@ import { LyricConfig } from "@/types/desktop-lyric";
 import defaultDesktopLyricConfig from "@/assets/data/lyricConfig";
 import { cloneDeep, isEqual, snakeCase } from "lodash-es";
 import { useI18n } from "vue-i18n";
+import { FontData } from "@/types/global";
 
 const { t } = useI18n();
 const settingStore = useSettingStore();
@@ -139,7 +140,10 @@ const getOptions = (key: string) => {
 
 // 获取全部系统字体
 const getAllSystemFonts = async () => {
-  if (!isElectron) return;
+  if (!isElectron) {
+    getWebAllSystemFonts();
+    return;
+  }
   try {
     const allFonts = await window.electron.ipcRenderer.invoke("get-all-fonts");
     systemFonts.value = allFonts.map((v: string) => {
@@ -153,6 +157,28 @@ const getAllSystemFonts = async () => {
       };
     });
   } catch (error) {
+    console.error("Failed to get system fonts:", error);
+  }
+};
+
+const getWebAllSystemFonts = async () => {
+  if (isElectron) return;
+  if (!window.queryLocalFonts) return;
+  try {
+    const fonts = await window.queryLocalFonts();
+    const all = fonts.map((v: FontData) => v.family);
+    const allFonts = [...new Set(all)].sort();
+    systemFonts.value = allFonts.map((name: string) => {
+      return {
+        label: name,
+        value: name,
+        style: {
+          fontFamily: name,
+        },
+      };
+    });
+  } catch (error) {
+    window.$message.error(t("message.get_web_font_fail"));
     console.error("Failed to get system fonts:", error);
   }
 };

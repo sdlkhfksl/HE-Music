@@ -129,6 +129,7 @@ export interface CommentInfo {
   user: CommentInfoUser;
   be_replied: CommentInfo;
   reply_count: string;
+  ip_location: string;
   sub_comments: CommentInfo[];
 
   // 子评论用

@@ -288,6 +288,7 @@
     "get_local_music_meta_fail": "Failed to get local track metadata",
     "get_url_fail": "Failed to get link",
     "get_video_data_fail": "Failed to get video data",
+    "get_web_font_fail": "Failed to retrieve the font list. Please check the relevant permissions.",
     "import_settings_confirm": "Importing settings will overwrite all current configurations and restart the software. Do you want to continue?",
     "import_settings_error": "Import settings error",
     "import_settings_fail": "Import settings failed",

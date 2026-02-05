@@ -24,5 +24,13 @@ declare global {
         import: () => Promise<any>;
       };
     };
+    queryLocalFonts?: () => Promise<FontData[]>;
   }
+}
+
+interface FontData {
+  family: string;
+  fullName: string;
+  postscriptName: string;
+  style: string;
 }
