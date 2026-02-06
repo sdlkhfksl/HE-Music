@@ -274,6 +274,13 @@ const appRoutes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  // comment
+  {
+    path: "/comment",
+    name: "comment",
+    component: () => import("@/views/Comment/Comment.vue"),
+  },
+
   // 最近播放
   {
     path: "/history",

@@ -233,7 +233,7 @@ const onKeyDown = async (e: KeyboardEvent) => {
     changeShortcut(globalShortcut);
   } else {
     changeShortcut(shortcut);
-    window.$message.success("message.shortcut_set_success");
+    window.$message.success(t("message.shortcut_set_success"));
   }
 };
 </script>

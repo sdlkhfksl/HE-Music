@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { ColorScheme, PlayModeType, RGB, SortField, SortOrder } from "@/types/main";
-import type { SongInfo } from "@/types/main.hemusic";
+import { CommentConfig, SongInfo } from "@/types/main.hemusic";
 
 interface StatusState {
   menuCollapsed: boolean;
@@ -84,6 +84,7 @@ interface StatusState {
   };
   /** 背景图 URL (Blob URL) */
   backgroundImageUrl: string | null;
+  commentConfig: CommentConfig;
 }
 
 export const useStatusStore = defineStore("status", {
@@ -183,6 +184,14 @@ export const useStatusStore = defineStore("status", {
       isSolid: false,
     },
     backgroundImageUrl: null,
+    commentConfig: {
+      id: "",
+      name: "",
+      creator: "",
+      platform: "",
+      cover: "",
+      resource_type: "song",
+    },
   }),
   actions: {
     /**
@@ -330,6 +339,7 @@ export const useStatusStore = defineStore("status", {
       "eqPreset",
       "themeBackgroundMode",
       "backgroundConfig",
+      "commentConfig",
     ],
   },
 });

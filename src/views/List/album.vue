@@ -261,6 +261,25 @@ const moreOptions = computed<DropdownOption[]>(() => [
     },
     icon: renderIcon("Link"),
   },
+  {
+    label: t("menu.view_comment"),
+    key: "view_comment",
+    show: platformStore.isFeatureSupport(platform.value, FeatureSupportFlag.GetCommentList),
+    props: {
+      onClick: () => {
+        statusStore.commentConfig = {
+          id: albumId.value,
+          name: albumDetailData.value?.name || "",
+          creator: albumDetailData.value?.artists.map((artist) => artist.name).join(" / ") || "",
+          platform: platform.value,
+          cover: albumDetailData.value?.cover || "",
+          resource_type: "album",
+        };
+        router.push({ name: "comment" });
+      },
+    },
+    icon: renderIcon("Message"),
+  },
 ]);
 
 // 获取专辑基础信息

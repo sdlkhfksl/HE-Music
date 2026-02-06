@@ -16,6 +16,7 @@ import type { SongInfo } from "@/types/main.hemusic";
 import { songEqual } from "@/utils/song";
 import { usePlayer } from "@/utils/player";
 import songManager from "@/utils/songManager";
+import { getSizeCover } from "@/utils/format";
 
 /** 歌曲菜单 */
 export const useSongMenu = () => {
@@ -122,6 +123,27 @@ export const useSongMenu = () => {
             router.push({ name: "video", query: { id: song.mv_id, platform: song.platform } }),
         },
         icon: renderIcon("Video", { size: 18 }),
+      },
+      {
+        key: "comment",
+        label: t("menu.view_comment"),
+        show: platformStore.isFeatureSupport(song.platform, FeatureSupportFlag.GetCommentList),
+        props: {
+          onClick: () => {
+            statusStore.commentConfig = {
+              id: song.id,
+              name: song.name,
+              creator: Array.isArray(song.artists)
+                ? song.artists.map((item) => item.name).join(" / ")
+                : String(song.artists),
+              platform: song.platform,
+              cover: getSizeCover(song, 300),
+              resource_type: "song",
+            };
+            router.push({ name: "comment" });
+          },
+        },
+        icon: renderIcon("Message", { size: 18 }),
       },
       {
         key: "line-1",
@@ -307,17 +329,28 @@ export const useSongMenu = () => {
         icon: renderIcon("Video", { size: 18 }),
         hideFullPlayer: true,
       },
-      // {
-      //   key: "comment",
-      //   label: t("menu.view_comment"),
-      //   show: platformStore.isFeatureSupport(song.platform, FeatureSupportFlag.GetCommentList),
-      //   props: {
-      //     onClick: () => {
-      //       statusStore.showPlayerComment = true
-      //     },
-      //   },
-      //   icon: renderIcon("Message", { size: 18 }),
-      // },
+      {
+        key: "comment",
+        label: t("menu.view_comment"),
+        show: platformStore.isFeatureSupport(song.platform, FeatureSupportFlag.GetCommentList),
+        props: {
+          onClick: () => {
+            statusStore.commentConfig = {
+              id: song.id,
+              name: song.name,
+              creator: Array.isArray(song.artists)
+                ? song.artists.map((item) => item.name).join(" / ")
+                : String(song.artists),
+              platform: song.platform,
+              cover: getSizeCover(song, 300),
+              resource_type: "song",
+            };
+            statusStore.showFullPlayer = false;
+            router.push({ name: "comment" });
+          },
+        },
+        icon: renderIcon("Message", { size: 18 }),
+      },
       {
         key: "line-1",
         type: "divider",

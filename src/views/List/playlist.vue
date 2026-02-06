@@ -306,6 +306,25 @@ const moreOptions = computed<DropdownOption[]>(() => [
     },
     icon: renderIcon("Link"),
   },
+  {
+    label: t("menu.view_comment"),
+    key: "view_comment",
+    show: platformStore.isFeatureSupport(platform.value, FeatureSupportFlag.GetCommentList),
+    props: {
+      onClick: () => {
+        statusStore.commentConfig = {
+          id: playlistId.value,
+          name: playlistDetailData.value?.name || "",
+          creator: playlistDetailData.value?.creator || "",
+          platform: platform.value,
+          cover: playlistDetailData.value?.cover || "",
+          resource_type: "playlist",
+        };
+        router.push({ name: "comment" });
+      },
+    },
+    icon: renderIcon("Message"),
+  },
 ]);
 
 // 获取歌单基础信息

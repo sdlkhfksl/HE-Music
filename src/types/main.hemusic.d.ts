@@ -284,3 +284,14 @@ export interface FilterInfo {
   platform: string;
   options: Option[];
 }
+
+export interface CommentConfig {
+  id: string;
+  name: string;
+  creator: string;
+  platform: string;
+  cover: string;
+  resource_type: CommentResourceType;
+}
+
+export type CommentResourceType = "song" | "mv" | "album" | "playlist";
