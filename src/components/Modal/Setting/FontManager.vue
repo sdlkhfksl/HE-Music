@@ -112,8 +112,6 @@ import { LyricConfig } from "@/types/desktop-lyric";
 import defaultDesktopLyricConfig from "@/assets/data/lyricConfig";
 import { cloneDeep, isEqual, snakeCase } from "lodash-es";
 import { useI18n } from "vue-i18n";
-import { FontData } from "@/types/global";
-
 const { t } = useI18n();
 const settingStore = useSettingStore();
 
@@ -140,8 +138,9 @@ const getOptions = (key: string) => {
 
 // 获取全部系统字体
 const getAllSystemFonts = async () => {
+  await getWebAllSystemFonts();
+  if (systemFonts.value.length > 0) return;
   if (!isElectron) {
-    getWebAllSystemFonts();
     return;
   }
   try {
@@ -162,15 +161,20 @@ const getAllSystemFonts = async () => {
 };
 
 const getWebAllSystemFonts = async () => {
-  if (isElectron) return;
   if (!window.queryLocalFonts) return;
   try {
     const fonts = await window.queryLocalFonts();
-    const all = fonts.map((v: FontData) => v.family);
+    const fontMap = new Map();
+    for (const font of fonts) {
+      if (!fontMap.has(font.family)) {
+        fontMap.set(font.family, font);
+      }
+    }
+    const all = fontMap.keys();
     const allFonts = [...new Set(all)].sort();
     systemFonts.value = allFonts.map((name: string) => {
       return {
-        label: name,
+        label: fontMap.get(name)?.fullName ?? name,
         value: name,
         style: {
           fontFamily: name,

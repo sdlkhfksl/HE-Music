@@ -130,9 +130,6 @@ const controlsOptions = computed<DropdownOption[]>(() => [
     label: t("common.auto_close"),
     key: "autoClose",
     icon: renderIcon("TimeAuto"),
-    props: {
-      onClick: () => openAutoClose(),
-    },
   },
   {
     label: t("common.play_rate"),

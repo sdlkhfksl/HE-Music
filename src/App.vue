@@ -6,7 +6,6 @@
 
 <script setup lang="ts">
 import { useDataStore } from "@/stores";
-import init from "@/utils/init";
 import { useI18n } from "vue-i18n";
 import blob from "@/utils/blob";
 const { t } = useI18n();
@@ -22,7 +21,6 @@ onMounted(async () => {
     location.replace("/");
     return;
   }
-  await init();
 });
 onUnmounted(() => {
   blob.revokeAllBlobURLs();
