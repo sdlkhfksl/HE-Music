@@ -30,7 +30,6 @@ interface SettingState {
   lyricTranFontSize: number;
   lyricRomaFontSize: number;
   lyricFontBold: boolean;
-  lyricFontWeight: number;
   showYrc: boolean;
   showYrcAnimation: boolean;
   showYrcLongEffect: boolean;
@@ -160,7 +159,6 @@ export const useSettingStore = defineStore("setting", {
     lyricTranFontSize: 22, // 歌词翻译大小
     lyricRomaFontSize: 18, // 歌词音译大小
     lyricFontBold: true, // 歌词字体加粗
-    lyricFontWeight: 700, // 歌词字重设置
     useAMLyrics: false, // 是否使用 AM 歌词
     useAMSpring: false, // 是否使用 AM 歌词弹簧效果
     AMHidePassedLines: false /** 隐藏已播放歌词 */,

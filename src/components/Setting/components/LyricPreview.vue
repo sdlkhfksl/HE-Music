@@ -67,9 +67,9 @@ const romaFontSize = fontSizeComputed("lyricRomaFontSize");
     }
     .n-text {
       font-family: var(--font-family);
-
       &:nth-of-type(1) {
         font-weight: var(--font-weight);
+        font-style: var(--font-style);
         font-size: calc(var(--font-size) * 1px);
       }
       &:nth-of-type(2) {

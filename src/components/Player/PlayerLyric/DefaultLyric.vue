@@ -7,7 +7,7 @@
       '--lrc-roma-size': settingStore.lyricRomaFontSize + 'px',
       '--lrc-bold': lyricFontStyle(settingStore.lyricFont).fontWeight,
       'font-family': lyricFontStyle(settingStore.lyricFont).fontFamily,
-      'font-style:': lyricFontStyle(settingStore.lyricFont).fontStyle,
+      'font-style': lyricFontStyle(settingStore.lyricFont).fontStyle,
       cursor: statusStore.playerMetaShow ? 'auto' : 'none',
       ...lyricLangFontStyle(settingStore),
     }"
