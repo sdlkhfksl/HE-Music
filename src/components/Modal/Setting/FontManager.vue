@@ -22,10 +22,17 @@
           </div>
         </div>
         <n-select
-          v-model:value="settingStore.globalFont"
-          :options="getOptions('globalFont')"
+          :value="getUIValue('globalFont')"
+          :options="[
+            {
+              label: t('common.system_default'),
+              value: 'default',
+            },
+            ...systemFonts,
+          ]"
           class="set"
           filterable
+          @update:value="(v, opt) => handleFontChange('globalFont', v, opt)"
         />
       </n-card>
     </div>
@@ -42,13 +49,18 @@
             </div>
             <Transition name="fade" mode="out-in">
               <n-button
-                :disabled="desktopLyricConfig.fontFamily === 'system-ui'"
+                :disabled="desktopLyricConfig.font.postScriptName === 'system-ui'"
                 type="primary"
                 strong
                 secondary
                 @click="
                   () => {
-                    desktopLyricConfig.fontFamily = 'system-ui';
+                    desktopLyricConfig.font.postScriptName = 'system-ui';
+                    Object.assign(desktopLyricConfig.font, {
+                      family: 'system-ui',
+                      weight: 400,
+                      style: 'normal',
+                    });
                     saveDesktopLyricConfig();
                   }
                 "
@@ -60,11 +72,23 @@
         </div>
         <n-flex align="center">
           <n-select
-            v-model:value="desktopLyricConfig.fontFamily"
-            :options="getOptions('desktop')"
+            :value="getUIValue('desktopLyric')"
+            :options="[
+              {
+                label: t('common.system_default'),
+                value: 'system-ui',
+                fontStyleSelection: {
+                  family: 'system-ui',
+                  weight: 400,
+                  style: 'normal',
+                  postscriptName: 'system-ui',
+                },
+              },
+              ...systemFonts,
+            ]"
             class="set"
             filterable
-            @update:value="saveDesktopLyricConfig"
+            @update:value="(v, opt) => handleFontChange('desktopLyric', v, opt)"
           />
         </n-flex>
       </n-card>
@@ -92,10 +116,17 @@
         </div>
         <n-flex align="center">
           <n-select
-            v-model:value="settingStore[font.keySetting]"
-            :options="getOptions(font.keySetting)"
+            :value="getUIValue(font.keySetting)"
+            :options="[
+              {
+                label: t('setting.general.lyric_font_follow_global'),
+                value: 'follow',
+              },
+              ...systemFonts,
+            ]"
             class="set"
             filterable
+            @update:value="(v, opt) => handleFontChange(font.keySetting, v, opt)"
           />
         </n-flex>
       </n-card>
@@ -107,13 +138,18 @@
 import { useSettingStore } from "@/stores";
 import { isElectron } from "@/utils/env";
 import type { SelectOption } from "naive-ui";
-import { lyricFontConfigs } from "@/utils/lyric/lyricFontConfig";
+import { LyricFontConfig, lyricFontConfigs } from "@/utils/lyric/lyricFontConfig";
 import { LyricConfig } from "@/types/desktop-lyric";
 import defaultDesktopLyricConfig from "@/assets/data/lyricConfig";
 import { cloneDeep, isEqual, snakeCase } from "lodash-es";
 import { useI18n } from "vue-i18n";
+import { FontData, FontStyleSelection } from "@/types/global";
+import { parseFontDataStyle } from "@/utils/helper";
+
 const { t } = useI18n();
 const settingStore = useSettingStore();
+
+type LyricKey = LyricFontConfig["keySetting"] | "globalFont" | "desktopLyric";
 
 // 系统字体选项
 const systemFonts = ref<SelectOption[]>([]);
@@ -121,72 +157,103 @@ const systemFonts = ref<SelectOption[]>([]);
 // 桌面歌词配置
 const desktopLyricConfig = reactive<LyricConfig>({ ...defaultDesktopLyricConfig });
 
-// 获取下拉选项
-const getOptions = (key: string) => {
-  const isGlobal = key === "globalFont";
-  const isDesktop = key === "desktop";
-  let defaultLabel = t("setting.general.lyric_font_follow_global");
-  let defaultValue = "follow";
+const getUIValue = (key: LyricKey) => {
+  if (key === "desktopLyric") return desktopLyricConfig.font.postScriptName;
+  const val = settingStore[key];
+  if (val === "default" || val === "follow") return val; // 'default' 或 'follow'
+  return val.postscriptName;
+};
 
-  if (isGlobal || isDesktop) {
-    defaultLabel = t("common.system_default");
-    defaultValue = isGlobal ? "default" : "system-ui";
+/**
+ * 统一更新函数：支持普通 Store 字段 和 桌面歌词特殊对象
+ */
+const handleFontChange = (key: LyricKey, value: string, option: any) => {
+  const selection = option.fontStyleSelection as FontStyleSelection;
+
+  // 情况 A: 更新桌面歌词 (Nested Object)
+  if (key === "desktopLyric") {
+    Object.assign(desktopLyricConfig.font, {
+      family: selection.family,
+      weight: selection.weight,
+      style: selection.style,
+      postScriptName: selection.postscriptName,
+    });
+    saveDesktopLyricConfig();
+    return;
   }
-
-  return [{ label: defaultLabel, value: defaultValue }, ...systemFonts.value];
+  if (value === "default" || value === "follow") {
+    (settingStore as any)[key] = value;
+  } else {
+    (settingStore as any)[key] = selection;
+  }
 };
 
 // 获取全部系统字体
 const getAllSystemFonts = async () => {
-  await getWebAllSystemFonts();
+  await getWebSystemFonts();
   if (systemFonts.value.length > 0) return;
   if (!isElectron) {
     return;
   }
   try {
     const allFonts = await window.electron.ipcRenderer.invoke("get-all-fonts");
-    systemFonts.value = allFonts.map((v: string) => {
-      const name = v.replace(/^['"]+|['"]+$/g, "");
-      return {
-        label: name,
-        value: name,
-        style: {
-          fontFamily: name,
-        },
-      };
-    });
+    systemFonts.value = allFonts
+      .sort((a: any, b: any) => a.name.localeCompare(b.name))
+      .map((v: any) => {
+        const fontWeight = parseFontDataStyle(v.weight).fontWeight;
+        const fontStyle = parseFontDataStyle(v.style).fontStyle;
+        return {
+          label: v.name,
+          value: v.postScriptName,
+          style: {
+            fontFamily: v.familyName,
+            fontWeight,
+            fontStyle,
+          },
+          fontStyleSelection: {
+            family: v.familyName,
+            weight: fontWeight,
+            style: fontStyle,
+            postscriptName: v.postScriptName,
+          },
+        };
+      });
   } catch (error) {
     console.error("Failed to get system fonts:", error);
   }
 };
 
-const getWebAllSystemFonts = async () => {
+// 获取全部系统字体
+const getWebSystemFonts = async () => {
   if (!window.queryLocalFonts) return;
   try {
     const fonts = await window.queryLocalFonts();
-    const fontMap = new Map();
-    for (const font of fonts) {
-      if (!fontMap.has(font.family)) {
-        fontMap.set(font.family, font);
-      }
-    }
-    const all = fontMap.keys();
-    const allFonts = [...new Set(all)].sort();
-    systemFonts.value = allFonts.map((name: string) => {
-      return {
-        label: fontMap.get(name)?.fullName ?? name,
-        value: name,
-        style: {
-          fontFamily: name,
-        },
-      };
-    });
+    systemFonts.value = fonts
+      .sort((a, b) => a.fullName.localeCompare(b.fullName))
+      .map((v: FontData) => {
+        const { fontWeight, fontStyle } = parseFontDataStyle(v.style);
+        return {
+          label: v.fullName,
+          value: v.postscriptName,
+          style: {
+            fontFamily: v.family,
+            fontWeight,
+            fontStyle,
+          },
+          fontStyleSelection: {
+            family: v.family,
+            weight: fontWeight,
+            style: fontStyle,
+            postscriptName: v.postscriptName,
+          },
+        };
+      });
+    console.log("systemFonts:", systemFonts.value);
   } catch (error) {
     window.$message.error(t("message.get_web_font_fail"));
     console.error("Failed to get system fonts:", error);
   }
 };
-
 // 获取桌面歌词配置
 const getDesktopLyricConfig = async () => {
   if (!isElectron) return;

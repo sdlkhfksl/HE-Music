@@ -152,19 +152,6 @@ export const useLyricSettings = (): SettingConfig => {
             action: openFontManager,
           },
           {
-            key: "lyricFontWeight",
-            label: t("setting.lyrics.font_weight"),
-            type: "input-number",
-            description: t("setting.lyrics.font_weight_tip"),
-            min: 100,
-            max: 900,
-            step: 100,
-            value: computed({
-              get: () => settingStore.lyricFontWeight,
-              set: (v) => (settingStore.lyricFontWeight = v),
-            }),
-          },
-          {
             key: "lyricsPosition",
             label: t("setting.lyrics.lyrics_position"),
             type: "select",
@@ -434,22 +421,6 @@ export const useLyricSettings = (): SettingConfig => {
             }),
           },
           {
-            key: "desktopLyricFontWeight",
-            label: t("setting.lyrics.desktop_lyrics_font_weight"),
-            type: "input-number",
-            description: t("setting.lyrics.desktop_lyrics_font_weight_tip"),
-            min: 100,
-            max: 900,
-            step: 100,
-            value: computed({
-              get: () => desktopLyricConfig.fontWeight,
-              set: (v) => {
-                desktopLyricConfig.fontWeight = v;
-                saveDesktopLyricConfig();
-              },
-            }),
-          },
-          {
             key: "desktopLyricFontSize",
             label: t("setting.lyrics.desktop_lyrics_font_size"),
             type: "select",
@@ -459,9 +430,9 @@ export const useLyricSettings = (): SettingConfig => {
               value: 20 + i,
             })),
             value: computed({
-              get: () => desktopLyricConfig.fontSize,
+              get: () => desktopLyricConfig.font.size,
               set: (v) => {
-                desktopLyricConfig.fontSize = v;
+                desktopLyricConfig.font.size = v;
                 saveDesktopLyricConfig();
               },
             }),

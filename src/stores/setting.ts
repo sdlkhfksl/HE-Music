@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { keywords, regexes } from "@/assets/data/exclude";
 import { ThemeColorType } from "@/types/color";
+import { FontStyleSelection } from "@/types/global";
 
 interface SettingState {
   /** 明暗模式 */
@@ -11,14 +12,14 @@ interface SettingState {
   themeFollowCover: boolean;
   /** 主题变体 */
   themeVariant: "primary" | "secondary" | "tertiary" | "neutral" | "neutralVariant" | "error";
-  globalFont: "default" | string;
-  lyricFont: "follow" | string;
+  globalFont: "default" | FontStyleSelection;
+  lyricFont: "follow" | FontStyleSelection;
   /** 日语歌词字体 */
-  japaneseLyricFont: "follow" | string;
+  japaneseLyricFont: "follow" | FontStyleSelection;
   /** 英语歌词字体 */
-  englishLyricFont: "follow" | string;
+  englishLyricFont: "follow" | FontStyleSelection;
   /** 韩语歌词字体 */
-  koreanLyricFont: "follow" | string;
+  koreanLyricFont: "follow" | FontStyleSelection;
   showCloseAppTip: boolean;
   closeAppMethod: "exit" | "hide";
   showTaskbarProgress: boolean;

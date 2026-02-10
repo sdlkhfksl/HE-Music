@@ -5,8 +5,9 @@
       '--lrc-size': settingStore.lyricFontSize + 'px',
       '--lrc-tran-size': settingStore.lyricTranFontSize + 'px',
       '--lrc-roma-size': settingStore.lyricRomaFontSize + 'px',
-      '--lrc-bold': settingStore.lyricFontWeight,
-      'font-family': settingStore.lyricFont !== 'follow' ? settingStore.lyricFont : '',
+      '--lrc-bold': lyricFontStyle(settingStore.lyricFont).fontWeight,
+      'font-family': lyricFontStyle(settingStore.lyricFont).fontFamily,
+      'font-style:': lyricFontStyle(settingStore.lyricFont).fontStyle,
       cursor: statusStore.playerMetaShow ? 'auto' : 'none',
       ...lyricLangFontStyle(settingStore),
     }"
@@ -115,7 +116,7 @@ import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
 import { getLyricLanguage } from "@/utils/format";
 import { isElectron } from "@/utils/env";
 import { usePlayer } from "@/utils/player";
-import { lyricLangFontStyle } from "@/utils/lyric/lyricFontConfig";
+import { lyricFontStyle, lyricLangFontStyle } from "@/utils/lyric/lyricFontConfig";
 
 const props = defineProps({
   currentTime: {
@@ -671,12 +672,18 @@ onBeforeUnmount(() => {
         }
         .yrc-word:lang(ja) {
           font-family: var(--ja-font-family);
+          font-weight: var(--ja-font-weight);
+          font-style: var(--ja-font-style);
         }
         .yrc-word:lang(en) {
           font-family: var(--en-font-family);
+          font-weight: var(--en-font-weight);
+          font-style: var(--en-font-style);
         }
         .yrc-word:lang(ko) {
           font-family: var(--ko-font-family);
+          font-weight: var(--ko-font-weight);
+          font-style: var(--ko-font-style);
         }
         &.end-with-space {
           margin-right: 12px;
@@ -687,12 +694,18 @@ onBeforeUnmount(() => {
       }
       &:lang(ja) {
         font-family: var(--ja-font-family);
+        font-weight: var(--ja-font-weight);
+        font-style: var(--ja-font-style);
       }
       &:lang(en) {
         font-family: var(--en-font-family);
+        font-weight: var(--en-font-weight);
+        font-style: var(--en-font-style);
       }
       &:lang(ko) {
         font-family: var(--ko-font-family);
+        font-weight: var(--ko-font-weight);
+        font-style: var(--ko-font-style);
       }
     }
     .tran {

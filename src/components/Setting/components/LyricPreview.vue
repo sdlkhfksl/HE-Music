@@ -4,7 +4,7 @@
     :content-style="{
       'flex-direction': 'column',
       'align-items': settingStore.lyricsPosition,
-      '--font-weight': settingStore.lyricFontWeight,
+      '--font-weight': lyricFontStyle(settingStore.lyricFont).fontWeight,
       '--font-size': settingStore.lyricFontSize,
       '--font-tran-size': tranFontSize,
       '--font-roma-size': romaFontSize,
@@ -14,7 +14,8 @@
           : settingStore.lyricsPosition === 'flex-start'
             ? 'left'
             : 'right',
-      '--font-family': settingStore.lyricFont !== 'follow' ? settingStore.lyricFont : '',
+      '--font-family': lyricFontStyle(settingStore.lyricFont).fontFamily,
+      '--font-style': lyricFontStyle(settingStore.lyricFont).fontStyle,
     }"
     class="set-item"
   >
@@ -32,6 +33,7 @@
 <script setup lang="ts">
 import { useSettingStore } from "@/stores";
 import { useI18n } from "vue-i18n";
+import { lyricFontStyle } from "@/utils/lyric/lyricFontConfig";
 
 const settingStore = useSettingStore();
 const { t } = useI18n();

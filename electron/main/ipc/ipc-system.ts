@@ -1,6 +1,6 @@
 import { app, ipcMain, net, powerSaveBlocker, session } from "electron";
 import { ipcLog } from "../logger";
-import { getFonts } from "font-list";
+import { getFonts2 } from "font-list";
 import { useStore } from "../store";
 import mainWindow from "../windows/main-window";
 import { changeLanguage } from "../i18n";
@@ -39,7 +39,7 @@ const initSystemIpc = (): void => {
   // 获取系统全部字体
   ipcMain.handle("get-all-fonts", async () => {
     try {
-      const fonts = await getFonts();
+      const fonts = await getFonts2({ disableQuoting: true });
       return fonts;
     } catch (error) {
       ipcLog.error(`❌ Failed to get all system fonts: ${error}`);

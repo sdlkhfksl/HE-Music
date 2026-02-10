@@ -303,3 +303,66 @@ export const runIdle = (task: () => void) => {
     }, 0);
   }
 };
+
+const WEIGHT_MAP = new Map([
+  // --- 最具体的 ---
+  ["extrabold", 800],
+  ["ultrabold", 800],
+  ["semibold", 600],
+  ["demibold", 600],
+  ["extralight", 200],
+  ["ultralight", 200],
+  // --- 日本 W 体系 ---
+  ["w1", 100],
+  ["w2", 200],
+  ["w3", 300],
+  ["w4", 400],
+  ["w5", 500],
+  ["w6", 600],
+  ["w7", 700],
+  ["w8", 800],
+  ["w9", 900],
+  // --- 通用名称 ---
+  ["black", 900],
+  ["heavy", 900],
+  ["bold", 700],
+  ["medium", 500],
+  ["light", 300],
+  ["hairline", 100],
+  ["thin", 100],
+  // --- 最通用的/别名 (放在最后) ---
+  ["regular", 400],
+  ["normal", 400],
+  ["roman", 400],
+  ["book", 400],
+]);
+
+export const parseFontDataStyle = (style: string) => {
+  // 1. 安全处理：如果输入为空或非字符串，返回默认值
+  if (!style) {
+    return { fontWeight: 400, fontStyle: "normal" };
+  }
+
+  const lowerCaseStyle = style.toLowerCase();
+  const normalizedWeightStyle = lowerCaseStyle.replace(/[\s-]/g, "");
+
+  // 4. 查找字体权重 (font-weight)
+  let fontWeight = 400; // 默认值为 'normal'
+  for (const [keyword, value] of WEIGHT_MAP.entries()) {
+    if (normalizedWeightStyle.includes(keyword)) {
+      fontWeight = value;
+      break; // 找到第一个匹配项（最具体的）后立刻停止
+    }
+  }
+
+  // 5. 查找字体样式 (font-style)
+  let fontStyle = "normal";
+  if (lowerCaseStyle.includes("italic")) {
+    fontStyle = "italic";
+  } else if (lowerCaseStyle.includes("oblique")) {
+    fontStyle = "oblique";
+  }
+
+  // 6. 返回最终结果
+  return { fontWeight, fontStyle };
+};

@@ -5,9 +5,6 @@ const config: LyricConfig = {
   playedColor: "#fe7971",
   unplayedColor: "#ccc",
   shadowColor: "rgba(0, 0, 0, 0.5)",
-  fontFamily: "system-ui",
-  fontSize: 24,
-  fontWeight: 700,
   showTran: true,
   showYrc: true,
   isDoubleLine: true,
@@ -15,6 +12,13 @@ const config: LyricConfig = {
   limitBounds: false,
   textBackgroundMask: false,
   alwaysShowPlayInfo: false,
+  font: {
+    family: "system-ui",
+    size: 24,
+    weight: 700,
+    postScriptName: "system-ui",
+    style: "normal",
+  },
 };
 
 export default config;

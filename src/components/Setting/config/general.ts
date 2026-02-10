@@ -177,6 +177,9 @@ export const useGeneralSettings = (): SettingConfig => {
                 value: "kuwo",
               },
             ],
+            componentProps: {
+              multiple: true,
+            },
             description: t("setting.general.registry_protocols_tip"),
             value: computed({
               get: () => settingStore.registryProtocols,

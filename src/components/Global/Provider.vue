@@ -117,7 +117,7 @@ const changeGlobalTheme = () => {
     }
     // 构造主题缓存 Key
     const themeModeLabel = theme.value ? "dark" : "light";
-    const themeCacheKey = `${themeModeLabel}|${settingStore.themeGlobalColor ? 1 : 0}|${settingStore.globalFont}|${colorSchemes.primary}|${colorSchemes.background}|${colorSchemes["surface-container"]}`;
+    const themeCacheKey = `${themeModeLabel}|${settingStore.themeGlobalColor ? 1 : 0}|${JSON.stringify(settingStore.globalFont)}|${colorSchemes.primary}|${colorSchemes.background}|${colorSchemes["surface-container"]}`;
     if (lastThemeCacheKey === themeCacheKey) return;
     lastThemeCacheKey = themeCacheKey;
 
@@ -126,8 +126,11 @@ const changeGlobalTheme = () => {
     const surfaceContainerRGB = colorSchemes["surface-container"] as string;
 
     // 全局字体
-    const fontFamily = `${settingStore.globalFont === "default" ? "v-sans" : settingStore.globalFont}, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`;
-
+    const fontFamily = `${settingStore.globalFont === "default" ? "v-sans" : settingStore.globalFont.family}, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`;
+    const fontWeight =
+      settingStore.globalFont === "default" ? "normal" : settingStore.globalFont.weight.toString();
+    const fontStyle =
+      settingStore.globalFont === "default" ? "normal" : settingStore.globalFont.style;
     // 预计算颜色值
     const colors = {
       primary: `rgb(${primaryRGB})`,
@@ -144,12 +147,17 @@ const changeGlobalTheme = () => {
     // 通用样式基座
     const commonBase = {
       fontFamily,
+      fontWeight: fontWeight,
+      fontStyle,
       primaryColor: colors.primary,
       primaryColorHover: colors.primary78,
       primaryColorPressed: toRGBA(primaryRGB, 0.26),
       primaryColorSuppl: colors.primary12,
     } as GlobalThemeOverrides["common"];
 
+    console.log("commonBase:", commonBase);
+    document.body.style.fontWeight = fontWeight;
+    document.body.style.fontStyle = fontStyle;
     /**
      * 获取组件样式
      * @param isGlobal 是否全局着色

@@ -33,8 +33,9 @@
         :style="{
           '--display-count-down-show': settingStore.countDownShow ? 'flex' : 'none',
           '--amll-lp-font-size': settingStore.lyricFontSize + 'px',
-          'font-weight': settingStore.lyricFontWeight,
-          'font-family': settingStore.lyricFont !== 'follow' ? settingStore.lyricFont : '',
+          'font-weight': lyricFontStyle(settingStore.lyricFont).fontWeight,
+          'font-family': lyricFontStyle(settingStore.lyricFont).fontFamily,
+          'font-style:': lyricFontStyle(settingStore.lyricFont).fontStyle,
           ...lyricLangFontStyle(settingStore),
         }"
         class="am-lyric"
@@ -50,7 +51,7 @@ import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
 import { getLyricLanguage } from "@/utils/format";
 import { usePlayer } from "@/utils/player";
 import { cloneDeep } from "lodash-es";
-import { lyricLangFontStyle } from "@/utils/lyric/lyricFontConfig";
+import { lyricFontStyle, lyricLangFontStyle } from "@/utils/lyric/lyricFontConfig";
 
 defineProps({
   currentTime: {
@@ -219,12 +220,18 @@ watch(lyricPlayerRef, (player) => {
 
   :lang(ja) {
     font-family: var(--ja-font-family);
+    font-weight: var(--ja-font-weight);
+    font-style: var(--ja-font-style);
   }
   :lang(en) {
     font-family: var(--en-font-family);
+    font-weight: var(--en-font-weight);
+    font-style: var(--en-font-style);
   }
   :lang(ko) {
     font-family: var(--ko-font-family);
+    font-weight: var(--ko-font-weight);
+    font-style: var(--ko-font-style);
   }
 }
 

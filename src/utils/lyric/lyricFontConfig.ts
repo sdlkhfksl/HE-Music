@@ -1,28 +1,30 @@
 import { useSettingStore } from "@/stores";
+import { FontStyleSelection } from "@/types/global";
+import { kebabCase } from "lodash-es";
 
 export interface LyricFontConfig {
   keySetting: "lyricFont" | "japaneseLyricFont" | "englishLyricFont" | "koreanLyricFont";
-  default: string;
+  default: "follow" | FontStyleSelection;
 }
 
 export interface LyricLangFontConfig extends LyricFontConfig {
-  keyCss: string;
+  keyPrefixCss: string;
 }
 
 export const lyricLangFontConfigs: LyricLangFontConfig[] = [
   {
     keySetting: "englishLyricFont",
-    keyCss: "--en-font-family",
+    keyPrefixCss: "--en-",
     default: "follow",
   },
   {
     keySetting: "japaneseLyricFont",
-    keyCss: "--ja-font-family",
+    keyPrefixCss: "--ja-",
     default: "follow",
   },
   {
     keySetting: "koreanLyricFont",
-    keyCss: "--ko-font-family",
+    keyPrefixCss: "--ko-",
     default: "follow",
   },
 ];
@@ -37,9 +39,32 @@ export const lyricFontConfigs: LyricFontConfig[] = [
 
 export const lyricLangFontStyle = (settingStore = useSettingStore()) => {
   return Object.fromEntries(
-    lyricLangFontConfigs.map((c) => {
-      const settingValue = settingStore[c.keySetting];
-      return [c.keyCss, settingValue !== c.default ? settingValue : ""];
-    }),
+    lyricLangFontConfigs
+      .map((c) => {
+        const settingValue = settingStore[c.keySetting];
+
+        const css = lyricFontStyle(settingValue);
+
+        return Object.keys(css).map((key) => {
+          return [c.keyPrefixCss + kebabCase(key), css[key]];
+        });
+      })
+      .flat(),
   );
+};
+
+// 'follow' | FontStyleSelection 转换成样式表
+export const lyricFontStyle = (v: "follow" | FontStyleSelection) => {
+  if (v == "follow") {
+    return {
+      fontFamily: "",
+      fontWeight: "",
+      fontStyle: "",
+    };
+  }
+  return {
+    fontFamily: v.family,
+    fontWeight: v.weight,
+    fontStyle: v.style,
+  };
 };

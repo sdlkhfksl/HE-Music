@@ -52,9 +52,10 @@
       </div>
       <n-flex
         :style="{
-          fontSize: lyricConfig.fontSize + 'px',
-          fontFamily: lyricConfig.fontFamily,
-          fontWeight: lyricConfig.fontWeight,
+          fontSize: lyricConfig.font.size + 'px',
+          fontFamily: lyricConfig.font.family,
+          fontWeight: lyricConfig.font.weight,
+          fontStyle: lyricConfig.font.style,
           textShadow: `0 0 4px ${lyricConfig.shadowColor}`,
         }"
         :class="['lyric-container', lyricConfig.position]"
@@ -532,7 +533,7 @@ const onDocPointerUp = () => {
     // 恢复拖拽前宽高
     window.electron.ipcRenderer.send("update-lyric-size", dragState.winWidth, dragState.winHeight);
     // 根据字体大小恢复一次高度
-    const height = fontSizeToHeight(lyricConfig.fontSize);
+    const height = fontSizeToHeight(lyricConfig.font.size);
     if (height) pushWindowHeight(height);
     // 恢复最大宽高
     window.electron.ipcRenderer.send("toggle-fixed-max-size", {
@@ -568,7 +569,7 @@ watchThrottled(
   (size) => {
     if (!Number.isFinite(size)) return;
     if (dragState.isDragging) return;
-    if (size === lyricConfig.fontSize) return;
+    if (size === lyricConfig.font.size) return;
     const next = { fontSize: size };
     window.electron.ipcRenderer.send("update-desktop-lyric-option", next, true);
   },
@@ -603,7 +604,7 @@ const pushWindowHeight = (nextHeight: number) => {
 
 // 监听配置中的字体大小变化，同步更新窗口高度
 watch(
-  () => lyricConfig.fontSize,
+  () => lyricConfig.font.size,
   (size) => {
     const height = fontSizeToHeight(size);
     if (height) pushWindowHeight(height);
@@ -662,7 +663,7 @@ onMounted(() => {
   window.electron.ipcRenderer.on("update-desktop-lyric-option", (_event, config: LyricConfig) => {
     Object.assign(lyricConfig, config);
     // 根据文字大小改变一次高度
-    const height = fontSizeToHeight(config.fontSize);
+    const height = fontSizeToHeight(config.font.size);
     if (height) pushWindowHeight(height);
     // 是否锁定
     sendToMain("toogleDesktopLyricLock", config.isLock);

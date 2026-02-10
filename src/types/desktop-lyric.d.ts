@@ -34,11 +34,7 @@ export interface LyricConfig {
   /** 阴影颜色 */
   shadowColor: string;
   /** 字体 */
-  fontFamily: string;
-  /** 字体大小 */
-  fontSize: number;
-  /** 字体字重设置 */
-  fontWeight: number;
+  font: FontConfig;
   /** 是否双行 */
   isDoubleLine: boolean;
   /** 显示翻译 */
@@ -67,4 +63,12 @@ export interface RenderLine {
   key: string;
   /** 是否高亮 */
   active: boolean;
+}
+
+export interface FontConfig {
+  family: string;
+  weight: number;
+  style: string;
+  postScriptName: string;
+  size: number; // 建议把 fontSize 也归类到这里
 }

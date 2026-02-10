@@ -34,3 +34,10 @@ interface FontData {
   postscriptName: string;
   style: string;
 }
+
+interface FontStyleSelection {
+  family: string;
+  weight: number;
+  style: string;
+  postscriptName: string;
+}
