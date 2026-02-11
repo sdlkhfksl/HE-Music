@@ -115,7 +115,6 @@ const openCommentTarget = () => {
   overflow: hidden;
   .song-data {
     height: 90px;
-    margin: 0 12px;
     padding: 0 16px;
     border-radius: 12px;
     background-color: var(--surface-container-hex);
