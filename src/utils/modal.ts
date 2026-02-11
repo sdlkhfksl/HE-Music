@@ -432,6 +432,7 @@ export const openCopyLyrics = async () => {
     preset: "card",
     transformOrigin: "center",
     autoFocus: false,
+    trapFocus: false,
     style: { width: "500px" },
     title: t("common.copy_lyrics"),
     content: () => {
