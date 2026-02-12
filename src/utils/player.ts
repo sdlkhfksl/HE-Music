@@ -419,9 +419,9 @@ class Player {
    * 核心外部调用
    * @param autoPlay 是否自动播放
    * @param seek 播放位置
+   * @param quality 音质
    */
   public async initPlayer(autoPlay: boolean = true, seek: number = 0, quality: string = "") {
-    const dataStore = useDataStore();
     const musicStore = useMusicStore();
     const statusStore = useStatusStore();
     try {
@@ -454,7 +454,7 @@ class Player {
         }
       }
       // 在线歌曲
-      else if (id && dataStore.playList.length) {
+      else if (id && platform) {
         // 播放地址
         let playerUrl: string | null = null;
 
