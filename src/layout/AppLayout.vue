@@ -100,7 +100,7 @@
               <KeepAlive
                 v-if="settingStore.useKeepAlive"
                 :max="20"
-                :exclude="['layout', 'Comment']"
+                :exclude="['layout', 'Comment', 'Video']"
               >
                 <component :is="Component" class="router-view" />
               </KeepAlive>

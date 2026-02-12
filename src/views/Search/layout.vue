@@ -82,7 +82,7 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
-      <n-tab-pane name="artists" :tab="t('common.artists')" display-directive="show:lazy">
+      <n-tab-pane name="artist" :tab="t('common.artists')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchSinger)"
@@ -96,7 +96,7 @@
           </n-tab-pane>
         </n-tabs>
       </n-tab-pane>
-      <n-tab-pane name="videos" :tab="t('common.videos')" display-directive="show:lazy">
+      <n-tab-pane name="video" :tab="t('common.videos')" display-directive="show:lazy">
         <n-tabs class="tabs" type="bar" animated>
           <n-tab-pane
             v-for="platform in platformStore.featureSupportList(FeatureSupportFlag.SearchMV)"
