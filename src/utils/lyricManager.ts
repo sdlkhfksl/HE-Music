@@ -17,6 +17,7 @@ class LyricManager {
     musicStore.setSongLyric({}, true);
     // 重置歌词索引
     statusStore.lyricIndex = -1;
+    statusStore.lyricLoading = false;
   }
   /**
    * 处理在线歌词

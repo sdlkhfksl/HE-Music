@@ -244,7 +244,7 @@ export const openDownloadSong = async (song: SongInfo) => {
 
 let settingModal: ModalReactive | null = null;
 // 打开设置
-export const openSetting = async (type: SettingType = "general") => {
+export const openSetting = async (type: SettingType = "general", scrollTo?: string) => {
   const { default: MainSetting } = await import("@/components/Setting/MainSetting.vue");
   if (settingModal) {
     settingModal.destroy();
@@ -261,7 +261,7 @@ export const openSetting = async (type: SettingType = "general") => {
       settingModal = null;
     },
     content: () => {
-      return h(MainSetting, { type });
+      return h(MainSetting, { type, scrollTo });
     },
   });
 };

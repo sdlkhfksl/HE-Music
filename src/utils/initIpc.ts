@@ -42,10 +42,12 @@ const initIpc = () => {
       await toLikeSong(musicStore.playSong, !dataStore.isLikeSong(musicStore.playSong));
     });
     // 开启设置
-    window.electron.ipcRenderer.on("openSetting", (_, type: SettingType) => openSetting(type));
+    window.electron.ipcRenderer.on("openSetting", (_, type: SettingType, scrollTo?: string) =>
+      openSetting(type, scrollTo),
+    );
     // 桌面歌词开关
     window.electron.ipcRenderer.on("toggleDesktopLyric", () => player.toggleDesktopLyric());
-    window.electron.ipcRenderer.on("closeDesktopLyric", () => player.toggleDesktopLyric());
+    window.electron.ipcRenderer.on("closeDesktopLyric", () => player.setDesktopLyricShow(false));
     // 无更新
     window.electron.ipcRenderer.on("update-not-available", () => {
       closeUpdateStatus();
