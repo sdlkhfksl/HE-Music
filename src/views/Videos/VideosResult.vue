@@ -5,8 +5,8 @@
         <n-tag
           v-for="opt in tab.options"
           :key="opt.value"
-          :bordered="false"
-          :class="{ choose: opt.value == filters[tab.id] }"
+          :bordered="opt.value == filters[tab.id]"
+          :type="opt.value == filters[tab.id] ? 'primary' : 'default'"
           round
           @click="queryChange(tab.id, opt.value)"
         >
