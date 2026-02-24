@@ -7,7 +7,6 @@
           type="text"
           :show-button="false"
           :placeholder="t('modal.username_placeholder')"
-          passively-activated
           clearable
           :maxlength="18"
           :minlength="4"
@@ -25,7 +24,6 @@
           :placeholder="t('modal.password_placeholder')"
           :maxlength="18"
           :minlength="6"
-          passively-activated
           clearable
         >
           <template #prefix>
@@ -34,7 +32,7 @@
         </n-input>
       </n-form-item>
       <n-form-item :show-label="false">
-        <n-button class="login" type="primary" @click="login">
+        <n-button :loading="loading" class="login" type="primary" @click.stop="login">
           {{ t("common.login") }}
         </n-button>
       </n-form-item>
@@ -54,6 +52,7 @@ const { passwordRule, usernameRule } = useFormRule();
 const emit = defineEmits<{
   saveLogin: [any, LoginType];
 }>();
+const loading = ref(false);
 
 // 表单类型
 interface FormType {
@@ -77,12 +76,18 @@ const login = debounce(async (e: MouseEvent) => {
   e.preventDefault();
   // 验证输入
   await formRef.value?.validate();
+
+  if (loading.value) return;
+  loading.value = true;
   // 登录
-  const loginResult = await accountLogin(
-    formData.value.username as string,
-    formData.value.password as string,
-  );
-  emit("saveLogin", loginResult, "password");
+  accountLogin(formData.value.username as string, formData.value.password as string)
+    .then((loginResult) => {
+      emit("saveLogin", loginResult, "password");
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+
   // if (loginResult.code !== 200) {
   //   window.$message.error("登录失败，请重试");
   //   return;

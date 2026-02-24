@@ -33,6 +33,9 @@
         confirm: rotateConfirm,
       }"
     />
+    <div class="loading" v-if="loading">
+      <n-spin size="large" />
+    </div>
   </div>
 </template>
 
@@ -61,7 +64,6 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  close: [];
   success: [];
 }>();
 
@@ -164,4 +166,17 @@ const refresh = () => {
 onMounted(getCaptchaData);
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+</style>

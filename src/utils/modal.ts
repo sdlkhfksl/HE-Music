@@ -342,15 +342,14 @@ export const openCaptcha = async (scene: number, meta: string): Promise<boolean>
         return h(Captcha, {
           scene,
           meta,
-          onClose: () => {
-            modal.destroy();
-            resolve(false); // 用户关闭弹窗，验证失败
-          },
           onSuccess: () => {
             modal.destroy();
             resolve(true); // 验证成功
           },
         });
+      },
+      onClose: () => {
+        resolve(false); // 关闭弹窗，验证失败
       },
     });
   });
