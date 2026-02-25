@@ -700,6 +700,8 @@
       "lyrics_tran_font_size": "Translated Lyrics Size",
       "lyrics_tran_font_size_placeholder": "Enter translated lyrics font size",
       "lyrics_tran_font_size_tip": "Unit: px, Min: 5, Max: 40",
+      "show_desktop_animation": "Lyrics switching animation",
+      "show_desktop_animation_tip": "After enabling, there will be animated transitions when switching lyrics.",
       "show_desktop_font_lyrics": "Show Word-by-Word Lyrics",
       "show_desktop_font_lyrics_tip": "Whether to display word-by-word effect for desktop lyrics",
       "show_desktop_lyrics": "Show Desktop Lyrics",

@@ -12,6 +12,7 @@ const config: LyricConfig = {
   limitBounds: false,
   textBackgroundMask: false,
   alwaysShowPlayInfo: false,
+  animation: true,
   font: {
     family: "system-ui",
     size: 24,

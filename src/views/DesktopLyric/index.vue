@@ -6,6 +6,7 @@
         {
           locked: lyricConfig.isLock,
           hovered: isHovered,
+          'no-animation': !lyricConfig.animation,
         },
       ]"
     >
@@ -68,6 +69,7 @@
       </div>
       <TransitionGroup
         tag="div"
+        :name="transitionName"
         :style="{
           fontSize: lyricConfig.font.size + 'px',
           fontFamily: lyricConfig.font.family,
@@ -280,6 +282,14 @@ const placeholder = (word: string): RenderLine[] => [
     active: true,
   },
 ];
+
+/**
+ * 渲染的歌词行 transition name
+ */
+const transitionName = computed(() => {
+  if (!lyricConfig.animation) return "";
+  return "lyric-slide";
+});
 
 /**
  * 根据索引计算 absolute top

@@ -421,6 +421,19 @@ export const useLyricSettings = (): SettingConfig => {
             }),
           },
           {
+            key: "desktopLyricAnimation",
+            label: t("setting.lyrics.show_desktop_animation"),
+            type: "switch",
+            description: t("setting.lyrics.show_desktop_animation_tip"),
+            value: computed({
+              get: () => desktopLyricConfig.animation,
+              set: (v) => {
+                desktopLyricConfig.animation = v;
+                saveDesktopLyricConfig();
+              },
+            }),
+          },
+          {
             key: "desktopLyricFontSize",
             label: t("setting.lyrics.desktop_lyrics_font_size"),
             type: "select",

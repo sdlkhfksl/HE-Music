@@ -700,6 +700,8 @@
       "lyrics_tran_font_size": "翻译歌词大小",
       "lyrics_tran_font_size_placeholder": "请输入翻译歌词字体大小",
       "lyrics_tran_font_size_tip": "单位 px，最小 5，最大 40",
+      "show_desktop_animation": "歌词切换动画",
+      "show_desktop_animation_tip": "开启后歌词切换时会有动画过渡效果",
       "show_desktop_font_lyrics": "显示逐字歌词",
       "show_desktop_font_lyrics_tip": "是否显示桌面歌词逐字效果",
       "show_desktop_lyrics": "显示桌面歌词",
