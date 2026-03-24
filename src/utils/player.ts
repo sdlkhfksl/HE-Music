@@ -343,8 +343,6 @@ class Player {
       window.$message.error("播放错误次数过多，已停止播放");
       return;
     }
-    // 超过次数：切到下一首或清空
-    this.retryInfo.count = 0;
     if (dataStore.playList.length > 1) {
       window.$message.error("当前歌曲播放失败，已跳至下一首");
       await this.nextOrPrev("next");
@@ -473,7 +471,7 @@ class Player {
             return;
           }
           window.$message.error(t("message.no_song_link"));
-          await this.nextOrPrev("next");
+          await this.handlePlaybackError(undefined);
           return;
         }
         // 有有效 URL 才创建播放器
@@ -498,7 +496,7 @@ class Player {
     } catch (err) {
       console.error("❌ 初始化音乐播放器出错：", err);
       window.$message.error(t("message.song_play_fail"));
-      await this.nextOrPrev("next");
+      await this.handlePlaybackError(undefined);
     }
   }
   /**

@@ -113,14 +113,6 @@ serverHemusic.interceptors.response.use(
     window.$message.error(
       (response && (response.data as { message?: string }).message) || error.message,
     );
-    // window.$notification.error({
-    //   title: t("message.request_error"),
-    //   description: `${t("common.status_code")}: ${response?.status || ""}`,
-    //   content: (response && (response.data as { message?: string }).message) || error.message,
-    //   meta: t("message.request_error_tips"),
-    //   duration: 5000,
-    // });
-    // 返回错误
     return Promise.reject(error);
   },
 );
