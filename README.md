@@ -4,6 +4,8 @@
 >
 > 该版本为特别修改版，和SPlayer不兼容，需搭配定制的服务端运行，不知道后端服务的用户请使用 SPlayer
 
+基于 Flutter 的由 AI 驱动的安卓版本 [HE-Music-Flutter](https://github.com/serious-snow/HE-Music-Flutter.git)
+
 ![main](/screenshots/SPlayer.jpg)
 
 ## 第三方登录说明
